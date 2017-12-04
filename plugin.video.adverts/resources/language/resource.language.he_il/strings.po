@@ -1,0 +1,33 @@
+# Kodi Media Center language file
+# Addon Name: AdverToLog
+# Addon id: plugin.video.adverts
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: plugin.video.adverts\n"
+"Report-Msgid-Bugs-To: http://forum.kodi.tv/showthread.php?tid=311064\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2017-10-30 07:51+0200\n"
+"Last-Translator: A. Dambledore\n"
+"Language-Team: Eng2Heb\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: he_IL\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Enable Debugging [Log errors]"
+msgstr "אפשר מצב איתור באגים"
+
+msgctxt "#30001"
+msgid "Filter results for Preferred Region & Resolution"
+msgstr "סינון תוצאות עבור אזור מועדף ורזולוציה"
+
+msgctxt "#30002"
+msgid "Preferred Resolution"
+msgstr "רזולוציה מועדפת"
+
+msgctxt "#30003"
+msgid "Preferred Region"
+msgstr "אזור מועדף"

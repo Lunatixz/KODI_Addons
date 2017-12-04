@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+  <strings>
+    <string id="32000">General</string>
+    <string id="30002">Open Configuration Manager</string>    
+    <string id="32003">Create NFO's (ComingSoon)</string>
+    <string id="32004">Strm Folder</string>
+    <string id="30310">Strm Limit Per Configuration</string>
+    <string id="34022">Remove old strms before generating new ones</string>
+    <string id="32007">Sort Youtube into is own folder</string>
+    <string id="30305">Download Youtube/RSS Thumbs (ComingSoon)</string>
+    <string id="32100">Service</string>
+    <string id="32001">Automatic Update</string>
+    <string id="32002">Update Every (Hours)</string>
+    <string id="32006">Startup Delay (Seconds)</string>
+    <string id="32005">Run During Playback</string>
+    <string id="34009">Run Library Scan when finished</string>
+    <string id="34010">Clean Database when finished</string>
+    <string id="34002">Clear Strm folder before each run</string>
+    <string id="34023">Internal Strm link references</string>
+    <string id="34024">Sort Strms by</string>
+  </strings>
+
+

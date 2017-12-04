@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="20000">
+        <setting id="enable_animated" type="bool" enable="false" label="20001" default="false"/>
+        <setting id="ignore_playing" type="bool" label="20002" default="false"/>
+        <setting id="include_kodidb" type="bool" label="20003" default="true"/>
+        <setting id="refresh_timer" type="slider" label="20004" default="30.0" range="30.0,1.0,900.0" option="float" />
+    </category>
+    <category label="30000">
+        <setting id="IPPORT" type="text" label="30001" default="localhost:8080"/>
+        <setting id="USERPASS" type="text" label="30002" default="kodi:kodi"/>
+        <setting id="autostart_delay" type="enum" values="Disabled|5s|10s|15s|20s|25s|30s" label="30003" default="0"/>
+    </category>
+</settings>

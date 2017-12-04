@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="context.pseudotv.live.export" name="PseudoTV Live Export" version="1.1.9" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.14.0"/>
+    </requires>
+    <extension point="kodi.context.item" library="addon.py">
+        <item>
+            <label>32000</label>
+            <visible>System.HasAddon(script.pseudotv.live) + [ListItem.Property(IsPlayable)|ListItem.IsFolder|SubString(ListItem.FileName,.xsp)|SubString(ListItem.FileName,upnp:)|SubString(ListItem.FileName,pvr:)|SubString(ListItem.FileName,plugin:)|Window.IsVisible(MyPVRChannels.xml)|Window.IsVisible(MyPVRGuide.xml)]</visible>        
+        </item>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <description>Export sources to PseudoTV Live for easy channel creation.</description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/context.pseudotv.live.export</source>
+        <email>pseudotvlive@gmail.com</email>
+        <website>www.pseudotvlive.com</website>
+        <forum>http://pseudotvlive.com/index.php/forum</forum>
+    </extension>
+</addon>

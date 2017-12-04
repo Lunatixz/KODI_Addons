@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="service.mediamirror" version="0.0.1" name="Media Mirror" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.requests" version="2.7.0"/>
+    </requires>
+    <extension point="xbmc.python.script" library="settings.py"/>
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Effortlessly create multiroom sharing with Kodi clients throughout your network.</summary>
+        <description lang="en_GB">Share what your viewing with multiple Kodi clients throughout your network.[CR]Share local content, plugins, UPNP and PVR backends. Share one central experience throughout your home.</description>
+        <disclaimer lang="en_GB" >*Requires all Kodi instances configured with a centralized file server and database.[CR]Each client requires identical configuration "InSync" with the master, same access to files, plugins and PVR backend sources. *See: http://kodi.wiki/view/Syncing_and_sharing</disclaimer>  
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.mediamirror</source>
+        <news></news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>

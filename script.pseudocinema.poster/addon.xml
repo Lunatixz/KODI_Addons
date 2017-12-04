@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.pseudocinema.poster" version="0.0.2a" name="PseudoCinema Poster" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.14.0"/>
+        <import addon="script.module.pil" version="0.0.1"/>
+        <import addon="script.module.requests" version="2.7.0"/>
+        <import addon="script.module.pyfscache" version="0.9.12"/>
+        <import addon="script.module.simplejson" version="3.3.0"/>
+        <import addon="script.module.beautifulsoup" version="3.2.1"/>
+        <import addon="script.module.metahandler" version="2.9.0"/>
+        <import addon="script.common.plugin.cache" version="2.5.5"/>
+        <import addon="script.artwork.downloader" version="12.0.29"/>
+        <import addon="script.tv.show.next.aired" version="6.0.13"/>
+        <import addon="script.skin.helper.service" version="0.0.43"/>
+        <import addon="script.extendedinfo" version="3.0.1"/>
+        <import addon="plugin.video.youtube" version="5.1.8"/>
+        <import addon="plugin.video.vimeo" version="4.1.4"/>
+    </requires>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Virtual Movie Poster</summary>
+        <description lang="en">Virtual Movie Poster</description>
+        <disclaimer lang="en">This software is a BETA release, bugs maybe common until final release.</disclaimer>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/script.pseudocinema.poster</source>
+        <email>pseudotvlive@gmail.com</email>
+        <website>www.pseudotvlive.com</website>
+        <forum>http://pseudotvlive.com/index.php/forum</forum>
+    </extension>
+    <extension point="xbmc.python.script" library="default.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+</addon>

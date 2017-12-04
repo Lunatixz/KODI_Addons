@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.netcamstudio" version="0.0.1" name="Netcam Studio" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.14.0"/>
+        <import addon="script.module.pil" version="0.0.1"/>
+        <import addon="script.module.requests" version="2.7.0"/>
+        <import addon="script.module.pyfscache" version="0.9.12"/>
+        <import addon="script.module.simplejson" version="3.3.0"/>
+        <import addon="script.module.beautifulsoup" version="3.2.1"/>
+        <import addon="script.common.plugin.cache" version="2.5.5"/>
+    </requires>
+	<extension point="xbmc.python.script" defaultresolution="1080i" library="default.py"/>
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Netcam Studio for webcams and network cameras.</summary>
+        <description lang="en">Netcam Studio is the successor to webcamXP, the popular software for webcams and network cameras monitoring by Moonware Studios. No license or membership is required to use features such as motion detection and remote monitoring from another computer, a phone or a tablet. The free version allows to connect 2 video sources. The official Netcam Studio Clients (Windows, Web, Smartphone and Tablet) are free and can be installed on as many devices as needed. The Web API allows to you to create your own clients or to operate with other applications in any programming language.</description>
+        <disclaimer lang="en">This software is a BETA release, bugs maybe common until final release.</disclaimer>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/script.pseudocinema.poster</source>
+        <email>pseudotvlive@gmail.com</email>
+        <website>http://www.netcamstudio.com/</website>
+        <forum>http://pseudotvlive.com/index.php/forum</forum>
+    </extension>
+</addon>

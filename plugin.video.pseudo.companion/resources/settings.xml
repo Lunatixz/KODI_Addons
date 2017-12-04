@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="General">
+        <setting label="Enable Debugging" type="bool" id="Enable_Debugging" default="false" />
+    </category>
+    <category label="Library Integration">
+        <setting label="Strm Folder" enable="false" type="folder" id="STRM_LOC" source="auto" default="" />   
+        <setting label="Sort Folders by" enable="false" type="enum" id="Path_Type" values="Content Type|Source Name" default="0"/>
+        <setting label="Clear Folders" enable="false" type="bool" id="Clear_Strms"  default="false"/>
+        <setting label="Update Strms every" enable="false" type="enum" id="Automatic_Update" values="Disabled|6h|12h|24h|48h|72h" default="0"/>    
+        <setting label="Delay Update on Startup" enable="false" type="enum" id="Automatic_Update_Delay" subsetting="true" visible="!eq(-1,0)" values="Disabled|5s|10s|15s|20s"  default="1"/>
+        <setting label="Update while playing" enable="false" type="bool" id="Automatic_Update_Run" subsetting="true" visible="!eq(-2,0)" default="true"/>
+    </category>
+</settings>
+
+

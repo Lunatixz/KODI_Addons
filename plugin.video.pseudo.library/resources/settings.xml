@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="32000">
+        <setting label="32004" type="folder" id="STRM_LOC" source="auto" default="special://userdata/plugin.video.pseudo.library/strms" />   
+        <setting label="32003" type="bool" id="Write_NFOS" default="false" />
+        <setting label="34022" type="bool" id="Clear_Strms" default="false"/>
+        <setting label="34023" type="enum" id="Link_Type" values="PseudoLibrary|Original Plugin" default="0"/>
+        <setting label="34024" type="enum" id="Path_Type" values="Type|Plugin" default="0"/>
+        <setting label="32001" type="bool" id="Automatic_Update" default="false" />
+        <setting label="32002" type="enum" id="Automatic_Update_Time" subsetting="true" visible="eq(-1,true)" values="6|12|24|48|72" default="2"/>
+        <setting label="32006" type="enum" id="Automatic_Update_Delay" subsetting="true" visible="eq(-2,true)" values="0|5|10|15|20"  default="1"/>
+        <setting label="32005" type="bool" id="Automatic_Update_Run" subsetting="true" visible="eq(-3,true)" default="true"/>
+        <setting label="34009" type="bool" id="Automatic_Update_Folder" subsetting="true" visible="eq(-4,true)" default="false" />
+        <setting label="34010" type="bool" id="Automatic_Clean_Folder" subsetting="true" visible="eq(-5,true)" default="false" />
+        <setting label="34002" type="bool" id="Automatic_Clear_Folder" subsetting="true" visible="eq(-6,true)" default="false" />
+    </category>
+</settings>

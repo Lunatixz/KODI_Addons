@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <allowoverlay>no</allowoverlay>
+    <zorder>1</zorder>
+    <controls>
+        <control type="image">
+            <posx>0</posx>
+            <posy>-480</posy>
+            <width>2000</width>
+            <height>2000</height>
+            <align>center</align>
+            <aligny>center</aligny>
+            <aspectratio>keep</aspectratio>
+            <texture border="-10" background="true">$INFO[Window(10000).Property(MOVIEPOSTER.Background)]</texture>
+            <animation effect="rotate" start="0" end="-90" center="auto" time="0" tween="Quadratic" condition="true">Conditional</animation>
+        </control>   
+        <control type="image">
+            <posx>420</posx>
+            <posy>-450</posy>
+            <width>1080</width>
+            <height>1980</height>
+            <aspectratio>keep</aspectratio>
+            <texture border="10" background="true">$INFO[Window(10000).Property(MOVIEPOSTER.Poster)]</texture>
+            <animation effect="rotate" start="0" end="-90" center="auto" time="0" tween="Quadratic" condition="true">Conditional</animation>
+        </control>
+        <control type="image">
+            <posx>1575</posx>
+            <posy>320</posy>
+            <width>540</width>
+            <height min="5" max="420">auto</height>
+            <aspectratio>keep</aspectratio>
+            <align>center</align>
+            <aligny>center</aligny>
+            <texture background="true">$INFO[Window(10000).Property(MOVIEPOSTER.Marquee)]</texture>
+            <animation effect="rotate" start="0" end="-90" center="auto" time="0" tween="Quadratic" condition="true">Conditional</animation>
+        </control>
+        <!-- </control> -->
+        <control type="label">
+            <posx>1050</posx>
+            <posy>540</posy>
+            <width>1080</width>
+            <height>40</height>
+            <align>center</align>
+            <aligny>center</aligny>
+            <font>font30</font>
+            <textcolor>ff000000</textcolor>
+            <shadowcolor>C0C0C0C0</shadowcolor>
+            <aspectratio>keep</aspectratio>
+            <visible>false</visible>
+            <animation effect="rotate" start="0" end="-90" center="auto" time="0" tween="Quadratic" condition="true">Conditional</animation>
+            <label>$INFO[Window(10000).Property(MOVIEPOSTER.Title)]</label>
+        </control>
+        <control type="grouplist">
+            <posx>-450</posx>
+            <posy>480</posy>
+            <width>1080</width>
+            <height>100</height>
+            <orientation>horizontal</orientation>
+            <itemgap>-50</itemgap>
+            <animation effect="rotate" start="0" end="-90" center="auto" time="0" tween="Quadratic" condition="true">Conditional</animation>
+            <control type="image">
+                <width min="50" max="200">auto</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <aspectratio>keep</aspectratio>
+                <texture fallback="Logos/MPAA/NR.png" colordiffuse="FFFFFFFF">$INFO[Window(10000).Property(MOVIEPOSTER.MPAA),Logos/MPAA/,.png]</texture>
+            </control>
+            <control type="image">
+                <width min="50" max="200">auto</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <aspectratio>keep</aspectratio>
+                <texture fallback="Logos/Video/defaultsource.png" colordiffuse="FFFFFFFF">$INFO[Window(10000).Property(MOVIEPOSTER.Video.Codec),Logos/Video/,.png]</texture>
+            </control>
+            <control type="image">
+                <width min="50" max="200">auto</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <aspectratio>keep</aspectratio>
+                <texture fallback="Logos/Video/defaultsource.png" colordiffuse="FFFFFFFF">$INFO[Window(10000).Property(MOVIEPOSTER.Video.Width),Logos/Video/,.png]</texture>
+            </control>
+            <control type="image">
+                <width min="50" max="200">auto</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <aspectratio>keep</aspectratio>
+                <texture fallback="Logos/AspectRatio/defaultaspect.png" colordiffuse="FFFFFFFF">$INFO[Window(10000).Property(MOVIEPOSTER.Video.Aspect),Logos/AspectRatio/,.png]</texture>
+            </control>
+            <control type="image">
+                <width min="50" max="200">auto</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <aspectratio>keep</aspectratio>
+                <texture fallback="Logos/Video/defaultsource.png" colordiffuse="FFFFFFFF">$INFO[Window(10000).Property(MOVIEPOSTER.Audio.Codec),Logos/Audio/,.png]</texture>
+            </control>
+            <control type="image">
+                <width min="50" max="200">auto</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <aspectratio>keep</aspectratio>
+                <texture fallback="Logos/Channels/2.png" colordiffuse="FFFFFFFF">$INFO[Window(10000).Property(MOVIEPOSTER.Audio.Channels),Logos/Channels/,.png]</texture>
+            </control>
+            <control type="image">
+                <width min="50" max="200">auto</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <aspectratio>keep</aspectratio>
+                <texture fallback="Logos/Language/us.png" colordiffuse="FFFFFFFF">$INFO[Window(10000).Property(MOVIEPOSTER.Audio.Language),Logos/Language/,.png]</texture>
+            </control>
+        </control>                    
+    </controls>     
+</window>

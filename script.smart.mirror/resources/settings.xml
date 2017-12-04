@@ -1,0 +1,8 @@
+<settings>
+    <category label="Config">
+        <setting id="Poll_TIME" label="Ping Every X secs" type="slider" default="1" range="1,1,60" option="int" />
+        <setting id="UPNP_OFFSET" type="slider"   label="Playback Offset (milliseconds)"default="0.1" range="0,.01,5" option="float" />
+        <setting id="Enable_Debugging" type="bool" label="Enable Debug Logging" default="false" />
+        <setting type="sep" />
+    </category>
+</settings>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+    <string id="20000">Tweaks</string>
+    <string id="20001">Enable Animated Posters [when available]</string>
+    <string id="20002">Ignore Playing Posters</string>
+    <string id="20003">Include Kodi Library Posters</string>
+    <string id="20004">Poster Refresh</string>
+    <string id="30000">General</string>
+    <string id="30001">Enter Kodi IP:PORT</string>
+    <string id="30002">Enter Kodi USER:PASS</string>
+    <string id="30003">Enable Autostart/Startup Delay</string>
+</strings>
+
+

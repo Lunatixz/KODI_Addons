@@ -28,7 +28,7 @@ import xml.etree.ElementTree
 from zipfile import ZipFile
 
 GITPATH = 'C:/Users/kgrae/Desktop/GitHub/KODI_Addons/'
-ZIPPATH = os.path.join(GITPATH,'zips')
+ZIPPATH = os.path.join(GITPATH,'zips','')
 
 # Compatibility with 3.0, 3.1 and 3.2 not supporting u"" literals
 if sys.version < '3':
@@ -133,10 +133,10 @@ class Generator:
         print("version: " + version)
         home = os.getcwd()
         os.chdir(fpath)
-        path = ZIPPATH + addon
+        path = os.path.join(ZIPPATH,addon)
         if(not os.path.exists(path)) : os.makedirs(path)
         
-        with ZipFile(ZIPPATH + addon + '/' + addon + '-' + version + '.zip','w') as addonzip:
+        with ZipFile(os.path.join(ZIPPATH,addon,addon + '-' + version + '.zip'),'w') as addonzip:
             for root, dirs, files in os.walk(addon):
                 print("Root: " + root )
                 print("Dirs: " + str(len(dirs)) )

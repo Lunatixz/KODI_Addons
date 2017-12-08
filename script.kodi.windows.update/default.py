@@ -64,7 +64,7 @@ class Installer(object):
                 responce = urllib2.urlopen(request, timeout = TIMEOUT).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, responce, expiration=datetime.timedelta(minutes=5))
             return BeautifulSoup(self.cache.get(ADDON_NAME + '.openURL, url = %s'%url), "html.parser")
-        except Exception, e:
+        except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
             return None
@@ -151,7 +151,7 @@ class Installer(object):
         dia.update(0)
         try:
             urllib.urlretrieve(url.rstrip('/').replace('https','http'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time))
-        except Exception,e:
+        except Exception as e:
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
             log("downloadEXE, Failed! " + str(e), xbmc.LOGERROR)
             return

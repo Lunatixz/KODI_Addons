@@ -15,7 +15,7 @@
         <website>http://kodi.tv</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.windows.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=325226</forum>
-        <news>v1.0.1[CR]-Added After Install Cleanup.</news>
+        <news></news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

@@ -1,5 +1,5 @@
 # Kodi Media Center language file
-# Addon Name: Kodi Android Installer
+# Addon Name: Kodi Windows Installer
 # Addon id: script.kodi.windows.update
 # Addon Provider: Lunatixz
 msgid ""

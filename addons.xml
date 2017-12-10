@@ -447,7 +447,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.playonbrowser" name="PlayOn Browser" version="2.0.1" provider-name="Lunatixz">
+<addon id="plugin.video.playonbrowser" name="PlayOn Browser" version="2.0.1a" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -464,8 +464,8 @@
         <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
         <forum>http://forum.kodi.tv/showthread.php?tid=233136</forum>
         <website>https://www.playon.tv</website>
-        <source>https://github.com/Lunatixz/plugin.video.playonbrowser/tree/master</source>
-        <news>>v.2.0.1[CR]- Fixed PlayLater playback[CR]v.2.0.0[CR]- Refactored and optimized Code.[CR]- Added PlayLater Recording via Context Menu.</news>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.playonbrowser</source>
+        <news>>v.2.0.2[CR]- Improved UPNPID detection[CR]- URL caching improvements[CR]v.2.0.1[CR]- Fixed PlayLater playback[CR]v.2.0.0[CR]- Refactored and optimized Code.[CR]- Added PlayLater Recording via Context Menu.</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -917,22 +917,23 @@
     </extension>
 </addon>
 
-<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.0.2" provider-name="Team Kodi">
+<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.0.3" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="script.module.beautifulsoup4" version="4.3.2"/>
     </requires>
     <extension point="xbmc.python.script" library="default.py"/>
+    <extension point="xbmc.service" library="service.py" start="login"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Download and Install Kodi packages.</summary>
         <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>android</platform>
+        <platform>all</platform>
         <website>http://kodi.tv</website>
-        <source>https://github.com/Lunatixz/script.kodi.android.update</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.android.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=322783</forum>
-        <news>v1.0.2[CR]-Bug Fix[CR]v1.0.1[CR]-Added After Install Cleanup.</news>
+        <news>v1.0.3[CR]-Improved functionality[CR]v1.0.1[CR]-Added After Install Cleanup.</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -943,7 +944,7 @@
     </extension>
 </addon>
 
-<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.0.0" provider-name="Team Kodi">
+<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.0.1" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -959,7 +960,8 @@
         <website>http://kodi.tv</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.windows.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=325226</forum>
-        <news></news>
+        <disclaimer>UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
+        <news>v1.0.1[CR]-Improved functionality</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

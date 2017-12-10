@@ -35,6 +35,7 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 
 # Globals
 TIMEOUT        = 30
+CONTENT_TYPE   = 'files'
 PLAYON_DATA    = '/data/data.xml'
 BASE_VIDEO_URL = "%s/%s/main.m3u8"
 BASE_ID_URL    = "%s/data/data.xml?id=%s"
@@ -45,13 +46,11 @@ KODILIBRARY    = False #todo strm contextMenu
 URLTYPE        = {0:'m3u8',1:'upnp',2:'ext'}[int(REAL_SETTINGS.getSetting('playonmedia'))]
 PTVL_RUNNING   = xbmcgui.Window(10000).getProperty('PseudoTVRunning') == "True"
 
-
 def log(msg, level=xbmc.LOGDEBUG):
-    if DEBUG == True or level == xbmc.LOGERROR:
-        if level == xbmc.LOGERROR:
-            msg += ' ,' + traceback.format_exc()
-        xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg), level)
-   
+    if DEBUG == False and level != xbmc.LOGERROR: return
+    if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
+    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg.encode("utf-8")), level)
+     
 def getParams():
     param=[]
     if len(sys.argv[2])>=2:
@@ -92,8 +91,7 @@ def parseSEinfo(label):
             episode = int( m.group('ep'))
     log("parseSEinfo, return S:" + str(season) +',E:'+ str(episode)) 
     return season, episode
-     
-     
+
 socket.setdefaulttimeout(TIMEOUT)
 class PlayOn:
     def __init__(self):
@@ -110,18 +108,14 @@ class PlayOn:
                 request = urllib2.Request(url)
                 request.add_header('User-Agent','Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)')
                 response = urllib2.urlopen(request, timeout=TIMEOUT).read()
-                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, response, expiration=datetime.timedelta(hours=1))
-                if url == BASE_URL + PLAYON_DATA:
-                    self.chkIP(response)
+                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, response, expiration=datetime.timedelta(minutes=5))
+                if url == BASE_URL + PLAYON_DATA: self.chkIP(response)
             return self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-        except urllib2.URLError, e:
-            log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except socket.timeout, e:
-            log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except Exception, e:
-            log("openURL Failed! " + str(e), xbmc.LOGERROR)
-            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30010), ICON, 5000)
-
+        except urllib2.URLError, e: log("openURL Failed! " + str(e), xbmc.LOGERROR)
+        except socket.timeout, e: log("openURL Failed! " + str(e), xbmc.LOGERROR)
+        except Exception as e: log("openURL Failed! " + str(e), xbmc.LOGERROR)
+        xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30010), ICON, 5000)
+ 
     
     def chkIP(self, response):
         results = xmltodict.parse(response)
@@ -135,33 +129,48 @@ class PlayOn:
                     log('chkIP, ServerVer = ' + ServerVer)
                     REAL_SETTINGS.setSetting("playonServerid",ServerMSG)
                     xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30011)%ServerName, ICON, 5000)
-                except:
-                    pass
-        else:
-            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30012), ICON, 5000)
+                except: pass
+        else: xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30012), ICON, 5000)
     
     
     def getUPNP(self):
-        """ Check if upnp id is valid. """
-        url = BASE_UPNP
-        json_query = ('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s"},"id":1}'%url)
+        log('getUPNP')
+        """ Check Kodi UPNP support. """
+        json_query = ('{"jsonrpc":"2.0","method":"Settings.GetSettingValue","params":{"setting":"services.upnp"},"id":1}')
         data = json.loads(xbmc.executeJSONRPC(json_query))
         try:
-            if not data['result']['files'][0]['file'].endswith('/playonprovider/'):
-                url = ''
-        except Exception,e:
-            url = ''
-            log('getUPNP, Failed! ' + str(e))
-        log('getUPNP, url = ' + url)
-        return url
+            if 'result' in data and 'value' in data['result']: return data['result']['value']
+        except Exception as e: log('getUPNP, Failed! ' + str(e))
+        return False
+        
+    
+    def setUPNP(self):
+        log('setUPNP')
+        """ Enable Kodi UPNP support. """
+        json_query = ('{"jsonrpc":"2.0","method":"Settings.SetSettingValue","params":{"setting":"services.upnp","value":true},"id":1}')
+        xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30015), ICON, 5000)
+        return json.loads(xbmc.executeJSONRPC(json_query))
+
+    
+    def getUPNP_ID(self):
+        log('getUPNP_ID')
+        """ Check if upnp id is valid. """
+        json_query = ('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s"},"id":1}'%BASE_UPNP)
+        data = json.loads(xbmc.executeJSONRPC(json_query))
+        try:
+            if not data['result']['files'][0]['file'].endswith('/playonprovider/'): return None
+        except Exception as e: 
+            log('getUPNP_ID, Failed! ' + str(e))
+            return None
+        return BASE_UPNP
             
             
     def chkUPNP(self):
-        """ Query json, locate 'playon server' path, else prompt. """
         log('chkUPNP')
-        if len(self.getUPNP()) > 0:
-            return
+        """ Query json, locate 'playon server' path, else prompt. """
+        if self.getUPNP_ID() is not None: return
         else:
+            if not self.getUPNP(): self.setUPNP()
             json_query = ('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"upnp://"},"id":1}')
             data = json.loads(xbmc.executeJSONRPC(json_query))
             if data and 'result' in data and 'files' in data['result']:
@@ -173,10 +182,8 @@ class PlayOn:
                         REAL_SETTINGS.setSetting("playonUPNPid",BASE_UPNP.rstrip('/'))
             elif PTVL_RUNNING == False:
                 BASE_UPNP = xbmcgui.Dialog().browse(0, LANGUAGE(30014), 'files', '', False, False, 'upnp://')
-                if BASE_UPNP != -1:
-                    REAL_SETTINGS.setSetting("playonUPNPid",BASE_UPNP.rstrip('/'))
-            else:
-                xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30010), ICON, 5000)
+                if BASE_UPNP != -1: REAL_SETTINGS.setSetting("playonUPNPid",BASE_UPNP.rstrip('/'))
+            else: xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30010), ICON, 5000)
                 
 
     def buildItemMenu(self, uri=PLAYON_DATA):
@@ -186,28 +193,22 @@ class PlayOn:
             results  = []
             ranNum   = random.randrange(9)
             response = dict(xmltodict.parse(self.openURL(BASE_URL + uri)))
-            if response and 'catalog' in response and 'group' in response['catalog']:
-                results = response['catalog']['group']
+            if response and 'catalog' in response and 'group' in response['catalog']: results = response['catalog']['group']
             elif response and 'group' in response and response['group']['@href'] == uri:
                 results = response['group']['group']
                 genSTRM = True
-            if isinstance(results,collections.OrderedDict):
-                results = [dict(results)]
+            if isinstance(results,collections.OrderedDict): results = [dict(results)]
                 
             for item in results:
                 try:
-                    if isinstance(item,collections.OrderedDict):
-                        item = dict(item)
+                    if isinstance(item,collections.OrderedDict): item = dict(item)
                     if item['@type'] == 'folder':
                         name  = item['@name'].replace('PlayOn','[B]- PlayOn[/B]').replace('PlayMark','[B]- PlayMark[/B]')
                         thumb = BASE_URL + ((item.get('@art','').replace('&size=tiny','&size=large')) or folderIcon(ranNum))
                         self.addDir(name,item['@href'] ,1,thumb, genSTRM)
-                    elif item['@type'] == 'video':
-                        self.addLink(item['@name'],item['@href'],9,len(results))
-                except Exception, e:
-                    log("buildItemMenu Failed! " + str(e), xbmc.LOGERROR)
-        except Exception, e:
-            log("buildItemMenu Failed! " + str(e), xbmc.LOGERROR)
+                    elif item['@type'] == 'video': self.addLink(item['@name'],item['@href'],9,len(results))
+                except Exception as e: log("buildItemMenu Failed! " + str(e), xbmc.LOGERROR)
+        except Exception as e: log("buildItemMenu Failed! " + str(e), xbmc.LOGERROR)
            
            
     def playLater(self, name, uri):
@@ -237,8 +238,7 @@ class PlayOn:
             label = title
             mType = 'movie'
             if tvshowtitle is not None:
-                if tvshowtitle not in title:
-                    label = '%s - %s'%(tvshowtitle,title)
+                if tvshowtitle not in title: label = '%s - %s'%(tvshowtitle,title)
                 season, episode = parseSEinfo(title)
                 infoList['season']  = int(season)
                 infoList['episode'] = int(episode)
@@ -260,23 +260,19 @@ class PlayOn:
                 mins  = int(timeList[1])
                 secs  = int(timeList[2])
                 duration = ((hours * 60 * 60) + (mins * 60) + secs)
-            else:
-                duration = 0 
+            else: duration = 0 
                 
-            if URLTYPE == 'm3u8' and 'playlaterrecordings' not in result['@href']:
-                url = BASE_VIDEO_URL%(BASE_URL,result['@href'].split('?id=')[1])
-            elif URLTYPE == 'ext' or 'playlaterrecordings' in result['@href']:
-                url = BASE_URL + '/' + dict(result['media'])['@src']
-            else:
-                url = BASE_UPNP + '/' + dict(result['media'])['@src'].split('.')[0].split('/')[0] + '/'
+            if URLTYPE == 'm3u8' and 'playlaterrecordings' not in result['@href']: url = BASE_VIDEO_URL%(BASE_URL,result['@href'].split('?id=')[1])
+            elif URLTYPE == 'ext' or 'playlaterrecordings' in result['@href']: url = BASE_URL + '/' + dict(result['media'])['@src']
+            else: url = BASE_UPNP + '/' + dict(result['media'])['@src'].split('.')[0].split('/')[0] + '/'
                 
             log('playVideo, url = ' + url)
             liz=xbmcgui.ListItem(name, path=url)
             liz.addContextMenuItems(contextMenu)
+            CONTENT_TYPE = mType
             infoList = {"mediatype":mType,"label":label,"title":label,"tvshowtitle":tvshowtitle,"plot":plot,"duration":duration,"aired":aired}
-            infoArt  = {"thumb":thumb,"poster":thumb,"icon":ICON,"fanart":FANART}
             liz.setInfo(type="Video", infoLabels=infoList)
-            liz.setArt(infoArt)
+            liz.setArt({"thumb":thumb,"poster":thumb,"icon":ICON,"fanart":FANART})
             liz.setProperty("IsPlayable","true")
             liz.setProperty("IsInternetStream","true")
             return liz
@@ -311,18 +307,12 @@ class PlayOn:
   
   
 params=getParams()
-try:
-    url=urllib.unquote_plus(params["url"])
-except:
-    url=None
-try:
-    name=urllib.unquote_plus(params["name"])
-except:
-    name=None
-try:
-    mode=int(params["mode"])
-except:
-    mode=None
+try: url=urllib.unquote_plus(params["url"])
+except: url=None
+try: name=urllib.unquote_plus(params["name"])
+except: name=None
+try: mode=int(params["mode"])
+except: mode=None
     
 log("Mode: "+str(mode))
 log("URL : "+str(url))
@@ -334,6 +324,9 @@ if mode==7:     PlayOn().genSTRMS(name, url)
 if mode==8:     PlayOn().playLater(name, url)
 if mode==9:     PlayOn().playVideo(name, url)
 
-xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_NONE )
-xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_LABEL )
-xbmcplugin.endOfDirectory(int(sys.argv[1]),cacheToDisc=True)
+xbmcplugin.setContent(int(sys.argv[1])    , CONTENT_TYPE)
+xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
+xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_NONE)
+xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_LABEL)
+xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_TITLE)
+xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)

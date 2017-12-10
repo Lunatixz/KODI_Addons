@@ -59,3 +59,7 @@ msgstr ""
 msgctxt "#30014"
 msgid "Navigate to UPNP, locate Playon Server"
 msgstr ""
+
+msgctxt "#30015"
+msgid "Kodi UPNP Enabled"
+msgstr ""

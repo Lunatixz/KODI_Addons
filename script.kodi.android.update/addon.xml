@@ -11,7 +11,7 @@
         <summary lang="en_GB">Download and Install Kodi packages.</summary>
         <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
+        <platform>android</platform>
         <website>http://kodi.tv</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.android.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=322783</forum>

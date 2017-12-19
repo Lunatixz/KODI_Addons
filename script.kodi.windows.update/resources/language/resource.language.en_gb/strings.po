@@ -55,3 +55,7 @@ msgstr ""
 msgctxt "#30009"
 msgid "UWP Installations Not Supported!"
 msgstr ""
+
+msgctxt "#30010"
+msgid "/../../Users/*/AppData/Local/Packages/XBMCFoundation.Kodi_*"
+msgstr ""

@@ -17,10 +17,11 @@
 # along with uEPG.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import os, json, urllib, epg, traceback, ast, time, datetime, random, itertools
+import os, json, urllib, epg, traceback, ast, time, datetime, random, itertools, calendar
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs, xbmcaddon
 
 from simplecache import SimpleCache
+from pyhdhr import PyHDHR
 
 # Plugin Info
 ADDON_ID      = 'script.module.uepg'
@@ -45,7 +46,7 @@ PVR_PARAMS      = ["title","plot","plotoutline","starttime","endtime","runtime",
 ART_PARAMS      = ["thumb","poster","fanart","banner","landscape","clearart","clearlogo"]
 ALL_PARAMS      = list(set(FILE_PARAMS+PVR_PARAMS+ART_PARAMS))
 IGNORE_VALUES   = ['',[],-1,{},None]
-
+MEDIA_TYPES     = {'SP':'video','SH':'episode','EP':'episode','MV':'movie'}
 EPGGENRE_LOC    = 'epg-genres'
 COLOR_FAVORITE  = 'gold'
 TIME_BAR        = 'TimeBar.png'
@@ -128,6 +129,11 @@ def ascii(string):
            string = string.encode('ascii', 'ignore')
     return string
        
+def trimString(content, limit=250, suffix='...'):
+    if len(content) <= limit:
+        return content
+    return content[:limit].rsplit(' ', 1)[0]+suffix
+    
 def getGenreColor(genre):
     genre = genre.split(' / ')[0]
     # return random.choice(GENRE_TYPES)[0] #test
@@ -176,14 +182,18 @@ def notificationDialog(message, header=ADDON_NAME, show=True, sound=False, time=
             log("notificationDialog Failed! " + str(e), xbmc.LOGERROR)
             xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
     
-def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', autoclose=0):
-    return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
+def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', custom='', autoclose=0):
+    try: return xbmcgui.Dialog().yesno(header, str1, no, yes, custom, autoclose)
+    except: return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
     
 def okDialog(str1, str2='', str3='', header=ADDON_NAME):
     xbmcgui.Dialog().ok(header, str1, str2, str3)
     
 def textViewer(str1, header=ADDON_NAME):
     xbmcgui.Dialog().textviewer(header, str1)
+    
+def getKodiVersion():
+    return xbmc.getInfoLabel('System.BuildVersion')    
     
 def splitall(path):
     allparts = []
@@ -420,3 +430,67 @@ class RPCHelper(object):
             data = self.sendJSON(command)
             self.cache.set(ADDON_NAME + '.cacheJSON, command = %s'%(command), ((data)), expiration=life)
         return self.cache.get(ADDON_NAME + '.cacheJSON, command = %s'%(command))
+        
+        
+class HDHR(object):
+    def __init__(self):
+        self.pyHDHR = PyHDHR.PyHDHR()
+        
+
+    def hasHDHR(self):
+        return len((self.pyHDHR.getTuners() or '')) > 0
+
+
+    def getLiveURL(self, channel):
+        return self.pyHDHR.getLiveTVURL(str(channel))
+
+
+    def getChannelInfo(self, channel):
+        return self.pyHDHR.getChannelInfo(str(channel))
+        
+        
+    def parseDate(self, epoch):
+        log("parseDate") 
+        return time.mktime(time.gmtime(epoch))
+        
+        
+    def getChannelItems(self):
+        for channel in self.pyHDHR.getChannelList():
+            try:
+                newChannel = {}
+                guidedata  = []
+                chan       = self.getChannelInfo(str(channel))
+                isHD       = chan.getHD() == 1
+                hasCC      = True
+                logo       = (chan.getImageURL() or ICON)
+                newChannel['channelname']   = (chan.getAffiliate() or chan.getGuideName() or chan.getGuideNumber() or 'N/A')
+                newChannel['channelnumber'] = float(chan.getGuideNumber())
+                newChannel['channellogo']   = logo
+                newChannel['isfavorite']    = chan.getFavorite() == 1
+                for program in chan.getProgramInfos():
+                    tmpdata = {}
+                    starttime            = float(program.getStartTime())
+                    endtime              = float(program.getEndTime())
+                    runtime              = int(endtime - starttime)
+                    airdate              = float(program.getOriginalAirdate())
+                    if starttime < time.time(): continue
+                    tmpdata['label']     = program.getTitle()
+                    tmpdata['title']     = '%s - %s'%(program.getTitle(), program.getEpisodeTitle()) if len(program.getEpisodeTitle() or '') > 0 else program.getTitle()
+                    tmpdata['endtime']   = endtime
+                    tmpdata['starttime'] = starttime
+                    tmpdata['duration']  = runtime
+                    tmpdata['mediatype'] = 'episode' #MEDIA_TYPES[mediatype.upper()]
+                    tmpdata['url']       = chan.getURL()
+                    tmpdata['label2']    = "HD" if isHD else ""
+                    tmpdata['aired']     = (datetime.datetime.fromtimestamp((airdate or starttime))).strftime('%Y-%m-%d')
+                    thumb                = (program.getImageURL() or logo)
+                    tmpdata['art']       = {"thumb":thumb,"poster":thumb,"clearlogo":logo}
+                    tmpdata['genre']     = list(set([x.getName() for x in program.getProgramFilters()]))
+                    tmpdata['plot']      = trimString(program.getSynopsis())
+                    isNEW = False
+                    if airdate > 0: isNEW = ((int(airdate)) + 48*60*60) > int(starttime)
+                    if "*" in tmpdata['label'] and isNEW == False: isNEW = True
+                    guidedata.append(tmpdata)
+                newChannel['guidedata'] = guidedata
+                yield newChannel
+            except Exception as e: log("getChannelItems failed! " + str(e), xbmc.LOGERROR)

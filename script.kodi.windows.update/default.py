@@ -39,7 +39,7 @@ DEBUG     = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 CLEAN     = REAL_SETTINGS.getSetting('Disable_Maintenance') == 'false'
 BASE_URL  = 'http://mirrors.kodi.tv/%s/windows/'
 BUILD_OPT = ['nightlies','releases','snapshots','test-builds']
-UWP_PATH  = '/../../Users/*/AppData/Local/Packages/XBMCFoundation.Kodi_*'
+UWP_PATH  = LANGUAGE(30010)
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return

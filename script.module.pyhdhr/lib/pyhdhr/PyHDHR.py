@@ -1,3 +1,5 @@
+# modified from original https://github.com/jumpmanjay/PyHDHR
+
 import time
 import string
 from datetime import datetime
@@ -7,6 +9,7 @@ import os
 from decimal import Decimal
 import operator
 import re
+import xbmc
 
 try:
   Log
@@ -16,22 +19,22 @@ except NameError:
             return
         
         def Debug(self, s):
-            print(s)
+            xbmc.log(s, xbmc.LOGDEBUG)
 
         def Info(self, s):
-            print(s)
+            xbmc.log(s, xbmc.LOGINFO)
 
         def Warn(self, s):
-            print(s)
+            xbmc.log(s, xbmc.LOGWARNING)
           
         def Error(self, s):
-            print(s)
+            xbmc.log(s, xbmc.LOGERROR)
 
         def Critical(self, s):
-            print(s)
+            xbmc.log(s, xbmc.LOGFATAL)
 
         def Exception(self, s):
-            print(s)
+            xbmc.log(s, xbmc.LOGDEBUG)
         
     Log = Logger()
         
@@ -1108,16 +1111,3 @@ class PyHDHR:
         except Exception as e:
             Log.Critical("Exception in PyHDHR.discoveryDump while attempting to load: "+str(URL_DISCOVER))
             Log.Critical(e)
-
-if __name__ == "__main__":
-   import argparse
-   parser = argparse.ArgumentParser()
-   parser.add_argument('-f','--file',help='file to output to',default='output.txt')
-   args = parser.parse_args()
-   p = PyHDHR()
-   p.discover()
-   rp = p.getFilteredRecordedPrograms(SortType.asc,GroupType.All,None)
-   if rp:
-      for r in rp:
-         print(r.getProgramID())
-   p.discoveryDump(args.file)

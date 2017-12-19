@@ -65,7 +65,7 @@ USTVNOW_MENU = [("Live"       , '', 0),
                 ("Recordings" , '', 2),
                 ("Lineup"     , '', 3),
                 ("Movies"     , '', 5),
-                ("Highlights", '', 12),
+                ("Highlights" , '', 12),
                 ("OnDemand"   , '', 13),
                 ("Search"     , '', 11),
                 ("Guide"      , '', 20)]
@@ -109,9 +109,6 @@ def okDialog(str1, str2='', str3='', header=ADDON_NAME):
 def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', autoclose=0):
     return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
      
-def notificaiton(self, str1, header=ADDON_NAME):
-    xbmcgui.Dialog().notification(header, str1, ICON, 4000)
-     
 def getParams():
     param=[]
     if len(sys.argv[2])>=2:
@@ -136,7 +133,8 @@ class USTVnow():
         self.cache  = SimpleCache()
         self.isFree = REAL_SETTINGS.getSetting('User_isFree') == "True"
         if self.login(USER_EMAIL, PASSWORD) == False: raise SystemExit
-        
+        try: self.reminders = json.loads(REAL_SETTINGS.getSetting('User_Reminders'))
+        except: self.reminders = {}
         
     def mainMenu(self):
         log('mainMenu')
@@ -209,16 +207,16 @@ class USTVnow():
                         REAL_SETTINGS.setSetting('User_isFree'    ,str(userlink['data']['plan_name'] == 'Free Plan'))
                         dvrPlan = 2 if 'dvr' in (userlink['data']['plan_name']).lower() else None
                         REAL_SETTINGS.setSetting('User_DVRpoints' ,str(dvrPlan or userlink['data']['points'] or 0))
-                        notification(LANGUAGE(30006) + userlink['data']['fname'])
+                        xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30006) + userlink['data']['fname'], ICON, 4000)
                         
                         if userlink['data']['need_account_renew'] == True:
-                            notification(LANGUAGE(30016) + userlink['data']['fname'])
+                            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30016) + userlink['data']['fname'], ICON, 4000)
                         elif userlink['data']['need_account_activation'] == True:
-                            notification(LANGUAGE(30022) + userlink['data']['fname'])
+                            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30022) + userlink['data']['fname'], ICON, 4000)
                         else: 
                             if REAL_SETTINGS.getSetting('User_DVRpoints') != REAL_SETTINGS.getSetting('Last_DVRpoints'):
                                 REAL_SETTINGS.setSetting('Last_DVRpoints',REAL_SETTINGS.getSetting('User_DVRpoints'))
-                                notification(LANGUAGE(30021) + userlink['data']['fname'])
+                                xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30021) + userlink['data']['fname'], ICON, 4000)
                                 
                         #check subscription
                         try:
@@ -304,7 +302,7 @@ class USTVnow():
                 REAL_SETTINGS.setSetting('User_Token','')
                 REAL_SETTINGS.setSetting('User_Paskey','')
                 REAL_SETTINGS.setSetting('User_Activated',str(False))
-                notification(LANGUAGE(30007))
+                xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30007), ICON, 4000)
                 return False
         else:
             #firstrun wizard
@@ -332,6 +330,11 @@ class USTVnow():
         names   = sorted(list(set(sorted(counter.elements()))))
         log('getChannelNames, names = ' + str(names))
         return names
+        
+        
+    # def browseReminders(self):
+    # {'label':'','thumb':'','startime':000000,'info':[{}]}
+    # context to delete
         
 
     def browseLive(self):
@@ -611,7 +614,7 @@ class USTVnow():
                 self.resolveURL(url, dvr)
         except Exception as e:
             log('replaceToken, Unable to login ' + str(e), xbmc.LOGERROR)
-            notification(LANGUAGE(30005))
+            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30005), ICON, 4000)
             raise SystemExit
 
             
@@ -621,7 +624,7 @@ class USTVnow():
             setlink = (self.net.http_POST(BASEURL + 'gtv/1/dvr/updatedvr', form_data={'scheduleid':url,'token':self.token,'action':'remove'}, headers=self.buildHeader()).content.encode("utf-8").rstrip())
         else:
             if int(REAL_SETTINGS.getSetting('User_DVRpoints')) <= 1:
-                notification(LANGUAGE(30019))
+                xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30019), ICON, 4000)
                 return
             opt = name.split('@')#lazy solution rather then create additional url parameters for this single function.
             if recurring == True: 
@@ -634,10 +637,10 @@ class USTVnow():
         log('setRecording, action = ' + action + ', status = ' + status)
         if status == 'failure':
             log('setRecording, setlink = ' + str(setlink), xbmc.LOGERROR)
-            notification(LANGUAGE(30023)%action.title())
+            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30023)%action.title(), ICON, 4000)
             return
         self.cache.set(ADDON_NAME + '.recorded', None, expiration=datetime.timedelta(seconds=1))
-        notification(LANGUAGE(30024)%action.title())
+        xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30024)%action.title(), ICON, 4000)
         # xbmc.sleep(1001)
         # xbmc.executebuiltin("Container.Update(plugin://plugin.video.ustvnow/?mode=1)")
         # xbmc.executebuiltin("Container.Update(plugin://plugin.video.ustvnow/?mode=2)")
@@ -683,7 +686,7 @@ class USTVnow():
     def uEPG(self):
         log('uEPG')
         #support for upcoming uEPG universal epg framework module, module will be available from the Kodi repository.
-        #https://github.com/Lunatixz/XBMC_Addons/tree/master/script.module.uepg
+        #https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.uepg
         collect = []
         if self.channels is None: xbmc.executebuiltin("Container.Refresh")
         for channel in self.channels:
@@ -714,7 +717,7 @@ class USTVnow():
                         mtype     = MEDIA_TYPES[mediatype.upper()]
                         thumb     = IMG_SOURCE%(str(channel['srsid']),channel['callsign'],mediatype)
                         poster    = thumb if mediatype.lower() == 'mv' else ''
-                        logo      = IMG_CHLOGO_W%(channel['callsign'])
+                        logo      = IMG_CHLOGO%(channel['callsign'])
                         newChannel['channellogo'] = logo
                         
                         for key, value in channel.iteritems():
@@ -781,6 +784,7 @@ elif mode == 13:USTVnow().browseVOD(url)
 elif mode == 19:xbmc.executebuiltin("RunScript(script.module.uepg,listitem=%s&skin_path=%s&refresh_path=%s&refresh_interval=%s&row_count=%s)"%(urllib.quote(sys.argv[0]+"?mode=3"),urllib.quote(json.dumps(ADDON_PATH)),urllib.quote(json.dumps(sys.argv[0]+"?mode=19")),urllib.quote(json.dumps("7200")),urllib.quote(json.dumps("7"))))
 elif mode == 20:xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&skin_path=%s&refresh_path=%s&refresh_interval=%s&row_count=%s)"%(urllib.quote(json.dumps(list(USTVnow().uEPG()))),urllib.quote(json.dumps(ADDON_PATH)),urllib.quote(json.dumps(sys.argv[0]+"?mode=20")),urllib.quote(json.dumps("7200")),urllib.quote(json.dumps("7"))))
 elif mode == 21:xbmc.executebuiltin("action(ContextMenu)")
+elif mode == 22:xbmc.executebuiltin('Addon.OpenSettings(script.module.uepg)')
 
 xbmcplugin.setContent(int(sys.argv[1])    , CONTENT_TYPE)
 xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)

@@ -1,4 +1,4 @@
-![screenshot](https://github.com/Lunatixz/script.module.uepg/raw/master/resources/images/icon.png)
+![screenshot](https://github.com/Lunatixz/XBMC_Addons/raw/master/script.module.uepg/resources/images/icon.png)
 # uEPG developed by Lunatixz
 
 - Please only FORK TO IMPROVE. Nothing kills a project quicker then cloning and abuse of the GNU licence. This project was written to be universally used within Kodi. There is no need to fork for individual plugin use. Please respect the work and effort put into this project. Fork to contribute and/or improve the project only. Thank You = )

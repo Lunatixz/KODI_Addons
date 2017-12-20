@@ -69,6 +69,14 @@ msgid "HDHomerun Tuner Detected!! [CR] Would You like to Merge HDHomerun Channel
 msgstr ""
 
 msgctxt "#30013"
-msgid ""
+msgid "No HDHomerun Favorites Found!"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Visit my.hdhomerun.com to select your Favorite Channels"
+msgstr ""
+
+msgctxt "#30015"
+msgid "To disable HDHomerun Tuner Support, open %s guide settings"
 msgstr ""
 

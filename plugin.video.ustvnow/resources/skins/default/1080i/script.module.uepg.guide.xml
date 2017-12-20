@@ -139,6 +139,22 @@
                     <width>90</width>
                     <height>40</height>
                     <aspectratio scalediffuse="true" align="center" aligny="center">keep</aspectratio>
+                    <texture fallback="" background="true">USTVnow.png</texture>
+                    <animation effect="fade" time="100">VisibleChange</animation> 
+                    <visible>[!String.IsEqual(Container(40000).ListItem.Property(IsHDHomerun),okay)]</visible>
+                </control>
+                <control type="image">
+                    <width>90</width>
+                    <height>40</height>
+                    <aspectratio scalediffuse="true" align="center" aligny="center">keep</aspectratio>
+                    <texture fallback="" background="true">HDHR.png</texture>
+                    <animation effect="fade" time="100">VisibleChange</animation> 
+                    <visible>[String.IsEqual(Container(40000).ListItem.Property(IsHDHomerun),okay)]</visible>
+                </control>
+                <control type="image">
+                    <width>100</width>
+                    <height>40</height>
+                    <aspectratio scalediffuse="true" align="center" aligny="center">keep</aspectratio>
                     <texture fallback="" background="true">$INFO[Container(40000).ListItem.Art(clearlogo)]</texture>
                     <animation effect="fade" time="100">VisibleChange</animation> 
                 </control>

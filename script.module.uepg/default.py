@@ -22,15 +22,15 @@ import os, collections, threading, datetime, time, epg, utils, itertools
 
 class Channel(object):
     def __init__(self):
-        name       = ''
-        logo       = ''
-        number     = -1
-        listSize   = 0
-        totalTime  = 0
-        isFavorite = False
-        isValid    = False
-        guidedata  = []
-        listItems  = []
+        name        = ''
+        logo        = ''
+        number      = -1
+        listSize    = 0
+        totalTime   = 0
+        isFavorite  = False
+        isValid     = False
+        guidedata   = []
+        listItems   = []
         
         
 class ChannelList(object):
@@ -85,9 +85,10 @@ class ChannelList(object):
         try:
             channelItems.sort(key=lambda x:x['channelnumber'])
             if self.incHDHR: 
-                HDHRitems = list(utils.HDHR().getChannelItems())
+                HDHRitems = (list(utils.HDHR().getChannelItems()) or [])
                 HDHRitems.sort(key=lambda x:x['channelnumber'])
-                channelItems.extend(HDHRitems)
+                if len(HDHRitems) == 0: utils.okDialog(utils.LANGUAGE(30013), utils.LANGUAGE(30014), utils.LANGUAGE(30015)%(self.pluginName))
+                else: channelItems.extend(HDHRitems)
             if self.validateChannels(channelItems) == True:
                 self.setupChannelList(channelItems)
                 return True
@@ -143,17 +144,17 @@ class ChannelList(object):
         for i in range(self.maxChannels):
             if utils.adaptiveDialog((i*100//len(channelItems)), self.busy, string1=utils.LANGUAGE(30006)) == False: break
             try:
-                item                        = channelItems[i]
-                item['guidedata']           = sorted(item['guidedata'], key=lambda x:x['starttime'])
-                item['guidedata']           = item['guidedata'][:self.maxGuidedata]#truncate guidedata to a manageable amount.
-                self.channels[i].name       = item['channelname']
-                self.channels[i].logo       = (item.get('channellogo','')        or '')
-                self.channels[i].number     = (item.get('channelnumber','')      or i + 1)
-                self.channels[i].isFavorite = (item.get('isfavorite','')         or False)
-                self.channels[i].guidedata  = (item['guidedata']                 or '')
-                self.channels[i].listSize   = len(self.channels[i].guidedata)
-                self.channels[i].listItems  = utils.poolListItem(item['guidedata'])
-                self.channels[i].isValid    = True #todo
+                item                         = channelItems[i]
+                item['guidedata']            = sorted(item['guidedata'], key=lambda x:x['starttime'])
+                item['guidedata']            = item['guidedata'][:self.maxGuidedata]#truncate guidedata to a manageable amount.
+                self.channels[i].name        = item['channelname']
+                self.channels[i].logo        = (item.get('channellogo','')        or '')
+                self.channels[i].number      = (item.get('channelnumber','')      or i + 1)
+                self.channels[i].isFavorite  = (item.get('isfavorite','')         or False)
+                self.channels[i].guidedata   = (item['guidedata']                 or '')
+                self.channels[i].listSize    = len(self.channels[i].guidedata)
+                self.channels[i].listItems   = utils.poolListItem(item['guidedata'])
+                self.channels[i].isValid     = True #todo
                 totalTime = 0
                 for idx, tmpdata in enumerate(self.channels[i].guidedata): totalTime = totalTime + int((tmpdata.get('runtime','') or tmpdata.get('duration','')))
                 self.channels[i].totalTime = totalTime
@@ -233,7 +234,7 @@ if __name__ == '__main__':
         firstHDHR = utils.REAL_SETTINGS.getSetting('FirstTime_HDHR') == "true"
         if utils.HDHR().hasHDHR() and firstHDHR and not channelLST.incHDHR:
             utils.REAL_SETTINGS.setSetting('FirstTime_HDHR','false')
-            if utils.yesnoDialog((utils.LANGUAGE(30012)%(utils.ADDON_NAME)),custom='Later'):
+            if utils.yesnoDialog((utils.LANGUAGE(30012)%(channelLST.pluginName)),custom='Later'):
                 utils.REAL_SETTINGS.setSetting('Enable_HDHR','true')
                 channelLST.incHDHR = True
                 

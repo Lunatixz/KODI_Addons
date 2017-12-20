@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.cbsn" version="10.0.1" name="CBS News" provider-name="Lunatixz">
+<addon id="plugin.video.cbsn" version="10.0.2" name="CBS News" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -12,14 +12,12 @@
         <description lang="en_GB">CBS News: dedicated to providing the best in journalism under standards it pioneered at the dawn of radio and television and continue in the digital age.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/plugin.video.cbsn/tree/master</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.cbsn</source>
         <website>http://cbsnews.com</website>
         <news></news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
         </assets>
     </extension>
 </addon>

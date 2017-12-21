@@ -15,9 +15,9 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.disclosetv</source>
-        <website>http://cnn.com</website>
+        <website>http://disclose.tv</website>
         <news></news>
-        <forum>https://forum.kodi.tv/showthread.php?tid=324060</forum>
+        <forum>https://forum.kodi.tv/showthread.php?tid=325746</forum>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

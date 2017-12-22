@@ -87,7 +87,7 @@ class Disclose(object):
          
          
     def buildMenu(self):
-        self.addDir('Browse Videos', BASE_VID, 1)
+        self.addDir('Browse', BASE_VID, 1)
         self.addYoutube("Browse Youtube" , 'plugin://plugin.video.youtube/channel/UCA-Ls4dkRBXHMjRjeTDTdjg/')
             
             

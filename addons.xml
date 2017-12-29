@@ -1057,6 +1057,27 @@
     </extension>
 </addon>
 
+<addon id="script.module.pynewsapi" version="0.1.1" name="pynewsapi" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0" />
+        <import addon="script.module.requests" version="2.7.0"/>
+    </requires>
+    <extension library="lib" point="xbmc.python.module" />
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">A python wrapper for News API.</summary>
+        <description lang="en_GB">A python wrapper for News API.</description>
+        <forum>http://forum.kodi.tv</forum>
+        <website>https://newsapi.org/</website>
+        <license>MIT</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pynewsapi</source>
+        <news></news>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="script.module.pyqrcode" version="0.0.1" name="pyQRcode" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.24.0" />

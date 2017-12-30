@@ -126,7 +126,6 @@ class CNN(object):
             thumb = (video('div', {'class': 'cd__wrapper'})[0])
             try: thumb = 'http:' + (json.loads((re.search('"large":(.*?)"},', str(thumb)).group(1) + '"}'))['uri'])
             except: thumb = ICON
-            print vid_url
             results = video('div', {'class': 'cd__content'})[0]
             try: title = results('div', {'class': 'cd__kicker'})[0].get_text()
             except: title = None

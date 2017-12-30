@@ -391,6 +391,34 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.newsblender" version="1.0.0" name="News Blender" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.youtube.dl" version="17.0.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Access worldwide news from over 5,000 news sources and blogs in one plugin.</summary>
+        <description lang="en_GB">Get breaking news headlines, and search for articles from over 5,000 news sources and blogs.</description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.newsblender</source>
+        <website>http://newsapi.org</website>
+        <news></news>
+        <forum>https://forum.kodi.tv/showthread.php?tid=326129</forum>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.video.newsmaxtv" version="1.0.0" name="NewsmaxTV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1054,27 +1082,6 @@
 		<assets>
 			<icon>icon.png</icon>
 		</assets>
-    </extension>
-</addon>
-
-<addon id="script.module.pynewsapi" version="0.1.1" name="pynewsapi" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0" />
-        <import addon="script.module.requests" version="2.7.0"/>
-    </requires>
-    <extension library="lib" point="xbmc.python.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">A python wrapper for News API.</summary>
-        <description lang="en_GB">A python wrapper for News API.</description>
-        <forum>http://forum.kodi.tv</forum>
-        <website>https://newsapi.org/</website>
-        <license>MIT</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pynewsapi</source>
-        <news></news>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
     </extension>
 </addon>
 

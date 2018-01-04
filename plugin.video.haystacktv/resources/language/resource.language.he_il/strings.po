@@ -21,5 +21,9 @@ msgid "Enable Debugging [Log errors]"
 msgstr "אפשר מצב איתור באגים"
 
 msgctxt "#30001"
-msgid "Site unreachable, try again later..."
+msgid "Something went wrong, Try again..."
 msgstr "האתר לא זמין. נסה שנית מאוחר יותר..."
+
+msgctxt "#30002"
+msgid "Select Preferred Quality"
+msgstr ""

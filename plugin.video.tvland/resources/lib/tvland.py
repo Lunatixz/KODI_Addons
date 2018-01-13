@@ -1,20 +1,20 @@
 #   Copyright (C) 2018 Lunatixz
 #
 #
-# This file is part of SpikeTV.
+# This file is part of TV Land.
 #
-# SpikeTV is free software: you can redistribute it and/or modify
+# TV Land is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# SpikeTV is distributed in the hope that it will be useful,
+# TV Land is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with SpikeTV.  If not, see <http://www.gnu.org/licenses/>.
+# along with TV Land.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
 import sys, time, datetime, re, traceback
@@ -25,7 +25,7 @@ from YDStreamExtractor import getVideoInfo
 from simplecache import SimpleCache, use_cache
 
 # Plugin Info
-ADDON_ID      = 'plugin.video.spiketv'
+ADDON_ID      = 'plugin.video.tvland'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME    = REAL_SETTINGS.getAddonInfo('name')
 SETTINGS_LOC  = REAL_SETTINGS.getAddonInfo('profile')
@@ -41,8 +41,8 @@ CONTENT_TYPE  = 'files'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
 PTVL_RUNNING  = xbmcgui.Window(10000).getProperty('PseudoTVRunning') == 'True'
-BASE_URL      = 'http://www.spike.com'
-IGNORE_LIST   = ['ent_m100', 'ent_m069', 'ent_m150', 'ent_m151', 'ent_m112', 'ent_m116']
+BASE_URL      = 'http://www.tvland.com'
+IGNORE_LIST   = ['ent_m100', 'ent_m150', 'ent_m151', 'ent_m112', 'ent_m116']
 MAIN_MENU     = [("Latest Episodes", BASE_URL + '/full-episodes', 1),
                  ("Browse Shows"   , BASE_URL + '/shows'        , 1)]
 
@@ -55,7 +55,7 @@ def getParams():
     return dict(urlparse.parse_qsl(sys.argv[2][1:]))
                  
 socket.setdefaulttimeout(TIMEOUT)
-class SpikeTV(object):
+class TVLand(object):
     def __init__(self):
         log('__init__')
         self.cache = SimpleCache()
@@ -78,15 +78,15 @@ class SpikeTV(object):
          
     def buildMenu(self, items):
         for item in items: self.addDir(*item)
-        self.addYoutube("Browse Youtube" , 'plugin://plugin.video.youtube/user/SpikeTV/')
+        self.addYoutube("Browse Youtube" , 'plugin://plugin.video.youtube/user/tvland/')
             
             
     def browse(self, name, url):
         log('browse, ' + name)
         response = self.openURL(url)
         if len(response) == 0: return
-        try: items = json.loads(re.search('var triforceManifestURL = "(.+?)";',response).group(1))
-        except: items = json.loads(re.search('var triforceManifestFeed = (.+?);',response).group(1))
+        try: items = json.loads(re.search('var triforceManifestFeed = (.+?);\n',response).group(1))
+        except: items = json.loads(re.search('var triforceManifestURL = "(.+?)";',response).group(1))  
         try: thumb = (response.split('//meta[@property="og:image"]/@content')[0].strip() or ICON)
         except: thumb = ICON
         thumb = (thumb or ICON)
@@ -99,48 +99,35 @@ class SpikeTV(object):
             if result is None: continue
             try: ent_code = result.split('/feeds/')[1].split('/')[0]
             except: ent_code = ''
-            ent_code = ent_code.split('_spike')[0]
+            ent_code = ent_code.split('_tvland')[0]
             if ent_code not in IGNORE_LIST: continue
             jsonResponse = json.loads(self.openURL(result))
-            if ent_code == 'ent_m151':
+            try: title = jsonResponse['result']['promo']['headline'].title()
+            except: 
                 try: title = jsonResponse['result']['data']['headerText'].title()
-                except: continue
-                infoLabels = {"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
-                infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
+                except: title = feed_title
+            infoLabels = {"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
+            infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}    
+            if ent_code == 'ent_m151': 
+                if title == 'Latest Full Episodes': return self.browseVideos(title, result)
+                self.addDir(title,result,2,infoLabels,infoArt)
                 if name != 'Latest Episodes': self.addDir(title,result,2,infoLabels,infoArt)
                 for item in jsonResponse['result']['data']['shows']:
-                    title      = item['title']
-                    infoLabels = {"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
-                    infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
-                    if name == 'Latest Episodes' and title == 'all shows': return self.browseVideos(title, item['url'])
+                    title = item['title']
+                    if name == 'Latest Episodes' and title == 'Latest Full Episodes': return self.browseVideos(title, item['url'])
                     elif name == 'Latest Episodes': continue
+                    infoLabels = {"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
+                    infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}    
                     self.addDir(title,item['url'],2,infoLabels,infoArt)
             elif ent_code == 'ent_m112':
-                try: title = jsonResponse['result']['promo']['headline'].title()
-                except: continue
-                if title == 'Full Episodes': return self.browseVideos(title, result)
-                elif name != 'Full Episodes': continue
-                infoLabels = {"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
-                infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
-                self.addDir(title,result,2,infoLabels,infoArt)
+                if title in ['Latest Full Episodes','Full Episodes']: return self.browseVideos(title, result)
+                self.addDir(title,result,2,infoLabels,infoArt) 
             else:
-                if ent_code == 'ent_m116':
-                    type = 'filters'
-                    try: title = jsonResponse['result']['promo']['headline'].title()
-                    except: continue
-                else:
-                    type = 'items'
-                    try: title = jsonResponse['result']['data']['headerText'].title()
-                    except:
-                        try: title = jsonResponse['result']['data']['header']['title'].title()
-                        except: continue
-                myURL      = json.dumps({"url":result,"type":type})
-                if title in ['Full Episodes','All Shows']: return self.browseShows(title, myURL)
-                elif title == 'Featured Shows': continue
-                elif name != 'Full Episodes' and name != 'Browse Shows': continue
-                infoLabels = {"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
-                infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
-                # if name == 'Browse Shows' and title == 'All Shows': return self.browseShows(title, myURL)
+                if ent_code == 'ent_m116': type = 'filters'
+                else: type = 'items'
+                myURL = json.dumps({"url":result,"type":type})
+                if title in ['Full Episodes','Featured Shows']: return self.browseShows(title, myURL)
+                elif name == 'Browse Shows' and title == 'All Shows': return self.browseShows(title, myURL)
                 self.addDir(title,myURL,3,infoLabels,infoArt)
       
       
@@ -220,7 +207,7 @@ class SpikeTV(object):
                 try: thumb = (item['image']['url'] or ICON)
                 except:
                     try: thumb = (item['image'][0]['url'] or ICON)
-                    except: thumb = ICON
+                    except: thumb = thumb
                 thumb = (thumb or ICON)
                 if thumb.startswith('//'): thumb = 'https:' + thumb
                 title      = item['title']
@@ -238,6 +225,8 @@ class SpikeTV(object):
         info = sorted(info, key=lambda x: x['idx'])
         plst = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         plst.clear()
+        xbmc.sleep(200)
+        idxLST = []
         for videos in info:
             vidIDX = videos['idx']
             url = videos['xbmc_url']
@@ -247,7 +236,7 @@ class SpikeTV(object):
             if vidIDX == 0: xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz) 
         plst.unshuffle()
         
-           
+        
     def addYoutube(self, name, url):
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'false')
@@ -280,8 +269,7 @@ class SpikeTV(object):
         else: liz.setArt(infoArt)
         u=sys.argv[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=True)
-
-        
+     
 params=getParams()
 try: url=urllib.unquote_plus(params["url"])
 except: url=None
@@ -293,11 +281,11 @@ log("Mode: "+str(mode))
 log("URL : "+str(url))
 log("Name: "+str(name))
 
-if mode==None:  SpikeTV().buildMenu(MAIN_MENU)
-elif mode == 1: SpikeTV().browse(name, url)
-elif mode == 2: SpikeTV().browseVideos(name, url)
-elif mode == 3: SpikeTV().browseShows(name, url)
-elif mode == 9: SpikeTV().playVideo(name, url)
+if mode==None:  TVLand().buildMenu(MAIN_MENU)
+elif mode == 1: TVLand().browse(name, url)
+elif mode == 2: TVLand().browseVideos(name, url)
+elif mode == 3: TVLand().browseShows(name, url)
+elif mode == 9: TVLand().playVideo(name, url)
 
 xbmcplugin.setContent(int(sys.argv[1])    , CONTENT_TYPE)
 xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)

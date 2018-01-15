@@ -94,7 +94,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.cbs" version="1.0.4" name="CBS" provider-name="Lunatixz">
+<addon id="plugin.video.cbs" version="1.0.5" name="CBS" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -109,7 +109,7 @@
         <description lang="en_GB"></description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/plugin.video.cbs/tree/master</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.cbs</source>
         <website>http://cbs.com</website>
         <news></news>
         <forum>https://forum.kodi.tv/showthread.php?tid=321811</forum>

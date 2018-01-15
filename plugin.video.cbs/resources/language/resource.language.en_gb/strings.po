@@ -1,10 +1,10 @@
 # Kodi Media Center language file
-# Addon Name: "NBC
-# Addon id: plugin.video.nbc
+# Addon Name: "CBS
+# Addon id: plugin.video.cbs
 # Addon Provider: Lunatixz
 msgid ""
 msgstr ""
-"Project-Id-Version: plugin.video.nbc\n"
+"Project-Id-Version: plugin.video.cbs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -23,3 +23,8 @@ msgstr ""
 msgctxt "#30001"
 msgid "Something went wrong, Try again..."
 msgstr ""
+
+msgctxt "#30002"
+msgid "Select Preferred Quality"
+msgstr ""
+

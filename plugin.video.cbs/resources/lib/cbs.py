@@ -1,4 +1,4 @@
-#   Copyright (C) 2017 Lunatixz
+#   Copyright (C) 2018 Lunatixz
 #
 #
 # This file is part of CBS.
@@ -18,11 +18,11 @@
 
 # -*- coding: utf-8 -*-
 import sys, time, datetime, re, traceback
-import urllib, urllib2, socket, json, HTMLParser
+import urlparse, urllib, urllib2, socket, json, HTMLParser
 import xbmc, xbmcgui, xbmcplugin, xbmcaddon
 
 from bs4 import BeautifulSoup
-from youtube_dl import YoutubeDL
+from YDStreamExtractor import getVideoInfo
 from simplecache import SimpleCache
 
 # Plugin Info
@@ -40,6 +40,7 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 TIMEOUT       = 15
 CONTENT_TYPE  = 'files'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
+QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
 BASE_URL      = 'http://www.cbs.com'
 WATCH_URL     = 'http://www.cbs.com/watch'
 SHOW_URL      = 'http://www.cbs.com/carousels/videosBySection/%s/offset/0/limit/40/xs/0'
@@ -47,79 +48,58 @@ SHOWS_URL     = 'http://www.cbs.com/shows'
 
 MAIN_MENU = [("Latest Episodes", "", 1),
              ("Browse Shows"   , "", 2)]
-             
+
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (uni(msg)), level)
-     
+    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
+             
 def uni(string, encoding = 'utf-8'):
     if isinstance(string, basestring):
-        if not isinstance(string, unicode):
-            string = unicode(string, encoding)
-        elif isinstance(string, unicode):
-            string = string.encode('ascii', 'replace')
+        if not isinstance(string, unicode): string = unicode(string, encoding)
+        elif isinstance(string, unicode): string = string.encode('ascii', 'replace')
     return string
    
 def unescape(string):
     try:
         parser = HTMLParser.HTMLParser()
         return (parser.unescape(string))
-    except:
-        return string
-        
+    except: return string
+   
 def getParams():
-    param=[]
-    if len(sys.argv[2])>=2:
-        params=sys.argv[2]
-        cleanedparams=params.replace('?','')
-        if (params[len(params)-1]=='/'):
-            params=params[0:len(params)-2]
-        pairsofparams=cleanedparams.split('&')
-        param={}
-        for i in range(len(pairsofparams)):
-            splitparams={}
-            splitparams=pairsofparams[i].split('=')
-            if (len(splitparams))==2:
-                param[splitparams[0]]=splitparams[1]
-    return param
-                 
+    return dict(urlparse.parse_qsl(sys.argv[2][1:]))
+                  
 socket.setdefaulttimeout(TIMEOUT)
 class CBS(object):
     def __init__(self):
         log('__init__')
         self.cache = SimpleCache()
-        self.ydl   = YoutubeDL()
            
            
     def openURL(self, url):
         log('openURL, url = ' + str(url))
         try:
             cacheResponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-            # if not cacheResponse:
-            request = urllib2.Request(url)
-            response = urllib2.urlopen(request, timeout = TIMEOUT).read()
-            self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, response, expiration=datetime.timedelta(hours=1))
+            if not cacheResponse:
+                request = urllib2.Request(url)
+                response = urllib2.urlopen(request, timeout = TIMEOUT).read()
+                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, response, expiration=datetime.timedelta(hours=1))
             return self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-        except urllib2.URLError, e:
-            log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except socket.timeout, e:
-            log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except Exception, e:
-            log("openURL Failed! " + str(e), xbmc.LOGERROR)
-            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
+        except urllib2.URLError as e:log("openURL Failed! " + str(e), xbmc.LOGERROR)
+        except socket.timeout as e:log("openURL Failed! " + str(e), xbmc.LOGERROR)
+        except Exception as e:log("openURL Failed! " + str(e), xbmc.LOGERROR)
+        xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
         return ''
          
          
     def buildMenu(self, items):
-        for item in items:
+        for item in items: 
             self.addDir(*item)
         self.addYoutube("Browse Youtube" , 'plugin://plugin.video.youtube/user/CBS/')
             
                 
     def browseLatest(self, url=None):
-        if url is None:
-            url = WATCH_URL
+        if url is None: url = WATCH_URL
         soup = BeautifulSoup(self.openURL(url), "html.parser")
         items = soup('li', {'class': 'episode'})
         for item in items:
@@ -143,14 +123,14 @@ class CBS(object):
                             if type not in metaKeys:
                                 metaKeys.append(type)
                                 metaLST[type] = meta.split('" itemprop="%s"'%type)[0]
-                                
-            plot  = unescape(uni((metaLST.get('name','')     or metaLST['description']).decode("utf-8")))
-            label = unescape(uni((metaLST.get('description') or metaLST['name']).decode("utf-8")))
+            try:
+                label = unescape(uni((metaLST.get('description')    or metaLST['name']).decode("utf-8")))
+                plot  = unescape(uni((metaLST.get('description','') or metaLST['name']).decode("utf-8")))
+            except: continue
             thumb = metaLST['thumbnailUrl']
             aired = metaLST['uploadDate']
             url   = metaLST['url']
-            if not url.startswith('http://'):
-                url = (BASE_URL + '%s'%url).lstrip('/')                
+            if not url.startswith('http://'): url = (BASE_URL + '%s'%url).lstrip('/')                
             # seinfo = ('S' + ('0' if seasonNumber < 10 else '') + str(seasonNumber) + 'E' + ('0' if episodeNumber < 10 else '') + str(episodeNumber))
             # label  = '%s'%(label) if seasonNumber + episodeNumber == 0 else '%s - %s'%(label, seinfo)
             infoLabels ={"mediatype":"episodes","label":label ,"title":label,"TVShowTitle":label,"plot":plot,"aired":aired}
@@ -162,14 +142,9 @@ class CBS(object):
         log('browseEpisodes')
         items = json.loads(self.openURL(url))['result']['data']
         for item in items:
-            if 'status' in item and item['status'].lower() != 'available':
-                continue
-            if 'is_protected' in item and item['is_protected'] == True:
-                continue
-            if 'is_paid_content' in item and item['is_paid_content'] == True:
-                continue
-                
-            print item
+            if 'status' in item and item['status'].lower() != 'available': continue
+            if 'is_protected' in item and item['is_protected']: continue
+            if 'is_paid_content' in item and item['is_paid_content']: continue
             title     = uni(item['title'] or item['label'] or item['episode_title'])
             thumb     = (item['thumb']['large'] or item['thumb']['small'] or ICON)
             aired     = str(item['airdate_iso']).split('T')[0]
@@ -185,11 +160,8 @@ class CBS(object):
             
             seasonNumber  = int(item.get('season_number','0')   or '0')
             episodeNumber = int(item.get('episode_number','0')  or '0')
-            
             url       = item['url']
-            if not url.startswith('http://'):
-                url = (BASE_URL + '%s'%url).lstrip('/')
-
+            if not url.startswith('http://'): url = (BASE_URL + '%s'%url).lstrip('/')
             seinfo = ('S' + ('0' if seasonNumber < 10 else '') + str(seasonNumber) + 'E' + ('0' if episodeNumber < 10 else '') + str(episodeNumber))
             label  = '%s - %s'%(showTitle, title) if seasonNumber + episodeNumber == 0 else '%s - %s - %s'%(showTitle, seinfo, title)
             infoLabels ={"mediatype":"episodes","label":label ,"title":label,"TVShowTitle":showTitle,"plot":plot,"aired":aired,"duration":duration,"season":seasonNumber,"episode":episodeNumber}
@@ -205,9 +177,7 @@ class CBS(object):
         seasons = eval(items['seasons'])
         if len(seasons) == 0: return
         for item in seasons:
-            print item, type(item)
-            if item["total_count"] == item["premiumCount"]:
-                continue
+            if item["total_count"] == item["premiumCount"]: continue
             title = uni(item["title"])
             url   = '%s/%s/' %(url,item["season"])
             try: items = json.loads(self.openURL(url)) 
@@ -265,26 +235,24 @@ class CBS(object):
             title       = uni(show.get_text())
             thumb       = thumbLST[idx]['src']
             url         = uriLST[idx]['href']
-            if not url.startswith('http://'):
-                url = (BASE_URL + url).lstrip('/')
-            if not url.endswith('/video/'):
-                url = '%s/video/'%url.rstrip('/')
+            if not url.startswith('http://'): url = (BASE_URL + url).lstrip('/')
+            if not url.endswith('/video/'): url = '%s/video/'%url.rstrip('/')
             url = json.dumps({'url':url,'thumb':thumb})
             infoLabels ={"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
             infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
             self.addDir(title,url,3,infoLabels,infoArt)
 
- 
+            
     def playVideo(self, name, url, liz=None):
-        log('playVideo, url = ' + url)
-        self.ydl.add_default_info_extractors()
-        with self.ydl:
-            result = self.ydl.extract_info(url, download=False)
-            status = True if result else False
-            url = result.get('manifest_url','')
-            liz = xbmcgui.ListItem(name, path=url)
-            xbmcplugin.setResolvedUrl(int(sys.argv[1]), status, liz)
-
+        log('playVideo')
+        info = getVideoInfo(url,QUALITY,True)
+        if info is None: return
+        info = info.streams()
+        url  = info[0]['xbmc_url']
+        liz  = xbmcgui.ListItem(name, path=url)
+        if 'subtitles' in info[0]['ytdl_format']: liz.setSubtitles([x['url'] for x in info[0]['ytdl_format']['subtitles'].get('en','') if 'url' in x])
+        xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
+        
             
     def addYoutube(self, name, url):
         liz=xbmcgui.ListItem(name)
@@ -299,15 +267,10 @@ class CBS(object):
         log('addLink, name = ' + name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'true')
-        if infoList == False:
-            liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"genre":"News"})
-        else:
-            liz.setInfo(type="Video", infoLabels=infoList)
-            
-        if infoArt == False:
-            liz.setArt({'thumb':ICON,'fanart':FANART})
-        else:
-            liz.setArt(infoArt)
+        if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"genre":"News"})
+        else: liz.setInfo(type="Video", infoLabels=infoList)  
+        if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
+        else: liz.setArt(infoArt)
         u=sys.argv[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,totalItems=total)
 
@@ -317,31 +280,20 @@ class CBS(object):
         log('addDir, name = ' + name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'false')
-        if infoList == False:
-            liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"genre":"News"})
-        else:
-            liz.setInfo(type="Video", infoLabels=infoList)
-        if infoArt == False:
-            liz.setArt({'thumb':ICON,'fanart':FANART})
-        else:
-            liz.setArt(infoArt)
+        if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"genre":"News"})
+        else: liz.setInfo(type="Video", infoLabels=infoList)
+        if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
+        else: liz.setArt(infoArt)
         u=sys.argv[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=True)
 
 params=getParams()
-try:
-    url=urllib.unquote_plus(params["url"])
-except:
-    url=None
-try:
-    name=urllib.unquote_plus(params["name"])
-except:
-    name=None
-try:
-    mode=int(params["mode"])
-except:
-    mode=None
-    
+try: url=urllib.unquote_plus(params["url"])
+except: url=None
+try: name=urllib.unquote_plus(params["name"])
+except: name=None
+try: mode=int(params["mode"])
+except: mode=None
 log("Mode: "+str(mode))
 log("URL : "+str(url))
 log("Name: "+str(name))

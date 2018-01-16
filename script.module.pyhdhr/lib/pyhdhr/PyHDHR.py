@@ -508,6 +508,12 @@ class Tuner(BaseDevice):
         if 'LineupURL' in parsestr:
             self.LineupURL = parsestr['LineupURL']
         
+    def setLocalIP(self,localip):
+        self.LocalIP = localip
+        self.BaseURL = "http://"+localip+":80"
+        self.LineupURL = self.BaseURL+"/lineup.json"
+        self.DiscoverURL = self.BaseURL+"/discover.json"
+        
     def addHD(self):
         self.HDCount = self.HDCount + 1
     
@@ -578,6 +584,8 @@ class Tuner(BaseDevice):
         try:
             response = urllib2.urlopen(self.DiscoverURL,None,5)
             data = json.loads(response.read())
+            if 'DeviceID' in data:
+                self.DeviceID = data['DeviceID']
             if 'TunerCount' in data:
                 self.TunerCount = data['TunerCount']
             if 'DeviceAuth' in data:
@@ -708,9 +716,20 @@ class PyHDHR:
     LastDiscover = 0
     LastRecordedDiscover = 0
     RecordedPrograms = {}
+    SDDVREnabled = False
+    SDDVRDiscover = 0
+    ManualTunerIPs = set()
     
     def __init__(self):
         return
+        
+    def setManualTunerList(self,tuners):
+        if tuners:
+            tunerips = tuners.split(';')
+            for ip in tunerips:
+                regx = Regex('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)').search(ip)
+                if regx and ip not in self.ManualTunerIPs:
+                    self.ManualTunerIPs.add(ip)
         
     def getTuners(self):
         self.discover()
@@ -789,15 +808,22 @@ class PyHDHR:
                 progs = self.ChannelInfos[guideno].getProgramInfos()
                 if len(progs) > 0:
                     return progs[0]
-        
+        return None
+
     def getLiveTVURL(self,guideno):
+        chaninfo = self.getLiveTVChannelInfo(guideno)
+        if chaninfo:
+            return chaninfo.getURL()
+        return None            
+        
+    def getLiveTVChannelInfo(self,guideno):
         self.discover(True)
         for tunerkey in self.Tuners:
             chaninfos = self.Tuners[tunerkey].getChannelInfos()
             if guideno in chaninfos:
                 try:
                     response = urllib2.urlopen(chaninfos[guideno].getURL()+"?duration=1",None,5)
-                    return chaninfos[guideno].getURL()
+                    return chaninfos[guideno]
                 except Exception as e:
                     regx = re.search('HTTP Error 503:',str(e))
                     if regx != None:
@@ -931,6 +957,27 @@ class PyHDHR:
             Log.Critical(e)
             return False
             
+    def hasSDDVR(self,force=False):
+        if not force:
+            if len(self.DVRs) > 0:
+                return True
+            if time.time() - self.SDDVRDiscover < 60:
+                return self.SDDVREnabled
+            
+        self.SDDVRDiscover = time.time()
+            
+        try:
+            response = urllib2.urlopen(URL_DISCOVER,None,5)
+            data = json.loads(response.read())
+            for item in data:
+                if 'StorageID' in item:
+                    self.SDDVREnabled = True
+                    return True
+        except Exception as e:
+            Log.Critical("Exception in PyHDHR.hasSDDVR while attempting to load: "+str(URL_DISCOVER))
+            Log.Critical(e)
+        return self.SDDVREnabled
+
     def discover(self,force=False):
         if not force:
             if time.time() - self.LastDiscover < 60:
@@ -938,6 +985,19 @@ class PyHDHR:
             
         self.LastDiscover = time.time()
             
+        for ip in self.ManualTunerIPs:
+            tuner = Tuner(self)
+            tuner.setLocalIP(ip)
+            if tuner.discover():
+                if tuner.getDeviceID() in self.Tuners:
+                    if self.Tuners[tuner.getDeviceID()].discover():
+                        self.Tuners[tuner.getDeviceID()].processLineup(self)
+                        self.Tuners[tuner.getDeviceID()].processGuide(self)
+                else:
+                    tuner.processLineup(self)
+                    tuner.processGuide(self)
+                    self.Tuners[tuner.getDeviceID()] = tuner
+        
         try:
             response = urllib2.urlopen(URL_DISCOVER,None,5)
             data = json.loads(response.read())
@@ -953,19 +1013,22 @@ class PyHDHR:
                         if dvr.discover():
                             self.DVRs[item['StorageID']] = dvr
                 elif 'DeviceID' in item and 'LineupURL' in item:
-                    #Tuner
-                    if item['DeviceID'] in self.Tuners:
-                        self.Tuners[item['DeviceID']].parse(item)
-                        if self.Tuners[item['DeviceID']].discover():
-                            self.Tuners[item['DeviceID']].processLineup(self)
-                            self.Tuners[item['DeviceID']].processGuide(self)
+                    if len(self.ManualTunerIPs) == 0:
+                        #Tuner
+                        if item['DeviceID'] in self.Tuners:
+                            self.Tuners[item['DeviceID']].parse(item)
+                            if self.Tuners[item['DeviceID']].discover():
+                                self.Tuners[item['DeviceID']].processLineup(self)
+                                self.Tuners[item['DeviceID']].processGuide(self)
+                        else:
+                            tuner = Tuner(self)
+                            tuner.parse(item)
+                            if tuner.discover():
+                                tuner.processLineup(self)
+                                tuner.processGuide(self)
+                                self.Tuners[item['DeviceID']] = tuner
                     else:
-                        tuner = Tuner(self)
-                        tuner.parse(item)
-                        if tuner.discover():
-                            tuner.processLineup(self)
-                            tuner.processGuide(self)
-                            self.Tuners[item['DeviceID']] = tuner
+                        Log.Debug("PyHDHR.discover - ignoring tuner (in manual config mode)")
                 else:
                     Log.Debug("PyHDHR.discover - could not determine device type - " + str(item))
             return True

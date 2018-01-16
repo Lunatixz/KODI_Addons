@@ -109,18 +109,21 @@ class Cheddar(object):
             infoList = {"mediatype":"episode","label":label,"title":label,"plot":plot,'genre':'News',"studio":"cheddar","aired":airdate}
             infoArt  = {"thumb":thumb,"poster":thumb,"fanart":FANART}
             self.addLink(label, uri, 9, infoList, infoArt)
-                
 
+            
     def playVideo(self, name, url):
         log('playVideo, name = ' + name)
-        if name == 'Live': liz = xbmcgui.ListItem(name, path=url)
+        if name == 'Live': 
+            liz = xbmcgui.ListItem(name, path=url)
+            liz.setProperty('inputstreamaddon','inputstream.adaptive')
+            liz.setProperty('inputstream.adaptive.manifest_type','hls') 
         else:
             info = getVideoInfo(url,QUALITY,True)
             if info is None: return
             info = info.streams()
             url  = info[0]['xbmc_url']
             liz  = xbmcgui.ListItem(name, path=url)
-            if 'subtitles' in info[0]['ytdl_format']: liz.setSubtitles([x['url'] for x in info[0]['ytdl_format']['subtitles'].get('en','') if 'url' in x])   
+            if 'subtitles' in info[0]['ytdl_format']: liz.setSubtitles([x['url'] for x in info[0]['ytdl_format']['subtitles'].get('en','') if 'url' in x])  
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
             
                    

@@ -38,10 +38,10 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 
 ## GLOBALS ##
 TIMEOUT       = 30
+CONTENT_TYPE  = 'episodes'
 BASEURL       = 'http://cheddar.com/'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
-CONTENT_TYPE  = 'episodes'
 
 Cheddar_MENU  = [("Latest" , 'collections/latest', 1),
                  ("Browse" , 'collections'       , 1)]

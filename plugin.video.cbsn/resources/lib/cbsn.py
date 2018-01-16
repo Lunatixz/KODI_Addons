@@ -18,7 +18,7 @@
 
 # -*- coding: utf-8 -*-
 import sys, time, datetime, re, traceback
-import urllib, urllib2, socket, json
+import urlparse, urllib, urllib2, socket, json
 import xbmc, xbmcgui, xbmcplugin, xbmcaddon
 
 from simplecache import SimpleCache
@@ -40,26 +40,15 @@ CONTENT_TYPE  = 'files'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 LIVEURL       = 'https://cbsn1.cbsistatic.com/scripts/Video.js?v=00bfcbe9781bd47659f8000ff016c50212e26dee'
 VIDURL        = 'https://www.cbsnews.com/videos'
-
+           
 def log(msg, level=xbmc.LOGDEBUG):
-    if not DEBUG and level != xbmc.LOGERROR: return
+    if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg), level)
-   
+    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
+    
 def getParams():
-    param=[]
-    if len(sys.argv[2])>=2:
-        params=sys.argv[2]
-        cleanedparams=params.replace('?','')
-        if (params[len(params)-1]=='/'): params=params[0:len(params)-2]
-        pairsofparams=cleanedparams.split('&')
-        param={}
-        for i in range(len(pairsofparams)):
-            splitparams={}
-            splitparams=pairsofparams[i].split('=')
-            if (len(splitparams))==2: param[splitparams[0]]=splitparams[1]
-    return param
-                 
+    return dict(urlparse.parse_qsl(sys.argv[2][1:]))
+               
 socket.setdefaulttimeout(TIMEOUT)
 class CBSN(object):
     def __init__(self):
@@ -117,9 +106,12 @@ class CBSN(object):
                 except: log("buildBrowse, no video media found")
                     
                     
-    def playVideo(self, name, url, liz=None):
+    def playVideo(self, name, url):
         log('playVideo')
-        if not liz: liz = xbmcgui.ListItem(name, path=url)
+        liz = xbmcgui.ListItem(name, path=url)
+        if name == 'CBS News Live': 
+            liz.setProperty('inputstreamaddon','inputstream.adaptive')
+            liz.setProperty('inputstream.adaptive.manifest_type','hls') 
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
 
         
@@ -155,7 +147,6 @@ class CBSN(object):
         else: liz.setArt(infoArt)
         u=sys.argv[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=True)
-
         
 params=getParams()
 try: url=urllib.unquote_plus(params["url"])

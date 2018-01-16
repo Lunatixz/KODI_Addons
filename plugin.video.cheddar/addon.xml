@@ -2,7 +2,6 @@
 <addon id="plugin.video.cheddar" name="Cheddar" provider-name="Lunatixz" version="1.0.3">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="inputstream.adaptive" version="2.0.0"/>  
         <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="script.module.youtube.dl" version="17.0.0"/>
         <import addon="script.module.beautifulsoup4" version="4.3.2"/>

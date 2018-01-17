@@ -566,10 +566,10 @@ class Tuner(BaseDevice):
             try:
                 response = urllib2.urlopen(self.BaseURL+"/transcode.html",None,5)
 
-                regx = Regex('transcodeChanged\(\)">((.|\n)+?)</select>').search(response.read())
+                regx = re.search('transcodeChanged\(\)">((.|\n)+?)</select>',response.read())
                 selecttags = regx.group(1)
 
-                regx = Regex('.+"(.*)".+selected=').search(selecttags)
+                regx = re.search('.+"(.*)".+selected=',selecttags)
                 self.TranscodeOption = regx.group(1)
             except Exception as e:
                 pass
@@ -727,7 +727,7 @@ class PyHDHR:
         if tuners:
             tunerips = tuners.split(';')
             for ip in tunerips:
-                regx = Regex('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)').search(ip)
+                regx = re.search('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)',ip)
                 if regx and ip not in self.ManualTunerIPs:
                     self.ManualTunerIPs.add(ip)
         

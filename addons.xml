@@ -94,6 +94,28 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.bobross" version="1.0.0" name="Bob Ross - YouTube" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="plugin.video.youtube" version="5.3.10"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">The official YouTube channel of "The Joy of Painting" and Bob Ross. Happy painting!!</summary>
+        <description lang="en_GB">You've see Bob Ross before. He is the soft-spoken guy painting happy clouds, mountains, and trees in about 26 television minutes, using big house painting-type brushes and encouraging audiences with his gentle reminder, "you can do it." The Joy of Painting is an American half-hour instructional television show hosted by painter Bob Ross which ran from January 11, 1983, until May 17, 1994. In each episode, Ross taught techniques for landscape oil painting, completing a painting in each session.</description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/plugin.video.bobross</source>
+        <news></news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.video.cbs" version="1.0.5" name="CBS" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1145,7 +1167,7 @@
     </extension>
 </addon>
 
-<addon id="script.module.pyqrcode" version="0.0.1" name="pyQRcode" provider-name="Lunatixz">
+<addon id="script.module.pyqrcode" version="0.0.2" name="pyQRcode" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.24.0" />
     </requires>
@@ -1157,7 +1179,7 @@
         <website>https://pypi.python.org/pypi/pyqrcode</website>
         <license>Apache2</license>
         <platform>all</platform>
-        <source>https://github.com/pylast/pyqrcode</source>
+        <source>https://github.com/mnooner256/pyqrcode</source>
         <news></news>
         <assets>
             <icon>icon.png</icon>

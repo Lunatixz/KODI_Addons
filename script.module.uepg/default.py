@@ -40,8 +40,8 @@ class ChannelList(object):
         self.maxGuidedata = 48
         self.maxChannels  = None
         self.uEPGRunning  = utils.getProperty('uEPGRunning') == "True"
+        self.incHDHR      = utils.REAL_SETTINGS.getSetting('Enable_HDHR')
         self.useKodiSkin  = utils.REAL_SETTINGS.getSetting('useKodiSkin') == "true"
-        self.incHDHR      = utils.REAL_SETTINGS.getSetting('Enable_HDHR') == "true"
         
         
     def prepareListItem(self, channelPath):
@@ -207,6 +207,7 @@ if __name__ == '__main__':
             except: pass
             
         channelLST = ChannelList()
+        channelLST.incHDHR      = (utils.loadJson(utils.unquote(params.get('include_hdhr','')))          or channelLST.incHDHR) == 'true'
         channelLST.skinPath     = ((utils.loadJson(utils.unquote(params.get('skin_path',''))))           or channelLST.chkSkinPath())
         channelLST.mediaFolder  = os.path.join(channelLST.skinPath,'resources','skins','default','media')
         channelLST.refreshPath  = utils.loadJson(utils.unquote(params.get('refresh_path',None)           or None))

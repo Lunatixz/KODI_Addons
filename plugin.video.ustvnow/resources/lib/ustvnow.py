@@ -140,6 +140,7 @@ class USTVnow():
         log('mainMenu')
         for item in USTVNOW_MENU:
             self.addDir(*item)
+        xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
         
         
     def buildHeader(self):
@@ -317,12 +318,17 @@ class USTVnow():
                 return False
         
         
+    def grabChannelName(self, sname):
+        try: return CHAN_NAMES[sname]
+        except: return sname
+        
+        
     def getChannelNames(self):
         collect = []
         if self.channels is None: xbmc.executebuiltin("Container.Refresh")
         for channel in self.channels:
             try:
-                name = CHAN_NAMES[channel['stream_code']]
+                name = self.grabChannelName(channel['stream_code'])
                 if self.isFree == True and name not in FREE_CHANS: continue
                 collect.append(name)
             except: pass
@@ -339,13 +345,17 @@ class USTVnow():
 
     def browseLive(self):
         log('browseLive')
+        channelCheck = []
         d = datetime.datetime.utcnow()
         now = datetime.datetime.fromtimestamp(calendar.timegm(d.utctimetuple()))  
         if self.channels is None: xbmc.executebuiltin("Container.Refresh")
         for channel in self.channels:
             try:
-                name = CHAN_NAMES[channel['stream_code']]
+                name = self.grabChannelName(channel['stream_code'])
+                print name
                 if self.isFree == True and name not in FREE_CHANS: continue
+                if name in channelCheck: continue
+                else: channelCheck.append(name)
                 startime = datetime.datetime.fromtimestamp(channel['ut_start'])
                 endtime  = startime + datetime.timedelta(seconds=channel['runtime'])
                 if endtime > now and startime <= now:
@@ -353,6 +363,7 @@ class USTVnow():
                     self.addLink(label, url, 9, liz, len(self.channels))
             except Exception as e:
                 log('browseLive, failed ' + str(e), xbmc.LOGERROR)
+        xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_LABEL)
                 
                 
     def browseRecordings(self, recorded=False):
@@ -366,12 +377,13 @@ class USTVnow():
                 endtime   = startime + datetime.timedelta(seconds=channel['runtime'])
                 if recorded == False and channel['event_inprogress'] == 0: continue
                 elif recorded == True and channel['event_inprogress'] != 0: continue
-                label, url, liz = self.buildRecordedListItem(CHAN_NAMES[channel['stream_code']])
+                label, url, liz = self.buildRecordedListItem(self.grabChannelName(channel['stream_code']))
                 mode = 10 if recorded == True else 21
                 if mode == 21: liz.setProperty("IsPlayable","false")
                 self.addLink(label, url, mode, liz, len(self.recorded))
             except Exception as e:
                 log('browseRecordings, failed ' + str(e), xbmc.LOGERROR)
+        xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
                 
 
     def browseGuide(self, name=None, upcoming=False):
@@ -384,11 +396,12 @@ class USTVnow():
                 icon = (os.path.join(IMG_PATH,'logos','%s.png'%channel) or ICON)
                 infoArt  = {"thumb":icon,"poster":icon,"icon":icon,"fanart":FANART}
                 self.addDir(channel, channel, 4, infoArt=infoArt)
+            xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_LABEL)
         else:
             for channel in self.channels:
                 try:
                     if self.isFree == True and name not in FREE_CHANS: continue
-                    if name == CHAN_NAMES[channel['stream_code']]:
+                    if name == self.grabChannelName(channel['stream_code']):
                         startime  = datetime.datetime.fromtimestamp(channel['ut_start'])
                         endtime   = startime + datetime.timedelta(seconds=channel['runtime'])
                         if endtime > now and (startime <= now):
@@ -401,6 +414,7 @@ class USTVnow():
                             self.addLink(label, url, mode, liz, len(self.channels))
                 except Exception as e:
                     log('browseGuide, failed ' + str(e), xbmc.LOGERROR)
+            xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
                 
            
     def browseFeatured(self, hlt=False):
@@ -412,7 +426,7 @@ class USTVnow():
         if optLST is None: xbmc.executebuiltin("Container.Refresh")
         for channel in optLST:
             try:
-                name = CHAN_NAMES[channel['sname']]
+                name      = self.grabChannelName(channel['sname'])
                 startime  = datetime.datetime.fromtimestamp(channel['ut_start'])
                 endtime   = startime + datetime.timedelta(seconds=channel['runtime'])
                 if endtime > now and (startime <= now or startime > now):
@@ -421,6 +435,7 @@ class USTVnow():
                     self.addLink(label, url, 21, liz, len(optLST))
             except Exception as e:
                 log('browseFeatured, failed ' + str(e), xbmc.LOGERROR)
+        xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
 
        
     def browseVOD(self, url=None, limit=24):
@@ -447,6 +462,7 @@ class USTVnow():
                 liz.addContextMenuItems([('Purchase','')])
                 self.addLink(label, url, 22, liz, len(items))
             # self.addDir('>> Next', BASEWEB + next, 13)
+            xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
                 
 
     def search(self):
@@ -460,7 +476,7 @@ class USTVnow():
                 items = json.loads(self.net.http_POST(BASEURL + 'gtv/1/live/search', form_data={'token':self.token,'q_title':query}, headers=self.buildHeader()).content.encode("utf-8").rstrip())['results']['programs']
                 for channel in items:
                     try:
-                        name = CHAN_NAMES[channel['progs']['scode']]
+                        name = self.grabChannelName(channel['progs']['scode'])
                         label, url, liz = self.buildChannelListItem(name, channel['progs'], opt='Search')
                         liz.setProperty("IsPlayable","false")
                         self.addLink(label, url, 21, liz, len(items))
@@ -471,6 +487,7 @@ class USTVnow():
                     liz = xbmcgui.ListItem(label)
                     liz.setArt({"thumb":ICON,"poster":ICON,"fanart":FANART})
                     self.addLink(label, '', 0, liz, 1)
+                xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
             except Exception as e:
                 log('search, failed ' + str(e), xbmc.LOGERROR)
         else: self.mainMenu()
@@ -500,7 +517,7 @@ class USTVnow():
     def buildChannelListItem(self, name, channel=None, opt=''):
         if channel is None:
             for idx, channel in enumerate(self.channels):
-                if name == CHAN_NAMES[channel['stream_code']]: break
+                if name == self.grabChannelName(channel['stream_code']): break
         startime  = datetime.datetime.fromtimestamp(channel['ut_start'])
         endtime   = startime + datetime.timedelta(seconds=channel['runtime'])
         title     = unescape(channel['title'])
@@ -536,7 +553,7 @@ class USTVnow():
     
     def buildRecordedListItem(self, name):
         for channel in self.recorded:
-            if name == CHAN_NAMES[channel['stream_code']] or name == str(channel['scheduleid']):
+            if name == self.grabChannelName(channel['stream_code']) or name == str(channel['scheduleid']):
                 startime  = datetime.datetime.fromtimestamp(channel['ut_start'])
                 endtime   = startime + datetime.timedelta(seconds=channel['runtime'])
                 title     = unescape(channel['title'])
@@ -546,7 +563,7 @@ class USTVnow():
                 liz       = xbmcgui.ListItem(label)
                 mediatype = (channel.get('mediatype','') or (channel.get('connectorid',''))[:2] or (channel.get('content_id',''))[:2] or 'SP')
                 mtype     = MEDIA_TYPES[mediatype.upper()]
-                infoList  = {"mediatype":mtype,"label":label,"label2":label2,"title":label,"studio":CHAN_NAMES[channel['stream_code']],
+                infoList  = {"mediatype":mtype,"label":label,"label2":label2,"title":label,"studio":self.grabChannelName(channel['stream_code']),
                              "duration":channel['runtime'],"plotoutline":unescape(channel['synopsis']),"plot":unescape(channel['description']),
                              "aired":startime.strftime('%Y-%m-%d')}
                 thumb  = IMG_SOURCE%(str(channel['srsid']),channel['callsign'],mediatype)
@@ -584,7 +601,7 @@ class USTVnow():
                             self.replaceToken(url, dvr)
         else:
             for channel in self.channels:
-                if url == CHAN_NAMES[channel['stream_code']]:
+                if url == self.grabChannelName(channel['stream_code']):
                     try:
                         urllink = json.loads(self.net.http_POST(BASEURL + 'stream/1/live/view', form_data={'token':self.token,'key':self.passkey,'scode':channel['scode']}, headers=self.buildHeader()).content.encode("utf-8").rstrip())
                         '''{u'pr': u'll', u'domain': u'ilvc02.ll.ustvnow.com',u'stream': u'http://ilvc02.ll.ustvnow.com/ilv10/pr/xxl/smil:0B64AWHTMUSTVNOW/playlist.m3u8?', 
@@ -691,7 +708,7 @@ class USTVnow():
         if self.channels is None: xbmc.executebuiltin("Container.Refresh")
         for channel in self.channels:
             try:
-                name = CHAN_NAMES[channel['stream_code']]
+                name = self.grabChannelName(channel['stream_code'])
                 if self.isFree == True and name not in FREE_CHANS: continue
                 collect.append(name)
             except: pass
@@ -709,7 +726,7 @@ class USTVnow():
             newChannel['channelnumber'] = channelNum
             for channel in self.channels:
                 try:
-                    name = CHAN_NAMES[channel['stream_code']]
+                    name = self.grabChannelName(channel['stream_code'])
                     if self.isFree == True and name not in FREE_CHANS: continue
                     if name == channelName:
                         tmpdata = {}
@@ -787,8 +804,4 @@ elif mode == 21:xbmc.executebuiltin("action(ContextMenu)")
 elif mode == 22:xbmc.executebuiltin('Addon.OpenSettings(script.module.uepg)')
 
 xbmcplugin.setContent(int(sys.argv[1])    , CONTENT_TYPE)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_NONE)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_LABEL)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_TITLE)
 xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)

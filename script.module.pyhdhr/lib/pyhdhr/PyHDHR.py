@@ -856,7 +856,7 @@ class PyHDHR:
                 Log.Critical(e)
         return self.RecordedPrograms
 
-    def getFilteredRecordedPrograms(self,sortby,grouptype,groupby):
+    def getFilteredRecordedPrograms(self,sortby=SortType.asc,grouptype=GroupType.All,groupby=None):
         self.discover()
         progs = self.getRecordedPrograms()
         
@@ -984,7 +984,6 @@ class PyHDHR:
                 return True
             
         self.LastDiscover = time.time()
-            
         for ip in self.ManualTunerIPs:
             tuner = Tuner(self)
             tuner.setLocalIP(ip)

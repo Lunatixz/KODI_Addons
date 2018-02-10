@@ -382,7 +382,8 @@ class RPCHelper(object):
              
     def cacheJSON(self, command, life=datetime.timedelta(minutes=15)):
         log('cacheJSON')
-        cacheResponce = self.cache.get(ADDON_NAME + '.cacheJSON, command = %s'%(command))
+        if DEBUG: cacheResponse = None
+        else: cacheResponce = self.cache.get(ADDON_NAME + '.cacheJSON, command = %s'%(command))
         if not cacheResponce or DEBUG == True:
             data = self.sendJSON(command)
             self.cache.set(ADDON_NAME + '.cacheJSON, command = %s'%(command), ((data)), expiration=life)

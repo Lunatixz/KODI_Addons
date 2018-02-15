@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.cbsn" version="10.0.3" name="CBS News" provider-name="Lunatixz">
+<addon id="plugin.video.cbsn" version="10.0.4" name="CBS News" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/> 
         <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.youtube.dl" version="17.0.0"/>
+        <import addon="script.module.addon.signals" version="0.0.3"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
     </requires>
+    <extension point="xbmc.service" library="announce.py" start="login"/>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>

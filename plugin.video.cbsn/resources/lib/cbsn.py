@@ -22,6 +22,8 @@ import urlparse, urllib, urllib2, socket, json
 import xbmc, xbmcgui, xbmcplugin, xbmcaddon
 
 from simplecache import SimpleCache
+from bs4 import BeautifulSoup
+from YDStreamExtractor import getVideoInfo
 
 # Plugin Info
 ADDON_ID      = 'plugin.video.cbsn'
@@ -38,9 +40,11 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 TIMEOUT       = 15
 CONTENT_TYPE  = 'files'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-LIVEURL       = 'https://cbsn1.cbsistatic.com/scripts/Video.js?v=00bfcbe9781bd47659f8000ff016c50212e26dee'
+LIVEURL       = 'https://cbsn1.cbsistatic.com/live/'
 VIDURL        = 'https://www.cbsnews.com/videos'
-           
+EPSURL        = 'https://www.cbsnews.com/%s/full-episodes/'
+VIDMENU       = ['This Morning','48 Hours','60 Minutes','Sunday Morning','Face the Nation','Originals','Assignment']
+
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
@@ -75,41 +79,63 @@ class CBSN(object):
              
 
     def buildMainMenu(self):
-        self.addLink('Live'              ,'',0)
-        self.addDir('Browse'             ,'',1)
+        self.addLink('Live'  ,'',0)
+        self.addDir('Latest' ,'',1)
+        self.addDir('Browse' ,'',2)
         self.addYoutube("Browse Youtube" , 'plugin://plugin.video.youtube/user/CBSNewsOnline/')
         
         
+    def buildBrowse(self):
+        for item in VIDMENU: self.addDir(item ,(EPSURL%urllib.quote_plus(item)),3)
+        
+    
     def buildLiveLink(self):
-        urlbase = 'http:'+re.compile('vidThis.hlsurl = "(.+?)"', re.DOTALL).search(self.openURL(LIVEURL)).group(1)
+        urlbase = re.compile('contentUrl":"(.+?)"', re.DOTALL).search(self.openURL(LIVEURL)).group(1).replace('\/','/')
         self.playVideo('CBS News Live',urlbase)
             
-            
-    def buildBrowse(self):
-        results = json.loads(re.compile("data-cbsvideoui-options='{(.+?)}'", re.DOTALL).search(self.openURL(VIDURL)).group(1).replace('"state":',''))
-        if results and 'playlist' in results:
-            for item in results['playlist']:
+    
+    def buildLatest(self):
+        results = json.loads('{'+re.compile("CBSNEWS.defaultPayload = {(.+?)};", re.DOTALL).search(self.openURL(LIVEURL)).group(1).split("CBSNEWS.defaultLayout")[0])
+        if 'items' not in results: return
+        items = results['items']
+        for item in items:
+            try:
+                thumb = item['images']['hd']
+                label = item['title']      
                 try:
-                    thumb = results['playlist'][item]['promoImage']['path']
-                    label = results['playlist'][item]['title']
-                    plotoutline  = results['playlist'][item]['headline']
-                    plot = results['playlist'][item]['dek']
-                    tags  = results['playlist'][item].get('keywords','')
-                    duration = results['playlist'][item]['duration']
-                    path  = results['playlist'][item]['medias']['tablet']['url']
-                    date  = results['playlist'][item]['airDate']['date']
-                    aired = (datetime.datetime.strptime(date[0:9], '%Y-%m-%d')).strftime('%Y-%m-%d') 
-                    plot  = '%s - %s'%(date, plot)
-                    infoLabel  = {"mediatype":"video","label":label,"title":label,"plot":plot,"plotoutline":plotoutline,"genre":"News","duration":duration,"aired":aired,"tag":tags}
-                    infoArt    = {"thumb":thumb,"poster":thumb,"icon":ICON,"fanart":FANART}
-                    self.addLink(label,path,9,infoLabel,infoArt,len(results['playlist']))
-                except: log("buildBrowse, no video media found")
+                    if item['durationLabel'] == '59:59': continue
+                    runtime = item['durationLabel'].split(':')
+                    if len(runtime) == 3:
+                        h, m, s = runtime
+                        duration = int(h) * 3600 + int(m) * 60 + int(s)
+                    else:
+                        m, s = runtime   
+                        duration = int(m) * 60 + int(s)
+                except: duration = item['duration']
+                plot  = item['fulltitle']
+                path  = item['video']
+                aired = ''
+                # aired = (datetime.datetime.fromtimestamp(item['timestamp'].replace('L',''))).strftime('%Y-%m-%d') 
+                infoLabel  = {"mediatype":"video","label":label,"title":label,"plot":plot,"genre":"News","duration":duration,"aired":aired}
+                infoArt    = {"thumb":thumb,"poster":thumb,"icon":ICON,"fanart":FANART}
+                self.addLink(label,path,9,infoLabel,infoArt,len(items))
+            except: log("buildLatest, no video media found")
+                    
+                    
+    def buildVideos(self, name, url):
+        soup  = BeautifulSoup(self.openURL(url), "html.parser")
+        print soup
+        # items = soup('a', {'class': 'site-nav__item-anchor site-nav__item-anchor--level-2 '})
+
+        
+        
+                    
                     
                     
     def playVideo(self, name, url):
         log('playVideo')
         liz = xbmcgui.ListItem(name, path=url)
-        if name == 'CBS News Live': 
+        if 'm3u8' in url: 
             liz.setProperty('inputstreamaddon','inputstream.adaptive')
             liz.setProperty('inputstream.adaptive.manifest_type','hls') 
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
@@ -162,7 +188,9 @@ log("Name: "+str(name))
 
 if mode==None:  CBSN().buildMainMenu()
 elif mode == 0: CBSN().buildLiveLink()
-elif mode == 1: CBSN().buildBrowse()
+elif mode == 1: CBSN().buildLatest()
+elif mode == 2: CBSN().buildBrowse()
+elif mode == 3: CBSN().buildVideos(name, url)
 elif mode == 9: CBSN().playVideo(name, url)
 
 xbmcplugin.setContent(int(sys.argv[1])    , CONTENT_TYPE)

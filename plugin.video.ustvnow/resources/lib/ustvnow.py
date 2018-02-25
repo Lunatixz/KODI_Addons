@@ -1,4 +1,4 @@
-#   Copyright (C) 2017 Lunatixz
+#   Copyright (C) 2018 Lunatixz
 #
 #
 # This file is part of USTVnow
@@ -18,7 +18,7 @@
 
 # -*- coding: utf-8 -*-
 import os, sys, datetime, re, traceback, HTMLParser, calendar
-import urllib, urllib2, socket, json, collections, net, random
+import urlparse, urllib, urllib2, socket, json, collections, net, random
 import xbmc, xbmcvfs, xbmcgui, xbmcplugin, xbmcaddon
 
 from simplecache import SimpleCache
@@ -55,10 +55,12 @@ MEDIA_TYPES  = {'SP':'video','SH':'episode','EP':'episode','MV':'movie'}
 FREE_CHANS   = ['CW','ABC','FOX','PBS','CBS','NBC','MY9']
 URL_TYPE     = {0:'m3u8',1:'mp4'}[int(REAL_SETTINGS.getSetting('URL_Type'))]
 URL_QUALITY  = int(REAL_SETTINGS.getSetting('URL_Quality')) + 1
-CHAN_NAMES   = {'whtm':'ABC','ABC':'ABC','amchd':'AMC','AMC':'AMC','animalplanet':'Animal Planet','Animal Planet':'Animal Planet','bravo':'Bravo','Bravo':'Bravo','whphd':'CBS','CBS':'CBS','cnbc':'CNBC','CNBC':'CNBC','wlyh':'CW','CW':'CW','comedycentral':'Comedy Central','Comedy Central':'Comedy Central','discovery':'Discovery Channel','Discovery Channel':'Discovery Channel','espn':'ESPN','ESPN':'ESPN',
-                'FOX':'FOX','wpmt':'FOX','fxhd':'FX','FX':'FX','Fox News Channel':'Fox News','foxnews':'Fox News','frfrm':'Freeform','Freeform':'Freeform','msnbc':'MSNBC','MSNBC':'MSNBC','wgal':'NBC','NBC':'NBC','natgeo':'National Geographic','National Geographic Channel':'National Geographic','nickelodeon':'Nickelodeon','Nickelodeon':'Nickelodeon','wpsu':'PBS','PBS':'PBS',
-                'spiketv':'SPIKE TV','SPIKE TV':'SPIKE TV','sndnc':'SundanceTV','SundanceTV':'SundanceTV','syfy':'Syfy','Syfy':'Syfy','AE':'A&E','My9':'MY9','whvl':'MY9','bbca':'BBC America','BBCA':'BBC America','espntwo':'ESPN 2','ESPN2':'ESPN 2','nbcsnhd':'NBCSN','NBCSNHD':'NBCSN','tlchd':'TLC','The Learning Channel':'TLC','Universal HD':'Universal',
-                'usahd':'USA Network','USA':'USA Network'}
+CHAN_NAMES   = {'whtm':'ABC','amchd':'AMC','animalplanet':'Animal Planet','bravo':'Bravo','Bravo':'Bravo','whphd':'CBS','cnbc':'CNBC',
+                'wlyh':'CW','comedycentral':'Comedy Central','discovery':'Discovery Channel','espn':'ESPN','wpmt':'FOX','fxhd':'FX',
+                'Fox News Channel':'Fox News','foxnews':'Fox News','frfrm':'Freeform','msnbc':'MSNBC','wgal':'NBC','natgeo':'National Geographic',
+                'National Geographic Channel':'National Geographic','nickelodeon':'Nickelodeon','wpsu':'PBS','sndnc':'SundanceTV','syfy':'Syfy',
+                'AE':'A&E','My9':'MY9','whvl':'MY9','bbca':'BBC America','BBCA':'BBC America','espntwo':'ESPN 2','nbcsnhd':'NBCSN','NBCSNHD':'NBCSN',
+                'tlchd':'TLC','The Learning Channel':'TLC','Universal HD':'Universal','usahd':'USA Network','USA':'USA Network','spike-tv':'Paramount Network'}
 
 USTVNOW_MENU = [("Live"       , '', 0),
                 ("Schedules"  , '', 1),
@@ -110,21 +112,8 @@ def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', autocl
     return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
      
 def getParams():
-    param=[]
-    if len(sys.argv[2])>=2:
-        params=sys.argv[2]
-        cleanedparams=params.replace('?','')
-        if (params[len(params)-1]=='/'):
-            params=params[0:len(params)-2]
-        pairsofparams=cleanedparams.split('&')
-        param={}
-        for i in range(len(pairsofparams)):
-            splitparams={}
-            splitparams=pairsofparams[i].split('=')
-            if (len(splitparams))==2:
-                param[splitparams[0]]=splitparams[1]
-    return param
-
+    return dict(urlparse.parse_qsl(sys.argv[2][1:]))
+            
 socket.setdefaulttimeout(TIMEOUT)
 class USTVnow():
     def __init__(self):
@@ -135,6 +124,7 @@ class USTVnow():
         if self.login(USER_EMAIL, PASSWORD) == False: raise SystemExit
         try: self.reminders = json.loads(REAL_SETTINGS.getSetting('User_Reminders'))
         except: self.reminders = {}
+        
         
     def mainMenu(self):
         log('mainMenu')
@@ -149,7 +139,7 @@ class USTVnow():
         header_dict['Host']       = 'm-api.ustvnow.com'
         header_dict['Connection'] = 'keep-alive'
         header_dict['Referer']    = 'http://watch.ustvnow.com'
-        header_dict['Origin']     = 'http://watch.ustvnow.com'
+        header_dict['Origin']     = 'http://kodi.tv'
         header_dict['User-Agent'] = 'Mozilla/5.0 (X11; U; Linux i686; en-US) AppleWebKit/533.4 (KHTML, like Gecko) Chrome/5.0.375.127 Large Screen Safari/533.4 GoogleTV/162671'
         return header_dict
         
@@ -319,8 +309,8 @@ class USTVnow():
         
         
     def grabChannelName(self, sname):
-        try: return CHAN_NAMES[sname]
-        except: return sname
+        try: return CHAN_NAMES[sname.strip()]
+        except: return sname.strip()
         
         
     def getChannelNames(self):
@@ -330,7 +320,7 @@ class USTVnow():
             try:
                 name = self.grabChannelName(channel['stream_code'])
                 if self.isFree == True and name not in FREE_CHANS: continue
-                collect.append(name)
+                collect.append(name.strip())
             except: pass
         counter = collections.Counter(collect)
         names   = sorted(list(set(sorted(counter.elements()))))
@@ -399,6 +389,7 @@ class USTVnow():
             xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_LABEL)
         else:
             for channel in self.channels:
+                print name, self.grabChannelName(channel['stream_code'])
                 try:
                     if self.isFree == True and name not in FREE_CHANS: continue
                     if name == self.grabChannelName(channel['stream_code']):
@@ -454,13 +445,13 @@ class USTVnow():
             label = '[B]%s[/B]'%LANGUAGE(30029)
             liz = xbmcgui.ListItem(label)
             liz.setArt({"thumb":ICON,"poster":ICON,"fanart":FANART})
-            self.addLink(label, '', 22, liz, len(items))
+            self.addLink(label, '', '', liz, len(items))
             next = (items.get('paging','').get('next','') or '')
             for item in items['data']:
                 label, url, liz = self.buildVODListItem(item)
                 liz.setProperty("IsPlayable","true")
                 liz.addContextMenuItems([('Purchase','')])
-                self.addLink(label, url, 22, liz, len(items))
+                self.addLink(label, url, '', liz, len(items))
             # self.addDir('>> Next', BASEWEB + next, 13)
             xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
                 
@@ -710,7 +701,7 @@ class USTVnow():
             try:
                 name = self.grabChannelName(channel['stream_code'])
                 if self.isFree == True and name not in FREE_CHANS: continue
-                collect.append(name)
+                collect.append(name.strip())
             except: pass
                 
         channelNum  = 0

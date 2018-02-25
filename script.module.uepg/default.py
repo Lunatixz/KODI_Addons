@@ -1,4 +1,4 @@
-#   Copyright (C) 2017 Lunatixz
+#   Copyright (C) 2018 Lunatixz
 #
 #
 # This file is part of uEPG.
@@ -40,7 +40,7 @@ class ChannelList(object):
         self.maxGuidedata = 48
         self.maxChannels  = None
         self.uEPGRunning  = utils.getProperty('uEPGRunning') == "True"
-        self.incHDHR      = utils.REAL_SETTINGS.getSetting('Enable_HDHR')
+        self.incHDHR      = utils.REAL_SETTINGS.getSetting('Enable_HDHR') == "true"
         self.useKodiSkin  = utils.REAL_SETTINGS.getSetting('useKodiSkin') == "true"
         
         
@@ -84,7 +84,7 @@ class ChannelList(object):
         utils.log('prepareJson')
         try:
             channelItems.sort(key=lambda x:x['channelnumber'])
-            if self.incHDHR: 
+            if self.incHDHR == True: 
                 HDHRitems = (list(utils.HDHR().getChannelItems()) or [])
                 HDHRitems.sort(key=lambda x:x['channelnumber'])
                 if len(HDHRitems) == 0: utils.okDialog(utils.LANGUAGE(30013), utils.LANGUAGE(30014), utils.LANGUAGE(30015)%(self.pluginName))
@@ -207,13 +207,13 @@ if __name__ == '__main__':
             except: pass
             
         channelLST = ChannelList()
-        channelLST.incHDHR      = (utils.loadJson(utils.unquote(params.get('include_hdhr','')))          or channelLST.incHDHR) == 'true'
+        channelLST.incHDHR      = (utils.loadJson(utils.unquote(params.get('include_hdhr','')))          or channelLST.incHDHR)
         channelLST.skinPath     = ((utils.loadJson(utils.unquote(params.get('skin_path',''))))           or channelLST.chkSkinPath())
         channelLST.mediaFolder  = os.path.join(channelLST.skinPath,'resources','skins','default','media')
-        channelLST.refreshPath  = utils.loadJson(utils.unquote(params.get('refresh_path',None)           or None))
-        channelLST.refreshIntvl = int(utils.loadJson(utils.unquote(params.get('refresh_interval','0')))  or '0')
+        channelLST.refreshPath  = utils.loadJson(utils.unquote(params.get('refresh_path',''))            or utils.ADDON_ID)
+        channelLST.refreshIntvl = int(utils.loadJson(utils.unquote(params.get('refresh_interval','')))   or '0')
         channelLST.skinFolder   = os.path.join(channelLST.skinPath,'resources','skins','default','1080i',) if xbmcvfs.exists(os.path.join(channelLST.skinPath,'resources','skins','default','1080i','%s.guide.xml'%utils.ADDON_ID)) else os.path.join(channelLST.skinPath,'resources','skins','default','720p')
-        utils.setProperty('uEPG.rowCount',utils.loadJson(utils.unquote(params.get('row_count','9'))      or '9')) 
+        utils.setProperty('uEPG.rowCount',utils.loadJson(utils.unquote(params.get('row_count',''))       or '9'))
         channelLST.pluginName, channelLST.pluginAuthor, channelLST.pluginIcon, channelLST.pluginFanart, channelLST.pluginPath = utils.getPluginMeta(channelLST.refreshPath)
         
         utils.log('dataType = '     + str(dataType))
@@ -266,4 +266,5 @@ if __name__ == '__main__':
         else:
             utils.log("invalid uEPG information", xbmc.LOGERROR)
             utils.notificationDialog(utils.LANGUAGE(30002)%(channelLST.pluginName,channelLST.pluginAuthor),icon=channelLST.pluginIcon)
+            # utils.REAL_SETTINGS.openSettings() 
         del utils.KODI_MONITOR

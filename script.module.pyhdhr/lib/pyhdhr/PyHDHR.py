@@ -1,45 +1,55 @@
+#   Copyright (C) 2018 Lunatixz
+#
+#
+# This file is part of PyHDHR
+#
+# PyHDHR is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# PyHDHR is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PyHDHR. If not, see <http://www.gnu.org/licenses/>.
+
+# -*- coding: utf-8 -*-
 # modified from original https://github.com/jumpmanjay/PyHDHR
 
-import time
-import string
-from datetime import datetime
-import urllib2
-import json
-import os
-from decimal import Decimal
-import operator
-import re
+import time, string, urllib2, json, os, operator, re
 import xbmc
+from datetime import datetime
+from decimal import Decimal
 
-try:
-  Log
-except NameError:
-    class Logger:
-        def __init__(self):
-            return
-        
-        def Debug(self, s):
-            xbmc.log(s, xbmc.LOGDEBUG)
+class Logger(object):
+    def __init__(self):
+        return
+    
+    def Debug(self, s):
+        xbmc.log(s, xbmc.LOGDEBUG)
 
-        def Info(self, s):
-            xbmc.log(s, xbmc.LOGINFO)
+    def Info(self, s):
+        xbmc.log(s, xbmc.LOGINFO)
 
-        def Warn(self, s):
-            xbmc.log(s, xbmc.LOGWARNING)
-          
-        def Error(self, s):
-            xbmc.log(s, xbmc.LOGERROR)
+    def Warn(self, s):
+        xbmc.log(s, xbmc.LOGWARNING)
+      
+    def Error(self, s):
+        xbmc.log(s, xbmc.LOGERROR)
 
-        def Critical(self, s):
-            xbmc.log(s, xbmc.LOGFATAL)
+    def Critical(self, s):
+        xbmc.log(s, xbmc.LOGFATAL)
 
-        def Exception(self, s):
-            xbmc.log(s, xbmc.LOGDEBUG)
-        
-    Log = Logger()
-        
-URL_DISCOVER = 'http://my.hdhomerun.com/discover'
-URL_GUIDE_BASE = 'http://my.hdhomerun.com/api/guide.php?DeviceAuth='
+    def Exception(self, s):
+        xbmc.log(s, xbmc.LOGDEBUG)
+    
+#Globals
+Log                 = Logger()     
+URL_DISCOVER        = 'http://my.hdhomerun.com/discover'
+URL_GUIDE_BASE      = 'http://my.hdhomerun.com/api/guide.php?DeviceAuth='
 URL_RECORDING_RULES = 'http://my.hdhomerun.com/api/recording_rules?DeviceAuth='
 
 def searchString(needle,haystack):
@@ -48,18 +58,18 @@ def searchString(needle,haystack):
         if re.search(n, haystack, re.IGNORECASE):
             return True
 
-class SortType:
-    asc = 0
+class SortType(object):
+    asc  = 0
     desc = 1
 
-class GroupType:
-    All = 0
+class GroupType(object):
+    All      = 0
     SeriesID = 1
     Category = 2
 
-class SeriesSummary:
-    SeriesID = ""
-    ImageURL = ""
+class SeriesSummary(object):
+    SeriesID     = ""
+    ImageURL     = ""
     EpisodeCount = 0
     
     def __init__(self,SeriesID,ImageURL):
@@ -79,7 +89,7 @@ class SeriesSummary:
     def addEpisodeCount(self,ct):
         self.EpisodeCount = self.EpisodeCount + ct
 
-class ChannelInfo:
+class ChannelInfo(object):
     GuideNumber = ""
     GuideName = ""
     ImageURL = ""
@@ -159,7 +169,7 @@ class ChannelInfo:
     def getTuner(self):
         return self.Tuner
 
-class ProgramInfo:
+class ProgramInfo(object):
     SeriesID = ""
     EpisodeNumber = ""
     EpisodeTitle = ""
@@ -231,7 +241,7 @@ class ProgramInfo:
     def getEndTime(self):
         return self.EndTime
 
-class ProgramFilter:
+class ProgramFilter(object):
     Name = ""
     
     def __init__(self,Name):
@@ -240,7 +250,7 @@ class ProgramFilter:
     def getName(self):
         return self.Name
 
-class RecordedProgram:
+class RecordedProgram(object):
     Category =  ""
     ChannelAffiliate = ""
     ChannelImageURL =  ""
@@ -385,7 +395,7 @@ class RecordedProgram:
     def getCmdURL(self):
         return self.CmdURL
 
-class RecordingRule:
+class RecordingRule(object):
     SeriesID = ""
     Title = ""
     ImageURL = ""
@@ -458,7 +468,7 @@ class RecordingRule:
     def getRecordingRuleID(self):
         return self.RecordingRuleID
     
-class BaseDevice:
+class BaseDevice(object):
     LocalIP = ""
     BaseURL = ""
     DiscoverURL = ""
@@ -704,7 +714,7 @@ class DVR(BaseDevice):
             Log.Critical(e)
             return False
         
-class PyHDHR:
+class PyHDHR(object):
     Tuners = {}
     DVRs = {}
     ProgramFilters = {}

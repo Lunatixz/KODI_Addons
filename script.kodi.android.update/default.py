@@ -35,12 +35,17 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 
 ## GLOBALS ##
 TIMEOUT   = 15
+MIN_VER   = 5 #Minimum Android Version Compatible with Kodi
 DEBUG     = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 CLEAN     = REAL_SETTINGS.getSetting('Disable_Maintenance') == 'false'
-MIN_VER   = 5 #Minimum Android Version Compatible with Kodi
+VERSION   = REAL_SETTINGS.getSetting("Version")
+# VERSION = 'Android 4.0.0 API level 24, kernel: Linux ARM 64-bit version 3.10.96+' #Test
+PLATFORM  = {True:"arm64-v8a", False:"arm", None:""}[('64' in REAL_SETTINGS.getSetting("Platform") or None)]
+# PLATFORM = None #Test
 BASE_URL  = 'http://mirrors.kodi.tv/'
-DROID_URL = BASE_URL + '%s/android/'
+DROID_URL = BASE_URL + '%s/android/%s/'
 BUILD_OPT = ['nightlies','releases','snapshots','test-builds']
+BUILD_DEC = [LANGUAGE(30017),LANGUAGE(30016),LANGUAGE(30015),LANGUAGE(30018)]
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -51,9 +56,9 @@ socket.setdefaulttimeout(TIMEOUT)
 class Installer(object):
     def __init__(self):
         self.cache    = SimpleCache()
+        if not self.chkVersion(): return
         self.lastURL  = (REAL_SETTINGS.getSetting("LastURL") or self.buildMain())
         self.lastPath = REAL_SETTINGS.getSetting("LastPath")
-        if not self.chkBuild(): return
         self.selectDialog(self.lastURL)
         
         
@@ -64,26 +69,13 @@ class Installer(object):
         return False
         
         
-    def chkBuild(self):
+    def chkVersion(self):
         try: 
-            version = self.getBuild()
-            # version = 'Android 4.0.0 API level 24, kernel: Linux ARM 64-bit version 3.10.96+' #Test
-            build   = int(re.compile('Android (\d+)').findall(version)[0])
-            xbmcgui.Dialog().notification(ADDON_NAME, version, ICON, 8000)
+            build = int(re.compile('Android (\d+)').findall(VERSION)[0])
+            xbmcgui.Dialog().notification(ADDON_NAME, VERSION, ICON, 8000)
         except: build = MIN_VER
         if build >= MIN_VER: return True
         else: return self.disable(build)
-        
-        
-    def getBuild(self):
-        count = 0
-        while not xbmc.Monitor().abortRequested() and count < 3:
-            count += 1 
-            build = xbmc.getInfoLabel('System.OSVersionInfo')
-            if build.lower() != 'busy': return build
-            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30013), ICON, 1000)
-            if xbmc.Monitor().waitForAbort(1): return
-        return LANGUAGE(30010)
         
 
     def openURL(self, url):
@@ -113,10 +105,10 @@ class Installer(object):
         
     def buildMain(self):
         tmpLST = []
-        for item in BUILD_OPT: tmpLST.append(xbmcgui.ListItem(item.title(),'',ICON))
+        for idx, item in enumerate(BUILD_OPT): tmpLST.append(xbmcgui.ListItem(item.title(),BUILD_DEC[idx],ICON))
         select = xbmcgui.Dialog().select(ADDON_NAME, tmpLST, preselect=-1, useDetails=True)
         if select < 0: return #return on cancel.
-        return  DROID_URL%BUILD_OPT[select].lower()
+        return  DROID_URL%(BUILD_OPT[select].lower().replace('//','/'),PLATFORM)
             
             
     def buildItems(self, url):
@@ -125,10 +117,12 @@ class Installer(object):
         for item in self.getItems(soup):
             try: #folders
                 label, label2 = re.compile("(.*?)/-(.*)").match(item).groups()
-                yield (xbmcgui.ListItem(label,'',ICON))
+                if label == PLATFORM: label2 = LANGUAGE(30014)%PLATFORM
+                else: label2 = '' #Don't use time-stamp for folders
+                yield (xbmcgui.ListItem(label.strip(),label2,ICON))
             except: #files
                 label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
-                if label.endswith('.apk'): yield (xbmcgui.ListItem(label,label2,ICON))
+                if label.endswith('.apk'): yield (xbmcgui.ListItem(label.strip(),label2.strip(),ICON))
 
 
     def setLastPath(self, url, path):
@@ -136,15 +130,17 @@ class Installer(object):
         REAL_SETTINGS.setSetting("LastPath",path)
         
         
-    def selectDialog(self, url):
+    def selectDialog(self, url, bypass=False):
         log('selectDialog, url = ' + str(url))
         newURL = url
         while not xbmc.Monitor().abortRequested():
-            items = list(self.buildItems(url))
+            items  = list(self.buildItems(url))
             if len(items) == 0: break
-            label  = url.replace(BASE_URL,'./')
-            select = xbmcgui.Dialog().select(label, items, preselect=-1, useDetails=True)
-            if select < 0: return #return on cancel.
+            elif len(items) == 2 and not bypass and items[0].getLabel().startswith('Parent directory') and not items[1].getLabel().startswith('.apk'): select = 1 #If one folder bypass selection.
+            else:
+                label  = url.replace(BASE_URL,'./')
+                select = xbmcgui.Dialog().select(label, items, preselect=-1, useDetails=True)
+                if select < 0: return #return on cancel.
             label  = items[select].getLabel()
             newURL = url + items[select].getLabel()
             preURL = url.rsplit('/', 2)[0] + '/'
@@ -154,9 +150,9 @@ class Installer(object):
                 self.setLastPath(url,dest)
                 return self.downloadAPK(newURL,dest)
             elif label.startswith('Parent directory') and "android" in preURL:
-                return self.selectDialog(preURL)
+                return self.selectDialog(preURL, True)
             elif label.startswith('Parent directory') and "android" not in preURL:
-                return self.selectDialog(self.buildMain())
+                return self.selectDialog(self.buildMain(), False)
             url = newURL + '/'
                 
 
@@ -217,5 +213,4 @@ class Installer(object):
         xbmc.executebuiltin('XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),0.5,true)')
         xbmc.executebuiltin('StartAndroidActivity("","android.intent.action.VIEW","application/vnd.android.package-archive","file:'+apkfile+'")')
         
-if __name__ == '__main__':
-    Installer()
+if __name__ == '__main__': Installer()

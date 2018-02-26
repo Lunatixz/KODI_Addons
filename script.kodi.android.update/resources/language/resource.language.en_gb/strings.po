@@ -61,7 +61,7 @@ msgid "Unknown Android version"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Android v.%s.0.0 is incompatible with Kodi,"
+msgid "Android v.%s.0.0 is incompatible with new Kodi versions,"
 msgstr ""
 
 msgctxt "#30012"
@@ -71,3 +71,30 @@ msgstr ""
 msgctxt "#30013"
 msgid "Detecting Android version..."
 msgstr ""
+
+msgctxt "#30014"
+msgid "Current Android platform (%s)"
+msgstr ""
+
+msgctxt "#30015"
+msgid "Semi-stable (Monthly builds)."
+msgstr ""
+
+msgctxt "#30016"
+msgid "Stable (Final releases)."
+msgstr ""
+
+msgctxt "#30017"
+msgid "Unstable (Daily builds)."
+msgstr ""
+
+msgctxt "#30018"
+msgid "Experimental (Debugging builds)."
+msgstr ""
+
+msgctxt "#30019"
+msgid "Incompatible platform"
+msgstr ""
+
+
+

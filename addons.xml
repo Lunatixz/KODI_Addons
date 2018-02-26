@@ -303,6 +303,35 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.funnynordie" version="1.0.0" name="Funny or Die" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.youtube.dl" version="17.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Watch full episodes and clips from Funny or Die.</summary>
+        <description lang="en_GB">Funny Or Die is a comedy video website that combines user-generated content with original, exclusive content. The site is a place where celebrities, established and up-and-coming comedians and regular users can all put up stuff they think is funny. At the same time, the site hopes to eliminate all the junk that people have to pick through to find videos. That means around here you get to vote on what videos are funny and what videos deserve to die.</description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.funnynordie</source>
+        <website>http://funnyordie.com</website>
+        <news></news>
+        <forum>https://forum.kodi.tv/showthread.php?tid=328954</forum>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.video.haystacktv" version="1.0.1" name="Haystack.TV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1087,7 +1116,7 @@
     </extension>
 </addon>
 
-<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.0.4" provider-name="Team Kodi">
+<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.0.5" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.24.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -1103,7 +1132,7 @@
         <website>http://kodi.tv</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.android.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=322783</forum>
-        <news>v1.0.4[CR]-Android Version Detection[CR]- Improved Error Handling[CR]v1.0.3[CR]-Improved functionality[CR]v1.0.1[CR]-Added After Install Cleanup.</news>
+        <news>v1.0.5[CR]-Moved to Jarvis[CR]-Android Platform Detection[CR]-Streamlined Navigation[CR]v1.0.4[CR]-Android Version Detection[CR]- Improved Error Handling[CR]v1.0.3[CR]-Improved functionality[CR]v1.0.1[CR]-Added After Install Cleanup.</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

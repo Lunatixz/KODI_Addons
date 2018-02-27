@@ -1145,7 +1145,7 @@
     </extension>
 </addon>
 
-<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.0.5" provider-name="Team Kodi">
+<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.0.7" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.24.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -1172,7 +1172,7 @@
     </extension>
 </addon>
 
-<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.0.1" provider-name="Team Kodi">
+<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.0.2" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -1189,7 +1189,7 @@
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.windows.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=325226</forum>
         <disclaimer>UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
-        <news>v1.0.1[CR]-Improved functionality</news>
+        <news>v1.0.2[CR]-WIndows Platform Detection[CR]-Streamlined Navigation[CR]-Windows Version Detection[CR]v1.0.1[CR]-Improved functionality</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

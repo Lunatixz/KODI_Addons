@@ -1217,7 +1217,7 @@
     </extension>
 </addon>
 
-<addon id="script.module.pyhdhr" version="1.0.2" name="pyHDHR" provider-name="Lunatixz">
+<addon id="script.module.pyhdhr" version="1.0.3" name="pyHDHR" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0" />
     </requires>

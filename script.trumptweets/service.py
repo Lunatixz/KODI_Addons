@@ -1,4 +1,4 @@
-#   Copyright (C) 2017 Lunatixz
+#   Copyright (C) 2018 Lunatixz
 #
 #
 # This file is part of Trump Tweets.
@@ -16,11 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Trump Tweets.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, gui, feedparser, datetime, random
-import xbmc, xbmcaddon, xbmcgui, traceback
+import os, gui, time, datetime, random, urllib2, re
+import xbmc, xbmcaddon, xbmcgui, traceback, feedparser
 
 # Plugin Info
-ADDON_ID       = 'script.trumptweets'
+ADDON_ID      = 'script.trumptweets'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME    = REAL_SETTINGS.getAddonInfo('name')
 SETTINGS_LOC  = REAL_SETTINGS.getAddonInfo('profile')
@@ -35,83 +35,94 @@ DEBUG       = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 BASE_FEED   = 'https://twitrss.me/twitter_user_to_rss/?user=realDonaldTrump'
 
 def log(msg, level=xbmc.LOGDEBUG):
-    if DEBUG == True:
-        if level == xbmc.LOGERROR:
-            msg += ' ,' + traceback.format_exc()
-        xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + stringify(msg), level)
-        
-def stringify(string):
-    if isinstance(string, list):
-        string = (string[0])
-    elif isinstance(string, (int, float, long, complex, bool)):
-        string = str(string) 
-    
-    if isinstance(string, basestring):
-        if not isinstance(string, unicode):
-            string = unicode(string, 'utf-8')
-        elif isinstance(string, unicode):
-            string = string.encode('ascii', 'ignore')
-        else:
-            string = string.encode('utf-8', 'ignore')
-    return string
+    if DEBUG == False and level != xbmc.LOGERROR: return
+    if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
+    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
 
-def getProperty(str):
-    try:
-        return xbmcgui.Window(10000).getProperty(stringify(str))
-    except Exception,e:
-        log("Utils: getProperty, Failed! " + str(e), xbmc.LOGERROR)
-        return ''
+def getProperty(string1, cntrl=10000):
+    return xbmcgui.Window(cntrl).getProperty(string1)
           
-def setProperty(str1, str2):
-    try:
-        xbmcgui.Window(10000).setProperty(stringify(str1), stringify(str2))
-    except Exception,e:
-        log("Utils: setProperty, Failed! " + str(e), xbmc.LOGERROR)
+def setProperty(string1, value, cntrl=10000):
+    try: xbmcgui.Window(cntrl).setProperty(string1, value)
+    except Exception as e: log("setProperty, failed! " + str(e), xbmc.LOGERROR)
 
-def clearProperty(str):
-    xbmcgui.Window(10000).clearProperty(stringify(str))
-   
-class Service():
-    def __init__(self):
-        log('__init__')
-        random.seed()
-        self.myService = xbmc.Monitor()
-        while not self.myService.abortRequested():
-            WAIT_TIME = [300,600,900,1800][int(REAL_SETTINGS.getSetting('Wait_Time'))]
-            IGNORE = REAL_SETTINGS.getSetting('Not_While_Playing') == 'true'
-            if xbmc.Player().isPlayingVideo() == True and IGNORE == True:
-                self.myService.waitForAbort(WAIT_TIME)
-                continue
-            self.chkFEED()
-            if self.myService.waitForAbort(WAIT_TIME) == True:
-                break
+def clearProperty(string1, cntrl=10000):
+    xbmcgui.Window(cntrl).clearProperty(string1)
 
-                
-    def testString(self):
-        ''' 
-        gen. 140char mock sentence for skin test
-        '''
-        a = ''
-        for i in range(1,141):
-            a += 'W%s'%random.choice(['',' '])
-        return a[:140]
+class Monitor(xbmc.Monitor):
+    def __init__(self, *args, **kwargs):
+        self.pendingChange = True
+
         
+    def onSettingsChanged(self):
+        log('onSettingsChanged')
+        self.pendingChange = True
+        
+class Service(object):
+    def __init__(self):
+        random.seed()
+        self.myMonitor = Monitor()
+        self.startService()
+        
+        
+    def startService(self):
+        while not self.myMonitor.abortRequested():
+            if self.myMonitor.pendingChange == True:
+                self.myMonitor.pendingChange = False
+                REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
+                waitTime   = [300,600,900,1800][int(REAL_SETTINGS.getSetting('Wait_Time'))]
+                ignorePlay = REAL_SETTINGS.getSetting('Not_While_Playing') == 'true'
+            
+            # Don't run while playing.
+            if xbmc.Player().isPlayingVideo() == True and ignorePlay == True:
+                log('startService, ignore during playback')
+                continue
 
+            # Don't run while setting menu is opened.
+            if xbmcgui.getCurrentWindowDialogId() in [10140,10103]:
+                log('startService, settings dialog opened')
+                continue
+        
+            self.chkFEED()
+            
+            # Sleep
+            if self.myMonitor.waitForAbort(waitTime) == True:
+                log('startService, waitForAbort/pendingChange')
+                break
+    
+
+    def testString(self):
+        #gen. 140char mock sentence for skin test
+        a = ''
+        for i in range(1,281): a += 'W%s'%random.choice(['',' '])
+        return a[:280]
+        
+        
+    def correctTime(self, tweetTime):
+        log('correctTime, IN tweetTime = '+ tweetTime)
+        tweetTime  = datetime.datetime.strptime(tweetTime, '%a, %d %b %Y %H:%M:%S')
+        td_local   = tweetTime - datetime.timedelta(seconds=3600)
+        tweetTime  = td_local.strftime('%a, %d %b %Y %I:%M:%S %p').lstrip('0')
+        log('correctTime, OUT tweetTime = '+ tweetTime)
+        return tweetTime
+        
+        
     def chkFEED(self):
         log('chkFEED')
-        feed   = feedparser.parse(BASE_FEED)
-        items  = feed['entries']
-        index  = {True:random.randint(0,(len(items)-1)),False:0}[int(REAL_SETTINGS.getSetting('Enable_Random')) == 1]
-        item   = items[index]
-        if item and 'summary_detail' in item:
-            title = (stringify(item['title']).replace('\n','').replace('\t','').replace('\r','').rstrip())
-            pdate = item.get('published','').split('+')[0].rstrip()
-            if getProperty('%s.pdate' %ADDON_ID) != pdate:
-                setProperty('%s.title'%ADDON_ID,title)
-                setProperty('%s.pdate'%ADDON_ID,pdate)
-                ui = gui.GUI("default.xml", ADDON_PATH, "default")
-                ui.doModal()
-                del ui
-    
-if __name__ == '__main__':
-    Service()
+        try:
+            isRandom = int(REAL_SETTINGS.getSetting('Enable_Random')) == 1
+            feed     = feedparser.parse(BASE_FEED)
+            items    = feed['entries']
+            index    = {True:random.randint(0,(len(items)-1)),False:0}[isRandom]
+            item     = items[index]
+            title    = ((item['title']).replace('\n','').replace('\t','').replace('\r','').rstrip())
+            pdate    = self.correctTime(item.get('published','').split('+')[0].rstrip())
+            if getProperty('%s.pdate' %ADDON_ID) == pdate: return
+            setProperty('%s.title'%ADDON_ID,title)
+            setProperty('%s.pdate'%ADDON_ID,pdate)
+            ui = gui.GUI("default.xml", ADDON_PATH, "default")
+            ui.doModal()
+            del ui
+        except: pass
+                
+if __name__ == '__main__': Service()

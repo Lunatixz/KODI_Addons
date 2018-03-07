@@ -73,8 +73,8 @@ class service(object):
             
     def updateJson(self):
         log('updateJson')
-        if USERNAME is None: return
         self.myMonitor.pendingChange = False
+        if USERNAME is None: return
         for target_id in self.getTargets(): self.loadImages(target_id)
         return
         

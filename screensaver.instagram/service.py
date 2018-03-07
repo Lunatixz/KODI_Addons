@@ -32,8 +32,8 @@ FANART         = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE       = REAL_SETTINGS.getLocalizedString
 
 # Globals
-USERNAME       = REAL_SETTINGS.getSetting('Username')
-PASSWORD       = REAL_SETTINGS.getSetting('Password')
+USERNAME       = (REAL_SETTINGS.getSetting('Username') or None)
+PASSWORD       = (REAL_SETTINGS.getSetting('Password') or None)
 ORIGIN_URL     = 'https://www.instagram.com'
 LOGIN_URL      = ORIGIN_URL + '/accounts/login/ajax/'
 
@@ -73,6 +73,7 @@ class service(object):
             
     def updateJson(self):
         log('updateJson')
+        if USERNAME is None: return
         self.myMonitor.pendingChange = False
         for target_id in self.getTargets(): self.loadImages(target_id)
         return
@@ -164,7 +165,8 @@ class instagram(object):
         except Exception as exc:
             log('problem occur: %s' % (exc))
             exit()
-
+        
+        if USERNAME is None or PASSWORD is None: return
         self.session.headers.update({'X-CSRFToken': req.cookies['csrftoken']})
         login_data = {'username': USERNAME, 'password': PASSWORD}
         login = self.session.post(LOGIN_URL, data=login_data, allow_redirects=True)

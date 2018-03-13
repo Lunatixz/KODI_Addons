@@ -553,7 +553,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.newsblender" version="1.0.1" name="News Blender" provider-name="Lunatixz">
+<addon id="plugin.video.newsblender" version="1.0.2" name="News Blender" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -569,7 +569,7 @@
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.newsblender</source>
         <website>http://newsapi.org</website>
-        <news>v.1.0.1[CR]-Added Parsing Dialog</news>
+        <news>v.1.0.2[CR]-Fixed parsing errors[CR]v.1.0.1[CR]-Added Parsing Dialog</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=326129</forum>
         <assets>
             <icon>resources/images/icon.png</icon>
@@ -581,7 +581,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.newsmaxtv" version="1.0.0" name="NewsmaxTV" provider-name="Lunatixz">
+<addon id="plugin.video.newsmaxtv" version="1.0.1" name="NewsmaxTV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -594,7 +594,7 @@
         <description lang="en_GB">Newsmax TV is growing rapidly and now reaches over 40 million cable/satellite homes and subscribers.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/plugin.video.newsmaxtv</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.newsmaxtv</source>
         <website>http://www.newsmaxtv.com</website>
         <forum>http://forum.kodi.tv/showthread.php?tid=321030</forum>
         <news></news>
@@ -754,7 +754,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.skynews" version="1.0.1" name="Sky News" provider-name="Lunatixz">
+<addon id="plugin.video.skynews" version="1.0.2" name="Sky News" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -769,7 +769,7 @@
         <description lang="en_GB">Sky News - First for Breaking News, video, headlines, analysis and top stories from business, politics, entertainment and more in the UK and worldwide.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/plugin.video.skynews</source>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/plugin.video.skynews</source>
         <website>http://news.sky.com/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=320938</forum>
         <news></news>

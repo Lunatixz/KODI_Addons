@@ -42,8 +42,8 @@ DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 BASE_URL      = 'http://www.earthcam.com'
 NET_URL       = '%s/network/'%BASE_URL
 LOGO_URL      = 'http://icons.better-idea.org/icon?url=%s&size=70..120..200'
-MAIN_MENU     = [("Browse Featured", NET_URL, 2),
-				 ("Browse Feeds"   , NET_URL, 1)]
+MAIN_MENU     = [(LANGUAGE(30003), NET_URL, 2),
+				 (LANGUAGE(30004), NET_URL, 1)]
                  
 
 def log(msg, level=xbmc.LOGDEBUG):
@@ -79,7 +79,7 @@ class EarthCam(object):
          
     def buildMenu(self, items):
         for item in items: self.addDir(*item)
-        self.addYoutube("Browse Youtube" , 'plugin://plugin.video.youtube/user/earthcam/')
+        self.addYoutube(LANGUAGE(30005), 'plugin://plugin.video.youtube/user/earthcam/')
             
             
     def browse(self, name, url):

@@ -33,21 +33,21 @@ msgid "Not compatible with PseudoTV Live"
 msgstr ""
 
 msgctxt "#30004"
-msgid "Browse Shows"
+msgid "Shows"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Browse Standup"
+msgid "Standup"
 msgstr ""
 
 msgctxt "#30006"
-msgid "Browse Youtube"
+msgid "Youtube"
 msgstr ""
 
 msgctxt "#30007"
-msgid "Latest Episodes"
+msgid "Latest"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Browse Featured"
+msgid "Featured"
 msgstr ""

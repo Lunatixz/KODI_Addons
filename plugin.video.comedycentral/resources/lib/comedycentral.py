@@ -42,6 +42,7 @@ DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
 PTVL_RUNNING  = xbmcgui.Window(10000).getProperty('PseudoTVRunning') == 'True'
 BASE_URL      = 'http://www.cc.com'
+LOGO_URL      = 'https://dummyimage.com/512x512/035e8b/FFFFFF.png&text=%s'
 MAIN_MENU     = [(LANGUAGE(30007), BASE_URL + '/full-episodes' , 1),
                  (LANGUAGE(30008), BASE_URL + '/shows'         , 1),
                  (LANGUAGE(30004), BASE_URL + '/shows'         , 1)]
@@ -108,18 +109,18 @@ class CC(object):
             elif ent_code == 'ent_m013': return self.buildEpisodes(name, url, jsonResponse, jsonResponse['episodes'])
             elif ent_code in ['ent_m100','ent_m150']:
                 for item in jsonResponse['data']['items']:
-                    if ent_code == 'ent_m100' and name == LANGUAGE(30008): self.buildShow(item, thumb)
+                    if ent_code == 'ent_m100' and name == LANGUAGE(30008): self.buildShow(item)
                     elif ent_code == 'ent_m150' and name == LANGUAGE(30004):
-                        for show in item['sortedItems']: self.buildShow(show, thumb)
+                        for show in item['sortedItems']: self.buildShow(show)
 
 
-    def buildShow(self, show, thumb):
+    def buildShow(self, show):
         vid_url = (show.get('canonicalURL','') or show.get('url',None))
         title = (show.get('title','')          or show.get('shortTitle',None))
         plot  = (show.get('description','')    or show.get('shortDescription','') or title)
         if vid_url is None or title is None or not vid_url.startswith(BASE_URL): return
         try: thumb = show['image']['url']
-        except: pass
+        except: thumb = LOGO_URL%(urllib.quote(title))
         infoLabels = {"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title,"plot":plot}
         infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
         self.addDir(title,vid_url,1,infoLabels,infoArt)

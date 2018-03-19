@@ -286,7 +286,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.earthcam" version="1.0.0" name="EarthCam" provider-name="Lunatixz">
+<addon id="plugin.video.earthcam" version="1.0.1" name="EarthCam" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -302,7 +302,7 @@
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/plugin.video.earthcam/tree/master</source>
         <website>http://earthcam.com</website>
-        <news></news>
+        <news>v1.0.1[CR]-Fixed playback labels</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=329152</forum>
         <assets>
             <icon>resources/images/icon.png</icon>
@@ -891,35 +891,6 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.uepg.demo" version="1.0.0" name="uEPG Demo" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.uepg" version="0.0.1"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
-        <description lang="en_GB"></description>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/plugin.video.uepg.demo</source>
-        <website></website>
-        <forum></forum>
-        <news></news>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="plugin.video.ustvnow" name="USTVnow" provider-name="Lunatixz" version="2018.01.05">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1350,31 +1321,6 @@
     </extension>
 </addon>
 
-<addon id="script.netcamstudio" version="0.0.1" name="Netcam Studio" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.14.0"/>
-        <import addon="script.module.pil" version="0.0.1"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.pyfscache" version="0.9.12"/>
-        <import addon="script.module.simplejson" version="3.3.0"/>
-        <import addon="script.module.beautifulsoup" version="3.2.1"/>
-        <import addon="script.common.plugin.cache" version="2.5.5"/>
-    </requires>
-	<extension point="xbmc.python.script" defaultresolution="1080i" library="default.py"/>
-    <extension point="xbmc.service" library="service.py" start="startup"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en">Netcam Studio for webcams and network cameras.</summary>
-        <description lang="en">Netcam Studio is the successor to webcamXP, the popular software for webcams and network cameras monitoring by Moonware Studios. No license or membership is required to use features such as motion detection and remote monitoring from another computer, a phone or a tablet. The free version allows to connect 2 video sources. The official Netcam Studio Clients (Windows, Web, Smartphone and Tablet) are free and can be installed on as many devices as needed. The Web API allows to you to create your own clients or to operate with other applications in any programming language.</description>
-        <disclaimer lang="en">This software is a BETA release, bugs maybe common until final release.</disclaimer>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/script.pseudocinema.poster</source>
-        <email>pseudotvlive@gmail.com</email>
-        <website>http://www.netcamstudio.com/</website>
-        <forum>http://pseudotvlive.com/index.php/forum</forum>
-    </extension>
-</addon>
-
 <addon id="script.pseudocinema.poster" version="0.0.2a" name="PseudoCinema Poster" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
@@ -1613,26 +1559,6 @@
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.onmute</source>
-        <news></news>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="service.onnext" version="0.0.1" name="OnNext" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplejson" version="3.3.0"/>
-    </requires>
-    <extension point="xbmc.service" library="service.py" start="startup"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
-        <description lang="en_GB"></description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.onnext</source>
         <news></news>
         <assets>
             <icon>icon.png</icon>

@@ -49,5 +49,5 @@ msgid "Latest Episodes"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Featured Shows"
+msgid "Browse Featured"
 msgstr ""

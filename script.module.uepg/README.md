@@ -54,7 +54,7 @@ Details coming Soon.
 
 ### Guidedata Parameters. 
 
-- [Minimum JSON Example](https://github.com/Lunatixz/XBMC_Addons/raw/master/script.module.uepg/resources/example.json)
+- [Minimum JSON Example](https://github.com/Lunatixz/KODI_ADDONS/raw/master/script.module.uepg//resources/example.json)
 
 #### Per channel parameters:
 
@@ -80,7 +80,8 @@ Details coming Soon.
 
 #### Extended programme parameters:
 
-- [ListItem parameter details](https://codedocs.xyz/xbmc/xbmc/group__python__xbmcgui__listitem.html#ga0b71166869bda87ad744942888fb5f14)
+- [ListItem parameter details]
+(https://codedocs.xyz/xbmc/xbmc/group__python__xbmcgui__listitem.html#ga0b71166869bda87ad744942888fb5f14)
 
 - [ListItem Art parameter details](https://codedocs.xyz/xbmc/xbmc/group__python__xbmcgui__listitem.html#gad3f9b9befa5f3d2f4683f9957264dbbe)
 

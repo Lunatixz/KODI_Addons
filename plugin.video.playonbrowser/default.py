@@ -17,7 +17,7 @@
 # along with Playon Browser.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, os, re, random, traceback, json, xmltodict, collections
-import urllib, urllib2, socket, datetime
+import urlparse, urllib, urllib2, socket, datetime
 import xbmc, xbmcplugin, xbmcaddon, xbmcgui
 
 from simplecache import SimpleCache
@@ -37,7 +37,9 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 TIMEOUT        = 30
 CONTENT_TYPE   = 'files'
 PLAYON_DATA    = '/data/data.xml'
+SEARCH_URL     = "/data/data.xml?id=%s&searchterm="
 BASE_VIDEO_URL = "%s/%s/main.m3u8"
+AUTO_URL       = "http://m.playon.tv/q.php"
 BASE_ID_URL    = "%s/data/data.xml?id=%s"
 BASE_UPNP      = REAL_SETTINGS.getSetting("playonUPNPid").rstrip('/')
 BASE_URL       = REAL_SETTINGS.getSetting("playonserver").rstrip('/')
@@ -52,20 +54,14 @@ def log(msg, level=xbmc.LOGDEBUG):
     xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg.encode("utf-8")), level)
      
 def getParams():
-    param=[]
-    if len(sys.argv[2])>=2:
-        params=sys.argv[2]
-        cleanedparams=params.replace('?','')
-        if (params[len(params)-1]=='/'):
-            params=params[0:len(params)-2]
-        pairsofparams=cleanedparams.split('&')
-        param={}
-        for i in range(len(pairsofparams)):
-            splitparams={}
-            splitparams=pairsofparams[i].split('=')
-            if (len(splitparams))==2:
-                param[splitparams[0]]=splitparams[1]
-    return param
+    return dict(urlparse.parse_qsl(sys.argv[2][1:]))
+    
+def getKeyboard(default='',header=ADDON_NAME):
+    kb = xbmc.Keyboard(default,header)
+    xbmc.sleep(1000)
+    kb.doModal()
+    if kb.isConfirmed(): return kb.getText()
+    return False
     
 def folderIcon(val):
     log('folderIcon')
@@ -84,19 +80,19 @@ def parseSEinfo(label):
     pattern8 = re.compile(r"""(?:s|season)(?P<s>\d+)(?:.*)(?:e|x|episode|\n)(?:\s)(?P<ep>\d+) # s01 random123 e 02"""       , re.VERBOSE)
     patterns = [pattern1, pattern2, pattern3, pattern4, pattern5, pattern6, pattern7, pattern8 ]
 
-    for idx, p in enumerate(patterns):
-        m = re.search(p, label)
-        if m:
-            season  = int( m.group('s'))
-            episode = int( m.group('ep'))
+    for pattern in patterns:
+        match = re.search(pattern, label)
+        if match:
+            season  = int(match.group('s'))
+            episode = int(match.group('ep'))
     log("parseSEinfo, return S:" + str(season) +',E:'+ str(episode)) 
     return season, episode
 
+random.seed()
 socket.setdefaulttimeout(TIMEOUT)
 class PlayOn:
     def __init__(self):
         self.cache = SimpleCache()
-        random.seed()
         if URLTYPE == 'upnp': self.chkUPNP()
             
             
@@ -109,28 +105,39 @@ class PlayOn:
                 request.add_header('User-Agent','Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)')
                 response = urllib2.urlopen(request, timeout=TIMEOUT).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, response, expiration=datetime.timedelta(minutes=5))
-                if url == BASE_URL + PLAYON_DATA: self.chkIP(response)
             return self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-        except urllib2.URLError, e: log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except socket.timeout, e: log("openURL Failed! " + str(e), xbmc.LOGERROR)
         except Exception as e: log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30010), ICON, 5000)
- 
-    
-    def chkIP(self, response):
-        results = xmltodict.parse(response)
-        if results:
-            if 'catalog' in results:
-                try:
-                    ServerName = results['catalog']['@name']
-                    ServerVer = 'PlayOn v.%s'%results['catalog']['@server']
-                    ServerMSG = "Connected to [B]%s %s[/B]"%(ServerName,ServerVer)
-                    log('chkIP, ServerName = ' + ServerName)
-                    log('chkIP, ServerVer = ' + ServerVer)
-                    REAL_SETTINGS.setSetting("playonServerid",ServerMSG)
-                    xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30011)%ServerName, ICON, 5000)
-                except: pass
-        else: xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30012), ICON, 5000)
+        if url == BASE_URL + PLAYON_DATA: self.getIP()
+        
+        
+    def getIP(self):
+        url   = self.openURL(AUTO_URL).replace('|','')
+        match = re.findall(r'[0-9]+(?:\.[0-9]+){3}:[0-9]+', url)
+        log('getIP, match = ' + str(match))
+        if len(match) == 0:
+            url = getKeyboard(LANGUAGE(30001),LANGUAGE(30002))
+            if url == False: return
+        if not url.startswith('http'): url = "http://%s"%url
+        BASE_URL = url
+        REAL_SETTINGS.setSetting("playonserver",url)
+        self.chkIP(url)
+        
+        
+    def chkIP(self, url=BASE_URL):
+        log('chkIP, url = ' + str(url))
+        results = xmltodict.parse(self.openURL(url + PLAYON_DATA))
+        if results and 'catalog' in results:
+            try:
+                ServerName = results['catalog']['@name']
+                ServerVer = 'PlayOn v.%s'%results['catalog']['@server']
+                ServerMSG = "Connected to [B]%s %s[/B]"%(ServerName,ServerVer)
+                log('chkIP, ServerName = ' + ServerName)
+                log('chkIP, ServerVer = ' + ServerVer)
+                REAL_SETTINGS.setSetting("playonServerid",ServerMSG)
+                xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30011)%ServerName, ICON, 5000)
+                xbmc.executebuiltin("Container.Refresh")
+            except Exception as e: log("chkIP Failed! " + str(e), xbmc.LOGERROR)
+        else: xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30010), ICON, 5000)
     
     
     def getUPNP(self):
@@ -186,7 +193,7 @@ class PlayOn:
             else: xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30010), ICON, 5000)
                 
 
-    def buildItemMenu(self, uri=PLAYON_DATA):
+    def buildItemMenu(self, uri=PLAYON_DATA, search=False):
         log('buildItemMenu, uri = ' + uri)
         try:
             genSTRM  = False
@@ -194,23 +201,38 @@ class PlayOn:
             ranNum   = random.randrange(9)
             response = dict(xmltodict.parse(self.openURL(BASE_URL + uri)))
             if response and 'catalog' in response and 'group' in response['catalog']: results = response['catalog']['group']
-            elif response and 'group' in response and response['group']['@href'] == uri:
+            elif response and 'group' in response:# and response['group']['@href'] == uri:
                 results = response['group']['group']
-                genSTRM = True
+                genSTRM = True            
             if isinstance(results,collections.OrderedDict): results = [dict(results)]
-                
+            if not search and uri == PLAYON_DATA: self.addDir('[B][PlayOn][/B] Search','',2,ICON,genSTRM)
             for item in results:
                 try:
                     if isinstance(item,collections.OrderedDict): item = dict(item)
                     if item['@type'] == 'folder':
-                        name  = item['@name'].replace('PlayOn','[B]- PlayOn[/B]').replace('PlayMark','[B]- PlayMark[/B]')
+                        name  = item['@name'].replace('PlayOn','[B][PlayOn][/B]').replace('PlayMark','[B][Playon][/B] PlayMark')
+                        if search and name.startswith('[B][PlayOn][/B]'): continue
                         thumb = BASE_URL + ((item.get('@art','').replace('&size=tiny','&size=large')) or folderIcon(ranNum))
-                        self.addDir(name,item['@href'] ,1,thumb, genSTRM)
+                        if search and item.get('@searchable','false') == 'true':
+                            myURL = json.dumps({'id':item.get('@id',''),'uri':item['@href'],'searchable':item.get('@searchable','false')})
+                            self.addDir('Search %s'%name,myURL,3,thumb)
+                        elif not search: self.addDir(name,item['@href'],1,thumb, genSTRM)
                     elif item['@type'] == 'video': self.addLink(item['@name'],item['@href'],9,len(results))
                 except Exception as e: log("buildItemMenu Failed! " + str(e), xbmc.LOGERROR)
         except Exception as e: log("buildItemMenu Failed! " + str(e), xbmc.LOGERROR)
            
-           
+                           
+    def searchItem(self, uri):
+        log('searchItem, uri = ' + uri)
+        item  = json.loads(uri)
+        query = getKeyboard(header=LANGUAGE(30016))
+        if query == False: 
+            self.buildItemMenu(search=True)
+            return
+        else: query = 'dc:description%20contains%20' + urllib.quote(query)
+        self.buildItemMenu(SEARCH_URL%(item['id']) + query)
+        
+
     def playLater(self, name, uri):
         log('playLater, uri = ' + uri)
         response = dict(xmltodict.parse(self.openURL(BASE_URL + uri)))
@@ -320,6 +342,8 @@ log("Name: "+str(name))
 
 if mode==None:  PlayOn().buildItemMenu()
 if mode==1:     PlayOn().buildItemMenu(url)
+if mode==2:     PlayOn().buildItemMenu(search=True)
+if mode==3:     PlayOn().searchItem(url)
 if mode==7:     PlayOn().genSTRMS(name, url)
 if mode==8:     PlayOn().playLater(name, url)
 if mode==9:     PlayOn().playVideo(name, url)

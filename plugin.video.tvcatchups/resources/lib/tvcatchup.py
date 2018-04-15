@@ -39,7 +39,6 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 TIMEOUT       = 15
 CONTENT_TYPE  = 'episodes'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
 BASE_URL      = 'http://www.tvcatchup.com'
 LIVE_URL      = BASE_URL + '/channels'
 GUIDE_URL     = BASE_URL + '/tv-guide'

@@ -96,7 +96,7 @@ class ALTPOSTERS(object):
         log('setImage, url = ' + url)
         if not xbmcgui.Dialog().yesno(ADDON_NAME, LANGUAGE(32003)%(title)): return
         xbmcgui.Dialog().notification(ADDON_NAME,LANGUAGE(32004)%(title), ICON, 4000)
-        json_query = ('{"jsonrpc":"2.0","method":"VideoLibrary.SetMovieDetails","params":{"movieid" : %s, "thumbnail":"%s"},"id":1}' % (dbID,url))
+        json_query = ('{"jsonrpc":"2.0","method":"VideoLibrary.SetMovieDetails","params":{"movieid" : %s, "thumbnail" : "%s", "art" : %s},"id":1}' % (dbID,url,json.dumps({"poster":url})))
         xbmc.executeJSONRPC(json_query)
         xbmc.executebuiltin("Container.Refresh")
         

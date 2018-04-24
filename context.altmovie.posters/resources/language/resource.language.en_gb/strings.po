@@ -29,7 +29,7 @@ msgid "Search Depth"
 msgstr ""
 
 msgctxt "#32000"
-msgid "Search Alternative Poster"
+msgid "Select Alternative Poster"
 msgstr ""
 
 msgctxt "#32001"

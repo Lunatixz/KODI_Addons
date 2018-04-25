@@ -42,9 +42,9 @@ CONTENT_TYPE  = 'files'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
 BASE_URL      = 'http://www.cbs.com'
-WATCH_URL     = 'http://www.cbs.com/watch'
-SHOW_URL      = 'http://www.cbs.com/carousels/videosBySection/%s/offset/0/limit/40/xs/0'
-SHOWS_URL     = 'http://www.cbs.com/shows'
+WATCH_URL     = BASE_URL+'/watch'
+SHOW_URL      = BASE_URL+'/carousels/videosBySection/%s/offset/0/limit/40/xs/0'
+SHOWS_URL     = BASE_URL+'/shows'
 
 MAIN_MENU = [("Latest Episodes", "", 1),
              ("Browse Shows"   , "", 2)]
@@ -82,11 +82,9 @@ class CBS(object):
             cacheResponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
             if not cacheResponse:
                 request = urllib2.Request(url)
-                response = urllib2.urlopen(request, timeout = TIMEOUT).read()
-                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, response, expiration=datetime.timedelta(hours=1))
-            return self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-        except urllib2.URLError as e:log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except socket.timeout as e:log("openURL Failed! " + str(e), xbmc.LOGERROR)
+                cacheResponse = urllib2.urlopen(request, timeout = TIMEOUT).read()
+                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheResponse, expiration=datetime.timedelta(hours=1))
+            return cacheResponse
         except Exception as e:log("openURL Failed! " + str(e), xbmc.LOGERROR)
         xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
         return ''
@@ -149,7 +147,6 @@ class CBS(object):
             thumb     = (item['thumb']['large'] or item['thumb']['small'] or ICON)
             aired     = str(item['airdate_iso']).split('T')[0]
             showTitle = uni(item['series_title'])
-            plot      = uni(item['description'])
             runtime   = item['duration'].split(':')
             if len(runtime) == 3:
                 h, m, s = runtime
@@ -160,10 +157,11 @@ class CBS(object):
             
             seasonNumber  = int(item.get('season_number','0')   or '0')
             episodeNumber = int(item.get('episode_number','0')  or '0')
-            url       = item['url']
+            url = item['url']
             if not url.startswith('http://'): url = (BASE_URL + '%s'%url).lstrip('/')
             seinfo = ('S' + ('0' if seasonNumber < 10 else '') + str(seasonNumber) + 'E' + ('0' if episodeNumber < 10 else '') + str(episodeNumber))
             label  = '%s - %s'%(showTitle, title) if seasonNumber + episodeNumber == 0 else '%s - %s - %s'%(showTitle, seinfo, title)
+            plot   = uni(item.get('description',label))
             infoLabels ={"mediatype":"episodes","label":label ,"title":label,"TVShowTitle":showTitle,"plot":plot,"aired":aired,"duration":duration,"season":seasonNumber,"episode":episodeNumber}
             infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
             self.addLink(label, url, 9, infoLabels, infoArt, len(items))
@@ -221,20 +219,19 @@ class CBS(object):
                         
     def browseShows(self, url=None):
         log('browseShows')
-        soup = BeautifulSoup(self.openURL(SHOWS_URL), "html.parser")
-        item = soup('ul', {'class': 'shows-list'})[0]
-        
-        isFreeLST      = item('div', {'class': 'tune-info'})
-        titlesLST      = item('div', {'class': 'title hide'})
-        thumbLST       = item('img', {'class': 'poster-thumb'})
-        uriLST         = item('a', {'class': 'link-show-thumb-text'})
+        soup      = BeautifulSoup(self.openURL(SHOWS_URL), "html.parser")
+        item      = soup('ul', {'class': 'shows-list'})[0]
+        isFreeLST = item('div', {'class': 'tune-info'})
+        titlesLST = item('div', {'class': 'title hide'})
+        thumbLST  = item('img', {'class': 'poster-thumb'})
+        uriLST    = item('a', {'class': 'link-show-thumb-text'})
         
         for idx, show in enumerate(titlesLST):
-            isFree      = 'all access' not in isFreeLST[idx].get_text().lower()
+            isFree = 'all access' not in isFreeLST[idx].get_text().lower()
             if not isFree: continue 
-            title       = uni(show.get_text())
-            thumb       = thumbLST[idx]['src']
-            url         = uriLST[idx]['href']
+            title  = uni(show.get_text())
+            thumb  = thumbLST[idx]['src']
+            url    = uriLST[idx]['href']
             if not url.startswith('http://'): url = (BASE_URL + url).lstrip('/')
             if not url.endswith('/video/'): url = '%s/video/'%url.rstrip('/')
             url = json.dumps({'url':url,'thumb':thumb})
@@ -250,6 +247,9 @@ class CBS(object):
         info = info.streams()
         url  = info[0]['xbmc_url']
         liz  = xbmcgui.ListItem(name, path=url)
+        if 'm3u8' in url.lower():
+            liz.setProperty('inputstreamaddon','inputstream.adaptive')
+            liz.setProperty('inputstream.adaptive.manifest_type','hls')
         if 'subtitles' in info[0]['ytdl_format']: liz.setSubtitles([x['url'] for x in info[0]['ytdl_format']['subtitles'].get('en','') if 'url' in x])
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
         

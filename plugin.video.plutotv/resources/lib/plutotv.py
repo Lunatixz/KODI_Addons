@@ -98,14 +98,13 @@ class PlutoTV():
         
     @use_cache(1)
     def getRegion(self):
-        return (self.openURL(REGION_URL)['countryCode'] or 'US')
+        return (self.openURL(REGION_URL).get('countryCode','') or 'US')
         
         
     def login(self):
         log('login')
         #ignore guest login
         if USER_EMAIL == LANGUAGE(30009): return
-        
         if len(USER_EMAIL) > 0:
             header_dict               = {}
             header_dict['Accept']     = 'application/json, text/javascript, */*; q=0.01'
@@ -165,7 +164,7 @@ class PlutoTV():
         except Exception as e:
             log('openURL, Unable to open url ' + str(e), xbmc.LOGERROR)
             xbmcgui.Dialog().notification(ADDON_NAME, 'Unable to Connect, Check User Credentials', ICON, 4000)
-            return []
+            return ''
             
 
     def mainMenu(self):
@@ -421,7 +420,7 @@ class PlutoTV():
 
     def uEPG(self):
         log('uEPG')
-        #support for upcoming uEPG universal epg framework module, module will be available from the Kodi repository.
+        #support for uEPG universal epg framework module, available from the Kodi repository.
         #https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.uepg
         data      = (self.openURL(BASE_LINEUP))
         self.link = (self.openURL(BASE_GUIDE % (datetime.datetime.now().strftime('%Y-%m-%dT%H:00:00'),(datetime.datetime.now() + datetime.timedelta(hours=8)).strftime('%Y-%m-%dT%H:00:00'))))
@@ -429,7 +428,6 @@ class PlutoTV():
         
         
     def buildGuide(self, channel):
-        log('buildGuide')
         chthumb    = ''
         chlogo     = ''
         chid       = channel['_id']
@@ -443,6 +441,7 @@ class PlutoTV():
         if self.filter == True and (self.region in exclude or self.region not in region): return
         if 'thumbnail' in channel: chthumb = (channel['thumbnail'].get('path','') or '')
         if 'logo' in channel: chlogo = (channel['logo'].get('path','') or '')
+        log('buildGuide, channel = ' + str(chnum))
             
         newChannel = {}
         guidedata  = []
@@ -479,9 +478,9 @@ class PlutoTV():
                 title     = "%s: %s" %(chname, epname)
                 if any(k.lower().startswith(title.lower()) for k in IGNORE_KEYS): return
                 tmpdata = {"mediatype":self.mediaType[chcat],"label":title,"title":chname,"originaltitle":epname,"plot":epplot, "code":epid, "genre":chcat, "imdbnumber":chid, "duration":dur}
-                tmpdata['starttime'] = time.time() #int(time.mktime(time.strptime((item["start"].split('.')[0]), "%Y-%m-%dT%H:%M:%S")))
+                tmpdata['starttime'] = int(time.mktime(time.strptime((item["start"].split('.')[0]), "%Y-%m-%dT%H:%M:%S")))
                 tmpdata['url']       = sys.argv[0]+'?mode=7&name=%s&url=%s'%(title,url)
-                tmpdata['art']       ={"thumb":thumb,"clearart":poster,"fanart":FANART,"icon":chthumb,"clearlogo":chlogo}
+                tmpdata['art']       = {"thumb":thumb,"clearart":poster,"fanart":FANART,"icon":chthumb,"clearlogo":chlogo}
                 guidedata.append(tmpdata)
         newChannel['guidedata'] = guidedata
         return newChannel

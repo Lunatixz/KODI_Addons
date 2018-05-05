@@ -91,8 +91,7 @@ class CBS(object):
          
          
     def buildMenu(self, items):
-        for item in items: 
-            self.addDir(*item)
+        for item in items: self.addDir(*item)
         self.addYoutube("Browse Youtube" , 'plugin://plugin.video.youtube/user/CBS/')
             
                 
@@ -198,24 +197,26 @@ class CBS(object):
             metas = json.loads(re.search('(?:video.section_metadata = |"section_metadata"\:)({.+?}})',response).group(1))
 
             for item in items:
-                url     = SHOW_URL%item
-                seasons = (metas.get(item,'').get('display_seasons','') or False)
-                
-                if seasons:
-                    title = uni(metas[item]['title'])
-                    seasonLST = '%s}]'%((re.search('video.seasons = {(.*)filter: (\S.+?);',response).group(2)).split('}]')[0])
-                    url = json.dumps({'url':url,'seasons':seasonLST,'thumb':thumb})
-                    infoLabels ={"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
-                    infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
-                    self.addDir(title,url,4,infoLabels,infoArt)
-                else:
-                    item  = json.loads(self.openURL(url))
-                    if item and 'success' in item:
-                        title = uni(item['result']['title'])
+                try:
+                    url     = SHOW_URL%item
+                    seasons = (metas.get(item,'').get('display_seasons','') or False)
+                    
+                    if seasons:
+                        title = uni(metas[item]['title'])
+                        seasonLST = '%s}]'%((re.search('video.seasons = {(.*)filter: (\S.+?);',response).group(2)).split('}]')[0])
+                        url = json.dumps({'url':url,'seasons':seasonLST,'thumb':thumb})
                         infoLabels ={"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
                         infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
-                        self.addDir(title,url,5,infoLabels,infoArt)
-
+                        self.addDir(title,url,4,infoLabels,infoArt)
+                    else:
+                        item  = json.loads(self.openURL(url))
+                        if item and 'success' in item:
+                            title = uni(item['result']['title'])
+                            infoLabels ={"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
+                            infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
+                            self.addDir(title,url,5,infoLabels,infoArt)
+                except: continue
+                
                         
     def browseShows(self, url=None):
         log('browseShows')
@@ -247,9 +248,6 @@ class CBS(object):
         info = info.streams()
         url  = info[0]['xbmc_url']
         liz  = xbmcgui.ListItem(name, path=url)
-        if 'm3u8' in url.lower():
-            liz.setProperty('inputstreamaddon','inputstream.adaptive')
-            liz.setProperty('inputstream.adaptive.manifest_type','hls')
         if 'subtitles' in info[0]['ytdl_format']: liz.setSubtitles([x['url'] for x in info[0]['ytdl_format']['subtitles'].get('en','') if 'url' in x])
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
         

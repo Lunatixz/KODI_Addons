@@ -146,6 +146,34 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.cbr" version="1.0.0" name="CBR.com" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">CBR.com - The World's Top Destination For Comic, Movie &amp; TV news.</summary>
+        <description lang="en_GB">Comic Book Resources, also known as CBR, is a website dedicated to the coverage of comic book-related news and discussion.</description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.cbr</source>
+        <website>https://www.cbr.com</website>
+        <news></news>
+        <forum>https://forum.kodi.tv/showthread.php?tid=331825</forum>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.video.cbs" version="1.0.8" name="CBS" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -904,6 +932,36 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.teleup" name="TeleUp" provider-name="Lunatixz" version="2018.05.04">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.requests" version="2.7.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.uepg" version="1.0.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">The Official plugin for the TeleUp Service.</summary>
+        <description lang="en_GB">Entirely Legal and Free! Start watching instantly or record shows for later. Signup for one of three packages today!</description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.teleup</source>
+        <website>http://teleup.com</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=331599</forum>
+        <news></news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.video.trekyards" version="1.0.0" name="TrekYards - YouTube" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1013,7 +1071,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.ustvnow" name="USTVnow" provider-name="Lunatixz" version="2018.01.05">
+<addon id="plugin.video.ustvnow" name="USTVnow" provider-name="Lunatixz" version="2018.05.04">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.requests" version="2.7.0"/>
@@ -1421,7 +1479,7 @@
     </extension>
 </addon>
 
-<addon id="script.module.uepg" version="1.0.4" name="uEPG" provider-name="Lunatixz">
+<addon id="script.module.uepg" version="1.0.5" name="uEPG" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.pyhdhr" version="1.0.0"/>

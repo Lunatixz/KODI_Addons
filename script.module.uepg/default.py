@@ -53,34 +53,31 @@ class ChannelList(object):
         for i, item in enumerate(channelResults):
             utils.adaptiveDialog((i*100//len(channelResults))//2, self.busy, string1=utils.LANGUAGE(30004))
             if len(item.get('channelname','')) > 0: channelnames.append(item['channelname'])
-                            
+                                            
         channelNum   = 0
         channelItems = []
         counter      = collections.Counter(channelnames)
-        self.channelNames = list(set(counter.elements()))
-        [utils.poolList(self.prepareChannel,sorted(channelnames))]
+        channelnames = list(set(counter.elements()))
+        for channel in sorted(channelnames):
+            utils.adaptiveDialog((i*50//len(channelnames)), self.busy, string1=utils.LANGUAGE(30004))
+            newChannel  = {}
+            guidedata   = []
+            starttime   = time.time()
+            channelName = channel
+            channelNum  = channelNum + 1
+            newChannel['channelname']   = channelName
+            for item in channelResults:
+                if channel == item['channelname']:
+                    starttime = starttime + (int(item.get('duration','')) or int(item.get('runtime','')))
+                    item['starttime']           = int(item['starttime']              or starttime)
+                    newChannel['channelnumber'] = (item.get('channelnumber','')      or channelNum)
+                    newChannel['channellogo']   = (item.get('channellogo','')        or self.pluginIcon)
+                    guidedata.append(item)
+            if len(guidedata) > 0:
+                newChannel['guidedata'] = guidedata
+                channelItems.append(newChannel)
         utils.adaptiveDialog(100, self.busy, string1=utils.LANGUAGE(30005))
         return self.prepareJson(channelItems)
-        
-    
-    def prepareChannel(self, channel):
-        utils.adaptiveDialog((i*100//len(self.channelNames))//2, self.busy, string1=utils.LANGUAGE(30004))
-        newChannel  = {}
-        guidedata   = []
-        starttime   = time.time()
-        channelName = channel
-        channelNum  = channelNum + 1
-        newChannel['channelname']   = channelName
-        for item in channelResults:
-            if channel == item['channelname']:
-                starttime = starttime + (int(item.get('duration','')) or int(item.get('runtime','')))
-                item['starttime']           = int(item['starttime']              or starttime)
-                newChannel['channelnumber'] = (item.get('channelnumber','')      or channelNum)
-                newChannel['channellogo']   = (item.get('channellogo','')        or self.pluginIcon)
-                guidedata.append(item)
-        if len(guidedata) > 0:
-            newChannel['guidedata'] = guidedata
-            channelItems.append(newChannel)
                 
                 
     def prepareJson(self, channelItems):

@@ -68,7 +68,7 @@ class TUFFTV(object):
             if not cacheresponse:
                 request  = urllib2.Request(url)
                 cacheresponse = urllib2.urlopen(request, timeout = TIMEOUT).read()
-                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=datetime.timedelta(minutes=15))
+                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=datetime.timedelta(minutes=5))
             return cacheresponse
         except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
@@ -89,24 +89,26 @@ class TUFFTV(object):
                 
     def buildGuide(self, live=False):
         log('buildGuide, live = ' + str(live))
-        idx   = 0
+        skip  = 0
         url   = self.buildLive()
         now   = datetime.datetime.now()
-        tnow   = datetime.datetime.strptime((datetime.datetime.time(now)).strftime('%I:%M %p'), '%I:%M %p')
+        tnow  = datetime.datetime.strptime((datetime.datetime.time(now)).strftime('%I:%M %p'), '%I:%M %p')
+        dayofweek = {'Monday':1,'Tuesday':2,'Wednesday':3,'Thursday':4,'Friday':5,'Saturday':6,'Sunday':7}[now.strftime('%A')]
         soup  = BeautifulSoup(self.openURL(REGION_URL), "html.parser")
         items = soup('table' , {'class': 'schedule-table'})[0].find_all('tr')
+        
         for item in items:
             item = item.find_all('td')
             try: 
-                AMPM = 'AM' if idx < 12 else 'PM'
+                AMPM = 'AM' if skip < 12 else 'PM'
                 starttime = '%s %s'%(item[0].get_text(),AMPM)
-                title = item[1].get_text().replace('[block]2','').replace('[block]4','')
+                title = item[dayofweek].get_text().replace('[block]2','').replace('[block]4','')
                 if title == '[/block]': continue
                 label = '%s %s'%(starttime,title)
                 startDate  = (datetime.datetime.strptime(starttime, '%I:%M %p'))
                 endDate1   = (startDate + datetime.timedelta(minutes=30))
                 endDate2   = (startDate + datetime.timedelta(minutes=60))
-                idx += 1
+                skip += 1
                 if live and (tnow >= startDate and (tnow <= endDate1 or tnow <= endDate2)): return label
                 elif live: continue
                 airdate    = now.strftime('%Y-%m-%d')

@@ -27,7 +27,7 @@ import sys
 import xml.etree.ElementTree
 from zipfile import ZipFile
 
-GITPATH = 'C:/Users/kgrae/OneDrive/Documents/GitHub/KODI_Addons/'
+GITPATH = 'C:/GitHub/KODI_Addons/'
 ZIPPATH = os.path.join(GITPATH,'zips','')
 
 # Compatibility with 3.0, 3.1 and 3.2 not supporting u"" literals

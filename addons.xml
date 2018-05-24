@@ -1428,6 +1428,29 @@
     </extension>
 </addon>
 
+<addon id="script.media.maintenance" version="1.0.0" name="Media Maintenance" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+    </requires>
+    <extension point="xbmc.python.script" library="default.py"/>
+    <extension point="xbmc.service" library="service.py" start="login"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB"></summary>
+        <description lang="en_GB"></description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.media.maintenance</source>
+        <website></website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=331996</forum>
+        <news></news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <icon>resources/images/fanart.jpg</icon>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="script.module.pyfscache" version="0.9.14" name="File Cache" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.14.0" />

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <setting id="Enable_Debugging" type="bool"   label="30000"  default="false" />
+    <setting                       type="lsep" />
+    <setting id="Enable_Removal"   type="bool"   label="30013"  default="false" />
+    <setting id="Removal_Warning"  type="text"   label="30014"  visible="eq(-1,true)" enable="false" />
+    <setting id="Play_Percentage"  type="slider" label="30020"  range="0,100"         option="percent"  default="85"/>
+    <setting                       type="lsep" />
+    <setting id="Monitor_Movies"   type="bool"   label="30024"  default="true" />
+    <setting id="ViewTVShows"      type="action" label="30002"  action="RunScript($CWD/default.py, -viewTVShows)"  default="" />
+    <setting id="ClearTVShows"     type="action" label="30012"  subsetting="true" visible="!eq(-1,)" action="RunScript($CWD/default.py, -clearTVShows)" default="" />
+    <!-- <setting id="ScanRadarr"       type="action" label="30006"  action="RunScript($CWD/default.py, -scanRadarr)" /> -->
+    <setting id="ScanSonarr"       type="action" label="30006"  action="RunScript($CWD/default.py, -scanSonarr)" />
+    <category label="30016">
+    <setting id="Sonarr_IP"        type="text"   label="30007"  subsetting="true" default="http://localhost:8989" />
+    <setting id="Sonarr_API"       type="text"   label="30008"  subsetting="true" default="" />
+    <setting id="TVShowList"       type="text"   label="30005"  enable="false"    visible="false"       default="" />
+    <!-- <setting id="MovieList"        type="text"   label="30005"  enable="false"    visible="false"       default="" /> -->
+    </category>
+    <!-- <category label="30019"> -->
+    <!-- <setting id="Radarr_IP"        type="text"   label="30007"  subsetting="true" default="http://localhost:7878" /> -->
+    <!-- <setting id="Radarr_API"       type="text"   label="30008"  subsetting="true" default="" /> -->
+    <!-- </category> -->
+</settings>

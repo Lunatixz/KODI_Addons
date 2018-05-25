@@ -1013,10 +1013,11 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.tvcatchups" version="1.0.1" name="TVCatchup" provider-name="Lunatixz">
+<addon id="plugin.video.tvcatchups" version="1.0.2" name="TVCatchup" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.tzlocal" version="1.0.0"/>
         <import addon="script.module.pytz" version="2014.2"/>
         <import addon="script.module.beautifulsoup4" version="4.3.2"/>
         <import addon="script.module.uepg" version="1.0.3"/>
@@ -1030,7 +1031,7 @@
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.tvcatchups</source>
         <website>https://www.tvcatchup.com</website>
-        <news>v1.0.1[CR]- Added EPG[CR] - Improved interface[CR]</news>
+        <news>v1.0.2[CR]- Fixed EPG Timezone Offsets[CR]v1.0.1[CR]- Added EPG[CR] - Improved interface[CR]</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=330887</forum>
         <assets>
             <icon>resources/images/icon.png</icon>
@@ -1522,6 +1523,27 @@
         <license>Apache2</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pyqrcode</source>
+        <news></news>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="script.module.tzlocal" version="1.5.2" name="tzlocal" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0" />
+        <import addon="script.module.pytz" version="2014.2"/>
+    </requires>
+    <extension library="lib" point="xbmc.python.module" />
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">A Python interface for tzlocal</summary>
+        <description lang="en_GB">A Python interface for tzlocal</description>
+        <forum>http://forum.kodi.tv</forum>
+        <website>https://github.com/regebro/tzlocal</website>
+        <license>MIT</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.tzlocal</source>
         <news></news>
         <assets>
             <icon>icon.png</icon>

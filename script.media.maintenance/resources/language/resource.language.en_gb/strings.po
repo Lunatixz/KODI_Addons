@@ -29,7 +29,7 @@ msgid "Select TV Shows to Monitor"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Scanning TV Shows"
+msgid "Scanning..."
 msgstr ""
 
 msgctxt "#30004"
@@ -45,11 +45,11 @@ msgid "Scan Sonnar for Monitored TV Shows"
 msgstr ""
 
 msgctxt "#30007"
-msgid "Sonarr IP:Port"
+msgid "IP:Port"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Sonarr API-Key"
+msgid "API-Key"
 msgstr ""
 
 msgctxt "#30009"
@@ -114,4 +114,20 @@ msgstr ""
 
 msgctxt "#30024"
 msgid "Monitor Movies"
+msgstr ""
+
+msgctxt "#30025"
+msgid "Clear Monitored Movies"
+msgstr ""
+
+msgctxt "#30026"
+msgid "Scan Radarr for Monitored Movies"
+msgstr ""
+
+msgctxt "#30027"
+msgid ""
+msgstr ""
+
+msgctxt "#30028"
+msgid "Monitors"
 msgstr ""

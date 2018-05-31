@@ -55,7 +55,9 @@ class Player(xbmc.Player):
         
     def onPlayBackEnded(self):
         log('onPlayBackEnded')
-        try: self.service.myUtils.removeContent(self.playingItem)
+        try: 
+            if (self.playingTime * 100 / self.playingTTime) >= float(REAL_SETTINGS.getSetting('Play_Percentage')): 
+                self.service.myUtils.removeContent(self.playingItem)
         except: pass
         
         
@@ -79,25 +81,44 @@ class Monitor(xbmc.Monitor):
         
 class Service(object):
     def __init__(self):
+        self.running   = False
         self.myUtils   = default.MM() 
         self.myMonitor = Monitor()
         self.myPlayer  = Player()
         self.myPlayer.service = self
         self.startService()
+    
+    
+    def chkTimer(self, method, args=None, timer=datetime.timedelta(minutes=30)):
+        if self.running: pass
+        self.running = True
+        name    = method.func_name
+        now     = datetime.datetime.now()
+        next    = now + timer
+        nextRun = (self.timers.get(name,'') or now)
+        if now >= nextRun:
+            try:
+                self.log("chkTimer, method = " + name)
+                self.timers[name] = next
+                if isinstance(args,tuple): method(*args)
+                elif args and len(args) > 0: method(args[0])
+                else: method()
+            except Exception as e: self.log('chkTimer, failed! ' + str(e), xbmc.LOGERROR)
+        self.running = False
         
         
     def chkSettings(self):
-        self.TVShowList = self.myUtils.getUserList()
         self.myMonitor.pendingChange = False
         
         
     def startService(self):
         log('startService')
         while not self.myMonitor.abortRequested():
-            if self.myMonitor.pendingChange: self.chkSettings()
+            if self.myMonitor.pendingChange and xbmcgui.getCurrentWindowDialogId() != 10140: self.chkSettings()
             if self.myMonitor.waitForAbort(5): break
             if self.myPlayer.isPlaying(): 
                 if len(self.myPlayer.playingItem) == 0: self.myPlayer.onPlayBackStarted()
                 self.myPlayer.playingTime = self.myPlayer.getTime()
+            # self.chkTimer(self.runner,timer=datetime.timedelta(minutes=30))
 
 if __name__ == '__main__': Service()

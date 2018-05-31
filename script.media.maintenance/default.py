@@ -34,6 +34,7 @@ FANART        = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE      = REAL_SETTINGS.getLocalizedString
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 SONARR_URL    = '%s/api/series?apikey=%s'%(REAL_SETTINGS.getSetting('Sonarr_IP'),REAL_SETTINGS.getSetting('Sonarr_API'))
+RADARR_URL    = '%s/api/movie?apikey=%s'%(REAL_SETTINGS.getSetting('Radarr_IP'),REAL_SETTINGS.getSetting('Radarr_API'))
 TIMEOUT       = 15
 NOTIFY        = True
 JSON_ENUM     = '["genre","studio","mpaa","premiered","file","art","thumbnail"]'
@@ -49,6 +50,7 @@ class MM(object):
     def __init__(self):
         self.cache = SimpleCache()
         self.TVShowList = self.getTVShows()
+        self.MoviesList = self.getMovies()
         
         
     def openURL(self, url):
@@ -67,51 +69,77 @@ class MM(object):
             return ''
             
             
-    def getSonarr(self):
-        tvList   = self.TVShowList
-        results  = self.openURL(SONARR_URL)
+    def getMonitored(self, type='series'):
+        log('getMonitored, type = ' + type)
+        if type == 'series': 
+            mediaList = self.TVShowList
+            url = SONARR_URL
+            setSetting = 'ScanSonarr'
+        else: 
+            mediaList = self.MoviesList
+            url = RADARR_URL
+            setSetting = 'ScanRadarr'
+        results  = self.openURL(url)
         if not results: return
-        userList = self.getUserList()
+        userList = self.getUserList(type)
         for idx, item in enumerate(results):
             updateDialogProgress = (idx) * 100 // len(results)
-            REAL_SETTINGS.setSetting('ScanSonarr','Scanning... (%d)'%(updateDialogProgress))
+            REAL_SETTINGS.setSetting('setSetting','Scanning... (%d'%(updateDialogProgress)+'%)')
             match = False
             show  = item["title"]
-            for tvtitle in userList:
-                if tvtitle.lower() == show.lower():
-                    log('getSonarr, sonarr match: show = ' + show + ', tvtitle = ' + tvtitle)
+            for kodititle in userList:
+                if kodititle.lower() == show.lower():
+                    log('getMonitored, monitor match: show = ' + show + ', kodititle = ' + kodititle)
                     match = True
                     break
             if match: continue
             if item["monitored"]: 
-                for sshow in tvList:
-                    sshow = sshow.getLabel()
-                    if sshow.lower() == show.lower(): 
-                        log('getSonarr, kodi match: show = ' + show + ', sshow = ' + sshow)
-                        userList.append(sshow)
+                for title in mediaList:
+                    title = title.getLabel()
+                    if title.lower() == show.lower(): 
+                        log('getMonitored, kodi match: show = ' + show + ', title = ' + title)
+                        userList.append(title)
                         break
         self.notificationDialog(LANGUAGE(30004))
-        REAL_SETTINGS.setSetting('ScanSonarr',LANGUAGE(30011)%(datetime.datetime.now().strftime('%Y-%m-%d')))
-        if len(userList) > 0: self.setUserList(userList)
+        if type == 'series': REAL_SETTINGS.setSetting(setSetting,LANGUAGE(30011)%(datetime.datetime.now().strftime('%Y-%m-%d')))
+        else: REAL_SETTINGS.setSetting(setSetting,LANGUAGE(30011)%(datetime.datetime.now().strftime('%Y-%m-%d')))
+        if len(userList) > 0: self.setUserList(userList, type)
         
            
-    def getUserList(self):
+    def getUserList(self, type='series'):
         REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
-        try: return (REAL_SETTINGS.getSetting('TVShowList').split(',') or [])
-        except: return []
+        if type == 'series': 
+            try: return (REAL_SETTINGS.getSetting('TVShowList').split(',') or [])
+            except: return []
+        else:
+            try: return (REAL_SETTINGS.getSetting('MoviesList').split(',') or [])
+            except: return []
         
         
-    def setUserList(self, userList):
+    def setUserList(self, userList, type='series'):
         msg = ""
+        if type == 'series': 
+            setSetting0 = 'ScanSonarr'
+            setSetting1 = 'TVShowList'
+            setSetting2 = 'ViewTVShows'
+        else: 
+            setSetting0 = 'ScanRadarr'
+            setSetting1 = 'MoviesList'
+            setSetting2 = 'ViewMovies'
+            
         if len(userList) > 0: 
             msg = LANGUAGE(30010)%(len(userList))
         else: 
             self.notificationDialog(LANGUAGE(30017))
-            REAL_SETTINGS.setSetting('ScanSonarr','')
+            REAL_SETTINGS.setSetting(setSetting0,'')
         userList = ','.join(userList)
-        log('setUserList, UserList = ' + userList)
-        REAL_SETTINGS.setSetting('TVShowList',userList)
-        REAL_SETTINGS.setSetting('ViewTVShows',msg)
+        log('setUserList, UserList = ' + userList + ', type = ' + type)
+        REAL_SETTINGS.setSetting(setSetting1,userList)
+        REAL_SETTINGS.setSetting(setSetting2,msg)
+        
+        
+    def hasMovie(self):
+        return bool(xbmc.getCondVisibility('Library.HasContent(Movies)'))
         
         
     def hasTV(self):
@@ -185,6 +213,23 @@ class MM(object):
         self.busyDialog(100, busy)
         log("getTVShows, found tvshows "  + str(len(TVShowList)))
         return [self.getListitem(show['label'],show['label2'],show['thumb']) for show in TVShowList]
+        
+        
+    def getMovies(self):
+        MoviesList = []
+        if not self.hasMovie(): return MoviesList
+        json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetMovies","params":{"properties":%s}, "id": 1}'%(JSON_ENUM))
+        json_response = self.sendJSON(json_query)
+        if 'result' not in json_response: return []
+        busy = self.busyDialog(0)
+        for idx, item in enumerate(json_response['result']['movies']):
+            updateDialogProgress = (idx) * 100 // len(json_response)
+            self.busyDialog(updateDialogProgress, busy)
+            MoviesList.append({'label':item['label'],'label2':item['file'],'thumb':(item['art'].get('poster','') or item['thumbnail'])})
+        MoviesList.sort(key=lambda x:x['label'])
+        self.busyDialog(100, busy)
+        log("getMovies, found movies "  + str(len(MoviesList)))
+        return [self.getListitem(show['label'],show['label2'],show['thumb']) for show in MoviesList]
     
     
     def viewTVShows(self):
@@ -239,8 +284,9 @@ if __name__ == '__main__':
     try: arg = sys.argv[1]
     except: arg = None    
     if arg is None: REAL_SETTINGS.openSettings()
-    elif arg == '-getTVShows': MM().getTVShows()
-    elif arg == '-viewTVShows': MM().viewTVShows()
-    elif arg == '-scanSonarr': MM().getSonarr()
+    elif arg == '-viewTVShows':  MM().viewTVShows()
+    elif arg == '-scanSonarr':   MM().getMonitored()
     elif arg == '-clearTVShows': MM().setUserList([])
+    elif arg == '-scanRadarr':   MM().getMonitored('movie')
+    elif arg == '-clearMovies':  MM().setUserList([], 'movie')
         

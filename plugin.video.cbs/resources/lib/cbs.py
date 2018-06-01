@@ -38,7 +38,7 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 
 ## GLOBALS ##
 TIMEOUT       = 15
-CONTENT_TYPE  = 'files'
+CONTENT_TYPE  = 'episodes'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
 BASE_URL      = 'http://www.cbs.com'
@@ -46,8 +46,8 @@ WATCH_URL     = BASE_URL+'/watch'
 SHOW_URL      = BASE_URL+'/carousels/videosBySection/%s/offset/0/limit/40/xs/0'
 SHOWS_URL     = BASE_URL+'/shows'
 
-MAIN_MENU = [("Latest Episodes", "", 1),
-             ("Browse Shows"   , "", 2)]
+MAIN_MENU = [("Latest", "", 1),
+             ("Shows" , "", 2)]
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -92,7 +92,7 @@ class CBS(object):
          
     def buildMenu(self, items):
         for item in items: self.addDir(*item)
-        self.addYoutube("Browse Youtube" , 'plugin://plugin.video.youtube/user/CBS/')
+        self.addYoutube("Youtube" , 'plugin://plugin.video.youtube/user/CBS/')
             
                 
     def browseLatest(self, url=None):
@@ -103,34 +103,30 @@ class CBS(object):
             seasonNumber  = 0
             episodeNumber = 0
             metas         = re.findall(r'<meta content="(.*?)>', str(item), re.DOTALL)
-            metaTYPES     = ["name","description","thumbnailUrl","uploadDate","url","seasonNumber"]
+            metas.extend(re.findall(r'<span content="(.*?)>', str(item), re.DOTALL))
+            metaTYPES     = ["name","description","thumbnailUrl","uploadDate","url","seasonNumber","episodeNumber"]
             metaLST       = {}
             metaKeys      = []
-            
             for type in metaTYPES:
                 for meta in metas:
                     if 'itemprop="%s"'%type in meta:
-                        if type == "name" and 'Episode' in meta:
-                            try: metaLST['episodeNumber'] = (int(filter(str.isdigit, str(meta.split('" itemprop="%s"'%type)[0])))  or 0)
-                            except: metaLST['episodeNumber'] = 0
-                        elif type == "name" and 'Season' in meta:
-                            try: metaLST['seasonNumber'] = (int(filter(str.isdigit, str(meta.split('" itemprop="%s"'%type)[0])))  or 0)
-                            except: metaLST['episodeNumber'] = 0
+                        if type == "description" and 'description' in metaKeys: metaLST["plot"] = meta.split('" itemprop="%s"'%type)[0]
                         else:
-                            if type not in metaKeys:
+                            if type not in metaKeys: 
                                 metaKeys.append(type)
                                 metaLST[type] = meta.split('" itemprop="%s"'%type)[0]
-            try:
-                label = unescape(uni((metaLST.get('description')    or metaLST['name']).decode("utf-8")))
-                plot  = unescape(uni((metaLST.get('description','') or metaLST['name']).decode("utf-8")))
-            except: continue
+            label = unescape(uni((metaLST.get('description') or metaLST['name']).decode("utf-8")))
+            plot  = unescape(uni((metaLST.get('plot','')     or label)))
+            try: aired = metaLST['uploadDate'].split('T')[0]
+            except: aired = datetime.datetime.now().strftime('%Y-%m-%d')
             thumb = metaLST['thumbnailUrl']
-            aired = metaLST['uploadDate']
             url   = metaLST['url']
-            if not url.startswith('http://'): url = (BASE_URL + '%s'%url).lstrip('/')                
-            # seinfo = ('S' + ('0' if seasonNumber < 10 else '') + str(seasonNumber) + 'E' + ('0' if episodeNumber < 10 else '') + str(episodeNumber))
-            # label  = '%s'%(label) if seasonNumber + episodeNumber == 0 else '%s - %s'%(label, seinfo)
-            infoLabels ={"mediatype":"episodes","label":label ,"title":label,"TVShowTitle":label,"plot":plot,"aired":aired}
+            if not url.startswith('http://'): url = (BASE_URL + '%s'%url).lstrip('/')        
+            seasonNumber = (int(filter(str.isdigit, str(metaLST.get('seasonNumber',seasonNumber)))))
+            episodeNumber = (int(filter(str.isdigit, str(metaLST.get('episodeNumber',episodeNumber)))))
+            seinfo = ('S' + ('0' if seasonNumber < 10 else '') + str(seasonNumber) + 'E' + ('0' if episodeNumber < 10 else '') + str(episodeNumber))
+            label  = '%s'%(label) if seasonNumber + episodeNumber == 0 else '%s - %s'%(label, seinfo)
+            infoLabels ={"mediatype":"episode","label":label ,"title":label,"TVShowTitle":label,"plot":plot,"aired":aired}
             infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
             self.addLink(label, url, 9, infoLabels, infoArt, len(items))
             
@@ -140,20 +136,18 @@ class CBS(object):
         items = json.loads(self.openURL(url))['result']['data']
         for item in items:
             if 'status' in item and item['status'].lower() != 'available': continue
-            if 'is_protected' in item and item['is_protected']: continue
-            if 'is_paid_content' in item and item['is_paid_content']: continue
-            title     = uni(item['title'] or item['label'] or item['episode_title'])
-            thumb     = (item['thumb']['large'] or item['thumb']['small'] or ICON)
-            aired     = str(item['airdate_iso']).split('T')[0]
+            title     = uni(item.get('title','') or item.get('label','') or item.get('episode_title',''))
+            vidType   = item['type']
+            thumb     = (item['thumb'].get('large','') or item['thumb'].get('small','') or ICON)
+            aired     = str(item['airdate_iso']).split('T')[0]#str(item['airdate'])
             showTitle = uni(item['series_title'])
             runtime   = item['duration'].split(':')
             if len(runtime) == 3:
                 h, m, s = runtime
                 duration  = int(h) * 3600 + int(m) * 60 + int(s)
             else:
-                h, m = runtime   
-                duration  = int(h) * 3600 + int(m) * 60
-            
+                m, s = runtime   
+                duration  = int(m) * 60 + int(s)
             seasonNumber  = int(item.get('season_number','0')   or '0')
             episodeNumber = int(item.get('episode_number','0')  or '0')
             url = item['url']
@@ -161,41 +155,41 @@ class CBS(object):
             seinfo = ('S' + ('0' if seasonNumber < 10 else '') + str(seasonNumber) + 'E' + ('0' if episodeNumber < 10 else '') + str(episodeNumber))
             label  = '%s - %s'%(showTitle, title) if seasonNumber + episodeNumber == 0 else '%s - %s - %s'%(showTitle, seinfo, title)
             plot   = uni(item.get('description',label))
-            infoLabels ={"mediatype":"episodes","label":label ,"title":label,"TVShowTitle":showTitle,"plot":plot,"aired":aired,"duration":duration,"season":seasonNumber,"episode":episodeNumber}
+            infoLabels ={"mediatype":"episode","label":label ,"title":label,"TVShowTitle":showTitle,"plot":plot,"aired":aired,"duration":duration,"season":seasonNumber,"episode":episodeNumber}
             infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
             self.addLink(label, url, 9, infoLabels, infoArt, len(items))
 
-    
-    def browseSeasons(self, url):
-        log('browseSeasons')
-        items = json.loads(url)
-        url = items['url']
-        thumb = items['thumb']
-        seasons = eval(items['seasons'])
-        if len(seasons) == 0: return
-        for item in seasons:
+            
+    def browseSeasons(self, myURL):
+        myURL = json.loads(myURL)
+        title = myURL['title']
+        url   = myURL['url']
+        thumb = myURL['thumb']
+        seasonLST = json.loads(myURL['seasons'])
+        CONTENT_TYPE  = 'tvshows'
+        for item in seasonLST['filter']:
             if item["total_count"] == item["premiumCount"]: continue
             title = uni(item["title"])
             url   = '%s/%s/' %(url,item["season"])
             try: items = json.loads(self.openURL(url)) 
             except: items = ''
             if 'success' in items:
-                infoLabels ={"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
+                infoLabels ={"mediatype":"tvshow","label":title ,"title":title,"TVShowTitle":title}
                 infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
                 self.addDir(title,url,5,infoLabels,infoArt)
 
-                
+
     def browseCategory(self, url):
         log('browseCategory')
-        items = json.loads(url)
-        url = items['url']
-        thumb = items['thumb']
+        items     = json.loads(url)
+        url       = items['url']
+        thumb     = items['thumb']
         response  = self.openURL(url).replace('\n','').replace('\r','').replace('\t','')
-        items = re.search('(?:video\.section_ids = |"section_ids"\:)\[([^\]]+)\]',response)
+        items     = re.search('(?:video\.section_ids = |"section_ids"\:)\[([^\]]+)\]',response)
         if items:
             items = items.group(1).split(',')
-            metas = json.loads(re.search('(?:video.section_metadata = |"section_metadata"\:)({.+?}})',response).group(1))
-
+            metas = json.loads(re.search('(?:video\.section_metadata = |"section_metadata"\:)({.+?}})',response).group(1))
+            CONTENT_TYPE  = 'tvshows'
             for item in items:
                 try:
                     url     = SHOW_URL%item
@@ -203,43 +197,42 @@ class CBS(object):
                     
                     if seasons:
                         title = uni(metas[item]['title'])
-                        seasonLST = '%s}]'%((re.search('video.seasons = {(.*)filter: (\S.+?);',response).group(2)).split('}]')[0])
-                        url = json.dumps({'url':url,'seasons':seasonLST,'thumb':thumb})
-                        infoLabels ={"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
-                        infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
-                        self.addDir(title,url,4,infoLabels,infoArt)
+                        try: seasonLST  = json.loads(re.search('video\.seasons = (.+?);',response).group(1))
+                        except: continue
+                        for season in seasonLST['filter']:
+                            if season['total_count'] == season['premiumCount']: continue
+                            else: title = item['title']
+                            url        = json.dumps({'title':title,'url':url,'seasons':json.dumps(seasonLST),'thumb':thumb})
+                            infoLabels = {"mediatype":"tvshow","label":title ,"title":title,"TVShowTitle":title}
+                            infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
+                            self.addDir(title,url,4,infoLabels,infoArt)
                     else:
                         item  = json.loads(self.openURL(url))
                         if item and 'success' in item:
                             title = uni(item['result']['title'])
-                            infoLabels ={"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
-                            infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
+                            infoLabels = {"mediatype":"tvshow","label":title ,"title":title,"TVShowTitle":title}
+                            infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
                             self.addDir(title,url,5,infoLabels,infoArt)
                 except: continue
                 
                         
     def browseShows(self, url=None):
         log('browseShows')
-        soup      = BeautifulSoup(self.openURL(SHOWS_URL), "html.parser")
-        item      = soup('ul', {'class': 'shows-list'})[0]
-        isFreeLST = item('div', {'class': 'tune-info'})
-        titlesLST = item('div', {'class': 'title hide'})
-        thumbLST  = item('img', {'class': 'poster-thumb'})
-        uriLST    = item('a', {'class': 'link-show-thumb-text'})
-        
-        for idx, show in enumerate(titlesLST):
-            isFree = 'all access' not in isFreeLST[idx].get_text().lower()
-            if not isFree: continue 
+        soup  = BeautifulSoup(self.openURL(SHOWS_URL), "html.parser")
+        item  = soup('ul', {'class': 'shows-list'})[0]
+        shows = item('div', {'class': 'title hide'})
+        for idx, show in enumerate(shows):
             title  = uni(show.get_text())
-            thumb  = thumbLST[idx]['src']
-            url    = uriLST[idx]['href']
+            if 'previews' in title.lower() or 'premieres' in title.lower(): continue
+            url    = item('a', {'class': 'link-show-thumb-text'})[idx]['href']
             if not url.startswith('http://'): url = (BASE_URL + url).lstrip('/')
             if not url.endswith('/video/'): url = '%s/video/'%url.rstrip('/')
-            url = json.dumps({'url':url,'thumb':thumb})
-            infoLabels ={"mediatype":"tvshows","label":title ,"title":title,"TVShowTitle":title}
+            thumb  = item('img', {'class': 'poster-thumb'})[idx]['src']
+            url    = json.dumps({'url':url,'thumb':thumb})
+            infoLabels ={"mediatype":"episode","label":title ,"title":title,"TVShowTitle":title}
             infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
             self.addDir(title,url,3,infoLabels,infoArt)
-
+            
             
     def playVideo(self, name, url, liz=None):
         log('playVideo')
@@ -265,7 +258,7 @@ class CBS(object):
         log('addLink, name = ' + name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'true')
-        if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"genre":"News"})
+        if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
         else: liz.setInfo(type="Video", infoLabels=infoList)  
         if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
         else: liz.setArt(infoArt)
@@ -278,7 +271,7 @@ class CBS(object):
         log('addDir, name = ' + name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'false')
-        if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"genre":"News"})
+        if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
         else: liz.setInfo(type="Video", infoLabels=infoList)
         if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
         else: liz.setArt(infoArt)

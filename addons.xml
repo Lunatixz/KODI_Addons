@@ -338,7 +338,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.disclosetv" version="1.0.6" name="Disclose.tv" provider-name="Lunatixz">
+<addon id="plugin.video.disclosetv" version="1.0.6a" name="Disclose.tv" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>

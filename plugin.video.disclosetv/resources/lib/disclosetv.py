@@ -133,10 +133,11 @@ class Disclose(object):
                 if len(re.findall('http[s]?://vimeo.com/', url)) > 0: url = VMURL%(url.split('/vimeo.com/')[1])
             else: raise Exception('resolveURL, unknown provider; data =' + json.dumps(data))
             log('resolveURL, url = ' + url)
+            liz = xbmcgui.ListItem(name, path=url)
             if 'm3u8' in url.lower():
                 liz.setProperty('inputstreamaddon','inputstream.adaptive')
                 liz.setProperty('inputstream.adaptive.manifest_type','hls')
-            return xbmcgui.ListItem(name, path=url)
+            return liz
         except Exception as e: log("resolveURL Failed! " + str(e), xbmc.LOGERROR)
         if isUWP(): return ''
         from YDStreamExtractor import getVideoInfo

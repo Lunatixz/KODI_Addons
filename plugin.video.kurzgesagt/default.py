@@ -20,4 +20,4 @@
 # -*- coding: utf-8 -*-
 import xbmc
 if __name__ == '__main__':
-    xbmc.executebuiltin("ActivateWindow(10025,plugin://plugin.video.youtube/channel/UCsXVk37bltHxD1rDPwtNM8Q/)")
+    xbmc.executebuiltin("ActivateWindow(10025,plugin://plugin.video.youtube/user/Kurzgesagt/)")

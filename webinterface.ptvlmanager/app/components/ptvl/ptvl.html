@@ -1,0 +1,46 @@
+<div class="ptvl">
+    <div class="row" ng-hide="!confirmed">
+        <div class="col-sm-2">
+            <label class="custom-file-upload">
+                <input type="file"  on-read-file="showContent($fileContent)" name="files[]" multiple/>
+                <i class="fa fa-cloud-upload btn btn-primary">Select settings2</i>
+            </label>
+            <output id="list"></output>
+        </div>
+        <div class="col-sm-4">
+            <button id="clear" class="btn btn-danger" ng-click="clearChannels()">Clear</button>
+        </div>
+        <div class="col-sm-6">
+            <div class="input-group input-group-lg search-box">
+                <input type="text" ng-model="search" class="form-control" placeholder="Search...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" ng-click="goSearch()">Go!</button>
+            </span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="alert" ng-hide="!channelF.length">No channels like that!</div>
+        <accordion close-others="oneAtATime">
+            <accordion-group ng-repeat="channel in channelF = ( channels | filter:search )">
+                <accordion-heading>
+                    <div class="row" ng-click="log(channel)">
+                        <div class="col-sm-6 col-md-6">
+                            Channel: {{channel.channel}}
+                        </div>
+                        <div class="col-sm-6 col-md-6 text-right">
+                            Name: {{channel.rules.sub[1].options[1]}}
+                        </div>
+                    </div>
+                </accordion-heading>
+                <div ng-include="'app/components/ptvl/templates/channel-details/channel-type.html'"></div>
+                    <div ng-include="channel.type.templateUrl"></div>
+            </accordion-group>
+        </accordion>
+        <div ng-show="channelsLoaded">
+            <button ng-click="saveSettings()" class="btn btn-primary">Download</button>
+        </div>
+    </div>
+</div>
+
+

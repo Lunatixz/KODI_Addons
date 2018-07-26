@@ -1,0 +1,51 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+
+    <!-- SCROLLS -->
+    <!-- load bootstrap and fontawesome via CDN -->
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+    <!-- AngularUi-Select-->
+    <link rel="stylesheet" href="bower_components/angular-ui-select/dist/select.min.css">
+
+    <link rel="stylesheet" href="bower_components/angular-dialog-service/dialogs.min.css" />
+
+    <link rel="stylesheet" href="app/assets/css/app.css" />
+
+    <!-- Load required JQuery Libraries from CDN -->
+    <script data-require="jquery" data-semver="2.1.3" src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script data-require="jqueryui" data-semver="1.11.4" src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+
+
+    <script src="bower_components/file-saver/FileSaver.js"></script>
+    <script src="bower_components/blob/Blob.js"></script>
+    <script src="bower_components/x2js/xml2json.js"></script>
+    <script src="bower_components/requirejs/require.js" data-main="app/main.js"></script>
+
+
+</head>
+<body>
+
+<!-- HEADER AND NAVBAR -->
+<header>
+    <nav ng-include="'./app/global/navbar/navbar.html'"></nav>
+</header>
+
+<!-- MAIN CONTENT AND INJECTED VIEWS -->
+<div class="container">
+
+   <div ui-view></div>
+
+</div>
+
+
+
+</body>
+</html>

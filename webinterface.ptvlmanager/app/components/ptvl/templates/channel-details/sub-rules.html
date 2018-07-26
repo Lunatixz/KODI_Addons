@@ -1,0 +1,155 @@
+<div ng-controller="subRulesCtrl">
+    <accordion>
+        <accordion-group>
+            <accordion-heading>
+                Options
+            </accordion-heading>
+            <div class="row rules-container" ng-show="subsLocked">
+                <div class="col-sm-12">
+                    <button class="btn btn-danger" style="width: 100%;" ng-click="unlockSubs()">Unlock</button>
+                </div>
+            </div>
+            <div class="row rules-container">
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[15].status = !rules[15].status"><input ng-disabled="subsLocked" class="pull-right" id="rule15" type="checkbox" ng-model="rules[15].status"/>Display Logo?</button>
+                </div>
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[5].status = !rules[5].status"><input ng-disabled="subsLocked" class="pull-right" id="rule5" type="checkbox" ng-model="rules[5].status"/>Don't play this channel?</button>
+                </div>
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[8].status = !rules[8].status"><input ng-disabled="subsLocked" class="pull-right" id="rule8" type="checkbox" ng-model="rules[8].status"/>Pause when not watching?</button>
+                </div>
+            </div>
+            <div class="row rules-container">
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[10].status = !rules[10].status"><input ng-disabled="subsLocked" class="pull-right" id="rule10" type="checkbox" ng-model="rules[10].status"/>Force Random Mode?</button>
+                </div>
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[9].status = !rules[9].status"><input ng-disabled="subsLocked" class="pull-right" id="rule9" type="checkbox" ng-model="rules[9].status"/>Force Resume Mode?</button>
+                </div>
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[7].status = !rules[7].status"><input ng-disabled="subsLocked" class="pull-right" id="rule7" type="checkbox" ng-model="rules[7].status"/>Force Real-Time Mode?</button>
+                </div>
+            </div>
+            <div class="row rules-container">
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[12].status = !rules[12].status"><input ng-disabled="subsLocked" class="pull-right" id="rule12" type="checkbox" ng-model="rules[12].status"/>Play Shows in Order?</button>
+                </div>
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[4].status = !rules[4].status"><input ng-disabled="subsLocked" class="pull-right" id="rule4" type="checkbox" ng-model="rules[4].status"/>Only Play Watched?</button>
+                </div>
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[11].status = !rules[11].status"><input ng-disabled="subsLocked" class="pull-right" id="rule11" type="checkbox" ng-model="rules[11].status"/>Only Play UnWatched?</button>
+                </div>
+            </div>
+            <div class="row rules-container">
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[14].status = !rules[14].status"><input ng-disabled="subsLocked" class="pull-right" id="rule14" type="checkbox" ng-model="rules[14].status"/>Exclude Strms?</button>
+                </div>
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[17].status = !rules[17].status"><input ng-disabled="subsLocked" class="pull-right" id="rule17" type="checkbox" ng-model="rules[17].status"/>Exclude BCT?</button>
+                </div>
+                <div class="col-sm-4">
+                    <button ng-disabled="subsLocked" button-toggle="active"
+                            class="btn btn-primary" style="width: 100%;" ng-click="rules[18].status = !rules[18].status"><input ng-disabled="subsLocked" class="pull-right" id="rule18" type="checkbox" ng-model="rules[18].status"/>Disable Popup?</button>
+                </div>
+            </div>
+            <div class="row rules-container">
+                <div class="col-sm-4">
+                    Name:
+                    <div class="input-group">
+                        <input type="text" class="form-control" ng-disabled="subsLocked||!rules[1].status" name="channelName" ng-model="rules[1].value.options[1]" style="width: 100%;">
+                    <span class="input-group-btn">
+                        <button ng-disabled="subsLocked" button-toggle="active"
+                                class="btn btn-primary" style="width: 100%;" ng-click="rules[1].status = !rules[1].status">
+                            <input ng-disabled="subsLocked" id="rule1" type="checkbox" ng-model="rules[1].status"/>Enabled</button>
+                    </span>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                   Reset Every X Hours:
+                    <div class="input-group">
+                        <input type="text" class="form-control" ng-disabled="subsLocked||!rules[13].status" name="resetHours" ng-model="rules[13].value.options[1]" style="width: 100%;">
+                    <span class="input-group-btn">
+                         <button ng-disabled="subsLocked" button-toggle="active"
+                                 class="btn btn-primary" style="width: 100%;" ng-click="rules[13].status = !rules[13].status">
+                             <input ng-disabled="subsLocked" id="rule13" type="checkbox" ng-model="rules[13].status"/>Enabled</button>
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row advanced-options">
+                <div class="col-sm-6">
+                    <button ng-disabled="subsLocked||wip" style="width: 100%;" button-toggle="active"
+                            class="btn btn-primary" ng-click="rules[6].status = !rules[6].status">
+                        <input ng-disabled="subsLocked" class="pull-right" id="rule6" type="checkbox" ng-model="rules[6].status"/>
+                        Interleaving Enabled (WIP)
+                    </button>
+                    <div ng-hide="!rules[6].status">
+                        <accordion>
+                            <accordion-group is-open="true">
+                                <div class="row">
+                                    <div class="col-sm-4 text-center">
+                                        Available:
+                                    </div>
+                                    <div class="col-sm-4 text-center">
+                                        Move:
+                                    </div>
+                                    <div class="col-sm-4 text-center">
+                                        Interleaved:
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <select size="10" style="width: 100%;" id="channels" multiple ng-multiple="true" ng-model="selectedChannels" ng-options="c.channel+': ('+c.rules.sub[1].options[1]+')' for c in channels"></select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <button class="btn btn-primary" style="width: 100%;" ng-click="addInterleave()">
+                                            <span class="glyphicon glyphicon-menu-right pull-right"></span>
+                                            Add</button>
+                                        <button class="btn btn-primary" style="width: 100%;" ng-click="delInterleave()">
+                                            <span class="glyphicon glyphicon-menu-left"></span>
+                                            Remove</button>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select size="10" style="width: 100%;" id="interleaved" multiple ng-multiple="true" ng-model="selectedChannels" ng-options="c.channel+': ('+c.rules.sub[1].options[1]+')' for c in channels"></select>
+                                    </div>
+                                </div>
+                            </accordion-group>
+                        </accordion>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <button ng-disabled="subsLocked||wip" style="width: 100%;" button-toggle="active"
+                            class="btn btn-primary" ng-click="rules[3].status = !rules[3].status">
+                        <input ng-disabled="subsLocked" class="pull-right" id="rule3" type="checkbox" ng-model="rules[3].status"/>
+                        Best Effort Scheduling Enabled (WIP)
+                    </button>
+                    <div ng-hide="!rules[3].status">
+                        <accordion>
+                            <accordion-group is-open="true">
+
+                            </accordion-group>
+                        </accordion>
+                    </div>
+                </div>
+            </div>
+            <div class="row rules-container" ng-hide="subsLocked">
+                <div class="col-sm-12">
+                    <button class="btn btn-success" style="width: 100%;" ng-click="saveSubRules()">Save Sub Rules</button>
+                </div>
+            </div>
+        </accordion-group>
+    </accordion>
+</div>

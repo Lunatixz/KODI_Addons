@@ -1,0 +1,81 @@
+<div class="modal-header">
+    <h3 class="modal-title">Title: {{details.label}}</h3>
+
+</div>
+<div class="modal-body">
+    <form name="updateCustomerForm">
+        <fieldset>
+            <div class="row">
+                <div class="form-group">
+                    <div data-ng-show="error" class="text-center text-danger">
+                        <div class="alert alert-danger" role="alert">
+                            <strong data-ng-bind="error"></strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 movie-thumbnail">
+                    <img id="tvshowthumb" ng-src="{{tvshowThumb}}" />
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <accordion close-others="oneAtATime">
+                            <accordion-group is-open="plot.open">
+                                <accordion-heading>
+                                    Plot <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': plot.open, 'glyphicon-chevron-right': !plot.open}"></i>
+                                </accordion-heading>
+                                {{details.plot}}
+                            </accordion-group>
+                            <accordion-group is-open="cast.open">
+                                <accordion-heading>
+                                    Cast <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': cast.open, 'glyphicon-chevron-right': !cast.open}"></i>
+                                </accordion-heading>
+                                <accordion close-others="members">
+                                    <accordion-group ng-repeat="cast in details.cast" ng-click="actorThumb(cast.order, cast.thumbnail)" is-open="member.open">
+                                        <accordion-heading>
+                                            {{cast.name}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': member.open, 'glyphicon-chevron-right': !member.open}"></i>
+                                        </accordion-heading>
+                                        <h6>Role: {{cast.role}}</h6>
+                                        <img ng-src="{{actorThumb[cast.order]}}" height="300" width="196" />
+                                    </accordion-group>
+                                </accordion>
+                            </accordion-group>
+                            <accordion-group is-open="genres.open">
+                                <accordion-heading>
+                                    Genres <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': genres.open, 'glyphicon-chevron-right': !genres.open}"></i>
+                                </accordion-heading>
+                                <li ng-repeat="genre in details.genre">
+                                    {{genre}}
+                                </li>
+                            </accordion-group>
+                            <accordion-group is-open="artwork.open" ng-click="getArtwork(details.art.banner, details.art.fanart)">
+                                <accordion-heading>
+                                    Artwork <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': artwork.open, 'glyphicon-chevron-right': !artwork.open}"></i>
+                                </accordion-heading>
+                                    Banner:  <img ng-src="{{banner}}" height="60" width="296" />
+                                    Fanart:  <img ng-src="{{fanart}}" height="270" width="390" />
+                            </accordion-group>
+                        </accordion>
+                        <label class="checkbox">
+                             <input type="checkbox" ng-model="oneAtATime">
+                             Open only one at a time
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-sm-push-6">
+
+                </div>
+                <div class="col-sm-6 col-sm-pull-6">
+
+                </div>
+            </div>
+            <div class="row">
+                           <div class="col-sm-6">
+                    <button class="btn btn-primary" ng-click="customerUpCtrl.update(customer); ok()" ng-disabled="updateCustomerForm.$invalid">Update & Close</button>
+                    <button class="btn btn-danger" ng-click="cancel()">Cancel</button>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>

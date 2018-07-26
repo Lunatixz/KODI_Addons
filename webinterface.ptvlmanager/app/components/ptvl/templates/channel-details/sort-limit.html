@@ -1,0 +1,30 @@
+<div class="row plugin">
+    <div class="col-sm-12 col-md-1 ch-plugin-sort-label">
+        Sort:
+    </div>
+    <div class="col-sm-12 col-md-3 ch-plugin-sort-dropdown">
+        <ui-select ng-model="sort.selected" theme="bootstrap" ng-disabled="channel.locked" on-select="selectSort(sort.selected)" reset-search-input="'false'">
+            <ui-select-match placeholder="{{sort.order}}">{{$select.selected.order}}</ui-select-match>
+            <ui-select-choices repeat="sort in sorts | filter: $select.search">
+                <span ng-bind-html="sort.order| highlight: $select.search"></span>
+            </ui-select-choices>
+        </ui-select>
+    </div>
+    <div class="col-sm-2" ng-show="changed.sort">
+        <button id="undoSort" class="btn btn-danger" ng-click="undoSort(channel)">Undo</button>
+    </div>
+    <div class="col-sm-12 col-md-1 ch-plugin-limit-label">
+        Limit:
+    </div>
+    <div class="col-sm-12 col-md-3 ch-plugin-limit-dropdown">
+        <ui-select ng-model="limit.selected" theme="bootstrap" ng-disabled="channel.locked" on-select="selectLimit(limit.selected)" reset-search-input="'false'">
+            <ui-select-match placeholder="{{limit.limit}}">{{$select.selected.limit}}</ui-select-match>
+            <ui-select-choices repeat="limit in limits | filter: $select.search">
+                <span ng-bind-html="limit.limit| highlight: $select.search"></span>
+            </ui-select-choices>
+        </ui-select>
+    </div>
+    <div class="col-sm-2" ng-show="changed.limit">
+        <button id="undoLimit" class="btn btn-danger" ng-click="undoLimit(channel)">Undo</button>
+    </div>
+</div>

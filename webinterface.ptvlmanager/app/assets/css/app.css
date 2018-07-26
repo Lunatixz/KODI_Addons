@@ -1,0 +1,269 @@
+body {
+    background-color: #c3c3c3;
+}
+
+.btn-navbar {
+    margin-right: 5px;
+}
+
+#movieList {
+    display: block;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.search-box {
+    padding-bottom: 10px;
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#moviethumb {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.movie-thumbnail {
+    height: 460px;
+    width: 296px;
+}
+
+.checkbox {
+    margin-right: 0;
+    margin-left: 25px;
+}
+
+#trailer {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#showList {
+    display: block;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#tvshowthumb {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+
+input[type="file"] {
+    display: none;
+}
+.custom-file-upload {
+    display: inline-block;
+    padding: 0 0 0 0;
+    cursor: pointer;
+    height: 100%;
+    text-align: justify;
+    vertical-align: middle;
+    font-size: 20px;
+}
+
+#home-movies-btn {
+    margin: 0 0 15px 0;
+    height: 56px;
+    width: 100%;
+    font-size: 30px;
+    text-align: center;
+    vertical-align: middle;
+ }
+
+#home-television-btn {
+    margin: 0 0 15px 0;
+    height: 56px;
+    width: 100%;
+    font-size: 30px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#home-ptvl-btn {
+    height: 56px;
+    width: 100%;
+    font-size: 30px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#home-about-btn {
+    height: 56px;
+    width: 100%;
+    font-size: 30px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* PsuedoTV Live */
+.ptvl {
+
+}
+
+.panel-group .panel {
+    overflow: visible;
+}
+
+.panel-default>.panel-heading {
+    background-image: linear-gradient(to bottom,#3073AD 0,#286090 100%);
+}
+
+.panel-default>.panel-heading {
+    color: #ffffff;
+    height: auto;
+}
+
+.btn-primary {
+    background-color: #1772B1;
+}
+
+.btn-primary:hover {
+    background-color: #1772B1;
+}
+
+/** Type Div **/
+.type {
+    padding-bottom: 18px;
+}
+
+.unlock {
+    padding-bottom: 18px;
+}
+
+.ch-type-label {
+    padding-left: 10px;
+    width: 7%;
+}
+
+.ch-type-dropdown {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.type-container {
+    background-color: #c3c3c3;
+    border-radius: 10px;
+    border: 2px solid #1772B1;
+    padding: 10px;
+}
+
+.rules-container {
+    padding-bottom: 10px;
+}
+
+.sort-limit {
+    padding-top: 10px;
+}
+
+/** Plugin Type **/
+
+
+/** Plugin Rows **/
+.plugin {
+    padding-bottom: 18px;
+}
+
+.ch-plugin-label {
+    padding-top: 8px;
+}
+
+.ch-plugin-dropdown {
+
+}
+
+.ch-plugin-path-label {
+    padding-top: 8px;
+}
+
+.ch-plugin-path-input {
+    padding-top: 4px;
+}
+
+.ch-plugin-sort-label {
+    padding-top: 8px;
+}
+
+.ch-plugin-sort-dropdown {
+
+}
+
+.ch-plugin-limit-label {
+    padding-top: 8px;
+}
+
+.ch-plugin-limit-dropdown {
+
+}
+
+/** YouTube Type **/
+.youtube {
+    padding-bottom: 18px;
+    width: 100%;
+}
+
+.ch-youtube-type-label {
+    padding-top: 6px;
+    padding-left: 10px;
+    margin: 0 0 0 0;
+    width: 11.33333%;
+}
+
+.ch-youtube-type-dropdown {
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+}
+
+.ch-youtube-path-label {
+    margin-top: 8px;
+    margin-right: 42px;
+    margin-left: 4px;
+    margin-bottom: 0;
+}
+
+.ch-youtube-path-input {
+    padding: 0 0 0 0;
+    margin: 5px 0 0 0;
+}
+
+#youtube-path-input {
+    width: 100%;
+}
+
+.ch-youtube-sort-label {
+    margin-left: 28px;
+    margin-right: 5px;
+}
+
+.ch-youtube-sort-dropdown {
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+}
+
+.ch-youtube-limit-label {
+    margin-left: 30px;
+}
+
+.ch-youtube-path-btn {
+    width: 15.5%;
+}
+
+/** Advanced Options **/
+.advanced-options {
+    padding-bottom: 18px;
+}
+
+/** Interleaving **/
+.interleaving {
+    padding-top: 10px;
+}
+
+.dialog-header-confirm { background-color: #333333; }
+
+.modal {
+    top: 200px;
+}

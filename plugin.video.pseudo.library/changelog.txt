@@ -1,0 +1,23 @@
+#.0.0.1
+Init
+#.0.0.2
+Automatic Service
+#.0.0.3
+Improved Parsing, Strm filenames
+#.0.0.4
+Fixed Missing Link in Strms
+#.0.0.5
+Misc changes, including configuration changes.
+Added Youtube channel, playlist and multitube.
+#.0.0.6
+Youtube Sort? Place Youtube into it's own folder.
+Clear Strm Folder (Purge all files and folders).
+Service Loop fix!
+New plugin detection
+Music type
+#.0.0.7
+Library Scan and Clean options.
+Service tweaks
+SMB/NFS folder paths allowed.
+#.0.0.8
+Service Fix

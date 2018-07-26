@@ -1,0 +1,9 @@
+<div class="type-container" ng-controller="playlistDetailsCtrl">
+    Playlist:
+    <ui-select ng-model="playlist.selected" theme="bootstrap" ng-disabled="channel.locked" on-select="selectPlaylist(playlist.selected)" reset-search-input="'false'">
+        <ui-select-match placeholder="{{playlist[1].name}}">{{$select.selected.name}}</ui-select-match>
+        <ui-select-choices repeat="playlist in playlists | filter: $select.search">
+            <span ng-bind-html="playlist.name| highlight: $select.search"></span>
+        </ui-select-choices>
+    </ui-select>
+</div>

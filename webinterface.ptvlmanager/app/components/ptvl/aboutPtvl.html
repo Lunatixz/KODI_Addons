@@ -1,0 +1,26 @@
+<div class="col-sm-12" >
+    <accordion ng-hide="readPtvl">
+        <accordion-group is-open="ptvlDetails.open">
+            <accordion-heading>
+                {{settings.name}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': ptvlDetails.open, 'glyphicon-chevron-right': !ptvlDetails.open}"></i>
+            </accordion-heading>
+            <h4>{{settings.description}}</h4>
+            <div class="col-sm-2">
+                <h5>Author: {{settings.author}}</h5>
+                <h5>Version: {{settings.version}}</h5>
+            </div>
+            <div class="col-sm-10">
+                <accordion>
+                    <accordion-group>
+                        <accordion-heading>
+                            Dependencies
+                        </accordion-heading>
+                        <li ng-repeat="dependency in settings.dependencies">
+                            {{dependency.addonid}} is required: {{dependency.required}} @ version {{dependency.version}}
+                        </li>
+                    </accordion-group>
+                </accordion>
+            </div>
+        </accordion-group>
+    </accordion>
+</div>

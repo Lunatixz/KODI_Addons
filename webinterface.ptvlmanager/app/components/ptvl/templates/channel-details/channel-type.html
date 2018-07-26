@@ -1,0 +1,30 @@
+<div class="ptvl" ng-controller="typeCtrl">
+    <div class="row unlock" ng-hide="!channel.locked">
+        <div class="col-sm-12">
+            <button id="locked" ng-class="{'btn btn-danger' : channel.locked, 'btn btn-primary' : !channel.locked }" ng-click="lock(channel)" style="width: 100%;">{{ channelLocked }}</button>
+        </div>
+    </div>
+    <div class="row type">
+        <div class="col-sm-12 col-md-3 col-md-offset-2 ch-type-label">
+            <h4>Type:</h4>
+        </div>
+        <div class="col-sm-4 col-md-5 ch-type-dropdown">
+            <ui-select ng-model="type.selected" theme="bootstrap" ng-disabled="channel.locked" on-select="selectType(type.selected)" reset-search-input="'false'">
+                <ui-select-match placeholder="{{channel.type.name}}">{{$select.selected.name}}</ui-select-match>
+                <ui-select-choices repeat="type in types | filter: $select.search">
+                    <span ng-bind-html="type.name| highlight: $select.search"></span>
+                    <small ng-bind-html="type.value | highlight: $select.search"></small>
+                </ui-select-choices>
+            </ui-select>
+        </div>
+        <div class="col-sm-3" ng-show="changed.type">
+            <button id="undo" class="btn btn-danger" style="width:100%;" ng-click="undo()">Undo</button>
+        </div>
+    </div>
+    <div class="row type" ng-hide="channel.locked">
+        <div class="col-sm-12 text-right" ng-show="!changed.saved">
+            <button id="save-type" class="btn btn-success" style="width:100%;" ng-click="saveType()">Save Type</button>
+        </div>
+    </div>
+</div>
+

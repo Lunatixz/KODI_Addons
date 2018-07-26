@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="webinterface.ptvlmanager" name="PTVL Manager" version="0.1.0a" provider-name="Peppy, Lunatixz">
+  <requires>
+    <import addon="xbmc.json" version="6.0.0" />
+  </requires>
+  <extension point="xbmc.webinterface"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_US">PTVL and Kodi media management webinterface</summary>
+    <description lang="en_US">PTVL webinterface allows you to control and manage Kodi libraries, and manage your PTVL Channels.</description>
+    <platform>all</platform>
+    <source>https://github.com/peppy6582/webinterface.ptvlmanager</source>
+    <forum>http://forum.kodi.tv/showthread.php?tid=225746</forum>
+  </extension>
+</addon>

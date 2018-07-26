@@ -1,0 +1,39 @@
+<div class="type-container" ng-controller="rssDetailsCtrl">
+    <div class="row youtube" ng-show="changed.path">
+        <div class="col-sm-12 col-md-12">
+            <h6 class="text-muted bg-danger">RSS path may have been changed, without being saved!</h6>
+        </div>
+    </div>
+    <div class="row youtube">
+        <div class="col-sm-2" >
+            Community List:
+        </div>
+        <div class="col-sm-6">
+            <ui-select ng-model="rssCommunityFeeds.selected" theme="bootstrap" ng-disabled="channel.locked" on-select="selectRssFeed(rssCommunityFeeds.selected)" reset-search-input="false">
+                <ui-select-match placeholder="{{rssCommunityFeeds.name}}">{{$select.selected.name}}</ui-select-match>
+                <ui-select-choices repeat="feed in rssCommunityFeeds | orderBy:'name' | filter: $select.search">
+                    <span ng-bind-html="feed.name | highlight: $select.search"></span>
+                </ui-select-choices>
+            </ui-select>
+        </div>
+    </div>
+    <div class="row youtube">
+        <div class="col-sm-2">
+            Feed:
+        </div>
+        <div class="col-sm-6">
+            <input type="text" name="path" id="rss-path-input" ng-disabled="channel.locked" ng-model="path" ng-click="changedPath();" style="width:524px">
+        </div>
+        <div class="col-sm-2 ch-rss-path-btn text-right">
+            <button id="undoRssFeed" class="btn btn-danger" ng-hide="!changed.path" ng-click="undoRssFeed()">Undo</button>
+        </div>
+    </div>
+    <div ng-include="'app/components/ptvl/templates/channel-details/sort-limit.html'"></div>
+    <div class="row">
+        <div class="col-sm-12">
+            <button id="save" class="btn btn-success" ng-hide="!changed.value" ng-click="saveRss(channel, path)" style="width: 100%;">Save</button>
+        </div>
+    </div>
+    <div class="sort-limit" ng-include="'app/components/ptvl/templates/channel-details/sub-rules.html'"></div>
+</div>
+

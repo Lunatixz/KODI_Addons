@@ -1,0 +1,40 @@
+<div class="type-container" ng-controller="youtubeDetailsCtrl">
+    <div class="row youtube" ng-show="changed.path">
+        <div class="col-sm-12 col-md-12">
+            <h6 class="text-muted bg-danger">YouTube path may have been changed, without being saved!</h6>
+        </div>
+    </div>
+    <div class="row youtube">
+        <div class="col-sm-1 ch-youtube-type-label" >
+            YouTube Type:
+        </div>
+        <div class="col-sm-2 ch-youtube-type-dropdown">
+            <ui-select ng-model="YtType.selected" theme="bootstrap" ng-disabled="channel.locked" on-select="selectYtType(YtType.selected)" reset-search-input="false">
+                <ui-select-match placeholder="{{YtType.name}}">{{$select.selected.name}}</ui-select-match>
+                <ui-select-choices repeat="YtType in YtTypes| filter: $select.search">
+                    <span ng-bind-html="YtType.name | highlight: $select.search"></span>
+                </ui-select-choices>
+            </ui-select>
+        </div>
+        <div class="col-sm-1" ng-hide="!changed.YtType">
+            <button id="undoPlugin" class="btn btn-danger" ng-click="undoYtType(channel)">Undo</button>
+        </div>
+        <div class="col-sm-1 ch-youtube-path-label">
+            {{ input }}:
+        </div>
+        <div class="col-sm-4 ch-youtube-path-input">
+            <input type="text" name="path" id="youtube-path-input" ng-disabled="channel.locked" ng-model="path" ng-click="changedPath();">
+        </div>
+        <div class="col-sm-2 ch-youtube-path-btn text-right">
+            <button id="undoPath" class="btn btn-danger" ng-hide="!changed.path" ng-click="undoPath()">Undo</button>
+        </div>
+    </div>
+    <div ng-include="'app/components/ptvl/templates/channel-details/sort-limit.html'"></div>
+    <div class="row">
+        <div class="col-sm-12">
+            <button id="save" class="btn btn-success" ng-hide="!changed.value" ng-click="saveYouTube(channel, path)" style="width: 100%;">Save</button>
+        </div>
+    </div>
+    <div class="sort-limit" ng-include="'app/components/ptvl/templates/channel-details/sub-rules.html'"></div>
+</div>
+

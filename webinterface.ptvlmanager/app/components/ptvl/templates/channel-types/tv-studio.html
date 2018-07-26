@@ -1,0 +1,26 @@
+<div class="type-container" ng-controller="tvStudioCtrl">
+    <div class="row tv-studio">
+        <div class="col-sm-12 col-md-2">
+            <h4>Studio:</h4>
+        </div>
+        <div class="col-sm-12 col-md-8">
+            <ui-select ng-model="studio.selected" theme="bootstrap" ng-disabled="channel.locked" on-select="selectStudio(studio.selected)" reset-search-input="'false'">
+                <ui-select-match placeholder="{{studio.name}}">{{$select.selected.name}}</ui-select-match>
+                <ui-select-choices repeat="studio in studios | orderBy: 'name' | filter: $select.search">
+                    <span ng-bind-html="studio.name| highlight: $select.search"></span>
+                </ui-select-choices>
+            </ui-select>
+        </div>
+        <div class="col-sm-12 col-md-2">
+            <div class="col-sm-1 col-md-1" ng-show="changed.studio">
+                <button id="undoStudio" class="btn btn-danger"  ng-click="undoStudio()">Undo</button>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-show="changed.studio">
+        <div class="col-sm-12">
+            <button id="saveStudio" style="width:100%;" class="btn btn-success"  ng-click="saveStudio()">Save</button>
+        </div>
+    </div>
+    <div class="sort-limit" ng-include="'app/components/ptvl/templates/channel-details/sub-rules.html'"></div>
+</div>

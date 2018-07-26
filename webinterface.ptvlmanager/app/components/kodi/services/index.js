@@ -1,0 +1,3 @@
+define([
+    './playlist'
+], function () {});

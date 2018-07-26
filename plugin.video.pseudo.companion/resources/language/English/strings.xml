@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+  <strings>
+    <string id="32000">General</string>
+    <string id="32001">Enable Donor Features</string>    
+    <string id="32002">Donor Verified:</string>  
+    <string id="32003">Enter Donor Username:Password</string>  
+    <string id="32011">Enable Debugging</string> 
+    <string id="33000">Library Integration (coming soon)</string> 
+    <string id="33001">Strm Folder</string>   
+    <string id="33002">Sort Folders by</string>  
+    <string id="33003">Clear Folders</string>   
+    <string id="33004">Update Strms every</string> 
+    <string id="33005">Delay Update on Startup</string>   
+    <string id="33006">Update while playing</string>   
+  </strings>
+
+

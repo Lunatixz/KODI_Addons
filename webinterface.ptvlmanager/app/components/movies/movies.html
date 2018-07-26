@@ -1,0 +1,17 @@
+<div>
+    <div class="input-group input-group-lg search-box">
+        <input type="text" ng-model="search" class="form-control" placeholder="Search...">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button">Go!</button>
+                </span>
+    </div><!-- /input-group -->
+
+    <div class="btn-group-vertical" id="movieList" ng-controller="moviesListCtrl as listCtrl">
+            <a ng-controller="moviesDetailsCtrl as detailsCtrl" ui-sref=".details" ng-click="detailsCtrl.modalDetails('lg', movie.movieid)" class="btn btn-primary btn-lg" ng-repeat="movie in movies| filter:search" >
+                {{movie.label}}
+                <span class="glyphicon glyphicon-menu-right glyphicon-align-right" aria-hidden="true"></span>
+            </a>
+
+    </div>
+</div>
+

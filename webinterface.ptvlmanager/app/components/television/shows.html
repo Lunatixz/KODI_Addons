@@ -1,0 +1,16 @@
+<div>
+    <div class="input-group input-group-lg search-box">
+        <input type="text" ng-model="search" class="form-control" placeholder="Search...">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button">Go!</button>
+                </span>
+    </div><!-- /input-group -->
+
+    <div class="btn-group-vertical" id="showList" ng-controller="showListCtrl as listCtrl">
+        <a ng-controller="showDetailsCtrl as detailsCtrl" ui-sref=".details" ng-click="detailsCtrl.modalDetails('lg', show.tvshowid)" class="btn btn-primary btn-lg" ng-repeat="show in shows| filter:search" >
+            {{show.label}}
+            <span class="glyphicon glyphicon-menu-right glyphicon-align-right" aria-hidden="true"></span>
+        </a>
+    </div>
+</div>
+

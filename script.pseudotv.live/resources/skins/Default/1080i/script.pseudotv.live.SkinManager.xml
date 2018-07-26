@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <allowoverlay>no</allowoverlay>
+    <zorder>1</zorder>
+    <controls>
+        <control type="image">
+            <description>Background</description>
+            <left>320</left>
+            <top>180</top>
+            <width>1280</width>
+            <height>845</height>
+            <texture border="40">pstvlButtonNoFocusAlt.png</texture>
+        </control>
+        <control type="image">
+            <description>Busy animation</description>
+            <top>50%</top>
+            <left>920</left>
+            <width>50</width>
+            <height>50</height>
+            <animation effect="rotate" condition="true" start="0" end="360" loop="true" time="1000" center="auto">Conditional</animation>
+            <texture flipx="true" colordiffuse="FF0297eb">spinner.gif</texture>
+            <aspectratio>keep</aspectratio>
+        </control>
+        <control type="image">
+            <description>Dialog Header image</description>
+            <left>320</left>
+            <top>180</top>
+            <width>1280</width>
+            <height>75</height>
+            <texture>config/settings_dialogheader.png</texture>
+        </control>
+        <control type="label">
+            <left>320</left>
+            <top>205</top>
+            <width>1280</width>
+            <height>40</height>
+            <font>PTVL13</font>
+            <label>Skin Manager - PseudoTV Live</label>
+            <align>center</align>
+            <aligny>center</aligny>
+            <textcolor>FF0297eb</textcolor>
+            <shadowcolor>black</shadowcolor>
+        </control>  
+        <control type="grouplist">
+            <left>415</left>
+            <top>280</top>   
+            <width>1280</width>
+            <height>845</height>
+            <itemgap>1024</itemgap>
+            <orientation>horizontal</orientation>
+            <control type="image">
+                <width>30</width>
+                <height>576</height>
+                <animation effect="fade" start="20" time="200" pulse="true">VisibleChange</animation>
+                <texture colordiffuse="$INFO[Window(10000).Property(PTVL.SSLEFTD)]">config/wall_arrow.png</texture>
+                <aspectratio>keep</aspectratio>
+            </control>
+            <control type="image">
+                <width>30</width>
+                <height>576</height>
+                <animation effect="fade" start="20" time="200" pulse="true">VisibleChange</animation>
+                <texture colordiffuse="$INFO[Window(10000).Property(PTVL.SSRIGHTD)]" flipx="true">config/wall_arrow.png</texture>
+                <aspectratio>keep</aspectratio>
+            </control>
+        </control>
+        <control description="panel" id="500" type="panel">
+            <viewtype label="panel">Panel</viewtype>   
+            <left>445</left>
+            <top>280</top>   
+            <width>1024</width>
+            <height>845</height>
+            <orientation>horizontal</orientation>
+            <preloaditems>3</preloaditems>
+            <pagecontrol>3</pagecontrol>
+            <focusedlayout height="845" width="1024">
+                <control description="SKINSHOTS" type="image"> 
+                    <description>Screenshots</description>
+                    <width>1024</width>
+                    <height>576</height>
+                    <timeperimage>200</timeperimage>
+                    <fadetime>200</fadetime>
+                    <randomize>true</randomize>
+                    <loop>yes</loop>
+                    <info background="true">ListItem.Property(PTVL.SKINSHOT)</info>
+                    <aspectratio aligny="top">keep</aspectratio>
+                </control>
+            </focusedlayout>
+            <itemlayout height="845" width="1024">
+                <control description="SKINSHOTS" type="image">  
+                    <description>Screenshots</description>
+                    <width>1024</width>
+                    <height>576</height>
+                    <timeperimage>200</timeperimage>
+                    <fadetime>200</fadetime>
+                    <randomize>true</randomize>
+                    <loop>yes</loop>
+                    <info background="true">ListItem.Property(PTVL.SKINSHOT)</info>
+                    <aspectratio aligny="top">keep</aspectratio>
+                </control>
+            </itemlayout>
+        </control> 	
+        <control type="grouplist">
+            <left>450</left>
+            <top>875</top>   
+            <width>1024</width>
+            <height>50</height>
+            <itemgap>10</itemgap>
+            <orientation>horizontal</orientation>
+            <control type="image">
+                <description>Skin resolution image</description>
+                <width>100</width>
+                <height>50</height>
+                <aspectratio aligny="top">keep</aspectratio>
+                <texture colordiffuse="FFFFFFFF">$INFO[Container(500).ListItem.Property(PTVL.SKINRESOLUTION),flags/resolution/,.png]</texture>
+            </control> 
+            <control type="image">
+                <description>Skin local image</description>
+                <width>100</width>
+                <height>50</height>
+                <aspectratio aligny="top">keep</aspectratio>
+                <texture colordiffuse="FFFFFFFF">$INFO[Container(500).ListItem.Property(PTVL.SKINLOCAL]</texture>
+            </control>   
+            <control type="image">
+                <description>Skin outdated image</description>
+                <width>100</width>
+                <height>50</height>
+                <aspectratio aligny="top">keep</aspectratio>
+                <texture colordiffuse="FFFFFFFF">$INFO[Container(500).ListItem.Property(PTVL.SKINOUTDATED]</texture>
+            </control> 
+        </control> 
+        <control type="image">
+            <description>Skin Name image</description>
+            <left>320</left>
+            <top>940</top>
+            <width>1280</width>
+            <height>80</height>
+            <texture>config/settings_dialogheader.png</texture>
+        </control> 
+        <control type="label">
+            <description>Skin Name</description> 
+            <left>415</left>
+            <top>955</top>      
+            <width>1024</width>
+            <height>25</height>
+            <font>PTVL13</font>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>[COLOR=FFFFFFFF]$INFO[Container(500).ListItem.Label][/COLOR]</label>
+        </control>  
+        <control type="label">
+            <description>Skin Details</description> 
+            <left>415</left>
+            <top>990</top>      
+            <width>1024</width>
+            <height>25</height>
+            <font>PTVL10</font>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>[COLOR=C0C0C0C0]$INFO[Container(500).ListItem.Property(PTVL.SKINAUTHOR)] $INFO[Container(500).ListItem.Property(PTVL.SKINVERSION)] [/COLOR]</label>
+        </control> 
+        <control type="image"> 
+            <description>Screenshots</description>
+            <left>445</left>
+            <top>280</top>   
+            <width>1024</width>
+            <height>576</height>
+            <texture background="true" fallback="$INFO[Window(10000).Property(PTVL.SHOT_FALLBACK)]">$INFO[Window(10000).Property(PTVL.SHOT)]</texture>
+            <aspectratio aligny="top">keep</aspectratio>
+        </control>
+    </controls>
+</window>

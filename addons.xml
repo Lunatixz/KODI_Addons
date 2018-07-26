@@ -976,6 +976,70 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.pseudo.companion" version="0.0.13" name="PseudoCompanion" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.14.0"/>
+        <import addon="script.module.buggalo" version="1.1.6"/>
+        <import addon="script.module.requests" version="2.7.0"/>
+        <import addon="script.module.pyfscache" version="0.9.12"/>
+        <import addon="script.module.feedparser" version="5.1.3"/>
+        <import addon="script.module.simplejson" version="3.3.0"/>
+        <import addon="script.module.beautifulsoup" version="3.2.1"/>
+        <import addon="script.module.metahandler" version="2.9.0"/>
+        <import addon="script.common.plugin.cache" version="2.5.5"/>
+        <import addon="plugin.video.youtube" version="5.1.8"/>
+        <import addon="plugin.video.vimeo" version="4.1.4"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.addon.metadata">
+        <platform>all</platform>
+        <description>Companion tools for PseudoTV Live, Features include:&#10;&#10;- PseudoTV Live remote via Yatse, Channel tools and utilities.&#10;&#10;- PseudoNetwork content provided Youtube.&#10;&#10;- PseudoLibrary strm generator.&#10;&#10;- Additional features coming soon</description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/plugin.video.pseudo.companion</source>
+        <email>pseudotvlive@gmail.com</email>
+        <website>www.pseudotvlive.com</website>
+        <forum>http://pseudotvlive.com/index.php/forum</forum>
+    </extension>
+</addon>
+
+<addon
+    id="plugin.video.pseudo.library"
+    version="0.0.2"
+    name="PseudoLibrary"
+    provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.1.0"/>
+        <import addon="script.module.t0mm0.common" version="2.0.0"/>
+        <import addon="script.module.beautifulsoup" version="3.2.1"/>
+        <import addon="script.module.simple.downloader" version="0.9.4"/>
+        <import addon="script.module.beautifulsoup4" />
+        <import addon="script.module.simple.downloader" version="0.9.4"/>
+        <import addon="script.module.requests" />
+        <import addon="script.module.httplib2" />
+        <import addon="script.module.youtube.dl" optional="true"/>
+        <import addon="plugin.video.youtube" version="3.0.0"/>
+        <import addon="script.module.urlresolver" optional="true"/>
+        <import addon="script.module.simplejson" />
+        <import addon="script.common.plugin.cache" version="2.5.2"/>
+        <import addon="script.module.metahandler" version="2.5.1"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+    </extension>
+<!--     <extension point="xbmc.python.script" library="run.py">
+        <provides>executable</provides>
+    </extension> -->
+    <extension point="xbmc.addon.metadata">
+        <platform>all</platform>
+        <summary lang="en">Virtual Library Strm Generator</summary>
+        <description lang="en">Generate Strms from Kodi Plugins, UPNP, Youtube, and RSS Sources.</description>
+    </extension>
+</addon>
+
 <addon id="plugin.video.screenrant" version="1.0.1" name="Screen Rant" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1277,7 +1341,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.ustvnow" name="USTVnow" provider-name="Lunatixz" version="2018.06.23">
+<addon id="plugin.video.ustvnow" name="USTVnow" provider-name="Lunatixz" version="2018.07.25">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.requests" version="2.7.0"/>
@@ -1295,7 +1359,7 @@
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.ustvnow</source>
         <website>http://ustvnow.com</website>
         <forum>http://forum.kodi.tv/showthread.php?tid=233135</forum>
-        <news>2018.06.23[CR]- Misc. Maintenance [CR]2018.1.5[CR]- Added HDHomerun Tuner Support[CR]- Fixed Channel Loading Errors[CR]2017.12.24[CR]- Improved Skin[CR]2017.10.16[CR]- Added OnDemand (Preview).[CR]- Added Highlights.[CR]- Added Search.[CR]- Improved UI.[CR]- Added EPG Guide w/DVR context menu.[CR]- Misc. Tweaks and Corrections.[CR]2017.8.23[CR]- Added Preferred Playback Method and Stream Quality settings.[CR]2017.8.5[CR]- Fixed encoding error.[CR]2017.8.2[CR]- Fixed paid subscription channels and dvr control.[CR]2017.7.31[CR]- Fixed login issues.[CR]- Added fallback token generation[CR]- Added initial support for uEPG module.[CR]2017.7.26[CR]- Corrected version format.[CR]- Changed "Featured" and "Guide" click behavior.[CR]- Improved Error handling.[CR]2017.4.7a[CR]- Added "Featured"[CR]- Fixed DVR support.2017.4.7[CR]-100% new code base, written from scratch for your enjoy!!, DVR Recording and Playback Untested.</news>
+        <news>2018.07.25[CR]- Fixed Login Issues[CR]2018.06.23[CR]- Misc. Maintenance [CR]2018.1.5[CR]- Added HDHomerun Tuner Support[CR]- Fixed Channel Loading Errors[CR]2017.12.24[CR]- Improved Skin[CR]2017.10.16[CR]- Added OnDemand (Preview).[CR]- Added Highlights.[CR]- Added Search.[CR]- Improved UI.[CR]- Added EPG Guide w/DVR context menu.[CR]- Misc. Tweaks and Corrections.[CR]2017.8.23[CR]- Added Preferred Playback Method and Stream Quality settings.[CR]2017.8.5[CR]- Fixed encoding error.[CR]2017.8.2[CR]- Fixed paid subscription channels and dvr control.[CR]2017.7.31[CR]- Fixed login issues.[CR]- Added fallback token generation[CR]- Added initial support for uEPG module.[CR]2017.7.26[CR]- Corrected version format.[CR]- Changed "Featured" and "Guide" click behavior.[CR]- Improved Error handling.[CR]2017.4.7a[CR]- Added "Featured"[CR]- Fixed DVR support.2017.4.7[CR]-100% new code base, written from scratch for your enjoy!!, DVR Recording and Playback Untested.</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -1798,8 +1862,6 @@
 <addon id="script.pseudotv.live" version="0.8.0f" name="PseudoTV Live" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
-        <import addon="context.pseudotv.live.export" version="1.0.8"/>
-        <import addon="plugin.video.pseudo.companion" version="0.0.7"/>
         <import addon="script.module.pil" version="0.0.1"/>
         <import addon="script.module.urlresolver" version="0.0.1"/>
         <import addon="script.module.buggalo" version="1.1.6"/>
@@ -1812,14 +1874,11 @@
         <import addon="script.common.plugin.cache" version="2.5.5"/>
         <import addon="script.module.youtube.dl" version="15.318.0"/>
         <import addon="script.module.simple.downloader" version="1.9.5"/>
-        <import addon="script.artwork.downloader" version="12.0.29"/>
-        <import addon="script.tv.show.next.aired" version="6.0.13"/>
-        <import addon="script.extendedinfo" version="3.0.1"/>
+        <import addon="script.artwork.downloader" version="12.0.29" optional="true"/>
+        <import addon="script.tv.show.next.aired" version="6.0.13" optional="true"/>
+        <import addon="script.extendedinfo" version="3.0.1" optional="true"/>
         <import addon="plugin.video.youtube" version="5.1.8" optional="true"/>
         <import addon="plugin.video.vimeo" version="4.1.4" optional="true"/>
-        <import addon="plugin.video.ustvnow" version="12.0.3" optional="true"/>
-        <import addon="plugin.video.playonbrowser" version="1.0.3" optional="true"/>
-        <import addon="plugin.program.super.favourites" version="1.0.35" optional="true"/>
     </requires>
     <extension point="xbmc.python.script" library="default.py">
         <provides>executable</provides>
@@ -1835,6 +1894,30 @@
         <email>pseudotvlive@gmail.com</email>
         <website>http://www.pseudotvlive.com</website>
         <forum>http://pseudotvlive.com/index.php/forum</forum>
+    </extension>
+</addon>
+
+<addon id="script.pseudotv.live.patcher" version="0.1.0" name="PseudoTV Live Patcher" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.pseudotv.live" version="0.9.0" />
+    </requires>
+    <extension point="xbmc.python.script" defaultresolution="1080i" library="default.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Apply custom PseudoTV Live fonts and patch skin files.</summary>
+        <description lang="en">Install Custom PseudoTV Live Fonts and Patch Kodi Skin to remove unwanted dialogs[CR] Patcher only alters files used by PseudoTV Live and will not harm/impact/effect Kodi</description>
+        <disclaimer lang="en" >This software is a BETA release, bugs maybe common until final release.[CR]</disclaimer>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/script.pseudotv.live.patcher</source>
+        <email>pseudotvlive@gmail.com</email>
+        <website>www.pseudotvlive.com</website>
+        <forum>http://pseudotvlive.com/index.php/forum</forum>
+        <news></news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
     </extension>
 </addon>
 
@@ -2034,5 +2117,19 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
     </extension>
+</addon>
+
+<addon id="webinterface.ptvlmanager" name="PTVL Manager" version="0.1.0a" provider-name="Peppy, Lunatixz">
+  <requires>
+    <import addon="xbmc.json" version="6.0.0" />
+  </requires>
+  <extension point="xbmc.webinterface"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_US">PTVL and Kodi media management webinterface</summary>
+    <description lang="en_US">PTVL webinterface allows you to control and manage Kodi libraries, and manage your PTVL Channels.</description>
+    <platform>all</platform>
+    <source>https://github.com/peppy6582/webinterface.ptvlmanager</source>
+    <forum>http://forum.kodi.tv/showthread.php?tid=225746</forum>
+  </extension>
 </addon>
 </addons>

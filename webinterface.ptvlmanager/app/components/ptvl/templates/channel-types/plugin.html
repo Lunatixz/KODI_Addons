@@ -1,0 +1,41 @@
+<div class="type-container" ng-controller="pluginDetailsCtrl">
+    <div class="row plugin" ng-show="changed.subfolders">
+        <div class="col-sm-12 col-md-12">
+            <h6 class="text-muted bg-danger">Subfolder may have been changed, without being saved!</h6>
+        </div>
+    </div>
+    <div class="row plugin">
+        <div class="col-sm-12 col-md-1 ch-plugin-label" >
+            plugin://
+        </div>
+        <div class="col-sm-12 col-md-3 ch-plugin-dropdown">
+            <ui-select ng-model="plugin.selected" theme="bootstrap" ng-disabled="channel.locked" on-select="selectPlugin(plugin.selected)" reset-search-input="'false'">
+                <ui-select-match placeholder="{{plugin.addonid}}">{{$select.selected.addonid}}</ui-select-match>
+                <ui-select-choices repeat="plugin in plugins | filter: $select.search">
+                    <span ng-bind-html="plugin.addonid| highlight: $select.search"></span>
+                </ui-select-choices>
+            </ui-select>
+        </div>
+        <div class="col-sm-1 col-md-1" ng-hide="!changed.plugin">
+            <button id="undoPlugin" class="btn btn-danger"  ng-click="undoPlugin()">Undo</button>
+        </div>
+        <div class="col-sm-12 col-md-1 ch-plugin-path-label">
+            Subfolder:
+        </div>
+        <div class="col-sm-12 col-md-3 ch-plugin-path-input">
+            <input type="text" name="subfolders" ng-disabled="channel.locked" ng-model="subfolders" style="width: 100%;" ng-click="changedSubs();">
+        </div>
+        <div class="col-sm-2">
+            <button id="undoSub" class="btn btn-danger" ng-hide="!changed.subfolders" ng-click="undoSub(channel)">Undo</button>
+        </div>
+    </div>
+    <div ng-include="'app/components/ptvl/templates/channel-details/sort-limit.html'"></div>
+    <div class="row">
+        <div class="col-sm-12">
+            <button id="save" class="btn btn-success" ng-hide="!changed.value" ng-click="savePlugin(channel, subfolders)" style="width: 100%;">Save</button>
+        </div>
+    </div>
+    <div class="sort-limit" ng-include="'app/components/ptvl/templates/channel-details/sub-rules.html'"></div>
+</div>
+
+

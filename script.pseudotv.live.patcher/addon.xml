@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.pseudotv.live.patcher" version="0.1.0" name="PseudoTV Live Patcher" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.pseudotv.live" version="0.9.0" />
+    </requires>
+    <extension point="xbmc.python.script" defaultresolution="1080i" library="default.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Apply custom PseudoTV Live fonts and patch skin files.</summary>
+        <description lang="en">Install Custom PseudoTV Live Fonts and Patch Kodi Skin to remove unwanted dialogs[CR] Patcher only alters files used by PseudoTV Live and will not harm/impact/effect Kodi</description>
+        <disclaimer lang="en" >This software is a BETA release, bugs maybe common until final release.[CR]</disclaimer>  
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/script.pseudotv.live.patcher</source>
+        <email>pseudotvlive@gmail.com</email>
+        <website>www.pseudotvlive.com</website>
+        <forum>http://pseudotvlive.com/index.php/forum</forum>
+        <news></news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>

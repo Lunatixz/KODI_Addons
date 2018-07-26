@@ -1,0 +1,4 @@
+define([
+    './showList',
+    './showDetails'
+], function () {});

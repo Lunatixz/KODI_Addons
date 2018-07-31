@@ -2,4 +2,5 @@
 <settings>
     <setting id="Enable_Debugging" type="bool" label="30000"  default="false" />
     <setting id="Quality" type="enum" label="30002"  default="3" values="SD|720p|1080p|Highest Available"/>
+    <setting id="Latest" type="slider" label="30010"  default="25" range="25,25,5000" option="int" />
 </settings>

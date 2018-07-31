@@ -55,3 +55,7 @@ msgstr ""
 msgctxt "#30009"
 msgid "Lineup"
 msgstr ""
+
+msgctxt "#30010"
+msgid "Latest Video Limit"
+msgstr ""

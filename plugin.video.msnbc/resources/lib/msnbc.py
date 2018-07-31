@@ -41,6 +41,7 @@ TIMEOUT       = 15
 CONTENT_TYPE  = 'episodes'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
+LATEST_LIMIT  = int(REAL_SETTINGS.getSetting('Latest'))
 BASE_URL      = 'http://www.msnbc.com/%s'
 SHOWS_URL     =  BASE_URL%'api/1.0/shows.json'
 PLAYLST_URL   =  BASE_URL%'api/1.0/getplaylistcarousel/vertical/%s.json'
@@ -95,27 +96,33 @@ class MSNBC(object):
 
         
     def getGuideData(self):
-        t1  = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:00')
-        h1  = (datetime.datetime.now() + datetime.timedelta(hours=8)).strftime('%H:00')
-        t2  = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:00')
-        h2  = (datetime.datetime.now() + datetime.timedelta(hours=8)).strftime('%H:00')
+        t1  = datetime.datetime.now().strftime('%Y-%m-%dT%I:%M:00')
+        h1  = (datetime.datetime.now() + datetime.timedelta(hours=8)).strftime('%I:00')
+        t2  = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%I:%M:00')
+        h2  = (datetime.datetime.now() + datetime.timedelta(hours=8)).strftime('%I:00')
         return BeautifulSoup(self.openURL(GUIDE_URL%(t1,h1,t2,h2)), "html.parser").findAll('item')
+        
+        
+    def correctOffset(self, dateOBJ):
+        return dateOBJ - (datetime.datetime.utcnow() - datetime.datetime.now())
         
         
     def buildGuideData(self):
         items = self.getGuideData()
         for item in items:
             now = datetime.datetime.utcnow()
-            starttime  = datetime.datetime.strptime(item.find('pllisting:starttime').get_text(),'%a, %d %b %Y %H:%M:%S GMT')
-            endtime    = datetime.datetime.strptime(item.find('pllisting:endtime').get_text(),'%a, %d %b %Y %H:%M:%S GMT')
+            starttime  = self.correctOffset(datetime.datetime.strptime(item.find('pllisting:starttime').get_text(),'%a, %d %b %Y %H:%M:%S GMT'))
+            endtime    = self.correctOffset(datetime.datetime.strptime(item.find('pllisting:endtime').get_text(),'%a, %d %b %Y %H:%M:%S GMT'))
             label      = item.find('pl:title').get_text().strip()
             label      = '%s - %s'%(starttime.strftime('%I:%M %p').lstrip('0'),label)
             plot       = item.find('pl:description').get_text().strip()
             genre      = item.find('plprogram:displaygenre').get_text().strip()
             duration   = item.find('plprogram:runtime').get_text().strip()
             aired      = starttime.strftime('%Y-%m-%d')
-            infoLabels = {"mediatype":"episode","label":label ,"title":label,"aired":aired,"genre":genre,"plot":plot,"duration":duration}
+            dateadded  = starttime.strftime('%Y-%m-%d %H:%M:%S')
+            infoLabels = {"mediatype":"episode","label":label ,"title":label,"dateadded":dateadded,"aired":aired,"genre":genre,"plot":plot,"duration":duration}
             self.addLink(label, LIVE_URL, 8, infoLabels, False)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_DATEADDED)
         
     
     def buildMenu(self, items):
@@ -202,11 +209,14 @@ class MSNBC(object):
                     print link
                     self.addLink(label, link, 9, infoLabels, infoArt, len(articles))
 
-                    
-    def browseLatest(self, name, curPage):
-        if curPage is None: curPage = '1'
-        log('browseLatest, page = ' + curPage)
-        videos = BeautifulSoup(self.openURL(LATEST_URL%curPage), "html.parser").findAll("url")
+
+    def buildLatest(self, curPage='1'):
+        log('buildLatest, page = ' + curPage)
+        return (BeautifulSoup(self.openURL(LATEST_URL%curPage), "html.parser").findAll("url"))[:LATEST_LIMIT]
+
+            
+    def browseLatest(self, name, url):
+        videos  = self.buildLatest()
         for video in videos:
             link  = video.find("video:player_loc").get_text()
             thumb = video.find("video:thumbnail_loc").get_text()
@@ -221,8 +231,6 @@ class MSNBC(object):
             infoLabel  = {"mediatype":"episode","label":label,"title":label,"plot":plot,"plotoutline":plot,"genre":"News","duration":dur,"aired":airdate}                    
             infoArt    = {"thumb":thumb,"poster":thumb,"icon":ICON,"fanart":FANART}
             self.addLink(label,link,9,infoLabel,infoArt,len(videos))
-        nextPage = str(int(curPage) + 1)
-        self.addDir(LANGUAGE(30008)%nextPage, nextPage, 4)
 
         
     def playLive(self, name):

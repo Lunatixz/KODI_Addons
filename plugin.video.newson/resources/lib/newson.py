@@ -105,7 +105,7 @@ class NewsOn(object):
             try: state.append(self.cleanState(channel['config']['state']))
             except: state.append(self.cleanState(channel['config']['locations'][0]['state']))
         states = collections.Counter(state)
-        for key, value in sorted(states.iteritems()): stateLST.append(("%s"%(key), key , '{}'))
+        for key, value in sorted(states.items()): stateLST.append(("%s"%(key), key , '{}'))
         return stateLST
             
             

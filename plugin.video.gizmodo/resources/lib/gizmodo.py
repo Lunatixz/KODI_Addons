@@ -40,7 +40,6 @@ TIMEOUT       = 15
 CONTENT_TYPE  = 'episodes'
 QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-mType         = int(REAL_SETTINGS.getSetting('Type'))
 BASE_URL      = 'https://gizmodo.com/video'
 LOGO_URL      = 'https://logo.clearbit.com/%s?size=512'
            

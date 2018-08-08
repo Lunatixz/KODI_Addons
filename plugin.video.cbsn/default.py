@@ -19,5 +19,6 @@
 # -*- coding: utf-8 -*-
 
 #entrypoint
-if __name__ == '__main__':
-    from resources.lib import cbsn
+import sys
+from resources.lib import cbsn
+if __name__ == '__main__': cbsn.CBSN(sys.argv).run()

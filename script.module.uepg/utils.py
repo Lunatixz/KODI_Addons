@@ -165,9 +165,8 @@ def notificationDialog(message, header=ADDON_NAME, show=True, sound=False, time=
             log("notificationDialog Failed! " + str(e), xbmc.LOGERROR)
             xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
     
-def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', custom='', autoclose=0):
-    try: return xbmcgui.Dialog().yesno(header, str1, no, yes, custom, autoclose)
-    except: return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
+def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', autoclose=0):
+    return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose) 
     
 def okDialog(str1, str2='', str3='', header=ADDON_NAME):
     xbmcgui.Dialog().ok(header, str1, str2, str3)
@@ -237,17 +236,9 @@ def showBusy():
 
 def hideBusy():
     while isBusyDialog() == True:
-        xbmc.executebuiltin('Dialog.Close(busydialog)')
+        xbmc.executebuiltin('Dialog.Close(dialognocancel)')
         xbmc.sleep(100)
-        
-def busyDialog(percent=0, control=None):
-    if percent == 0 and not control:
-        control = xbmcgui.DialogBusy()
-        control.create()
-    elif percent == 100 and control: return control.close()
-    elif control: control.update(percent)
-    return control
-    
+
 def ProgressDialogBG(percent=0, control=None, string1='', header=ADDON_NAME):
     if percent == 0 and not control:
         control = xbmcgui.DialogProgressBG()
@@ -273,8 +264,7 @@ def adaptiveDialog(percent, control=None, size=0, string1='', string2='', string
     elif getProperty('uEPGRunning') == 'True':
         if control: percent = 100
         else: return
-    if size < 50: return busyDialog(percent, control)
-    elif size < 150: return ProgressDialogBG(percent, control, string1, header)
+    if size < 150: return ProgressDialogBG(percent, control, string1, header)
     else: return ProgressDialog(percent, control, string1, string2, string3, header)
 
 def poolList(method, items):

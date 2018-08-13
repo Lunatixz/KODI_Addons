@@ -39,6 +39,7 @@ class ChannelList(object):
         self.channelNames = []
         self.maxGuidedata = 48
         self.maxChannels  = None
+        self.loading      = False
         self.uEPGRunning  = utils.getProperty('uEPGRunning') == "True"
         self.incHDHR      = utils.REAL_SETTINGS.getSetting('Enable_HDHR') == "true"
         self.useKodiSkin  = utils.REAL_SETTINGS.getSetting('useKodiSkin') == "true"
@@ -49,6 +50,7 @@ class ChannelList(object):
         channelnames   = []
         channelResults = utils.RPCHelper().getFileList(channelPath, life=datetime.timedelta(seconds=(self.refreshIntvl-600)))
         heading = '%s / %s'%(utils.ADDON_NAME,self.pluginName)
+        self.loading = True
         self.busy = utils.adaptiveDialog(0, size=len(channelResults), string1=utils.LANGUAGE(30004), header=heading)
         for i, item in enumerate(channelResults):
             utils.adaptiveDialog((i*100//len(channelResults))//2, self.busy, string1=utils.LANGUAGE(30004))
@@ -76,6 +78,7 @@ class ChannelList(object):
             if len(guidedata) > 0:
                 newChannel['guidedata'] = guidedata
                 channelItems.append(newChannel)
+        self.loading = False
         utils.adaptiveDialog(100, self.busy, string1=utils.LANGUAGE(30005))
         return self.prepareJson(channelItems)
                 
@@ -108,6 +111,7 @@ class ChannelList(object):
         channelnames   = []
         channelnumbers = []
         heading = '%s / %s'%(utils.ADDON_NAME,self.pluginName)
+        self.loading = True
         self.busy = utils.adaptiveDialog(0, size=len(channelItems), string1=utils.LANGUAGE(30004), header=heading)
         
         for i, item in enumerate(channelItems):
@@ -126,6 +130,7 @@ class ChannelList(object):
         for i in range(self.maxChannels):
             utils.adaptiveDialog((i*100//self.maxChannels)//2, self.busy, string1=utils.LANGUAGE(30004))
             self.channels.append(Channel())
+        self.loading = False
         utils.adaptiveDialog(100, self.busy, string1=utils.LANGUAGE(30005))
         
         if self.maxChannels is None or self.maxChannels == 0:
@@ -140,6 +145,7 @@ class ChannelList(object):
   
     def setupChannelList(self, channelItems):
         heading = '%s / %s'%(utils.ADDON_NAME,self.pluginName)
+        self.loading = True
         self.busy = utils.adaptiveDialog(0, size=len(channelItems), string1=utils.LANGUAGE(30006), header=heading)
         for i in range(self.maxChannels):
             if utils.adaptiveDialog((i*100//len(channelItems)), self.busy, string1=utils.LANGUAGE(30006)) == False: break
@@ -164,7 +170,8 @@ class ChannelList(object):
                 utils.log('setupChannelList, channel %s, isFavorite = %s'%(i+1,str(self.channels[i].isFavorite)))
                 utils.log('setupChannelList, channel %s, listSize = %s'%(i+1,str(self.channels[i].listSize)))
                 utils.log('setupChannelList, channel %s, totalTime = %s'%(i+1,str(self.channels[i].totalTime)))
-            except Exception as e: utils.log("setupChannelList, failed! idx (%s), error (%s), item (%s)"%(i, e, item), xbmc.LOGERROR)
+            except Exception as e: utils.log("setupChannelList, failed! idx (%s), error (%s), item (%s)"%(i, e, item), xbmc.LOGERROR)    
+        self.loading = False
         utils.adaptiveDialog(100, self.busy, string1=utils.LANGUAGE(30007))
 
         
@@ -226,17 +233,17 @@ if __name__ == '__main__':
         utils.setProperty('PluginIcon'   ,channelLST.pluginIcon)
         utils.setProperty('PluginFanart' ,channelLST.pluginFanart)
         utils.setProperty('PluginAuthor' ,channelLST.pluginAuthor)
-        
-        #show optional load screen
-        if channelLST.uEPGRunning == False and utils.getProperty('uEPGSplash') != 'True' and xbmcvfs.exists(os.path.join(channelLST.skinFolder,'%s.splash.xml'%utils.ADDON_ID)) == True:
-            mySplash   = epg.Splash('%s.splash.xml'%utils.ADDON_ID,channelLST.skinPath,'default')
-            mySplash.show()
-            xbmc.sleep(100)
+         
+        # #show optional load screen
+        # if channelLST.uEPGRunning == False and utils.getProperty('uEPGSplash') != 'True' and xbmcvfs.exists(os.path.join(channelLST.skinFolder,'%s.splash.xml'%utils.ADDON_ID)) == True:
+            # mySplash = epg.Splash('%s.splash.xml'%utils.ADDON_ID,channelLST.skinPath,'default')
+            # mySplash.show()
+            # xbmc.sleep(100)
             
         firstHDHR = utils.REAL_SETTINGS.getSetting('FirstTime_HDHR') == "true"
         if utils.HDHR().hasHDHR() and firstHDHR and not channelLST.incHDHR:
             utils.REAL_SETTINGS.setSetting('FirstTime_HDHR','false')
-            if utils.yesnoDialog((utils.LANGUAGE(30012)%(channelLST.pluginName)),custom='Later'):
+            if utils.yesnoDialog((utils.LANGUAGE(30012)%(channelLST.pluginName))):
                 utils.REAL_SETTINGS.setSetting('Enable_HDHR','true')
                 channelLST.incHDHR = True
                 
@@ -248,13 +255,13 @@ if __name__ == '__main__':
             utils.REAL_SETTINGS.setSetting('FirstTime_Run','false')
             utils.textViewer(utils.LANGUAGE(30008),'%s / %s'%(utils.ADDON_NAME,channelLST.pluginName))
 
-        if utils.getProperty('uEPGSplash') == 'True':
-            mySplash.close()
-            del mySplash
-            xbmc.sleep(100)
+        # if utils.getProperty('uEPGSplash') == 'True':
+            # mySplash.close()
+            # del mySplash
+            # xbmc.sleep(100)
         
         if hasChannels == True:
-            if channelLST.refreshIntvl > 0 and channelLST.refreshPath is not None: channelLST.startRefreshTimer()
+            # if channelLST.refreshIntvl > 0 and channelLST.refreshPath is not None: channelLST.startRefreshTimer()
             if channelLST.uEPGRunning == False and utils.getProperty('uEPGGuide') != 'True':
                 channelLST.myEPG = epg.uEPG('%s.guide.xml'%utils.ADDON_ID,channelLST.skinPath,'default')
                 channelLST.myEPG.channelLST = channelLST

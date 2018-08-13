@@ -1457,17 +1457,17 @@
     </extension>
 </addon>
 
-<addon id="repository.lunatixz" name="Lunatixz Beta Repository" version="1.0.2" provider-name="Lunatixz">
+<addon id="repository.lunatixz" name="Lunatixz Beta Repository" version="1.0.3" provider-name="Lunatixz">
     <extension point="xbmc.addon.repository" name="Lunatixz Beta Repository">
-        <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml</info>
-        <checksum>http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml.md5</checksum>
-        <datadir zip="true">http://raw.github.com/Lunatixz/KODI_Addons/master/zips</datadir>
+        <info compressed="false">https://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml</info>
+        <checksum>https://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml.md5</checksum>
+        <datadir zip="true">https://raw.github.com/Lunatixz/KODI_Addons/master/zips</datadir>
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB"></summary>
         <description lang="en_GB"></description>
         <platform>all</platform>
-        <source>http://raw.github.com/Lunatixz/KODI_Addons</source>
+        <source>https://raw.github.com/Lunatixz/KODI_Addons</source>
         <assets>
             <icon>icon.png</icon>
         </assets>
@@ -1857,7 +1857,7 @@
     </extension>
 </addon>
 
-<addon id="script.module.uepg" version="1.0.5" name="uEPG" provider-name="Lunatixz">
+<addon id="script.module.uepg" version="1.0.5b" name="uEPG" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.pyhdhr" version="1.0.0"/>
@@ -1872,7 +1872,7 @@
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.uepg</source>
         <website></website>
         <forum>https://forum.kodi.tv/showthread.php?tid=321231</forum>
-        <news>v1.0.3[CR]- Fixed listitem Parsing and Default Skin[CR]1.0.2[CR]- Added HDHomerun Tuner Support</news>
+        <news>v1.0.5b[CR]Temporarily disabled splash screen[CR]v1.0.3[CR]- Fixed listitem Parsing and Default Skin[CR]1.0.2[CR]- Added HDHomerun Tuner Support</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <screenshot>resources/images/screenshot01.png</screenshot>

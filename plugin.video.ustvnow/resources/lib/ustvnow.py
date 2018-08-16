@@ -608,7 +608,7 @@ class USTVnow():
                         if channel and channel['scode']: self.replaceToken(url, dvr)
                     
                     
-    def resolveDesktop(self, url, dvr, scode):
+    def replaceToken(self, url, dvr, scode):
         #generate alternative token using website endpoint rather then api.
         try:
             #get CSRF Token

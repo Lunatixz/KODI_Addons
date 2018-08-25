@@ -1857,6 +1857,26 @@
     </extension>
 </addon>
 
+<addon id="script.module.schedule" version="0.5.0" name="schedule" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.24.0" />
+    </requires>
+    <extension library="lib" point="xbmc.python.module" />
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">A Python interface for schedule</summary>
+        <description lang="en_GB">A Python interface for schedule</description>
+        <forum></forum>
+        <website>https://pypi.org/project/schedule/</website>
+        <license>MIT</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.schedule</source>
+        <news></news>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="script.module.uepg" version="1.0.5b" name="uEPG" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -2141,6 +2161,31 @@
         <platform>all</platform>
         <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.onmute</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=334361</forum>
+        <news></news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="service.ontime" version="0.0.1" name="OnTime" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.schedule" version="0.5.0"/>
+    </requires>
+    <extension point="xbmc.python.script" library="config.py"/>
+    <!-- <extension point="xbmc.python.pluginsource" library="default.py"> -->
+        <!-- <provides>video</provides> -->
+    <!-- </extension> -->
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Schedule Shows and Watch "OnTime".</summary>
+        <description lang="en_GB">Let "OnTime" manage your viewing habits using schedule playback.</description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.ontime</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=334619</forum>
         <news></news>
         <assets>
             <icon>icon.png</icon>

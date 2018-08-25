@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <setting id="clearSchedule"    type="action" label="32047" action="RunScript($CWD/clear.py)" option="close" />
+    <setting id="Enable_Debugging" type="bool"   label="32001" default="false" />
+    <setting id="Last_Update"      type="text"   label="32012" default=""   enable="false" />
+    <category label="32015">
+    <setting id="Default_Offset"   type="slider" label="32014" default="15" range="0,5,900" option="int" />
+    <setting id="Default_Action"   type="enum"   label="32007" default="0"  lvalues="32010|32011" />
+    <setting id="Default_Prompt"   type="enum"   label="32002" default="0"  lvalues="32003|32004|32005|32006" />
+    <setting id="Default_Label"    type="text"   label="32008" default="{title} about to start in {secondsleft} ..." />
+    </category>
+</settings>

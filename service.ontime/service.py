@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with OnTime.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, os, re, traceback, json, time, schedule, ast
+import sys, os, re, traceback, json, time, _strptime, datetime, schedule, ast
 import xbmc, xbmcplugin, xbmcaddon, xbmcgui
 from utils import *
 
@@ -119,7 +119,8 @@ class Service():
                     log("loadMySchedule, WARNING SETTING TAMPERED WITH! ", xbmc.LOGWARNING)
                     continue
                 elif date is not None: 
-                    dtobj = datetime.datetime.strptime(date, '%Y-%m-%d 00:00:00')
+                    try: dtobj = datetime.datetime.strptime(date, '%Y-%m-%d 00:00:00')
+                    except TypeError: dtobj = datetime.datetime(*(time.strptime(date, '%Y-%m-%d 00:00:00')[0:6]))
                     if nowtime <= dtobj <= threedays: log('loadMySchedule, loading date = ' + date)
                     else: continue
                     #todo pass job when dateobj isn't now, delete if old

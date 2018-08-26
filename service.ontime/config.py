@@ -16,14 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with OnTime.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, os, re, traceback, json, time, datetime, schedule, ast
+import sys, os, re, traceback, json, time, datetime, schedule, ast, base64, random
 import xbmc, xbmcplugin, xbmcaddon, xbmcgui
 from utils import *
     
 class OnTime():
     def __init__(self):
         log('__init__')
-        self.itemIDX     = 0
         self.mySchedule  = getMySchedule()
         self.configItems = {LANGUAGE(32016):self.buildPath  , LANGUAGE(32017):self.buildTitle,
                             LANGUAGE(32018):self.buildSCHED , LANGUAGE(32019):self.buildMSG,
@@ -35,9 +34,7 @@ class OnTime():
     def buildList(self, foList=0):
         log('buildList, foList = ' + str(foList))
         setProperty('CONFIG_OPEN','True')
-        print self.mySchedule[0], type(self.mySchedule[0]), SETTING_TEMPT[0], type(SETTING_TEMPT[0]), self.mySchedule[0] == SETTING_TEMPT[0]
         if not self.mySchedule[0] == SETTING_TEMPT[0]: self.mySchedule.insert(0,SETTING_TEMPT[0])
-        self.itemIDX = 0
         listitems = poolList(buildListItem, poolList(getItemInfo, self.mySchedule))
         listitems.insert(0, buildListItem(('+New Schedule', 'Create New Schedule', ICON, '', '')))
         print 'buildList', self.mySchedule, len(self.mySchedule), listitems, len(listitems)
@@ -52,7 +49,6 @@ class OnTime():
         
        
     def buildNew(self, idx):
-        self.itemIDX = idx
         item = self.mySchedule[idx]
         log('buildNew, item = ' + str(item))
         for config in list(self.configItems.values()): config(item)
@@ -128,7 +124,9 @@ class OnTime():
                     if validateTime(timeval): break
                 except: return
             opera = SCHED_OPERA%timeval
-        setSCHED(item,(SCHED_TEMPT.format(inttime=intVal, between='', interval=schedType.lower(), operator=opera, idx=self.itemIDX) or []))
+        tag = base64.b64encode(bytes('%s%s%s%d'%(intVal,schedType,opera,random.randint(0,9999))), 'utf-8')
+        setTag(item,tag)
+        setSCHED(item,(SCHED_TEMPT.format(inttime=intVal, between='', interval=schedType.lower(), operator=opera, idx=tag) or []))
     
     
     def buildMSG(self, item):

@@ -385,7 +385,7 @@ def validateTime(input, frmt='%H:%M'):
     
 def validateRange(typ, val):
     log('validateRange, typ = ' + typ + ', val = ' + str(val))
-    if 0 < val <= INTVAL_LIMITS[typ]: state = True
+    if 0 <= val <= INTVAL_LIMITS[typ]: state = True
     else:
         state = False
         notificationDialog(LANGUAGE(32031))
@@ -409,3 +409,7 @@ def getLastUpdate():
     
 def setLastUpdate(dtobj):
     REAL_SETTINGS.setSetting('Last_Update',dtobj)
+    
+def getLabel2(self, job):
+    pass
+    # schedule.every(1).days.tag(MURheXM2OTA=) todo job to readable string.

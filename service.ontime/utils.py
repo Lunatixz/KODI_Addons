@@ -385,7 +385,7 @@ def validateTime(input, frmt='%H:%M'):
     
 def validateRange(typ, val):
     log('validateRange, typ = ' + typ + ', val = ' + str(val))
-    if 0 <= val <= INTVAL_LIMITS[typ]: state = True
+    if 0 < val <= INTVAL_LIMITS[typ]: state = True
     else:
         state = False
         notificationDialog(LANGUAGE(32031))

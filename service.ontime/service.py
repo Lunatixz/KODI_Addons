@@ -121,7 +121,7 @@ class Service():
                 elif date is not None: 
                     try: dtobj = datetime.datetime.strptime(date, '%Y-%m-%d 00:00:00')
                     except TypeError: dtobj = datetime.datetime(*(time.strptime(date, '%Y-%m-%d 00:00:00')[0:6]))
-                    if nowtime <= dtobj <= threedays: log('loadMySchedule, loading date = ' + date)
+                    if threedays <= dtobj <= nowtime: log('loadMySchedule, loading date = ' + date)
                     else: continue
                     #todo pass job when dateobj isn't now, delete if old
                 self.evalJob(job,(args)) #ast.literal_eval to strict?

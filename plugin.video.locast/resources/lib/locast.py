@@ -91,7 +91,7 @@ socket.setdefaulttimeout(TIMEOUT)
 class Locast(object):
     def __init__(self, sysARG):
         log('__init__, sysARG = ' + str(sysARG))
-        self.token  = TOKEN
+        self.token  = (TOKEN or LANGUAGE(30017))
         self.sysARG = sysARG
         self.cache  = SimpleCache()
         self.net    = net.Net(cookie_file=COOKIE_JAR,http_debug=DEBUG)

@@ -151,7 +151,7 @@ class Locast(object):
         if not epg:
             now = ('{0:.23s}{1:s}'.format(datetime.datetime.now().strftime('%Y-%m-%dT00:00:00'),'-07:00'))
             epg = json.loads(self.net.http_POST(BASE_API, form_data={'action':'get_epgs','dma':city,'start_time':now}, headers=self.buildHeader()).content.encode("utf-8").rstrip())
-            self.cache.set(ADDON_NAME + '.getEPG.%s'%city, epg, expiration=datetime.timedelta(hours=3))
+            self.cache.set(ADDON_NAME + '.getEPG.%s'%city, epg, expiration=datetime.timedelta(hours=1))
         return epg
 
         
@@ -265,6 +265,7 @@ class Locast(object):
             tmpdata   = {"mediatype":type,"label":label,"title":label,'duration':duration,'plot':plot,'genre':listing.get('genres',[]),"aired":aired.strftime('%Y-%m-%d')}
             starttime = datetime.datetime.fromtimestamp(int(str(listing['startTime'])[:-3]))
             endtime   = starttime + datetime.timedelta(seconds=duration)
+            if now > endtime: continue
             tmpdata['starttime'] = time.mktime((starttime).timetuple())
             tmpdata['url'] = self.sysARG[0]+'?mode=9&name=%s&url=%s'%(chname,link)
             tmpdata['art'] = {"thumb":chlogo,"poster":chlogo,"fanart":FANART,"icon":chlogo,"logo":chlogo}

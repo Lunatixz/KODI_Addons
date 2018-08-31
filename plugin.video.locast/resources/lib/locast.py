@@ -210,18 +210,18 @@ class Locast(object):
         for listing in listings:
             try: starttime  = datetime.datetime.fromtimestamp(int(str(listing['startTime'])[:-3]))
             except: continue
-            duration   = listing['duration']
+            duration   = listing.get('duration',0)
             endtime    = starttime + datetime.timedelta(seconds=duration)
             label      = listing['title']
             # if listing['isNew']: label = '*%s'%label
             try: aired = datetime.datetime.fromtimestamp(int(str(listing['airdate'])[:-3]))
             except: aired = starttime
-            try: type  = {'Series':'episode'}[listing['showType']]
+            try: type  = {'Series':'episode'}[listing.get('showType','Series')]
             except: type = 'video'
             plot = (listing.get('description','') or label)
             if opt == 'Live' and starttime <= now <= endtime: label = '%s - %s'%(chname, label)
             elif opt == 'Lineup': label = '%s: %s - %s'%(starttime.strftime('%I:%M %p').lstrip('0'),chname,label)
-            infoLabels = {"mediatype":type,"label":label,"title":label,'duration':duration,'plot':plot,'genre':listing['genres'],"aired":aired.strftime('%Y-%m-%d')}
+            infoLabels = {"mediatype":type,"label":label,"title":label,'duration':duration,'plot':plot,'genre':listing.get('genres',[]),"aired":aired.strftime('%Y-%m-%d')}
             infoArt    = {"thumb":chlogo,"poster":chlogo,"fanart":FANART,"icon":chlogo,"logo":chlogo}
             if opt == 'Live':
                 if starttime <= now <= endtime: return self.addLink(label, path, 9, infoLabels, infoArt, total=len(listings))
@@ -255,13 +255,13 @@ class Locast(object):
         listings = station['listings']
         #todo added more meta from listings, ie mpaa, isNew, video/audio codec
         for listing in listings:
-            try: type  = {'Series':'episode'}[listing['showType']]
+            try: type  = {'Series':'episode'}[listing.get('showType','Series')]
             except: type = 'video'
             label = listing['title']
             plot  = (listing.get('description','') or label)
             try: aired = datetime.datetime.fromtimestamp(int(str(listing['airdate'])[:-3]))
             except: aired = now
-            duration  = listing['duration']
+            duration  = listing.get('duration',0)
             tmpdata   = {"mediatype":type,"label":label,"title":label,'duration':duration,'plot':plot,'genre':listing.get('genres',[]),"aired":aired.strftime('%Y-%m-%d')}
             starttime = datetime.datetime.fromtimestamp(int(str(listing['startTime'])[:-3]))
             endtime   = starttime + datetime.timedelta(seconds=duration)

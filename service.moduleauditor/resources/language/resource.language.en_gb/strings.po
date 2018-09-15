@@ -16,6 +16,34 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgctxt "#32001"
+msgctxt "#32000"
 msgid "Enable Debugging"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Something went wrong, Try again..."
+msgstr ""
+
+msgctxt "#32002"
+msgid "[COLOR=green]Verified[/COLOR]"
+msgstr ""
+
+msgctxt "#32003"
+msgid "[COLOR=orange]Unknown Origin[/COLOR]"
+msgstr ""
+
+msgctxt "#32004"
+msgid "[COLOR=red]Unknown Version[/COLOR]"
+msgstr ""
+
+msgctxt "#32004"
+msgid "[COLOR=red]Unknown Version[/COLOR]"
+msgstr ""
+
+msgctxt "#32004"
+msgid "[COLOR=red]Unknown Version[/COLOR]"
+msgstr ""
+
+msgctxt "#32004"
+msgid "[COLOR=red]Unknown Version[/COLOR]"
 msgstr ""

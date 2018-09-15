@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Kodi Module Auditor.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, traceback, json, urlparse, datetime, urllib, urllib2
+import sys, re, traceback, json, urlparse, datetime, urllib, urllib2, itertools
 import xbmc, xbmcplugin, xbmcaddon, xbmcgui
 import xml.etree.ElementTree as ET
 
@@ -45,6 +45,7 @@ DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == "true"
 BASE_URL      = 'http://mirrors.kodi.tv/addons/%s/addons.xml'
 MOD_QUERY     = '{"jsonrpc":"2.0","method":"Addons.GetAddons","params":{"type":"xbmc.python.module","properties":["name","version","author","enabled"]},"id":1}'
 VER_QUERY     = '{"jsonrpc":"2.0","method":"Application.GetProperties","params":{"properties":["version"]},"id":1}'
+DOTS          = itertools.cycle(['','.', '..', '...'])
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -104,7 +105,7 @@ def notificationDialog(message, header=ADDON_NAME, sound=False, time=1000, icon=
     try: xbmcgui.Dialog().notification(header, message, icon, time, sound)
     except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
     
-def textViewer(string1, header=ADDON_NAME, usemono=False):
+def textViewer(string1, header=ADDON_NAME, usemono=True):
     xbmcgui.Dialog().textviewer(header, uni(string1), usemono)
     
 def progressDialog(percent=0, control=None, string1='', string2='', string3='', header=ADDON_NAME):
@@ -117,7 +118,18 @@ def progressDialog(percent=0, control=None, string1='', string2='', string3='', 
         control.update(percent, string1, string2, string3)
     return control
     
-     
+def cleanString(text):
+    text = re.sub('\[COLOR=(.+?)\]','', text)
+    text = text.replace('[/COLOR]' ,'')
+    text = text.replace("[B]"      ,'')
+    text = text.replace("[/B]"     ,'')
+    text = text.replace("{filler}{status}" ,'')
+    return text
+    
+def generateFiller(string1, string2, totline=88, fill='.'):
+    filcnt  = totline - (len(cleanString(string1)) + len(cleanString(string2)))
+    return (fill * filcnt)[:totline]
+    
 class SCAN(object):
     def __init__(self):
         self.pUpdate = 0
@@ -158,7 +170,7 @@ class SCAN(object):
         #todo create listitem/selectDialog and trigger disable
         summary = self.scanModules()
         for item in summary: lineLST.append(item['label'])
-        textViewer('\n'.join(lineLST),usemono=True)
+        textViewer('\n'.join(lineLST))
         
     
     def scanModules(self):
@@ -172,7 +184,7 @@ class SCAN(object):
         for idx1, myModule in enumerate(myModules):
             found   = False
             error   = False
-            self.label   = '{name} v.{version} [B]{status}[/B]'.format(name=uni(myModule['name']),version=uni(myModule['version']),status='{status}')
+            self.label   = '{name} v.{version}{filler}[B]{status}[/B]'.format(name=uni(myModule['name']),version=uni(myModule['version']),filler='{filler}',status='{status}')
             self.label2  = '{id} by {author} {enabled}'.format(id=uni(myModule['addonid']),author=uni(myModule['author']),enabled=uni(myModule['enabled']))
             self.pUpdate = (idx1) * 100 // pTotal
             self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string1='Auditing Modules ...', string2='Verifying %s'%(uni(myModule['addonid'])))
@@ -184,9 +196,9 @@ class SCAN(object):
                 self.pUpdate = (idx1+ idx2) * 100 // pTotal
                 self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string2='Verifying %s'%(uni(myModule['addonid'])))
                 if found: 
-                    self.label  = self.label.format(status="[COLOR=green]Verified[/COLOR]")
+                    self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32002)),status=LANGUAGE(32002))
                     break
-            if not found: self.label = self.label.format(status='[COLOR=orange]Unknown Origin[/COLOR]')
+            if not found: self.label = self.label.format(filler=generateFiller(self.label,LANGUAGE(32003)),status=LANGUAGE(32003))
             summary.append({'found':found,'error':error,'label':self.label,'label2':self.label2,'kodiModule':(kodiModule),'myModule':(myModule)})
         summary = sorted(summary, key=lambda item: item['found'], reverse=False)
         summary = sorted(summary, key=lambda item: item['error'], reverse=True)
@@ -198,13 +210,13 @@ class SCAN(object):
         found = False
         error = False
         for kodiModule in kodiModules:
-            self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string3='Checking %s'%(uni(kodiModule['id'])))
+            self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string3='Checking %s ...'%(uni(kodiModule['id'])))
             try:
                 if myModule['addonid'] == kodiModule['id']:
                     found = True
                     if myModule['version'] != kodiModule['version']:
                         error = True
-                        self.label  = self.label.format(status='[COLOR=red]Unknown Version[/COLOR]')
+                        self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32004)),status=LANGUAGE(32004))
                     break
             except Exception as e: log('findModule, failed parse %s - %s'%(str(myModule),str(e)), xbmc.LOGERROR)
         if found: return found, error, kodiModule
@@ -224,14 +236,14 @@ class SCAN(object):
         
         
     def buildRepos(self): 
-        self.pDialog = progressDialog(0, string1="Building Kodi Repositories ...")
+        self.pDialog = progressDialog(0, string1="Evaluating Kodi Repositories %s"%(DOTS.next()))
         self.poolList(self.buildRepo, self.builds)
     
     
     def buildRepo(self, build):
         repository   = BUILDS[build]
         self.pUpdate = (self.builds.index(build)) * 100 // len(BUILDS)
-        self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string1="Building Kodi Repository", string2='Parsing %s'%(repository))
+        self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string1="Evaluating Kodi Repositories %s"%(DOTS.next()), string2='reviewing %s'%(repository))
         log('buildRepo, repository = %s'%(repository))
         self.kodiModules[repository] = list(self.buildModules(repository))
         

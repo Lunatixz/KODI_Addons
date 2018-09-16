@@ -2200,7 +2200,7 @@
     </extension>
 </addon>
 
-<addon id="service.moduleauditor" version="0.0.3" name="Kodi Module Auditor" provider-name="Team Kodi">
+<addon id="service.moduleauditor" version="0.0.4" name="Kodi Module Auditor" provider-name="Team Kodi">
     <requires>
         <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="xbmc.python" version="2.25.0"/>

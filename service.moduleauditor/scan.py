@@ -54,16 +54,13 @@ def log(msg, level=xbmc.LOGDEBUG):
     
 def ascii(string):
     if isinstance(string, basestring):
-        if isinstance(string, unicode):
-           string = string.encode('ascii', 'ignore')
+        if isinstance(string, unicode): string = string.encode('ascii', 'ignore')
     return string
     
 def uni(string):
     if isinstance(string, basestring):
-        if isinstance(string, unicode):
-           string = string.encode('utf-8', 'ignore' )
-        else:
-           string = ascii(string)
+        if isinstance(string, unicode): string = string.encode('utf-8', 'ignore' )
+        else: string = ascii(string)
     return string
     
 def loadJSON(string1):
@@ -74,9 +71,7 @@ def dumpJSON(string1):
 
 def getProperty(string1):
     try: return xbmcgui.Window(10000).getProperty('%s.%s'%(ADDON_ID,string1))
-    except Exception as e:
-        log("getProperty, Failed! " + str(e), xbmc.LOGERROR)
-        return ''
+    except Exception as e: return ''
           
 def setProperty(string1, string2):
     try: xbmcgui.Window(10000).setProperty('%s.%s'%(ADDON_ID,string1), string2)
@@ -126,7 +121,7 @@ def cleanString(text):
     text = text.replace("{filler}{status}" ,'')
     return text
     
-def generateFiller(string1, string2, totline=88, fill='.'):
+def generateFiller(string1, string2, totline=75, fill='.'):
     filcnt  = totline - (len(cleanString(string1)) + len(cleanString(string2)))
     return (fill * filcnt)[:totline]
     

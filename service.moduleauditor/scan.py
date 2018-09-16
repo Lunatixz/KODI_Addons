@@ -39,7 +39,7 @@ FANART        = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE      = REAL_SETTINGS.getLocalizedString
 
 ## GLOBALS ##
-TIMEOUT       = 30
+TIMEOUT       = 15
 BUILDS        = {18:'leia',17:'krypton',16:'jarvis',15:'isengard',14:'helix',13:'gotham'}
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == "true"
 BASE_URL      = 'http://mirrors.kodi.tv/addons/%s/addons.xml'
@@ -156,7 +156,7 @@ class SCAN(object):
             if not cacheresponse:
                 cacheresponse = (urllib2.urlopen(urllib2.Request(url), timeout=TIMEOUT)).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=datetime.timedelta(minutes=15))
-                xbmc.sleep(500)
+                xbmc.sleep(1000)
             return cacheresponse
         except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)

@@ -36,14 +36,34 @@ msgctxt "#32004"
 msgid "[COLOR=red]Unknown Version[/COLOR]"
 msgstr ""
 
-msgctxt "#32004"
-msgid "[COLOR=red]Unknown Version[/COLOR]"
+msgctxt "#32005"
+msgid "Silently run scan every x days"
 msgstr ""
 
-msgctxt "#32004"
-msgid "[COLOR=red]Unknown Version[/COLOR]"
+msgctxt "#32006"
+msgid "found [B]%d[/B] issues, Manually run for more details ..."
 msgstr ""
 
-msgctxt "#32004"
-msgid "[COLOR=red]Unknown Version[/COLOR]"
+msgctxt "#32007"
+msgid "Summary"
+msgstr ""
+
+msgctxt "#32008"
+msgid "Details"
+msgstr ""
+
+msgctxt "#32009"
+msgid "View Summary or Details?"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Module Disabled"
+msgstr ""
+
+msgctxt "#32011"
+msgid "Disable %s?"
+msgstr ""
+
+msgctxt "#32012"
+msgid "Select Module to disable"
 msgstr ""

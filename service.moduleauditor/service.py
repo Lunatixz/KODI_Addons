@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Kodi Module Auditor.  If not, see <http://www.gnu.org/licenses/>.
 
+import schedule
 import xbmc
 
 from scan import *
@@ -51,13 +52,14 @@ class Service(object):
     def __init__(self):
         self.myPlayer  = Player()
         self.myMonitor = Monitor()
-        # self.startService()
+        self.myScanner = SCAN()
+        self.startService()
 
          
     def startService(self):
-        #todo create scan schedule 
-        while not self.Monitor.abortRequested():
-            if self.Monitor.waitForAbort(2):
-                break
-
+        schedule.clear()
+        schedule.every(WAIT).days.do(self.myScanner.preliminary)
+        while not self.myMonitor.abortRequested():
+            if self.myMonitor.waitForAbort(15): break
+            schedule.run_pending()
 if __name__ == '__main__': Service()

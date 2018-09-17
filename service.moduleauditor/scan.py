@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Kodi Module Auditor.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, re, traceback, json, urlparse, datetime, urllib, urllib2, itertools
+import sys, re, traceback, json, urlparse
+import datetime, urllib, urllib2, itertools, random
 import xbmc, xbmcplugin, xbmcaddon, xbmcgui
 import xml.etree.ElementTree as ET
 
@@ -42,8 +43,9 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 TIMEOUT       = 15
 BUILDS        = {18:'leia',17:'krypton',16:'jarvis',15:'isengard',14:'helix',13:'gotham'}
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == "true"
+WAIT          = int(REAL_SETTINGS.getSetting('Scan_Wait'))
 BASE_URL      = 'http://mirrors.kodi.tv/addons/%s/addons.xml'
-MOD_QUERY     = '{"jsonrpc":"2.0","method":"Addons.GetAddons","params":{"type":"xbmc.python.module","properties":["name","version","author","enabled"]},"id":1}'
+MOD_QUERY     = '{"jsonrpc":"2.0","method":"Addons.GetAddons","params":{"type":"xbmc.python.module","enabled":true,"properties":["name","version","author","enabled"]},"id":1}'
 VER_QUERY     = '{"jsonrpc":"2.0","method":"Application.GetProperties","params":{"properties":["version"]},"id":1}'
 DOTS          = itertools.cycle(['','.', '..', '...'])
 
@@ -87,23 +89,36 @@ def inputDialog(heading=ADDON_NAME, default='', key=xbmcgui.INPUT_ALPHANUM, opt=
 def okDialog(str1, str2='', str3='', header=ADDON_NAME):
     xbmcgui.Dialog().ok(header, str1, str2, str3)
 
-def okDisable(string1):
-    if yesnoDialog(string1, no=LANGUAGE(30009), yes=LANGUAGE(30015)): 
-        results = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method":"Addons.SetAddonEnabled", "params":{"addonid":"%s","enabled":false}, "id": 1}'%ADDON_ID)
-        if results and "OK" in results: notificationDialog(LANGUAGE(30016))
-    else: sys.exit()
+def okDisable(string1, addonName, addonID, state):
+    if yesnoDialog(string1):
+        query = '{"jsonrpc": "2.0", "method":"Addons.SetAddonEnabled", "params":{"addonid":"%s","enabled":%s}, "id": 1}'%(addonID, str(state).lower())
+        log('okDisable, addonID = %s, state = %s, query = %s'%(addonID, state, query))
+        results = xbmc.executeJSONRPC(query)
+        if results and "OK" in results: 
+            notificationDialog(LANGUAGE(32010)%(state))
+            return True
+        else: notificationDialog(LANGUAGE(30001))
+    else: return False
         
 def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', autoclose=0):
     return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
     
-def notificationDialog(message, header=ADDON_NAME, sound=False, time=1000, icon=ICON):
+def notificationDialog(message, header=ADDON_NAME, sound=False, time=4000, icon=ICON):
     try: xbmcgui.Dialog().notification(header, message, icon, time, sound)
     except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
     
-def textViewer(string1, header=ADDON_NAME, usemono=True):
+def textViewer(string1, header=ADDON_NAME, usemono=True, silent=False):
+    if silent: return
     xbmcgui.Dialog().textviewer(header, uni(string1), usemono)
     
-def progressDialog(percent=0, control=None, string1='', string2='', string3='', header=ADDON_NAME):
+def selectDialog(list, header='', autoclose=0, preselect=None, useDetails=True):
+    if preselect is None: preselect = -1
+    select = xbmcgui.Dialog().select('%s - %s'%(ADDON_NAME,header), list, autoclose, preselect, useDetails)
+    if select > -1: return select
+    return None
+    
+def progressDialog(percent=0, control=None, string1='', string2='', string3='', header=ADDON_NAME, silent=False):
+    if silent: return
     if control is None:
         if percent == 0: control = xbmcgui.DialogProgress()
         if control is not None:control.create(header, string1, string2, string3)
@@ -112,6 +127,18 @@ def progressDialog(percent=0, control=None, string1='', string2='', string3='', 
         if percent == 100: return control.close()
         control.update(percent, string1, string2, string3)
     return control
+    
+def buildListItem(item):
+    log('buildListItem, item = ' + str(item))
+    try: 
+        label, label2, url = tuple(item)
+        liz = xbmcgui.ListItem(label, label2, path=url)
+        liz.setArt({'icon':ICON, 'thumb':ICON})
+        # contextMenu = [('Enable Module','XBMC.RunPlugin(%s)'%(sys.argv[0]+"?mode=1&name="+item+"&url="+url))]
+        # liz.addContextMenuItems(contextMenu)
+        return liz
+    except Exception as e: log("buildListItem, Failed! " + str(e), xbmc.LOGERROR)
+    return
     
 def cleanString(text):
     text = re.sub('\[COLOR=(.+?)\]','', text)
@@ -124,15 +151,22 @@ def cleanString(text):
 def generateFiller(string1, string2, totline=75, fill='.'):
     filcnt  = totline - (len(cleanString(string1)) + len(cleanString(string2)))
     return (fill * filcnt)[:totline]
-    
+
+def filterItems(items):
+    for item in items:
+        if not item['error'] and item['found']: continue
+        yield item
+            
 class SCAN(object):
     def __init__(self):
-        self.pUpdate = 0
-        self.pDialog = None
+        self.silent      = False
+        self.pDialog     = None
+        self.pUpdate     = 0
+        self.matchCNT    = 0
+        self.errorCNT    = 0
         self.kodiModules = {}
-        self.cache   = SimpleCache()
-        self.builds  = sorted(BUILDS, reverse=True)
-        self.buildRepos()
+        self.cache       = SimpleCache()
+        self.builds      = sorted(BUILDS, reverse=True)
         
         
     def sendJSON(self, command):
@@ -140,7 +174,7 @@ class SCAN(object):
         cacheresponse = self.cache.get(ADDON_NAME + '.sendJSON, command = %s'%command)
         if not cacheresponse:
             cacheresponse = loadJSON(xbmc.executeJSONRPC(command))
-            self.cache.set(ADDON_NAME + '.sendJSON, command = %s'%command, cacheresponse, expiration=datetime.timedelta(minutes=15))
+            self.cache.set(ADDON_NAME + '.sendJSON, command = %s'%command, cacheresponse, expiration=datetime.timedelta(minutes=1))
         return cacheresponse
         
         
@@ -150,23 +184,63 @@ class SCAN(object):
             cacheresponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
             if not cacheresponse:
                 cacheresponse = (urllib2.urlopen(urllib2.Request(url), timeout=TIMEOUT)).read()
-                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=datetime.timedelta(minutes=15))
+                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=datetime.timedelta(minutes=random.randrange(10, 20, 1)))
                 xbmc.sleep(1000)
             return cacheresponse
         except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
-            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
+            notificationDialog(LANGUAGE(30001))
             return ''
 
             
+    def preliminary(self): 
+        self.silent = True
+        self.validate()
+        if self.matchCNT + self.errorCNT > 0: notificationDialog(LANGUAGE(32006)%(self.errorCNT),time=8000)
+        
+            
     def validate(self):
         log('validate')
-        lineLST = []
-        #todo create listitem/selectDialog and trigger disable
+        self.matchCNT = 0
+        self.errorCNT = 0
+        self.buildRepos()
         summary = self.scanModules()
-        for item in summary: lineLST.append(item['label'])
+        if self.silent: return
+        if yesnoDialog(LANGUAGE(32009), yes=LANGUAGE(32008), no=LANGUAGE(32007)): self.buildDetails(filterItems(summary))
+        else: self.buildSummary(summary)
+            
+            
+    def buildSummary(self, items):
+        log('buildSummary')
+        lineLST = []
+        for item in items: lineLST.append(item['label'])
         textViewer('\n'.join(lineLST))
-        
+            
+            
+    def buildDetails(self, items):
+        log('buildDetails')
+        select = 0
+        listItems = []
+        for item in items:
+            addonID = (item['kodiModule'].get('id','') or item['kodiModule']['addonid'])
+            author  = (item['kodiModule'].get('provider-name','') or item['kodiModule']['author']) 
+            label   = '%s v.%s by %s'%(addonID,item['kodiModule']['version'],author)
+            label2  = 'Enabled: [B]%s[/B] | %s'%(str(item['kodiModule'].get('enabled',True)),item['label2'])
+            listItems.append((label,label2,addonID))
+        while select is not None:
+            select  = selectDialog(self.poolList(buildListItem, listItems),LANGUAGE(32012), preselect=select)
+            if select is None: return
+            item    = listItems[select]
+            state   = not (cleanString(item[1].split('Enabled: ')[1]) == 'True')
+            string1 = LANGUAGE(32011)%(item[0])
+            if okDisable(string1, item[0], item[2], state): 
+                listItems.pop(select)
+                select = 0
+
+            
+    def enableModule(self, name, url):
+        log('enableModule, name = %s, url = %s'%(name, url))
+    
     
     def scanModules(self):
         log('scanModules')
@@ -180,24 +254,31 @@ class SCAN(object):
             found   = False
             error   = False
             self.label   = '{name} v.{version}{filler}[B]{status}[/B]'.format(name=uni(myModule['name']),version=uni(myModule['version']),filler='{filler}',status='{status}')
-            self.label2  = '{id} by {author} {enabled}'.format(id=uni(myModule['addonid']),author=uni(myModule['author']),enabled=uni(myModule['enabled']))
             self.pUpdate = (idx1) * 100 // pTotal
-            self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string1='Auditing Modules ...', string2='Verifying %s'%(uni(myModule['addonid'])))
+            self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string1='Auditing Modules ...', string2='Verifying %s'%(uni(myModule['addonid'])), silent=self.silent)
             for idx2, branch in enumerate(topBranch):
                 repository = BUILDS[branch]
                 found, error, kodiModule = self.findModule(myModule, self.kodiModules[repository])
                 log('scanModules, myModule = %s, repository = %s, found = %s'%(myModule['addonid'],repository, found))
                 verifed = 'True' if found and not error else 'False'
                 self.pUpdate = (idx1+ idx2) * 100 // pTotal
-                self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string2='Verifying %s'%(uni(myModule['addonid'])))
-                if found: 
-                    self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32002)),status=LANGUAGE(32002))
+                self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string2='Verifying %s'%(uni(myModule['addonid'])), silent=self.silent)
+                if found and error:
+                    self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32004)),status=LANGUAGE(32004))
+                    self.label2 = LANGUAGE(32004)
                     break
-            if not found: self.label = self.label.format(filler=generateFiller(self.label,LANGUAGE(32003)),status=LANGUAGE(32003))
+                elif found and not error: 
+                    self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32002)),status=LANGUAGE(32002))
+                    self.label2 = LANGUAGE(32002)
+                    break
+            if not found and not error: 
+                self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32003)),status=LANGUAGE(32003))
+                self.label2 = LANGUAGE(32003)
             summary.append({'found':found,'error':error,'label':self.label,'label2':self.label2,'kodiModule':(kodiModule),'myModule':(myModule)})
+        summary = sorted(summary, key=lambda item: item['kodiModule']['name'], reverse=False)
         summary = sorted(summary, key=lambda item: item['found'], reverse=False)
         summary = sorted(summary, key=lambda item: item['error'], reverse=True)
-        self.pDialog = progressDialog(100, control=self.pDialog, string3='Audit Complete')
+        self.pDialog = progressDialog(100, control=self.pDialog, string3='Audit Complete', silent=self.silent)
         return summary
         
         
@@ -205,13 +286,14 @@ class SCAN(object):
         found = False
         error = False
         for kodiModule in kodiModules:
-            self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string3='Checking %s ...'%(uni(kodiModule['id'])))
+            self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string3='Checking %s ...'%(uni(kodiModule['id'])), silent=self.silent)
             try:
                 if myModule['addonid'] == kodiModule['id']:
                     found = True
+                    self.matchCNT += 1
                     if myModule['version'] != kodiModule['version']:
                         error = True
-                        self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32004)),status=LANGUAGE(32004))
+                        self.errorCNT += 1
                     break
             except Exception as e: log('findModule, failed parse %s - %s'%(str(myModule),str(e)), xbmc.LOGERROR)
         if found: return found, error, kodiModule
@@ -231,14 +313,14 @@ class SCAN(object):
         
         
     def buildRepos(self): 
-        self.pDialog = progressDialog(0, string1="Evaluating Kodi Repositories %s"%(DOTS.next()))
+        self.pDialog = progressDialog(0, string1="Evaluating Kodi Repositories %s"%(DOTS.next()), silent=self.silent)
         self.poolList(self.buildRepo, self.builds)
     
     
     def buildRepo(self, build):
         repository   = BUILDS[build]
         self.pUpdate = (self.builds.index(build)) * 100 // len(BUILDS)
-        self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string1="Evaluating Kodi Repositories %s"%(DOTS.next()), string2='reviewing %s'%(repository))
+        self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string1="Evaluating Kodi Repositories %s"%(DOTS.next()), string2='reviewing %s'%(repository.title()), silent=self.silent)
         log('buildRepo, repository = %s'%(repository))
         self.kodiModules[repository] = list(self.buildModules(repository))
         
@@ -269,6 +351,6 @@ class SCAN(object):
         log("Name: "+str(name))
 
         if mode==None:  self.validate()
-        elif mode == 0: self.validate()
+        if mode==1:     self.enableModule(name, url)
 
 if __name__ == '__main__': SCAN().run()

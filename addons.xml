@@ -1086,70 +1086,6 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.pseudo.companion" version="0.0.13" name="PseudoCompanion" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.14.0"/>
-        <import addon="script.module.buggalo" version="1.1.6"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.pyfscache" version="0.9.12"/>
-        <import addon="script.module.feedparser" version="5.1.3"/>
-        <import addon="script.module.simplejson" version="3.3.0"/>
-        <import addon="script.module.beautifulsoup" version="3.2.1"/>
-        <import addon="script.module.metahandler" version="2.9.0"/>
-        <import addon="script.common.plugin.cache" version="2.5.5"/>
-        <import addon="plugin.video.youtube" version="5.1.8"/>
-        <import addon="plugin.video.vimeo" version="4.1.4"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.service" library="service.py" start="startup"/>
-    <extension point="xbmc.addon.metadata">
-        <platform>all</platform>
-        <description>Companion tools for PseudoTV Live, Features include:&#10;&#10;- PseudoTV Live remote via Yatse, Channel tools and utilities.&#10;&#10;- PseudoNetwork content provided Youtube.&#10;&#10;- PseudoLibrary strm generator.&#10;&#10;- Additional features coming soon</description>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/plugin.video.pseudo.companion</source>
-        <email>pseudotvlive@gmail.com</email>
-        <website>www.pseudotvlive.com</website>
-        <forum>http://pseudotvlive.com/index.php/forum</forum>
-    </extension>
-</addon>
-
-<addon
-    id="plugin.video.pseudo.library"
-    version="0.0.2"
-    name="PseudoLibrary"
-    provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.1.0"/>
-        <import addon="script.module.t0mm0.common" version="2.0.0"/>
-        <import addon="script.module.beautifulsoup" version="3.2.1"/>
-        <import addon="script.module.simple.downloader" version="0.9.4"/>
-        <import addon="script.module.beautifulsoup4" />
-        <import addon="script.module.simple.downloader" version="0.9.4"/>
-        <import addon="script.module.requests" />
-        <import addon="script.module.httplib2" />
-        <import addon="script.module.youtube.dl" optional="true"/>
-        <import addon="plugin.video.youtube" version="3.0.0"/>
-        <import addon="script.module.urlresolver" optional="true"/>
-        <import addon="script.module.simplejson" />
-        <import addon="script.common.plugin.cache" version="2.5.2"/>
-        <import addon="script.module.metahandler" version="2.5.1"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-    <provides>video</provides>
-    </extension>
-<!--     <extension point="xbmc.python.script" library="run.py">
-        <provides>executable</provides>
-    </extension> -->
-    <extension point="xbmc.addon.metadata">
-        <platform>all</platform>
-        <summary lang="en">Virtual Library Strm Generator</summary>
-        <description lang="en">Generate Strms from Kodi Plugins, UPNP, Youtube, and RSS Sources.</description>
-    </extension>
-</addon>
-
 <addon id="plugin.video.screenrant" version="1.0.1" name="Screen Rant" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1989,44 +1925,6 @@
     <extension point="xbmc.service" library="service.py" start="startup"/>
 </addon>
 
-<addon id="script.pseudotv.live" version="0.8.0f" name="PseudoTV Live" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.14.0"/>
-        <import addon="script.module.pil" version="0.0.1"/>
-        <import addon="script.module.urlresolver" version="0.0.1"/>
-        <import addon="script.module.buggalo" version="1.1.6"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.pyfscache" version="0.9.12"/>
-        <import addon="script.module.feedparser" version="5.1.3"/>
-        <import addon="script.module.simplejson" version="3.3.0"/>
-        <import addon="script.module.beautifulsoup" version="3.2.1"/>
-        <import addon="script.module.metahandler" version="2.9.0"/>
-        <import addon="script.common.plugin.cache" version="2.5.5"/>
-        <import addon="script.module.youtube.dl" version="15.318.0"/>
-        <import addon="script.module.simple.downloader" version="1.9.5"/>
-        <import addon="script.artwork.downloader" version="12.0.29" optional="true"/>
-        <import addon="script.tv.show.next.aired" version="6.0.13" optional="true"/>
-        <import addon="script.extendedinfo" version="3.0.1" optional="true"/>
-        <import addon="plugin.video.youtube" version="5.1.8" optional="true"/>
-        <import addon="plugin.video.vimeo" version="4.1.4" optional="true"/>
-    </requires>
-    <extension point="xbmc.python.script" library="default.py">
-        <provides>executable</provides>
-    </extension>
-    <extension point="xbmc.service" library="service.py" start="startup"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en">Set-Top box solution for your Kodi content.</summary>
-        <description lang="en">PseudoTV Live acts similar to normal broadcast and cable TV. Complete with multiple preset, user-defined channels and a EPG, Features include:&#10;&#10;- Direct integrate with Kodi sources such as plugins, library media, UPNP and PVR backends.&#10;&#10;- Support for third-party hardware and sevices like HDhomerun, USTVnow, Emby and Plex.&#10;&#10;- Familiar family friendly settop Interface and controls.&#10;&#10;- Automatic channel creation using the autotuning option&#10;&#10;- In-App Channel Manager provides easy channel creation&#10;&#10;- Channel rules that allow a customizable experience.</description>
-        <disclaimer lang="en" >This software is a BETA release, bugs maybe common until final release.</disclaimer>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/script.pseudotv.live</source>
-        <email>pseudotvlive@gmail.com</email>
-        <website>http://www.pseudotvlive.com</website>
-        <forum>http://pseudotvlive.com/index.php/forum</forum>
-    </extension>
-</addon>
-
 <addon id="script.pseudotv.live.patcher" version="0.1.0" name="PseudoTV Live Patcher" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -2200,10 +2098,11 @@
     </extension>
 </addon>
 
-<addon id="service.moduleauditor" version="0.0.4" name="Kodi Module Auditor" provider-name="Team Kodi">
+<addon id="service.moduleauditor" version="0.0.5" name="Kodi Module Auditor" provider-name="Team Kodi">
     <requires>
-        <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.schedule" version="0.5.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
     </requires>
     <extension point="xbmc.python.script" library="scan.py"/>
     <extension point="xbmc.service" library="service.py" start="startup"/>

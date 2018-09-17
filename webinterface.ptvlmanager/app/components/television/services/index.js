@@ -1,4 +1,0 @@
-define([
-    './showList',
-    './showDetails'
-], function () {});

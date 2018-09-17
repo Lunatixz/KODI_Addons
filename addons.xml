@@ -2098,7 +2098,7 @@
     </extension>
 </addon>
 
-<addon id="service.moduleauditor" version="0.0.5" name="Kodi Module Auditor" provider-name="Team Kodi">
+<addon id="service.moduleauditor" version="0.0.6" name="Kodi Module Auditor" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.schedule" version="0.5.0"/>
@@ -2116,8 +2116,12 @@
         <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Malware. A clean scan does not guarantee your system is free from Malware. Use common sense when installing third-party repositories.</disclaimer>
         <news></news>
         <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
     </extension>
 </addon>

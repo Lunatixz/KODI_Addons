@@ -95,7 +95,7 @@ def okDisable(string1, addonName, addonID, state):
         log('okDisable, addonID = %s, state = %s, query = %s'%(addonID, state, query))
         results = xbmc.executeJSONRPC(query)
         if results and "OK" in results: 
-            notificationDialog(LANGUAGE(32010)%(state))
+            notificationDialog(LANGUAGE(32010))
             return True
         else: notificationDialog(LANGUAGE(30001))
     else: return False
@@ -159,14 +159,14 @@ def filterItems(items):
             
 class SCAN(object):
     def __init__(self):
+        self.cache       = SimpleCache()
         self.silent      = False
         self.pDialog     = None
         self.pUpdate     = 0
         self.matchCNT    = 0
         self.errorCNT    = 0
         self.kodiModules = {}
-        self.cache       = SimpleCache()
-        self.builds      = sorted(BUILDS, reverse=True)
+        self.topBranch   = BUILDS[self.sendJSON(VER_QUERY)['result']['version']['major']]
         
         
     def sendJSON(self, command):
@@ -185,7 +185,7 @@ class SCAN(object):
             if not cacheresponse:
                 cacheresponse = (urllib2.urlopen(urllib2.Request(url), timeout=TIMEOUT)).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=datetime.timedelta(minutes=random.randrange(10, 20, 1)))
-                xbmc.sleep(1000)
+                xbmc.sleep(2000)
             return cacheresponse
         except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
@@ -201,22 +201,15 @@ class SCAN(object):
             
     def validate(self):
         log('validate')
-        self.matchCNT = 0
-        self.errorCNT = 0
-        self.buildRepos()
+        self.matchCNT  = 0
+        self.errorCNT  = 0
+        self.buildRepo(self.topBranch)
         summary = self.scanModules()
         if self.silent: return
         if yesnoDialog(LANGUAGE(32009), yes=LANGUAGE(32008), no=LANGUAGE(32007)): self.buildDetails(filterItems(summary))
-        else: self.buildSummary(summary)
-            
-            
-    def buildSummary(self, items):
-        log('buildSummary')
-        lineLST = []
-        for item in items: lineLST.append(item['label'])
-        textViewer('\n'.join(lineLST))
-            
-            
+        else: textViewer('\n'.join([item['label'] for item in summary]))
+
+       
     def buildDetails(self, items):
         log('buildDetails')
         select = 0
@@ -233,9 +226,7 @@ class SCAN(object):
             item    = listItems[select]
             state   = not (cleanString(item[1].split('Enabled: ')[1]) == 'True')
             string1 = LANGUAGE(32011)%(item[0])
-            if okDisable(string1, item[0], item[2], state): 
-                listItems.pop(select)
-                select = 0
+            if okDisable(string1, item[0], item[2], state): listItems.pop(select)
 
             
     def enableModule(self, name, url):
@@ -244,33 +235,27 @@ class SCAN(object):
     
     def scanModules(self):
         log('scanModules')
-        summary   = []
-        progCNT   = 0
-        myModules = self.sendJSON(MOD_QUERY)['result']['addons']
-        myBuild   = self.sendJSON(VER_QUERY)['result']['version']['major']
-        topBranch = self.builds[self.builds.index(myBuild):]
-        pTotal    = len(topBranch) + len(myModules)
+        summary    = []
+        progCNT    = 0
+        repository = self.topBranch
+        myModules  = self.sendJSON(MOD_QUERY)['result']['addons']
+        pTotal     = len(myModules)
         for idx1, myModule in enumerate(myModules):
             found   = False
             error   = False
             self.label   = '{name} v.{version}{filler}[B]{status}[/B]'.format(name=uni(myModule['name']),version=uni(myModule['version']),filler='{filler}',status='{status}')
             self.pUpdate = (idx1) * 100 // pTotal
             self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string1='Auditing Modules ...', string2='Verifying %s'%(uni(myModule['addonid'])), silent=self.silent)
-            for idx2, branch in enumerate(topBranch):
-                repository = BUILDS[branch]
-                found, error, kodiModule = self.findModule(myModule, self.kodiModules[repository])
-                log('scanModules, myModule = %s, repository = %s, found = %s'%(myModule['addonid'],repository, found))
-                verifed = 'True' if found and not error else 'False'
-                self.pUpdate = (idx1+ idx2) * 100 // pTotal
-                self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string2='Verifying %s'%(uni(myModule['addonid'])), silent=self.silent)
-                if found and error:
-                    self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32004)),status=LANGUAGE(32004))
-                    self.label2 = LANGUAGE(32004)
-                    break
-                elif found and not error: 
-                    self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32002)),status=LANGUAGE(32002))
-                    self.label2 = LANGUAGE(32002)
-                    break
+            found, error, kodiModule = self.findModule(myModule, self.kodiModules[repository])
+            log('scanModules, myModule = %s, repository = %s, found = %s'%(myModule['addonid'],repository, found))
+            verifed = 'True' if found and not error else 'False'
+            self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string2='Verifying %s'%(uni(myModule['addonid'])), silent=self.silent)
+            if found and error:
+                self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32004)),status=LANGUAGE(32004))
+                self.label2 = LANGUAGE(32004)
+            elif found and not error: 
+                self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32002)),status=LANGUAGE(32002))
+                self.label2 = LANGUAGE(32002)
             if not found and not error: 
                 self.label  = self.label.format(filler=generateFiller(self.label,LANGUAGE(32003)),status=LANGUAGE(32003))
                 self.label2 = LANGUAGE(32003)
@@ -312,18 +297,12 @@ class SCAN(object):
         return results
         
         
-    def buildRepos(self): 
-        self.pDialog = progressDialog(0, string1="Evaluating Kodi Repositories %s"%(DOTS.next()), silent=self.silent)
-        self.poolList(self.buildRepo, self.builds)
-    
-    
-    def buildRepo(self, build):
-        repository   = BUILDS[build]
-        self.pUpdate = (self.builds.index(build)) * 100 // len(BUILDS)
-        self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string1="Evaluating Kodi Repositories %s"%(DOTS.next()), string2='reviewing %s'%(repository.title()), silent=self.silent)
+    def buildRepo(self, repository): 
         log('buildRepo, repository = %s'%(repository))
+        self.pDialog = progressDialog(0, string1="Building Kodi Repositories ...", string2='reviewing %s'%(repository.title()), silent=self.silent)
         self.kodiModules[repository] = list(self.buildModules(repository))
-        
+        self.pDialog = progressDialog(100, string1="Building Kodi Repositories ...", string2='reviewing %s'%(repository.title()), silent=self.silent)
+    
         
     def buildModules(self, branch):
         log('buildModules, branch = ' + (branch))

@@ -26,6 +26,7 @@ import os
 import sys
 import xml.etree.ElementTree
 from zipfile import ZipFile
+from shutil import copyfile
 
 GITPATH = 'C:/GitHub/KODI_Addons/'
 ZIPPATH = os.path.join(GITPATH,'zips','')
@@ -135,7 +136,20 @@ class Generator:
         os.chdir(fpath)
         path = os.path.join(ZIPPATH,addon)
         if(not os.path.exists(path)) : os.makedirs(path)
-        
+        print("copying icon.png...")
+        if os.path.exists(os.path.join(addon,'icon.png')): copyfile(os.path.join(addon,'icon.png'), os.path.join(path,'icon.png'))
+        elif os.path.exists(os.path.join(addon,'resources','images','icon.png')): copyfile(os.path.join(addon,'resources','images','icon.png'), os.path.join(path,'icon.png'))
+        print("copying fanart.jpg...")
+        if os.path.exists(os.path.join(addon,'fanart.jpg')): copyfile(os.path.join(addon,'fanart.jpg'), os.path.join(path,'fanart.jpg'))
+        elif os.path.exists(os.path.join(addon,'resources','images','fanart.jpg')): copyfile(os.path.join(addon,'resources','images','fanart.jpg'), os.path.join(path,'fanart.jpg'))
+        if os.path.exists(os.path.join(addon,'resources','images','screenshot01.png')): 
+            print("copying screenshots...")
+            for i in range(1,6):
+                try:
+                    sspath = os.path.join(addon,'resources','images','screenshot0%d.png'%i)
+                    copyfile(sspath, os.path.join(path,'screenshot0%d.png'%i))
+                    print("copied %s..."%sspath)
+                except: break
         with ZipFile(os.path.join(ZIPPATH,addon,addon + '-' + version + '.zip'),'w') as addonzip:
             for root, dirs, files in os.walk(addon):
                 print("Root: " + root )
@@ -156,16 +170,10 @@ class Generator:
         print(str(len(dirs)) + " dirs found in zipgen")
         for addon_dir in dirs:
             directory = os.path.join(fpath, addon_dir)
-            if(not os.path.isdir(directory)):
-                continue      
-            if(addon_dir.startswith('.')):
-                # skip hidden dirs
-                continue
+            if(not os.path.isdir(directory)): continue      
+            if(addon_dir.startswith('.')): continue # skip hidden dirs
             ## does nothing at the mnment
-            if(addon_dir.startswith("download")):
-                # skip download directory
-                continue
-            
+            if(addon_dir.startswith("download")): continue # skip download 
             print("processing..." + addon_dir)
             self.create_zip_file(fpath, addon_dir)
 

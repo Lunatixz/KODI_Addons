@@ -220,7 +220,7 @@ class SCAN(object):
             
     def validate(self):
         log('validate')
-        # if getProperty('Running') == 'True': return
+        if getProperty('Running') == 'True': return
         setProperty('Running','True')
         self.matchCNT  = 0
         self.errorCNT  = 0

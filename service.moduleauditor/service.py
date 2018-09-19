@@ -21,45 +21,34 @@ import xbmc
 
 from scan import *
 
-#todo scan modules
-class Player(xbmc.Player):
-    def __init__(self):
-        xbmc.Player.__init__(self, xbmc.Player())
-        
-        
-    def onPlayBackStarted(self):
-        log('onPlayBackStarted')
-        
-        
-    def onPlayBackEnded(self):
-        log('onPlayBackEnded')
-        
-        
-    def onPlayBackStopped(self):
-        log('onPlayBackStopped')
-        
-        
 class Monitor(xbmc.Monitor):
     def __init__(self):
         xbmc.Monitor.__init__(self, xbmc.Monitor())
+        self.pendingChange = False
         
         
     def onSettingsChanged(self):
         log("onSettingsChanged")
+        self.pendingChange = True
         
         
 class Service(object):
     def __init__(self):
-        self.myPlayer  = Player()
         self.myMonitor = Monitor()
         self.myScanner = SCAN()
+        self.myMonitor.waitForAbort(30) # startup delay
+        self.myScanner.preliminary()    # initial scan
         self.startService()
 
          
     def startService(self):
         schedule.clear()
-        schedule.every(WAIT).days.do(self.myScanner.preliminary)
+        self.myMonitor.pendingChange = False
+        schedule.every(int(REAL_SETTINGS.getSetting('Scan_Wait'))).days.do(self.myScanner.preliminary) # run every x days
         while not self.myMonitor.abortRequested():
-            if self.myMonitor.waitForAbort(15): break
+            if self.myMonitor.waitForAbort(30) or self.myMonitor.pendingChange: break
+            if xbmc.getGlobalIdleTime() >= 900: continue # do not notify when idle
             schedule.run_pending()
+        if self.myMonitor.pendingChange: self.startService()
+        
 if __name__ == '__main__': Service()

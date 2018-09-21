@@ -108,10 +108,6 @@ msgctxt "#32022"
 msgid "Ignore Module?"
 msgstr ""
 
-msgctxt "#32026"
-msgid "Replace with Verified Version?"
-msgstr ""
-
 msgctxt "#32023"
 msgid "More Information ..."
 msgstr ""
@@ -122,4 +118,8 @@ msgstr ""
 
 msgctxt "#32025"
 msgid "Select Action for %s"
+msgstr ""
+
+msgctxt "#32026"
+msgid "Disable Auto Scan"
 msgstr ""

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
     <setting id="Enable_Debugging" type="bool"   label="32000" default="false" />
+    <setting id="Disable_Service"  type="bool"   label="32026" default="false" />
     <setting id="Scan_Wait"        type="slider" label="32005" default="3" range="3,1,28" option="int" />
     <setting id="White_List"       type="text"   label="32005" default='{"modules":[]}' enable="false" visible="false" />
 </settings>

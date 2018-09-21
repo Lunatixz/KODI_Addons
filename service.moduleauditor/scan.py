@@ -40,7 +40,7 @@ DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == "true"
 BASE_URL      = 'http://mirrors.kodi.tv/addons/%s/addons.xml'
 MOD_QUERY     = '{"jsonrpc":"2.0","method":"Addons.GetAddons","params":{"type":"xbmc.python.module","enabled":true,"properties":["name","version","author","enabled"]},"id":1}'
 VER_QUERY     = '{"jsonrpc":"2.0","method":"Application.GetProperties","params":{"properties":["version"]},"id":1}'
-MENU_ITEMS    = [LANGUAGE(32021),LANGUAGE(32022),LANGUAGE(32024)]
+MENU_ITEMS    = [LANGUAGE(32021),LANGUAGE(32022)]
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -215,7 +215,7 @@ class SCAN(object):
     def preliminary(self): 
         self.silent = True
         self.validate()
-        if self.matchCNT + self.errorCNT > 0: notificationDialog(LANGUAGE(32006)%(self.errorCNT),time=8000)
+        if self.errorCNT > 0: notificationDialog(LANGUAGE(32006)%(self.errorCNT),time=8000)
         
             
     def validate(self):
@@ -318,14 +318,11 @@ class SCAN(object):
 
         
     def buildRepo(self):
-        self.pDialog  = progressDialog(0,   string1=LANGUAGE(32014), silent=self.silent)
-        xbmc.sleep(500)
+        self.pDialog  = progressDialog(0, string1=LANGUAGE(32014), silent=self.silent)
         repository    = BUILDS[self.sendJSON(VER_QUERY)['result']['version']['major']]
         log('buildRepo, repository = %s'%(repository))
-        self.pDialog  = progressDialog(50,  string2=LANGUAGE(32015)%(repository.title()), silent=self.silent)
-        xbmc.sleep(500)
+        self.pDialog  = progressDialog(0, string2=LANGUAGE(32015)%(repository.title()), silent=self.silent)
         self.kodiModules[repository] = list(self.buildModules(repository))
-        self.pDialog  = progressDialog(100, silent=self.silent)
         return repository
         
                 

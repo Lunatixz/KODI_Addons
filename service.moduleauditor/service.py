@@ -25,30 +25,32 @@ class Monitor(xbmc.Monitor):
     def __init__(self):
         xbmc.Monitor.__init__(self, xbmc.Monitor())
         self.pendingChange = False
-        
+        self.optOut = REAL_SETTINGS.getSetting('Disable_Service') == "true"
         
     def onSettingsChanged(self):
         log("onSettingsChanged")
         self.pendingChange = True
-        
-        
+        REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
+        self.optOut = REAL_SETTINGS.getSetting('Disable_Service') == "true"
+         
 class Service(object):
     def __init__(self):
         self.myMonitor = Monitor()
         self.myScanner = SCAN()
-        self.myMonitor.waitForAbort(30) # startup delay
-        self.myScanner.preliminary()    # initial scan
+        if not self.myMonitor.optOut:
+            self.myMonitor.waitForAbort(30) # startup delay
+            self.myScanner.preliminary()    # initial scan
         self.startService()
 
          
     def startService(self):
         schedule.clear()
         self.myMonitor.pendingChange = False
-        schedule.every(int(REAL_SETTINGS.getSetting('Scan_Wait'))).days.do(self.myScanner.preliminary) # run every x days
+        if not self.myMonitor.optOut: schedule.every(int(REAL_SETTINGS.getSetting('Scan_Wait'))).days.do(self.myScanner.preliminary) # run every x days
         while not self.myMonitor.abortRequested():
             if self.myMonitor.waitForAbort(30) or self.myMonitor.pendingChange: break
             if xbmc.getGlobalIdleTime() >= 900: continue # do not notify when idle
-            schedule.run_pending()
+            if not self.myMonitor.optOut: schedule.run_pending()
         if self.myMonitor.pendingChange: self.startService()
         
 if __name__ == '__main__': Service()

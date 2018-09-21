@@ -1424,17 +1424,17 @@
     </extension>
 </addon>
 
-<addon id="repository.lunatixz" name="Lunatixz Beta Repository" version="1.0.5" provider-name="Lunatixz">
+<addon id="repository.lunatixz" name="Lunatixz Beta Repository" version="1.0.6" provider-name="Lunatixz">
     <extension point="xbmc.addon.repository" name="Lunatixz Beta Repository">
-        <info compressed="false">https://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml</info>
-        <checksum>https://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml.md5</checksum>
-        <datadir zip="true">https://raw.github.com/Lunatixz/KODI_Addons/master/zips</datadir>
+        <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml</info>
+        <checksum>http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml.md5</checksum>
+        <datadir zip="true">http://raw.github.com/Lunatixz/KODI_Addons/master/zips</datadir>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Lunatixz Beta Repository</summary>
+        <summary lang="en_GB"></summary>
         <description lang="en_GB"></description>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/</source>
+        <source>http://raw.github.com/Lunatixz/KODI_Addons</source>
         <assets>
             <icon>icon.png</icon>
         </assets>
@@ -2053,7 +2053,7 @@
     </extension>
 </addon>
 
-<addon id="service.moduleauditor" version="0.0.8a" name="Kodi Module Auditor" provider-name="Team Kodi">
+<addon id="service.moduleauditor" version="0.0.9" name="Kodi Module Auditor" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.schedule" version="0.5.0"/>
@@ -2062,13 +2062,13 @@
     <extension point="xbmc.python.script" library="scan.py"/>
     <extension point="xbmc.service" library="service.py" start="startup"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
+        <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository. </summary>
         <description lang="en_GB"></description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.moduleauditor</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=335539</forum>
-        <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Malware. A clean scan does not guarantee your system is free from Malware. Use common sense when installing third-party repositories.</disclaimer>
+        <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
         <news></news>
         <assets>
             <icon>resources/images/icon.png</icon>

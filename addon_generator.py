@@ -1,4 +1,5 @@
 # *
+# *  Copyright (C) 2018      Lunatixz
 # *  Copyright (C) 2012-2013 Garrett Brown
 # *  Copyright (C) 2010      j48antialias
 # *
@@ -24,6 +25,7 @@
  
 import os
 import sys
+import fnmatch
 import xml.etree.ElementTree
 from zipfile import ZipFile
 from shutil import copyfile
@@ -48,6 +50,7 @@ class Generator:
     """
     def __init__( self ):
         # generate files
+        self._clean_addons()
         self._generate_addons_file()
         self._generate_md5_file()
         self._zipit(GITPATH)
@@ -56,7 +59,7 @@ class Generator:
     
     def _generate_addons_file( self ):
         # addon list
-        addons = os.listdir( "." )
+        addons = os.listdir(GITPATH)
         # final addons text
         addons_xml = u("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<addons>\n")
         # loop thru and add each addons addon.xml file
@@ -93,10 +96,10 @@ class Generator:
         # create a new md5 hash
         try:
             import md5
-            m = md5.new( open( "addons.xml", "r" ).read() ).hexdigest()
+            m = md5.new( open( os.path.join(GITPATH,"addons.xml"), "r" ).read() ).hexdigest()
         except ImportError:
             import hashlib
-            m = hashlib.md5( open( "addons.xml", "r", encoding="UTF-8" ).read().encode( "UTF-8" ) ).hexdigest()
+            m = hashlib.md5( open( os.path.join(GITPATH,"addons.xml"), "r", encoding="UTF-8" ).read().encode( "UTF-8" ) ).hexdigest()
         
         # save file
         try:
@@ -108,7 +111,7 @@ class Generator:
     def _save_file( self, data, file ):
         try:
             # write data to the file (use b for Python 3)
-            open( file, "wb" ).write( data )
+            open(os.path.join(GITPATH,file), "wb" ).write( data )
         except Exception as e:
             # oops
             print("An error occurred saving %s file!\n%s" % ( file, e ))
@@ -126,11 +129,22 @@ class Generator:
             print ('Failed to open %s' % addon_file)
             print( e.message)
 
+            
+    def _clean_addons(self):
+        matches = []
+        for root, dirnames, filenames in os.walk(GITPATH):
+            for filename in fnmatch.filter(filenames, '*.pyc'):
+                matches.append(os.path.join(root, filename))
+            for filename in fnmatch.filter(filenames, '*.pyo'):
+                matches.append(os.path.join(root, filename))
+        for filename in matches: 
+            print("removing: " + filename)
+            os.remove(filename)
+                 
     def create_zip_file( self, fpath, addon):
         print("addon_dir: " + addon)
         version = self.get_plugin_version(os.path.join(fpath,addon))
-        if not version:
-            return
+        if not version: return
         print("version: " + version)
         home = os.getcwd()
         os.chdir(fpath)
@@ -152,12 +166,11 @@ class Generator:
                 except: break
         with ZipFile(os.path.join(ZIPPATH,addon,addon + '-' + version + '.zip'),'w') as addonzip:
             for root, dirs, files in os.walk(addon):
-                print("Root: " + root )
-                print("Dirs: " + str(len(dirs)) )
+                print("Root: "  + root )
+                print("Dirs: "  + str(len(dirs)) )
                 print("Files: " + str(len(files)) )
                 for file_path in files:
-                    if file_path.endswith('.zip'):
-                        continue
+                    if file_path.endswith('.zip'): continue
                     print ("adding %s" % os.path.join(root, file_path)) 
                     addonzip.write(os.path.join(root, file_path))
             addonzip.close()

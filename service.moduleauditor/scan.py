@@ -204,7 +204,6 @@ class SCAN(object):
             if not cacheresponse:
                 cacheresponse = (urllib2.urlopen(urllib2.Request(url), timeout=TIMEOUT)).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=datetime.timedelta(hours=12))
-                xbmc.sleep(2000)
             return cacheresponse
         except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
@@ -228,7 +227,7 @@ class SCAN(object):
         setProperty('Running','False')
         if self.silent: return
         if yesnoDialog(LANGUAGE(32009), yes=LANGUAGE(32008), no=LANGUAGE(32007)): self.buildDetails(filterErrors(summary))
-        else: textViewer('\n'.join([item['label'] for item in summary]))
+        else: textViewer('\n'.join([item['label'] for item in summary]), silent=self.silent)
         
 
     def buildDetails(self, items):
@@ -275,7 +274,7 @@ class SCAN(object):
             if myModule['addonid'] in whiteList: continue
             self.label   = '{name} v.{version}{filler}[B]{status}[/B]'.format(name=uni(myModule['name']),version=uni(myModule['version']),filler='{filler}',status='{status}')
             self.pUpdate = (idx1) * 100 // pTotal
-            self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string1=LANGUAGE(32016))
+            self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string1=LANGUAGE(32016), silent=self.silent)
             found, error, kodiModule = self.findModule(myModule, self.kodiModules[repository])
             log('scanModules, myModule = %s, repository = %s, found = %s'%(myModule['addonid'],repository, found))
             verifed = 'True' if found and not error else 'False'
@@ -322,7 +321,7 @@ class SCAN(object):
         repository    = BUILDS[self.sendJSON(VER_QUERY)['result']['version']['major']]
         log('buildRepo, repository = %s'%(repository))
         self.pDialog  = progressDialog(0, string2=LANGUAGE(32015)%(repository.title()), silent=self.silent)
-        self.kodiModules[repository] = list(self.buildModules(repository))
+        self.kodiModules[repository] = (self.buildModules(repository))
         return repository
         
                 

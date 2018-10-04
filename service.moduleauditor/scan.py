@@ -304,7 +304,7 @@ class SCAN(object):
         for kodiModule in kodiModules:
             self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string3='Checking %s ...'%(uni(kodiModule['id'])), silent=self.silent)
             try:
-                if myModule['addonid'] == kodiModule['id']:
+                if myModule['addonid'].lower() == kodiModule['id'].lower():
                     found = True
                     self.matchCNT += 1
                     if myModule['version'] != kodiModule['version']:
@@ -321,7 +321,7 @@ class SCAN(object):
         repository    = BUILDS[self.sendJSON(VER_QUERY)['result']['version']['major']]
         log('buildRepo, repository = %s'%(repository))
         self.pDialog  = progressDialog(0, string2=LANGUAGE(32015)%(repository.title()), silent=self.silent)
-        self.kodiModules[repository] = (self.buildModules(repository))
+        self.kodiModules[repository] = list(self.buildModules(repository))
         return repository
         
                 

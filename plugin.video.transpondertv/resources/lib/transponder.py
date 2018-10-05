@@ -41,7 +41,6 @@ CONTENT_TYPE  = 'episodes'
 USER_EMAIL    = REAL_SETTINGS.getSetting('User_Email')
 PASSWORD      = REAL_SETTINGS.getSetting('User_Password')
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-TOKEN         = (REAL_SETTINGS.getSetting('User_Token') or '')
 COOKIE_JAR    = xbmc.translatePath(os.path.join(SETTINGS_LOC, "cookiejar.lwp"))
 BASE_URL      = 'https://transponder.tv'
 LOGIN_URL     = BASE_URL + '/login'
@@ -50,7 +49,6 @@ GUIDE_URL     = BASE_URL + '/guide?category=all'
 RECORD_URL    = BASE_URL + '/recording'
 NOWNEXT_URL   = BASE_URL + '/nownext'
 CHANNEL_URL   = BASE_URL + '/watch'
-
 LOGO          = os.path.join(SETTINGS_LOC,'%s.png')
 
 MAIN_MENU     = [(LANGUAGE(30003), '' , 1),
@@ -85,6 +83,7 @@ def notificationDialog(message, header=ADDON_NAME, sound=False, time=1000, icon=
     except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
 
 def cleanString(string1):
+    string1 = string1.replace('\n','').replace('\t','').replace('\r','')
     return string1.strip(' \t\n\r')
               
 def trimString(string1):
@@ -103,7 +102,6 @@ class Transponder(object):
     def __init__(self, sysARG):
         log('__init__')
         self.chnum   = 0
-        self.token   = TOKEN
         self.sysARG  = sysARG
         self.cache   = SimpleCache()
         self.cj      = cookielib.LWPCookieJar()
@@ -133,11 +131,15 @@ class Transponder(object):
                 login.form['email'] = user
                 login.form['password'] = password
                 login.submit()
+                login.open(LOGIN_URL)
+                if '/myaccount' not in login.response().read(): 
+                    notificationDialog(LANGUAGE(30024))
+                    return False
                 self.cj.save(COOKIE_JAR, ignore_discard=True)  
                 return True
             except Exception as e: 
                 log("login, failed! " + str(e), xbmc.LOGERROR)
-                okDialog(LANGUAGE(30012))
+                notificationDialog(LANGUAGE(30001))
                 return False
         else:
             #firstrun wizard

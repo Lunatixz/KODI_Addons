@@ -112,3 +112,7 @@ msgctxt "#30023"
 msgid "Recording Available"
 msgstr ""
 
+msgctxt "#30024"
+msgid "Something went wrong, please check user credentials and try again."
+msgstr ""
+

@@ -34,7 +34,7 @@ msgstr "Carpeta de vídeo"
 
 msgctxt "#32005"
 msgid "Video Limit"
-msgstr "Limite de vídeos"
+msgstr "Limite de vídeo"
 
 msgctxt "#32006"
 msgid "Randomize"
@@ -46,7 +46,7 @@ msgstr "Deshabilitar Trakt"
 
 msgctxt "#32008"
 msgid "Ignore Keypress (Stop to end)."
-msgstr "Ignorar pulsación de teclas (Stop para finalizar)."
+msgstr "Ignorar pulsación de teclas (Detener para finalizar)"
 
 msgctxt "#32009"
 msgid "Single Video"

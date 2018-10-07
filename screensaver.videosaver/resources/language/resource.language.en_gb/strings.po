@@ -47,3 +47,11 @@ msgstr ""
 msgctxt "#32008"
 msgid "Ignore Keypress (Stop to end)."
 msgstr ""
+
+msgctxt "#32009"
+msgid "Single Video"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Multiple Videos"
+msgstr ""

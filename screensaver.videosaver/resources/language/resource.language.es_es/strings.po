@@ -55,3 +55,15 @@ msgstr "Un solo vídeo"
 msgctxt "#32010"
 msgid "Multiple Videos"
 msgstr "Multiples vídeos"
+
+msgctxt "#30011"
+msgid "Mute ScreenSaver"
+msgstr "Mute ScreenSaver"
+
+msgctxt "#32012"
+msgid "Enable Debugging [Log errors]"
+msgstr ""
+
+msgctxt "#32013"
+msgid "Building Playlist"
+msgstr "Building Playlist"

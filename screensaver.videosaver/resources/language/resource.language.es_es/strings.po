@@ -58,12 +58,12 @@ msgstr "Multiples vídeos"
 
 msgctxt "#30011"
 msgid "Mute ScreenSaver"
-msgstr "Mute ScreenSaver"
+msgstr "Silenciar Salvapantallas"
 
 msgctxt "#32012"
 msgid "Enable Debugging [Log errors]"
-msgstr ""
+msgstr "Habilitar modo depuración [Errores en log]"
 
 msgctxt "#32013"
 msgid "Building Playlist"
-msgstr "Building Playlist"
+msgstr ""

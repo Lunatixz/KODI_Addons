@@ -253,7 +253,11 @@ class TVCatchup(object):
 
             
     def resolverURL(self, url):
-        return re.compile('<source src="(.+?)" type="application/x-mpegURL">').findall(self.openURL(BASE_URL + url))[0]
+        try: return re.compile('<source src="(.+?)" type="application/x-mpegURL">').findall(self.openURL(BASE_URL + url))[0]
+        except: 
+            xbmcgui.Dialog().ok(ADDON_NAME, LANGUAGE(30007))
+            xbmc.executebuiltin('XBMC.RunAddon(plugin.video.transpondertv)')
+            sys.exit()
             
             
     def playVideo(self, name, url, liz=None):

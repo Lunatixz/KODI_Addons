@@ -34,7 +34,7 @@ msgstr "Carpeta de vídeo"
 
 msgctxt "#32005"
 msgid "Video Limit"
-msgstr "Limite de vídeo"
+msgstr "Número de vídeos"
 
 msgctxt "#32006"
 msgid "Randomize"
@@ -58,12 +58,12 @@ msgstr "Multiples vídeos"
 
 msgctxt "#30011"
 msgid "Mute ScreenSaver"
-msgstr "Mute ScreenSaver"
+msgstr "Silenciar Salvapantallas"
 
 msgctxt "#32012"
 msgid "Enable Debugging [Log errors]"
-msgstr ""
+msgstr "Habilitar modo depuración [Errores en log]"
 
 msgctxt "#32013"
 msgid "Building Playlist"
-msgstr "Building Playlist"
+msgstr "Crear lista de reproducción"

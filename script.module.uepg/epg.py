@@ -74,7 +74,7 @@ class uEPG(xbmcgui.WindowXML):
         self.onInitReturn   = False
         self.player         = Player()
         self.player.uEPG    = self
-        self.rowCount       = (int(utils.getProperty("uEPG.rowCount")) or self.defaultRows)
+        self.rowCount       = (int(utils.getProperty("uEPG.rowCount") or self.defaultRows))
         self.overlay        = BackgroundWindow('%s.overlay.xml'%utils.ADDON_ID,utils.ADDON_PATH,"default")
         self.overlay.uEPG   = self
 
@@ -203,6 +203,8 @@ class uEPG(xbmcgui.WindowXML):
     def chkRows(self, rowcount):
         precount = rowcount
         if self.channelLST.maxChannels < rowcount: rowcount = self.channelLST.maxChannels
+        elif self.channelLST.maxChannels >= self.defaultRows and self.channelLST.skinPath.startswith(utils.ADDON_PATH): rowcount = self.defaultRows
+        
         utils.log("chkRows, rowcount = " + str(rowcount))
         return rowcount
         

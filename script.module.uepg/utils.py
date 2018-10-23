@@ -21,6 +21,7 @@ import os, json, urllib, epg, traceback, ast, time, datetime, random, itertools,
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs, xbmcaddon
 
 from simplecache import SimpleCache
+from metadatautils import MetadataUtils
 from pyhdhr import PyHDHR
 
 # Plugin Info
@@ -129,6 +130,11 @@ def ascii(string):
 def trimString(content, limit=250, suffix='...'):
     if len(content) <= limit: return content
     return content[:limit].rsplit(' ', 1)[0]+suffix
+  
+def getMeta(label, type='tvshows', yrs=''):
+    metadatautils = MetadataUtils()
+    metadatautils.tmdb.api_key = '9c47d05a3f5f3a00104f6586412306af'
+    return metadatautils.get_tmdb_details(title=label, year=yrs, media_type=type, manual_select=False)
     
 def getGenreColor(genre):
     genre = genre.split(' / ')
@@ -165,8 +171,9 @@ def notificationDialog(message, header=ADDON_NAME, show=True, sound=False, time=
             log("notificationDialog Failed! " + str(e), xbmc.LOGERROR)
             xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
     
-def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', autoclose=0):
-    return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose) 
+def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', custom='', autoclose=0):
+    try: return xbmcgui.Dialog().yesno(header, str1, no, yes, custom, autoclose)
+    except: return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
     
 def okDialog(str1, str2='', str3='', header=ADDON_NAME):
     xbmcgui.Dialog().ok(header, str1, str2, str3)
@@ -202,8 +209,11 @@ def loadJson(string):
 def dumpJson(mydict, sortkey=True):
     return json.dumps(mydict, sort_keys=sortkey)
 
-def getProperty(string):
-    try: return xbmcgui.Window(10000).getProperty((string))
+def getProperty(string1):
+    try: 
+        state = xbmcgui.Window(10000).getProperty((string1))
+        log("getProperty, string1 = " + string1 + ", state = " + state)
+        return state
     except Exception as e:
         log("getProperty, Failed! " + str(e), xbmc.LOGERROR)
         return ''
@@ -227,17 +237,6 @@ def roundToHalfHour(thetime):
     if n.minute > 29: n = n.replace(minute=30, second=0, microsecond=0)
     else: n = n.replace(minute=0, second=0, microsecond=0)
     return time.mktime(n.timetuple())
-    
-def isBusyDialog():
-    return xbmc.getCondVisibility('Window.IsActive(busydialog)')
-
-def showBusy():
-    if isBusyDialog() == False: xbmc.executebuiltin('ActivateWindow(busydialog)')
-
-def hideBusy():
-    while isBusyDialog() == True:
-        xbmc.executebuiltin('Dialog.Close(dialognocancel)')
-        xbmc.sleep(100)
 
 def ProgressDialogBG(percent=0, control=None, string1='', header=ADDON_NAME):
     if percent == 0 and not control:
@@ -264,7 +263,7 @@ def adaptiveDialog(percent, control=None, size=0, string1='', string2='', string
     elif getProperty('uEPGRunning') == 'True':
         if control: percent = 100
         else: return
-    if size < 150: return ProgressDialogBG(percent, control, string1, header)
+    if size < 50: return ProgressDialogBG(percent, control, string1, header)
     else: return ProgressDialog(percent, control, string1, string2, string3, header)
 
 def poolList(method, items):

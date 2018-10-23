@@ -39,7 +39,6 @@ class ChannelList(object):
         self.channelNames = []
         self.maxGuidedata = 48
         self.maxChannels  = None
-        self.loading      = False
         self.uEPGRunning  = utils.getProperty('uEPGRunning') == "True"
         self.incHDHR      = utils.REAL_SETTINGS.getSetting('Enable_HDHR') == "true"
         self.useKodiSkin  = utils.REAL_SETTINGS.getSetting('useKodiSkin') == "true"
@@ -50,7 +49,6 @@ class ChannelList(object):
         channelnames   = []
         channelResults = utils.RPCHelper().getFileList(channelPath, life=datetime.timedelta(seconds=(self.refreshIntvl-600)))
         heading = '%s / %s'%(utils.ADDON_NAME,self.pluginName)
-        self.loading = True
         self.busy = utils.adaptiveDialog(0, size=len(channelResults), string1=utils.LANGUAGE(30004), header=heading)
         for i, item in enumerate(channelResults):
             utils.adaptiveDialog((i*100//len(channelResults))//2, self.busy, string1=utils.LANGUAGE(30004))
@@ -70,15 +68,15 @@ class ChannelList(object):
             newChannel['channelname']   = channelName
             for item in channelResults:
                 if channel == item['channelname']:
+                    starttime = int(item.get('starttime','') or starttime)
                     starttime = starttime + (int(item.get('duration','')) or int(item.get('runtime','')))
-                    item['starttime']           = int(item['starttime']              or starttime)
+                    item['starttime'] = starttime
                     newChannel['channelnumber'] = (item.get('channelnumber','')      or channelNum)
                     newChannel['channellogo']   = (item.get('channellogo','')        or self.pluginIcon)
                     guidedata.append(item)
             if len(guidedata) > 0:
                 newChannel['guidedata'] = guidedata
                 channelItems.append(newChannel)
-        self.loading = False
         utils.adaptiveDialog(100, self.busy, string1=utils.LANGUAGE(30005))
         return self.prepareJson(channelItems)
                 
@@ -111,7 +109,6 @@ class ChannelList(object):
         channelnames   = []
         channelnumbers = []
         heading = '%s / %s'%(utils.ADDON_NAME,self.pluginName)
-        self.loading = True
         self.busy = utils.adaptiveDialog(0, size=len(channelItems), string1=utils.LANGUAGE(30004), header=heading)
         
         for i, item in enumerate(channelItems):
@@ -130,7 +127,6 @@ class ChannelList(object):
         for i in range(self.maxChannels):
             utils.adaptiveDialog((i*100//self.maxChannels)//2, self.busy, string1=utils.LANGUAGE(30004))
             self.channels.append(Channel())
-        self.loading = False
         utils.adaptiveDialog(100, self.busy, string1=utils.LANGUAGE(30005))
         
         if self.maxChannels is None or self.maxChannels == 0:
@@ -145,13 +141,12 @@ class ChannelList(object):
   
     def setupChannelList(self, channelItems):
         heading = '%s / %s'%(utils.ADDON_NAME,self.pluginName)
-        self.loading = True
         self.busy = utils.adaptiveDialog(0, size=len(channelItems), string1=utils.LANGUAGE(30006), header=heading)
         for i in range(self.maxChannels):
             if utils.adaptiveDialog((i*100//len(channelItems)), self.busy, string1=utils.LANGUAGE(30006)) == False: break
             try:
                 item                         = channelItems[i]
-                item['guidedata']            = sorted(item['guidedata'], key=lambda x:x['starttime'])
+                item['guidedata']            = sorted(item['guidedata'], key=lambda x:x.get('starttime',''), reverse=False)
                 item['guidedata']            = item['guidedata'][:self.maxGuidedata]#truncate guidedata to a manageable amount.
                 self.channels[i].name        = item['channelname']
                 self.channels[i].logo        = (item.get('channellogo','')        or '')
@@ -159,7 +154,7 @@ class ChannelList(object):
                 self.channels[i].isFavorite  = (item.get('isfavorite','')         or False)
                 self.channels[i].guidedata   = (item['guidedata']                 or '')
                 self.channels[i].listSize    = len(self.channels[i].guidedata)
-                self.channels[i].listItems   = utils.poolListItem(item['guidedata'])
+                self.channels[i].listItems   = [utils.buildListItem(data) for data in item['guidedata']]
                 self.channels[i].isValid     = True #todo
                 totalTime = 0
                 for idx, tmpdata in enumerate(self.channels[i].guidedata): totalTime = totalTime + int((tmpdata.get('runtime','') or tmpdata.get('duration','')))
@@ -170,8 +165,7 @@ class ChannelList(object):
                 utils.log('setupChannelList, channel %s, isFavorite = %s'%(i+1,str(self.channels[i].isFavorite)))
                 utils.log('setupChannelList, channel %s, listSize = %s'%(i+1,str(self.channels[i].listSize)))
                 utils.log('setupChannelList, channel %s, totalTime = %s'%(i+1,str(self.channels[i].totalTime)))
-            except Exception as e: utils.log("setupChannelList, failed! idx (%s), error (%s), item (%s)"%(i, e, item), xbmc.LOGERROR)    
-        self.loading = False
+            except Exception as e: utils.log("setupChannelList, failed! idx (%s), error (%s), item (%s)"%(i, e, item), xbmc.LOGERROR)
         utils.adaptiveDialog(100, self.busy, string1=utils.LANGUAGE(30007))
 
         
@@ -227,27 +221,28 @@ if __name__ == '__main__':
         utils.log('dataType = '     + str(dataType))
         utils.log('skinPath = '     + str(channelLST.skinPath))
         utils.log('skinFolder = '   + str(channelLST.skinFolder))
+        utils.log('rowCount = '     + utils.getProperty('uEPG.rowCount'))
         utils.log('refreshPath = '  + str(channelLST.refreshPath))
         utils.log('refreshIntvl = ' + str(channelLST.refreshIntvl))
         utils.setProperty('PluginName'   ,channelLST.pluginName)
         utils.setProperty('PluginIcon'   ,channelLST.pluginIcon)
         utils.setProperty('PluginFanart' ,channelLST.pluginFanart)
         utils.setProperty('PluginAuthor' ,channelLST.pluginAuthor)
-         
-        # #show optional load screen
+        
+        #show optional load screen
         # if channelLST.uEPGRunning == False and utils.getProperty('uEPGSplash') != 'True' and xbmcvfs.exists(os.path.join(channelLST.skinFolder,'%s.splash.xml'%utils.ADDON_ID)) == True:
-            # mySplash = epg.Splash('%s.splash.xml'%utils.ADDON_ID,channelLST.skinPath,'default')
+            # mySplash   = epg.Splash('%s.splash.xml'%utils.ADDON_ID,channelLST.skinPath,'default')
             # mySplash.show()
             # xbmc.sleep(100)
             
         firstHDHR = utils.REAL_SETTINGS.getSetting('FirstTime_HDHR') == "true"
         if utils.HDHR().hasHDHR() and firstHDHR and not channelLST.incHDHR:
             utils.REAL_SETTINGS.setSetting('FirstTime_HDHR','false')
-            if utils.yesnoDialog((utils.LANGUAGE(30012)%(channelLST.pluginName))):
+            if utils.yesnoDialog((utils.LANGUAGE(30012)%(channelLST.pluginName)),custom='Later'):
                 utils.REAL_SETTINGS.setSetting('Enable_HDHR','true')
                 channelLST.incHDHR = True
                 
-        if dataType   == 'json': hasChannels = channelLST.prepareJson(utils.loadJson(utils.unquote(data)))
+        if dataType   == 'json':     hasChannels = channelLST.prepareJson(utils.loadJson(utils.unquote(data)))
         elif dataType == 'property': hasChannels = channelLST.prepareJson(utils.loadJson(utils.unquote(utils.getProperty(data))))
         elif dataType == 'listitem': hasChannels = channelLST.prepareListItem(utils.unquote(data))
         
@@ -261,7 +256,7 @@ if __name__ == '__main__':
             # xbmc.sleep(100)
         
         if hasChannels == True:
-            # if channelLST.refreshIntvl > 0 and channelLST.refreshPath is not None: channelLST.startRefreshTimer()
+            if channelLST.refreshIntvl > 0 and channelLST.refreshPath is not None: channelLST.startRefreshTimer()
             if channelLST.uEPGRunning == False and utils.getProperty('uEPGGuide') != 'True':
                 channelLST.myEPG = epg.uEPG('%s.guide.xml'%utils.ADDON_ID,channelLST.skinPath,'default')
                 channelLST.myEPG.channelLST = channelLST

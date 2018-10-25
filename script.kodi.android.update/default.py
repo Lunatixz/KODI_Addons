@@ -59,10 +59,13 @@ socket.setdefaulttimeout(TIMEOUT)
 class Installer(object):
     def __init__(self):
         self.cache    = SimpleCache()
+        if xbmcgui.Window(10000).getProperty('%s.Running'%ADDON_ID) == 'True': return
+        xbmcgui.Window(10000).setProperty('%s.Running'%ADDON_ID,'True')
         if not self.chkVersion(): return
         self.lastURL  = (REAL_SETTINGS.getSetting("LastURL") or self.buildMain())
         self.lastPath = REAL_SETTINGS.getSetting("LastPath")
         self.selectDialog(self.lastURL)
+        xbmcgui.Window(10000).clearProperty('%s.Running'%ADDON_ID)
         
         
     def disable(self, build):
@@ -213,6 +216,6 @@ class Installer(object):
             
     def installAPK(self, apkfile):
         xbmc.executebuiltin('XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),0.5,true)')
-        xbmc.executebuiltin('StartAndroidActivity("","android.intent.action.VIEW","application/vnd.android.package-archive","file:'+apkfile+'")')
+        xbmc.executebuiltin('StartAndroidActivity("","android.intent.action.VIEW","application/vnd.android.package-archive","content:'+apkfile+'")')
         
 if __name__ == '__main__': Installer()

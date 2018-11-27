@@ -44,7 +44,7 @@ QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
 BASE_URL      = 'http://www.cbs.com'
 WATCH_URL     = BASE_URL+'/watch'
 SHOW_URL      = BASE_URL+'/carousels/videosBySection/%s/offset/0/limit/40/xs/0'
-SHOWS_URL     = BASE_URL+'/shows'
+SHOWS_URL     = BASE_URL+'/shows/all'
 
 MAIN_MENU = [("Latest", "", 1),
              ("Shows" , "", 2)]
@@ -197,11 +197,10 @@ class CBS(object):
                     
                     if seasons:
                         title = uni(metas[item]['title'])
-                        try: seasonLST  = json.loads(re.search('video\.seasons = (.+?);',response).group(1))
+                        try: seasonLST  = json.loads(re.search('video\.seasons = (.+?);',response).group(1).replace('filter','"filter"').replace('current','"current"'))
                         except: continue
                         for season in seasonLST['filter']:
                             if season['total_count'] == season['premiumCount']: continue
-                            else: title = item['title']
                             url        = json.dumps({'title':title,'url':url,'seasons':json.dumps(seasonLST),'thumb':thumb})
                             infoLabels = {"mediatype":"tvshow","label":title ,"title":title,"TVShowTitle":title}
                             infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
@@ -219,15 +218,14 @@ class CBS(object):
     def browseShows(self, url=None):
         log('browseShows')
         soup  = BeautifulSoup(self.openURL(SHOWS_URL), "html.parser")
-        item  = soup('ul', {'class': 'shows-list'})[0]
-        shows = item('div', {'class': 'title hide'})
+        shows = soup('article', {'class': 'show-browse-item'})
         for idx, show in enumerate(shows):
-            title  = uni(show.get_text())
+            title  = uni(show.get_text()).replace("\n", "")
             if 'previews' in title.lower() or 'premieres' in title.lower(): continue
-            url    = item('a', {'class': 'link-show-thumb-text'})[idx]['href']
+            url    = shows[idx].a['href']
             if not url.startswith('http://'): url = (BASE_URL + url).lstrip('/')
             if not url.endswith('/video/'): url = '%s/video/'%url.rstrip('/')
-            thumb  = item('img', {'class': 'poster-thumb'})[idx]['src']
+            thumb  = shows[idx].img['data-src']
             url    = json.dumps({'url':url,'thumb':thumb})
             infoLabels ={"mediatype":"episode","label":title ,"title":title,"TVShowTitle":title}
             infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}

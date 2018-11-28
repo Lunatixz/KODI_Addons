@@ -187,17 +187,8 @@ class CBS(object):
                             try: episodes = json.loads(self.openURL(seasonURL))
                             except: episodes = ''
                             if 'success' in episodes:
-                                infoLabels ={"mediatype":"tvshow",
-                                             "label":title,
-                                             "title":title,
-                                             "TVShowTitle":title
-                                            }
-                                infoArt    ={"thumb":thumb,
-                                             "poster":thumb,
-                                             "fanart":FANART,
-                                             "icon":ICON,
-                                             "logo":ICON
-                                            }
+                                infoLabels ={"mediatype":"tvshow", "label":title, "title":title, "TVShowTitle":title}
+                                infoArt    ={"thumb":thumb, "poster":thumb, "fanart":FANART, "icon":ICON, "logo":ICON}
                                 self.addDir(title,seasonURL,5,infoLabels,infoArt)
                     else:
                         item  = json.loads(self.openURL(url))

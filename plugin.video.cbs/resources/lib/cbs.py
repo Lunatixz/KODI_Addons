@@ -43,7 +43,7 @@ DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
 BASE_URL      = 'http://www.cbs.com'
 WATCH_URL     = BASE_URL+'/watch'
-SHOW_URL      = BASE_URL+'/carousels/videosBySection/%s/offset/0/limit/40/xs/0'
+SHOW_URL      = '%sxhr/episodes/page/0/size/40/xs/0/season/%s/'
 SHOWS_URL     = BASE_URL+'/shows/all'
 
 MAIN_MENU = [("Latest", "", 1),
@@ -166,49 +166,27 @@ class CBS(object):
         url       = items['url']
         thumb     = items['thumb']
         response  = self.openURL(url).replace('\n','').replace('\r','').replace('\t','')
-        items     = re.search('(?:video\.section_ids = |"section_ids"\:)\[([^\]]+)\]',response)
-        if items:
-            items = items.group(1).split(',')
-            metas = json.loads(re.search('(?:video\.section_metadata = |"section_metadata"\:)({.+?}})',response).group(1))
-            CONTENT_TYPE  = 'tvshows'
-            for item in items:
-                try:
-                    url     = SHOW_URL%item
-                    seasons = (metas.get(item,'').get('display_seasons','') or False)
-                    
-                    if seasons:
-                        title = uni(metas[item]['title'])
-                        try: seasonLST  = json.loads(re.search('video\.seasons = (.+?);',response).group(1).replace('filter','"filter"').replace('current','"current"'))
-                        except: continue
-                        for season in seasonLST['filter']:
-                            if season['total_count'] == season['premiumCount']: continue
-                            title = season['title']
-                            seasonURL   = '%s/%s/' %(url,season["season"])
-                            try: episodes = json.loads(self.openURL(seasonURL))
-                            except: episodes = ''
-                            if 'success' in episodes:
-                                infoLabels ={"mediatype":"tvshow",
-                                             "label":title,
-                                             "title":title,
-                                             "TVShowTitle":title
-                                            }
-                                infoArt    ={"thumb":thumb,
-                                             "poster":thumb,
-                                             "fanart":FANART,
-                                             "icon":ICON,
-                                             "logo":ICON
-                                            }
-                                self.addDir(title,seasonURL,5,infoLabels,infoArt)
-                    else:
-                        item  = json.loads(self.openURL(url))
-                        if item and 'success' in item:
-                            title = uni(item['result']['title'])
-                            infoLabels = {"mediatype":"tvshow","label":title ,"title":title,"TVShowTitle":title}
-                            infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
-                            self.addDir(title,url,5,infoLabels,infoArt)
-                except: continue
-                
-                        
+        seasons   = re.search('<select class="dropdown__filter__fake">(.*?)</select>',response)
+        if seasons:
+            items = re.findall(r'<option value="(.*?)".+?>(.*?)</option>',seasons.group(1),re.DOTALL)
+            if items:
+                CONTENT_TYPE  = 'tvshows'
+                for item in items:
+                    try:
+                        seasonURL = SHOW_URL%(url,item[0])
+                        title   = item[1].strip()
+                        infoLabels ={"mediatype":"tvshow","label":title,"title":title,"TVShowTitle":title}
+                        infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
+                        self.addDir(title,seasonURL,5,infoLabels,infoArt)
+                    except: continue
+        else:
+            seasonURL = SHOW_URL%(url,'')
+            title   = "Full Episodes"
+            infoLabels ={"mediatype":"tvshow","label":title,"title":title,"TVShowTitle":title}
+            infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
+            self.addDir(title,seasonURL,5,infoLabels,infoArt)
+
+
     def browseShows(self, url=None):
         log('browseShows')
         soup  = BeautifulSoup(self.openURL(SHOWS_URL), "html.parser")

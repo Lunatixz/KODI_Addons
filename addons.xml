@@ -317,7 +317,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.disclosetv" version="1.0.6a" name="Disclose.tv" provider-name="Lunatixz">
+<addon id="plugin.video.disclosetv" version="1.0.7" name="Disclose.tv" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -335,7 +335,7 @@
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.disclosetv</source>
         <website>http://disclose.tv</website>
-        <news>v1.0.6[CR]- Leia support[CR]- Updated website parser[CR]v1.0.5[CR]- Updated website parser[CR]v1.0.4[CR]- Added categories[CR]v1.0.3[CR]- Added Local URL resolver and UWP check.</news>
+        <news>v1.0.7[CR]- Fixed "Next Page" Error[CR]v1.0.6[CR]- Leia support[CR]- Updated website parser[CR]v1.0.5[CR]- Updated website parser[CR]v1.0.4[CR]- Added categories[CR]v1.0.3[CR]- Added Local URL resolver and UWP check.</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=325746</forum>
         <assets>
             <icon>resources/images/icon.png</icon>
@@ -1179,7 +1179,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.teleup" name="TeleUp" provider-name="Lunatixz" version="2018.06.23">
+<addon id="plugin.video.teleup" name="TeleUp" provider-name="Lunatixz" version="2018.01.08">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.requests" version="2.7.0"/>
@@ -1193,6 +1193,7 @@
         <summary lang="en_GB">The Official plugin for the TeleUp Service.</summary>
         <description lang="en_GB">Entirely Legal and Free! Start watching instantly or record shows for later. Signup for one of three packages today!</description>
         <platform>all</platform>
+        <broken>Backend changed; Update Pending...</broken>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.teleup</source>
         <website>http://teleup.com</website>
@@ -1601,6 +1602,33 @@
             <screenshot>resources/images/screenshot01.png</screenshot>
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="screensaver.nasa" name="NASA - Images of the Day" version="0.0.1" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+    </requires>
+    <extension point="xbmc.ui.screensaver" library="default.py"/>
+    <extension point="xbmc.python.script"  library="default.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Get the latest images from America's space agency. Get the ... NASA Images of the Day.</summary>
+        <description lang="en_GB"></description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <website>https://unsplash.com/</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=339148</forum>
+        <source>https://github.com/Lunatixz/screensaver.nasa/tree/master</source>
+        <news>Pre-Release Beta</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
     </extension>
 </addon>

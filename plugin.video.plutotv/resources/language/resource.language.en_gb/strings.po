@@ -57,9 +57,13 @@ msgid "Sign-In"
 msgstr ""
 
 msgctxt "#30011"
-msgid "/../../Users/*/AppData/Local/Packages/XBMCFoundation.Kodi_*"
+msgid "Channels"
 msgstr "
 
 msgctxt "#30012"
-msgid "/../../Program Files/WindowsApps/XBMCFoundation.Kodi_*"
+msgid "OnDemand"
+msgstr "
+
+msgctxt "#30013"
+msgid "Guide"
 msgstr "

@@ -53,9 +53,9 @@ BASE_GUIDE   = BASE_API + '/v1/timelines/%s.000Z/%s.000Z/matrix.json'
 LOGIN_URL    = BASE_API + '/v1/auth/local'
 BASE_CLIPS   = BASE_API + '/v2/episodes/%s/clips.json'
 REGION_URL   = 'http://ip-api.com/json'
-PLUTO_MENU   = [("Browse Channels" , BASE_LINEUP, 0),
-                ("Browse OnDemand" , BASE_LINEUP, 1),
-                ("Channel Guide"   , BASE_LINEUP, 20)]
+PLUTO_MENU   = [(LANGUAGE(30011), BASE_LINEUP, 0),
+                (LANGUAGE(30012), BASE_LINEUP, 1),
+                (LANGUAGE(30013), BASE_LINEUP, 20)]
               
 def isUWP():
     return (bool(xbmc.getCondVisibility("system.platform.uwp")) or sys.platform == "win10")
@@ -82,11 +82,13 @@ def log(msg, level=xbmc.LOGDEBUG):
     xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
     
 def getParams():
-    return dict(urlparse.parse_qsl(sys.argv[2][1:]))
+    return dict(urlparse.parse_qsl(self.sysARG[2][1:]))
                         
 socket.setdefaulttimeout(TIMEOUT)
-class PlutoTV():
-    def __init__(self):
+class PlutoTV(object):
+    def __init__(self, sysARG):
+        log('__init__, sysARG = ' + str(sysARG))
+        self.sysARG  = sysARG
         self.net     = net.Net()
         self.cache   = SimpleCache()
         self.region  = self.getRegion()
@@ -98,7 +100,7 @@ class PlutoTV():
         
     @use_cache(1)
     def getRegion(self):
-        return (self.openURL(REGION_URL).get('countryCode','') or 'US')
+        return (self.openURL(REGION_URL).get('countryCode','US'))
         
         
     def login(self):
@@ -164,7 +166,7 @@ class PlutoTV():
         except Exception as e:
             log('openURL, Unable to open url ' + str(e), xbmc.LOGERROR)
             xbmcgui.Dialog().notification(ADDON_NAME, 'Unable to Connect, Check User Credentials', ICON, 4000)
-            return ''
+            return {}
             
 
     def mainMenu(self):
@@ -328,7 +330,7 @@ class PlutoTV():
                 vid_offset = ch_timediff - dur_start
                 liz.setProperty('ResumeTime', str(vid_offset))
             playlist.add(url, liz, idx)
-            if idx == 0: xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
+            if idx == 0: xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
      
      
     def playContent(self, name, url):
@@ -338,7 +340,7 @@ class PlutoTV():
         t2   = (datetime.datetime.now() + datetime.timedelta(hours=8)).strftime('%Y-%m-%dT%H:00:00')
         link = (self.openURL(BASE_GUIDE % (t1,t2)))
         try: item = link[origurl][0]
-        except Exception as e: return log('playContent, failed! ' + str(e), xbmc.LOGERROR)
+        except Exception as e: return log('playContent, failed! ' + str(e) + ', origurl = ' + str(link.get(origurl,[EMPTY])), xbmc.LOGERROR)
         id = item['episode']['_id']
         ch_start = datetime.datetime.fromtimestamp(time.mktime(time.strptime((item["start"].split('.')[0]), "%Y-%m-%dT%H:%M:%S")))
         ch_timediff = (datetime.datetime.now() - ch_start).seconds
@@ -389,7 +391,7 @@ class PlutoTV():
         if 'm3u8' in url.lower():
             liz.setProperty('inputstreamaddon','inputstream.adaptive')
             liz.setProperty('inputstream.adaptive.manifest_type','hls')
-        xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
+        xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
 
            
     def addLink(self, name, u, mode, infoList=False, infoArt=False, total=0):
@@ -401,8 +403,8 @@ class PlutoTV():
         else: liz.setInfo(type="Video", infoLabels=infoList)
         if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
         else: liz.setArt(infoArt)
-        u=sys.argv[0]+"?url="+urllib.quote(u)+"&mode="+str(mode)+"&name="+urllib.quote(name)
-        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,totalItems=total)
+        u=self.sysARG[0]+"?url="+urllib.quote(u)+"&mode="+str(mode)+"&name="+urllib.quote(name)
+        xbmcplugin.addDirectoryItem(handle=int(self.sysARG[1]),url=u,listitem=liz,totalItems=total)
 
 
     def addDir(self, name, u, mode, infoList=False, infoArt=False):
@@ -414,8 +416,8 @@ class PlutoTV():
         else: liz.setInfo(type="Video", infoLabels=infoList)
         if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
         else: liz.setArt(infoArt)
-        u=sys.argv[0]+"?url="+urllib.quote(u)+"&mode="+str(mode)+"&name="+urllib.quote(name)
-        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=True)
+        u=self.sysARG[0]+"?url="+urllib.quote(u)+"&mode="+str(mode)+"&name="+urllib.quote(name)
+        xbmcplugin.addDirectoryItem(handle=int(self.sysARG[1]),url=u,listitem=liz,isFolder=True)
 
 
     def uEPG(self):
@@ -479,36 +481,41 @@ class PlutoTV():
                 if any(k.lower().startswith(title.lower()) for k in IGNORE_KEYS): return
                 tmpdata = {"mediatype":self.mediaType[chcat],"label":title,"title":chname,"originaltitle":epname,"plot":epplot, "code":epid, "genre":chcat, "imdbnumber":chid, "duration":dur}
                 tmpdata['starttime'] = int(time.mktime(time.strptime((item["start"].split('.')[0]), "%Y-%m-%dT%H:%M:%S")))
-                tmpdata['url']       = sys.argv[0]+'?mode=7&name=%s&url=%s'%(title,url)
+                tmpdata['url']       = self.sysARG[0]+'?mode=7&name=%s&url=%s'%(title,url)
                 tmpdata['art']       = {"thumb":thumb,"clearart":poster,"fanart":FANART,"icon":chthumb,"clearlogo":chlogo}
                 guidedata.append(tmpdata)
         newChannel['guidedata'] = guidedata
         return newChannel
+     
 
-params=getParams()
-try: url=urllib.unquote(params["url"])
-except: url=None
-try: name=urllib.unquote(params["name"])
-except: name=None
-try: mode=int(params["mode"])
-except: mode=None
-    
-log("Mode: "+str(mode))
-log("URL : "+str(url))
-log("Name: "+str(name))
+    def getParams(self):
+        return dict(urlparse.parse_qsl(self.sysARG[2][1:]))
 
-if mode==None:  PlutoTV().mainMenu()
-elif mode == 0: PlutoTV().browseGuide(url)
-elif mode == 1: PlutoTV().browseMenu()
-elif mode == 2: PlutoTV().browse(name, url)
-elif mode == 7: PlutoTV().playVideo(name, url)
-elif mode == 8: PlutoTV().playContent(name, url)
-elif mode == 9: PlutoTV().playChannel(name, url)
-elif mode == 20:xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&skin_path=%s&refresh_path=%s&refresh_interval=%s&row_count=%s)"%(urllib.quote(json.dumps(list(PlutoTV().uEPG()))),urllib.quote(json.dumps(ADDON_PATH)),urllib.quote(json.dumps(sys.argv[0]+"?mode=20")),urllib.quote(json.dumps("7200")),urllib.quote(json.dumps("5"))))
+            
+    def run(self):  
+        params=self.getParams()
+        try: url=urllib.unquote_plus(params["url"])
+        except: url=None
+        try: name=urllib.unquote_plus(params["name"])
+        except: name=None
+        try: mode=int(params["mode"])
+        except: mode=None
+        log("Mode: "+str(mode))
+        log("URL : "+str(url))
+        log("Name: "+str(name))
 
-xbmcplugin.setContent(int(sys.argv[1])    , CONTENT_TYPE)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_NONE)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_LABEL)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_TITLE)
-xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
+        if mode==None:  self.mainMenu()
+        elif mode == 0: self.browseGuide(url)
+        elif mode == 1: self.browseMenu()
+        elif mode == 2: self.browse(name, url)
+        elif mode == 7: self.playVideo(name, url)
+        elif mode == 8: self.playContent(name, url)
+        elif mode == 9: self.playChannel(name, url)
+        elif mode == 20:xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&skin_path=%s&refresh_path=%s&refresh_interval=%s&row_count=%s)"%(urllib.quote(json.dumps(list(self.uEPG()))),urllib.quote(json.dumps(ADDON_PATH)),urllib.quote(json.dumps(self.sysARG[0]+"?mode=20")),urllib.quote(json.dumps("7200")),urllib.quote(json.dumps("5"))))
+
+        xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_NONE)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_LABEL)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_TITLE)
+        xbmcplugin.endOfDirectory(int(self.sysARG[1]), cacheToDisc=True)

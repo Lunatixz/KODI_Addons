@@ -8,3 +8,5 @@
 [![Kodi Donate](https://img.shields.io/badge/Donate-Kodi-cyan.svg?style=flat-square)](https://kodi.tv/contribute/donate)
 [![Twitter URL](https://img.shields.io/badge/Twitter-@PseudoTV_Live-blue.svg?style=flat-square)](https://twitter.com/PseudoTV_Live)
 [![DMCA Policy](https://img.shields.io/badge/DMCA-Policy-lightgrey.svg?style=flat-square)](https://github.com/Lunatixz/KODI_Addons/raw/master/DMCA.md)
+
+Beta repository. Stable code submitted to Kodi repository. PLS DO NOT ADD TO WIZARDS, BUILDS OR REPOSITORY AND INDEXERS!! FINAL WARNING!!

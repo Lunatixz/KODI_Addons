@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of CBS.
@@ -42,7 +42,7 @@ CONTENT_TYPE  = 'episodes'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
 BASE_URL      = 'http://www.cbs.com'
-WATCH_URL     = BASE_URL+'/watch'
+LATEST_JSON   = BASE_URL + '/watch/xhr/episodes/page/%s/size/24/xs/1/season/'
 SHOW_URL      = '%sxhr/episodes/page/0/size/40/xs/0/season/%s/'
 SHOWS_URL     = BASE_URL+'/shows/all'
 
@@ -95,40 +95,28 @@ class CBS(object):
         self.addYoutube("Youtube" , 'plugin://plugin.video.youtube/user/CBS/')
             
                 
-    def browseLatest(self, url=None):
-        if url is None: url = WATCH_URL
-        soup = BeautifulSoup(self.openURL(url), "html.parser")
-        items = soup('li', {'class': 'episode'})
-        for item in items:
+    def browseLatest(self, page=0):
+        items = json.loads(self.openURL(LATEST_JSON%page))
+        if 'result' not in items: return
+        for item in items['result']['data']:
+            if item['status'] != "AVAILABLE": continue
             seasonNumber  = 0
             episodeNumber = 0
-            metas         = re.findall(r'<meta content="(.*?)>', str(item), re.DOTALL)
-            metas.extend(re.findall(r'<span content="(.*?)>', str(item), re.DOTALL))
-            metaTYPES     = ["name","description","thumbnailUrl","uploadDate","url","seasonNumber","episodeNumber"]
-            metaLST       = {}
-            metaKeys      = []
-            for type in metaTYPES:
-                for meta in metas:
-                    if 'itemprop="%s"'%type in meta:
-                        if type == "description" and 'description' in metaKeys: metaLST["plot"] = meta.split('" itemprop="%s"'%type)[0]
-                        else:
-                            if type not in metaKeys: 
-                                metaKeys.append(type)
-                                metaLST[type] = meta.split('" itemprop="%s"'%type)[0]
-            label = unescape(uni((metaLST.get('description') or metaLST['name']).decode("utf-8")))
-            plot  = unescape(uni((metaLST.get('plot','')     or label)))
-            try: aired = metaLST['uploadDate'].split('T')[0]
+            label = uni(item.get('title') or item['label'])
+            plot  = uni((item.get('description','') or label))
+            try: aired = item['airdate_iso'].split('T')[0]
             except: aired = datetime.datetime.now().strftime('%Y-%m-%d')
-            thumb = metaLST['thumbnailUrl']
-            url   = metaLST['url']
+            thumb = item['thumbUrl']
+            url   = item['url']
             if not url.startswith('http://'): url = (BASE_URL + '%s'%url).lstrip('/')        
-            seasonNumber = (int(filter(str.isdigit, str(metaLST.get('seasonNumber',seasonNumber)))))
-            episodeNumber = (int(filter(str.isdigit, str(metaLST.get('episodeNumber',episodeNumber)))))
+            seasonNumber = (int(filter(str.isdigit, str(item.get('season_number',seasonNumber)))))
+            episodeNumber = (int(filter(str.isdigit, str(item.get('episode_number',episodeNumber)))))
             seinfo = ('S' + ('0' if seasonNumber < 10 else '') + str(seasonNumber) + 'E' + ('0' if episodeNumber < 10 else '') + str(episodeNumber))
             label  = '%s'%(label) if seasonNumber + episodeNumber == 0 else '%s - %s'%(label, seinfo)
-            infoLabels ={"mediatype":"episode","label":label ,"title":label,"TVShowTitle":label,"plot":plot,"aired":aired}
+            infoLabels ={"mediatype":"episode","label":label ,"title":label,"TVShowTitle":label,"plot":plot,"aired":aired,"duration":item.get('duration_raw',0)}
             infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
             self.addLink(label, url, 9, infoLabels, infoArt, len(items))
+        self.addDir('>> Next', str(page+1), 6)
             
             
     def browseEpisodes(self, url):
@@ -260,11 +248,12 @@ log("URL : "+str(url))
 log("Name: "+str(name))
 
 if mode==None:  CBS().buildMenu(MAIN_MENU)
-elif mode == 1: CBS().browseLatest(url)
+elif mode == 1: CBS().browseLatest()
 elif mode == 2: CBS().browseShows(url)
 elif mode == 3: CBS().browseCategory(url)
 elif mode == 4: CBS().browseSeasons(url)
 elif mode == 5: CBS().browseEpisodes(url)
+elif mode == 6: CBS().browseLatest(int(url))
 elif mode == 9: CBS().playVideo(name, url)
 
 xbmcplugin.setContent(int(sys.argv[1])    , CONTENT_TYPE)

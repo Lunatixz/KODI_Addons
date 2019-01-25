@@ -206,7 +206,7 @@ class MSNBC(object):
                     else: duration = 0
                     infoLabels = {"mediatype":"video","label":label,"title":label,"plot":plot,"duration":duration}
                     infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":thumb,"logo":thumb}
-                    print link
+                    print(link)
                     self.addLink(label, link, 9, infoLabels, infoArt, len(articles))
 
 

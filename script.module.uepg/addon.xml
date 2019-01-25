@@ -6,14 +6,13 @@
         <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="script.module.metadatautils" version="1.0.0" />
     </requires>
-    <extension point="xbmc.python.script" defaultresolution="1080i" library="default.py"/>
+    <extension point="xbmc.python.script" library="default.py"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB"></summary>
         <description lang="en_GB"></description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.uepg</source>
-        <website></website>
         <forum>https://forum.kodi.tv/showthread.php?tid=321231</forum>
         <news>v1.0.3[CR]- Fixed listitem Parsing and Default Skin[CR]1.0.2[CR]- Added HDHomerun Tuner Support</news>
         <assets>

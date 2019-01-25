@@ -14,10 +14,9 @@
         <description lang="en_GB">Watch TV ads categorized by country, business, year from Advertolog.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/plugin.video.adverts</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.adverts</source>
         <website>http://www.advertolog.com</website>
-        <forum>http://forum.kodi.tv/showthread.php?tid=311064</forum>
-        <news></news>
+        <forum>https://forum.kodi.tv/showthread.php?tid=311064</forum>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>

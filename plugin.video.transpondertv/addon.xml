@@ -16,7 +16,7 @@
         <description lang="en_GB">Transponder.tv takes things to the next level in providing each user with their own remote tv set for controlling and viewing wherever they are. With the majority of UK Free to Air channels available and a soon to be launched recording feature, you will be able to watch your own tv wherever you are and whenever you want and who doesn't want free TV?</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.transponder.tv</source>
+        <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.transpondertv</source>
         <website>https://www.transponder.tv</website>
         <news>v.1.0.2[CR]-Optimized Code.[CR]-Increased Guide Data (default: 1-day, max: 3-days).[CR]-Auto Hide Recordings and Schedules when not in use.[CR]-Improved recording.</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=335116</forum>

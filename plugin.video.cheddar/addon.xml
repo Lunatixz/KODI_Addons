@@ -16,7 +16,7 @@
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/plugin.video.cheddar</source>
         <website>https://cheddar.com/</website>
-        <forum>http://forum.kodi.tv/showthread.php?tid=319217</forum>
+        <forum>https://forum.kodi.tv/showthread.php?tid=319217</forum>
         <news>>v.1.0.4[CR]-Fixed Parsing Errors[CR]-Added New Content and Live Feeds[CR]v.1.0.3[CR]-Added adaptive inputstream to Live feed.[CR]v.1.0.2[CR]-Updated web-parser[CR]-Miscellaneous Improvements[CR]v.1.0.1[CR]-Leia Compatibility.</news>
         <assets>
             <icon>resources/images/icon.png</icon>

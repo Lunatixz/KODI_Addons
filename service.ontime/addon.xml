@@ -14,9 +14,8 @@
         <description lang="en_GB">Let "OnTime" manage your viewing habits using schedule playback.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.ontime</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.ontime</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=334619</forum>
-        <news></news>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>

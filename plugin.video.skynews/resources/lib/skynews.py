@@ -80,7 +80,7 @@ class Sky(object):
     def buildLiveLink(self):
         try:
             link = 'http:' + BeautifulSoup(self.openURL(LIVEURL), "html.parser")('div', {'class': 'video-embed'})[0].find('iframe').get('src')
-            print self.resolveYoutube(link)
+            print(self.resolveYoutube(link))
             self.playVideo(LANGUAGE(30004),self.resolveYoutube(link))
         except: self.playVideo(LANGUAGE(30004),YTURL + 'XOacA3RYrXk')
         

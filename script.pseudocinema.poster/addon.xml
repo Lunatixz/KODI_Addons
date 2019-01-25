@@ -22,10 +22,14 @@
         <disclaimer lang="en">This software is a BETA release, bugs maybe common until final release.</disclaimer>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/script.pseudocinema.poster</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.pseudocinema.poster</source>
         <email>pseudotvlive@gmail.com</email>
         <website>www.pseudotvlive.com</website>
         <forum>http://pseudotvlive.com/index.php/forum</forum>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
     </extension>
     <extension point="xbmc.python.script" library="default.py">
         <provides>executable</provides>

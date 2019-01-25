@@ -12,10 +12,9 @@
         <description lang="en_GB"></description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.moduleauditor</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.moduleauditor</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=335539</forum>
         <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
-        <news></news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

@@ -1,4 +1,4 @@
-﻿#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2018 Lunatixz
 #
 #
 # This file is part of Media Maintenance.

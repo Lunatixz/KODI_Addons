@@ -13,10 +13,9 @@
         <description lang="en_GB">Welcome to the Internet's most comprehensive database of nationally airing TV Commercials. Explore the actors, songs and offers in the spots you see on TV.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/plugin.video.ispot</source>
-        <website>http://www.ispot.tv/</website>
-        <forum>http://forum.kodi.tv/showthread.php?tid=311057</forum>
-        <news></news>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.ispot</source>
+        <website>https://www.ispot.tv/</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=311057</forum>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>

@@ -14,8 +14,7 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.uncrate</source>
-        <website>https://www.uncrate.com</website>
-        <news></news>
+        <website>https://uncrate.com</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=331316</forum>
         <assets>
             <icon>resources/images/icon.png</icon>

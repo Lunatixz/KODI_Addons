@@ -14,8 +14,7 @@
         <platform>android freebsd ios linux osx windows</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.easyengineering</source>
-        <website>http://easyengineeringtv.com/</website>
-        <news></news>
+        <website>https://easyengineeringtv.com/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=332808</forum>
         <assets>
             <icon>resources/images/icon.png</icon>

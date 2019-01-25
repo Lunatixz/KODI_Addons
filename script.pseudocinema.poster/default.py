@@ -76,13 +76,13 @@ class MOVIEPOSTER(xbmcgui.WindowXMLDialog):
     def getProperty(self, str):
         try:
             return xbmcgui.Window(10000).getProperty(str)
-        except Exception,e:
+        except Exception as e:
             return ''
               
     def setProperty(self, str1, str2):
         try:
             xbmcgui.Window(10000).setProperty(str1, str2)
-        except Exception,e:
+        except Exception as e:
             pass
             
     def clearProperty(self, str):

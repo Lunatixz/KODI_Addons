@@ -13,9 +13,8 @@
         <description lang="en_GB">TV Land plays your favorite sitcoms and funny, fresh Original Series including YOUNGER, the critically acclaimed hit series starring Sutton Foster and Hillary Duff.  THE JIM GAFFIGAN SHOW, featuring Jim in a new series inspired by his real life as the father of five kids.  IMPASTOR, starring Michael Rosenbaum, is a comedy about a guy on the run who poses as a gay pastor and TEACHERS, featuring comedy troupe The Katydids, about the dysfunctional educators who mold America’s youth.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/plugin.video.tvland/tree/master</source>
-        <website>http://tvland.com</website>
-        <news></news>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.tvland</source>
+        <website>https://www.youtube.com/user/tvland/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=326984</forum>
         <assets>
             <icon>resources/images/icon.png</icon>

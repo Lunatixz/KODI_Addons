@@ -17,7 +17,7 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.haystacktv</source>
-        <website>http://www.haystack.tv/</website>
+        <website>https://www.haystack.tv/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=316485</forum>
         <news>>v.1.0.1[CR]-Leia Compatibility[CR]-Improved Video Parsing.</news>
         <assets>

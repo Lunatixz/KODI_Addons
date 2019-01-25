@@ -13,9 +13,8 @@
         <platform>all</platform>
         <website>http://trekyards.com</website>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/plugin.video.trekyards/tree/master</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.trekyards</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=323520</forum>
-        <news></news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

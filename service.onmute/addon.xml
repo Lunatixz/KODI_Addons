@@ -10,9 +10,8 @@
         <description lang="en_GB">Let "OnMute" toggle closed captioning and subtitles while Kodi is muted.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.onmute</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.onmute</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=334361</forum>
-        <news></news>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>

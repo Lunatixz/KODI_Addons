@@ -14,7 +14,7 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.newsblender</source>
-        <website>http://newsapi.org</website>
+        <website>https://newsapi.org/</website>
         <news>v.1.0.2[CR]-Fixed parsing errors[CR]v.1.0.1[CR]-Added Parsing Dialog</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=326129</forum>
         <assets>

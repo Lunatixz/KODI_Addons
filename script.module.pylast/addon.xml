@@ -9,11 +9,10 @@
         <summary lang="en_US">A Python interface to Last.fm and Libre.fm</summary>
         <description lang="en_US">A Python interface to Last.fm and Libre.fm</description>
         <forum></forum>
-        <website>https://pypi.python.org/pypi/pylast</website>
+        <website>https://pypi.org/project/pylast/</website>
         <license>Apache2</license>
         <platform>all</platform>
         <source>https://github.com/pylast/pylast</source>
-        <news></news>
 		<assets>
 			<icon>icon.png</icon>
 		</assets>

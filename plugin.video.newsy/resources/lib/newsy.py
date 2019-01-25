@@ -81,11 +81,11 @@ class Newsy(object):
                 response = urllib2.urlopen(request, timeout=TIMEOUT).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, response, expiration=datetime.timedelta(hours=6))
             return self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except socket.timeout, e:
+        except socket.timeout as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except Exception, e:
+        except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
             return ''
@@ -142,7 +142,7 @@ class Newsy(object):
                 rep = path, item['duration']//1000, item['headline']
                 self.cache.set(ADDON_NAME + '.resolveURL, url = %s'%url, rep, expiration=datetime.timedelta(hours=48))
             return self.cache.get(ADDON_NAME + '.resolveURL, url = %s'%url)
-        except Exception, e:
+        except Exception as e:
             log("resolveURL Failed! " + str(e), xbmc.LOGERROR)
         
         

@@ -1,4 +1,4 @@
-﻿#   Copyright (C) 2016 Lunatixz
+#   Copyright (C) 2016 Lunatixz
 #
 #
 # This file is part of Smart Mirror.

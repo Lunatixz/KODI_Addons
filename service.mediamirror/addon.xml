@@ -12,8 +12,7 @@
         <disclaimer lang="en_GB" >*Requires all Kodi instances configured with a centralized file server and database.[CR]Each client requires identical configuration "InSync" with the master, same access to files, plugins and PVR backend sources. *See: http://kodi.wiki/view/Syncing_and_sharing</disclaimer>  
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.mediamirror</source>
-        <news></news>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.mediamirror</source>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>

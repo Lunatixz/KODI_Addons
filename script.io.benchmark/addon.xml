@@ -11,8 +11,7 @@
         <description lang="en_GB">How fast does your device read and write?</description>
         <license>The MIT License (MIT)</license>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/script.io.benchmark</source>
-        <news></news>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.io.benchmark</source>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>

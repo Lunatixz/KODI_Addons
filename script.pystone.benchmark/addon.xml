@@ -11,8 +11,7 @@
         <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
         <license>The MIT License (MIT)</license>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/script.pystone.benchmark</source>
-        <news></news>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.pystone.benchmark</source>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>

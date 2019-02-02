@@ -15,14 +15,11 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/plugin.video.skynews</source>
-        <website>http://news.sky.com/</website>
+        <website>https://news.sky.com/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=320938</forum>
-        <news></news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
         </assets>
     </extension>
 </addon>

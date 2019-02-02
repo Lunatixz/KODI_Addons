@@ -14,8 +14,8 @@
         <description lang="en_GB">News 12, a cable network exclusive to seven regions of the New York tri-state area. Please select an region to get the latest local news and information.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/plugin.video.news12</source>
-        <website>http://news12.com</website>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.news12</source>
+        <website>http://www.news12.com</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=319396</forum>
         <news>[CR]v1.0.2[CR]- Improved browsing speed.[CR]v.1.0.1[CR]- Fixed Video Quality Error</news>
         <assets>

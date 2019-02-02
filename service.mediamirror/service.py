@@ -70,7 +70,7 @@ def loadJson(string):
         return {}
     try:
         return json.loads(uni(string))
-    except Exception,e:
+    except Exception as e:
         return json.loads(ascii(string))
         
 def SendRemote(IPP, AUTH, CNUM, params):
@@ -79,9 +79,9 @@ def SendRemote(IPP, AUTH, CNUM, params):
         xbmc_host, xbmc_port = IPP.split(":")
         username, password = AUTH.split(":")
         kodi_url = 'http://' + xbmc_host +  ':' + xbmc_port + '/jsonrpc'
-        print kodi_url
-        print params
-        print username, password
+        print(kodi_url)
+        print(params)
+        print(username, password)
         headers = {"Content-Type":"application/json"}
         time_before = time.time()
         r = requests.post(kodi_url,
@@ -95,7 +95,7 @@ def SendRemote(IPP, AUTH, CNUM, params):
         if AUTO == True:
             REAL_SETTINGS.setSetting("Client%d_offSet"%CNUM,("%.2f" % round(time_taken,2)))
         return loadJson(response.read())
-    except Exception,e:
+    except Exception as e:
         pass
     
 def getActivePlayer():
@@ -224,7 +224,7 @@ class Player(xbmc.Player):
                 
     def playClient(self, IPPlst):
         log('playClient')
-        print self.playType, self.playLabel, self.playFile, self.playThumb
+        print(self.playType, self.playLabel, self.playFile, self.playThumb)
         for IPP in IPPlst:
             if type == 'channel':
                 params = ({"jsonrpc": "2.0", "method": "Player.Open", "params": {"item": {"channelid": self.getClientPVRid(IPP, self.playLabel.split(' - ')[0], self.playFile)}}})

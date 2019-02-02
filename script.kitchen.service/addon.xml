@@ -3,7 +3,7 @@
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
     </requires>
-    <extension point="xbmc.python.pluginsource" library="main.py">
+    <extension point="xbmc.python.pluginsource" library="service.py">
         <provides>executable</provides>
     </extension>
     <extension point="xbmc.service" library="service.py" start="startup"/>
@@ -13,5 +13,8 @@
         <disclaimer lang="en" >This software is a BETA release, bugs maybe common until final release.</disclaimer>  
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
     </extension>
 </addon>

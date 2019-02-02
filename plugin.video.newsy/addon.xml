@@ -14,8 +14,8 @@
         <description lang="en_GB">Newsy is your source for concise, unbiased video news and analysis covering the top stories from around the world. With persistent curiosity and no agenda, we strive to fuel meaningful conversations by highlighting multiple sides of every story. Newsy delivers the news and perspective you need without the hype and bias common to many news sources.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/plugin.video.newsy</source>
-        <website>http://www.newsy.com</website>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.newsy</source>
+        <website>https://www.newsy.com/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=320402</forum>
         <news>[CR]v1.0.2[CR]- Improved caching.[CR]v1.0.1[CR]- Improved browsing speed.</news>
         <assets>

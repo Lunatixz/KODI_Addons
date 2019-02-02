@@ -13,5 +13,8 @@
         <license>BSD</license>
         <platform>all</platform>
         <source>https://github.com/jcstroud/pyfscache</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
     </extension>
 </addon>

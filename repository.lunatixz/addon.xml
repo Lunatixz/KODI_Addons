@@ -9,7 +9,7 @@
         <summary lang="en_GB"></summary>
         <description lang="en_GB"></description>
         <platform>all</platform>
-        <source>http://raw.github.com/Lunatixz/KODI_Addons</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/repository.lunatixz</source>
         <assets>
             <icon>icon.png</icon>
         </assets>

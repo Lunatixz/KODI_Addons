@@ -14,8 +14,8 @@
         <description lang="en_GB"></description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/plugin.video.nbc/tree/master</source>
-        <website>http://nbc.com</website>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.nbc</source>
+        <website>https://www.nbc.com/</website>
         <news>[CR]1.0.1[CR]- Fixed Parsing Error</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=321811</forum>
         <assets>

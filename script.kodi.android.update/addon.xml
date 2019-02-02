@@ -12,7 +12,7 @@
         <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>android</platform>
-        <website>http://kodi.tv</website>
+        <website>https://kodi.tv/</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.android.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=322783</forum>
         <news>v1.1.1[CR]-Temp Fix[CR]v1.1.0[CR]-Crash Fix[CR]v1.0.9[CR]-Improved UI[CR]v1.0.5[CR]-Moved to Jarvis[CR]-Android Platform Detection[CR]-Streamlined Navigation[CR]v1.0.4[CR]-Android Version Detection[CR]- Improved Error Handling[CR]v1.0.3[CR]-Improved functionality[CR]v1.0.1[CR]-Added After Install Cleanup.</news>

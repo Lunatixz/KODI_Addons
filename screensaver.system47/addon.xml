@@ -14,9 +14,8 @@
         <platform>all</platform>
         <website>http://www.mewho.com/system47/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=323285</forum>
-        <source>https://github.com/Lunatixz/screensaver.system47/tree/master</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.system47</source>
         <disclaimer lang="en_GB" >Streaming not recommend for metered Internet, choose download option under settings.</disclaimer>  
-        <news></news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

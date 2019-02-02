@@ -13,8 +13,8 @@
         <description lang="en_GB">EarthCam.net provides webcam technology and managed services consisting of live streaming video, time-lapse cameras and photography documentation for corporate clients and government agencies in major cities around the world.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/plugin.video.earthcam/tree/master</source>
-        <website>http://earthcam.com</website>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.earthcam</source>
+        <website>https://www.earthcam.com/</website>
         <news>v1.0.1[CR]-Fixed playback labels</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=329152</forum>
         <assets>

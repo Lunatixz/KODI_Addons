@@ -14,7 +14,7 @@
         <disclaimer lang="en_GB">Requires Playon Server Software</disclaimer>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
-        <forum>http://forum.kodi.tv/showthread.php?tid=233136</forum>
+        <forum>https://forum.kodi.tv/showthread.php?tid=233136</forum>
         <website>https://www.playon.tv</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.playonbrowser</source>
         <news>>v.2.0.4[CR]- Updated Auto-IP detection[CR]v.2.0.3[CR]- Added Search function[CR]- Added Auto-IP detection[CR]-v.2.0.2[CR]- Improved UPNPID detection[CR]- URL caching improvements[CR]v.2.0.1[CR]- Fixed PlayLater playback[CR]v.2.0.0[CR]- Refactored and optimized Code.[CR]- Added PlayLater Recording via Context Menu.</news>

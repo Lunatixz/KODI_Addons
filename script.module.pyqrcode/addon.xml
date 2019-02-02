@@ -8,11 +8,10 @@
         <summary lang="en_US">A Python interface to generate QR Code</summary>
         <description lang="en_US">A Python interface to generate QR Code</description>
         <forum></forum>
-        <website>https://pypi.python.org/pypi/pyqrcode</website>
+        <website>https://pypi.org/project/PyQRCode/</website>
         <license>Apache2</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pyqrcode</source>
-        <news></news>
         <assets>
             <icon>icon.png</icon>
         </assets>

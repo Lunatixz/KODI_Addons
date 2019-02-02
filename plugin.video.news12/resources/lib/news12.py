@@ -86,11 +86,11 @@ class News12():
                 response = urllib2.urlopen(request, timeout=TIMEOUT).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, response, expiration=datetime.timedelta(hours=6))
             return self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except socket.timeout, e:
+        except socket.timeout as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except Exception, e:
+        except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
 
@@ -181,7 +181,7 @@ class News12():
                         response = video['@attributes']['url'], int(video['@attributes']['duration'])
                 self.cache.set(ADDON_NAME + '.resolveURL, url = %s.%s'%(url,str(BITRATE)), response, expiration=datetime.timedelta(hours=48))
             return self.cache.get(ADDON_NAME + '.resolveURL, url = %s.%s'%(url,str(BITRATE)))
-        except Exception, e:
+        except Exception as e:
             log("resolveURL Failed! " + str(e), xbmc.LOGERROR)
 
             

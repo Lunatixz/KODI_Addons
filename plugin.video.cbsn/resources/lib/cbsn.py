@@ -71,7 +71,7 @@ class CBSN(object):
                 cacheResponse = urllib2.urlopen(request, timeout=TIMEOUT).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheResponse, expiration=datetime.timedelta(minutes=5))
             return cacheResponse
-        except Exception, e:
+        except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
             return ''
@@ -88,14 +88,14 @@ class CBSN(object):
     def buildBrowse(self):
         items = json.loads(self.openURL(PLS_URL))['navigation']['data']
         for item in items:
-            print item
+            print(item)
             
             
     def buildShows(self):
         soup  = BeautifulSoup(self.openURL(BASE_URL), "html.parser")
         items = soup('a', {'class': 'site-nav__item-anchor site-nav__item-anchor--level-2 '})
         for item in items:
-            print item
+            print(item)
         # for item in VID_URL: self.addDir(item ,(EPSURL%(urllib.quote(item.replace(' ','-')))),4)
         
     
@@ -169,7 +169,7 @@ class CBSN(object):
     def playVideo(self, name, url):
         log('playVideo')
         info = getVideoInfo(url,QUALITY,True)
-        print info
+        print(info)
         if info is None: return
         info = info.streams()
         url  = info[0]['xbmc_url']

@@ -12,10 +12,10 @@
         <description lang="en_GB">Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>windows</platform>
-        <website>http://kodi.tv</website>
+        <website>https://kodi.tv/</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.windows.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=325226</forum>
-        <disclaimer>UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
+        <disclaimer lang="en_GB">UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
         <news>v1.0.4[CR]-Improved UI[CR]v1.0.2[CR]-WIndows Platform Detection[CR]-Streamlined Navigation[CR]-Windows Version Detection[CR]v1.0.1[CR]-Improved functionality</news>
         <assets>
             <icon>resources/images/icon.png</icon>

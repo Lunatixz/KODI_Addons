@@ -15,8 +15,7 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.funnynordie</source>
-        <website>http://funnyordie.com</website>
-        <news></news>
+        <website>https://www.funnyordie.com/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=328954</forum>
         <assets>
             <icon>resources/images/icon.png</icon>

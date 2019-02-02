@@ -15,8 +15,7 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.cbs</source>
-        <website>http://cbs.com</website>
-        <news></news>
+        <website>https://www.cbs.com/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=321811</forum>
         <assets>
             <icon>resources/images/icon.png</icon>

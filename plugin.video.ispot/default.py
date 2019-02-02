@@ -137,7 +137,7 @@ class iSpot():
                 request.add_header('User-Agent','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11')
             page = urllib2.urlopen(request)
             return page
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError as e:
             log("open_url failed " + str(e))
 
             
@@ -257,7 +257,7 @@ class iSpot():
                 if title not in self.titleLST:
                     self.titleLST.append(title)
                     self.addLink(title,url, 2, infoList, infoArt, len(catlink))
-            except Exception,e:
+            except Exception as e:
                 log('PageParse, failed ' + str(e))
         #todo pagination?
         # if cnt < cntmax:

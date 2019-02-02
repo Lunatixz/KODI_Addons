@@ -12,9 +12,7 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.media.maintenance</source>
-        <website></website>
         <forum>https://forum.kodi.tv/showthread.php?tid=331996</forum>
-        <news></news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <icon>resources/images/fanart.jpg</icon>

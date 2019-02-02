@@ -92,7 +92,7 @@ class GUI(xbmcgui.WindowXMLDialog):
             return {}
         try:
             return json.loads(self.uni(string))
-        except Exception,e:
+        except Exception as e:
             return {}
           
 
@@ -103,9 +103,9 @@ class GUI(xbmcgui.WindowXMLDialog):
             request.add_header('User-Agent','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11')
             page = urllib2.urlopen(request, timeout = 15)
             return self.loadJson(page.read())
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             self.log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except socket.timeout, e:
+        except socket.timeout as e:
             self.log("openURL Failed! " + str(e), xbmc.LOGERROR)
         return {}
         

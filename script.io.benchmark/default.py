@@ -145,7 +145,7 @@ if __name__ == '__main__':
             
             result += ('*Median Results: R[[COLOR=blue]%s MB/s[/COLOR]] W[[COLOR=blue]%s MB/s[/COLOR]]  [COLOR=dimgrey][I] Back [/I] or [I]Okay [/I] to exit[/COLOR]\n'%(str(maxr), str(maxw)))
             result += ('[COLOR=dimgrey]*Median results from the best & worst SSD, HDD and Flash benchmarks[/COLOR]')
-        except Exception,e:
+        except Exception as e:
             result += ('\n[COLOR=red]Benchmark Failed![/COLOR]')
             result += ('\n[COLOR=red]%s[/COLOR]\n'%str(e))
 

@@ -55,7 +55,7 @@ class Download(object):
             soup = BeautifulSoup(urllib2.urlopen(DOWNLOAD_URL), "html.parser")
             url  = soup('a', {'class': 'DownloadButtonAd-startDownload gbtnSecondary'})[0]['href']
             urllib.urlretrieve(url.rstrip('/'), FILEPATH, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time))
-        except Exception,e:
+        except Exception as e:
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
             log("start, Failed! " + str(e), xbmc.LOGERROR)
             self.deletefile()

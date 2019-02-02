@@ -133,7 +133,7 @@ class LastFMTube():
             
     def browseMenu(self, user, pwd):
         for item in MENULST:
-            print item
+            print(item)
             self.addDir(*item,**{'user':user,'pwd':pwd})
             
             
@@ -151,7 +151,7 @@ class LastFMTube():
             return {}
         try:
             return json.loads(uni(string))
-        except Exception,e:
+        except Exception as e:
             return {}
             
             

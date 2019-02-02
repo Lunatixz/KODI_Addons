@@ -17,13 +17,9 @@
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.olympicchannel</source>
         <website>www.olympicchannel.com</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=318070</forum>
-        <news></news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
     </extension>
 </addon>

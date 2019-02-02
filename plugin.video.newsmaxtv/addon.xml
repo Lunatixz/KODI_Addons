@@ -13,9 +13,8 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.newsmaxtv</source>
-        <website>http://www.newsmaxtv.com</website>
-        <forum>http://forum.kodi.tv/showthread.php?tid=321030</forum>
-        <news></news>
+        <website>https://www.newsmaxtv.com</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=321030</forum>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

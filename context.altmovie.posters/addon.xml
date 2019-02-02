@@ -5,11 +5,13 @@
         <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="script.module.beautifulsoup4" version="4.3.2"/>
     </requires>
-    <extension point="kodi.context.item" library="capture.py">
-        <item>
-            <label>32000</label>
-            <visible>String.IsEqual(ListItem.dbtype,movie)</visible>
-        </item>
+    <extension point="kodi.context.item">
+        <menu id="kodi.core.main">
+            <item library="capture.py">
+                <label>32000</label>
+                <visible>String.IsEqual(ListItem.dbtype,movie)</visible>
+            </item>
+        </menu>
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">The world's largest curated collection of Alternative Movie Posters.</summary>

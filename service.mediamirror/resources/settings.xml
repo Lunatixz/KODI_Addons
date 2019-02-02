@@ -7,26 +7,26 @@
     <setting id="Client1" type="bool" label="32006" default="false" />
     <setting id="Client1_IPP" subsetting="true" type="text"  label="32004" visible="eq(-1,true)" default="0.0.0.0:8080" />
     <setting id="Client1_UPW" subsetting="true" type="text"   label="32005" option="" visible="eq(-2,true)" default="kodi:kodi" />
-    <setting id="Client1_offSet" type="slider"   label="32003"default="0.1" visible="eq(-3,true)" range="0,.01,120" option="float" />
+    <setting id="Client1_offSet" type="slider"   label="32003" default="0.1" visible="eq(-3,true)" range="0,.01,120" option="float" />
     <setting id="Client1_latency" type="text"   label="32007" default="0" visible="eq(-4,true)" enable="false"/>
     <setting id="Client2" type="bool"   label="32006" default="false" visible="eq(-5,true)"/>
     <setting id="Client2_IPP" subsetting="true" type="text"  label="Enter IP:Port" visible="eq(-1,true)" default="0.0.0.0:8080" />
     <setting id="Client2_UPW" subsetting="true" type="text"   label="32005" option="" visible="eq(-2,true)" default="kodi:kodi" />
-    <setting id="Client2_offSet" type="slider"   label="32003"default="0.1" visible="eq(-3,true)" range="0,.01,120" option="float" />
+    <setting id="Client2_offSet" type="slider"   label="32003" default="0.1" visible="eq(-3,true)" range="0,.01,120" option="float" />
     <setting id="Client2_latency" type="text"   label="32007" default="0" visible="eq(-4,true)" enable="false"/>
     <setting id="Client3" type="bool"   label="32006" default="false" visible="eq(-5,true)"/>
     <setting id="Client3_IPP" subsetting="true" type="text"  label="32004" visible="eq(-1,true)" default="0.0.0.0:8080" />
     <setting id="Client3_UPW" subsetting="true" type="text"   label="32005" option="" visible="eq(-2,true)" default="kodi:kodi" />
-    <setting id="Client3_offSet" type="slider"   label="32003"default="0.1" visible="eq(-3,true)" range="0,.01,120" option="float" />
+    <setting id="Client3_offSet" type="slider"   label="32003" default="0.1" visible="eq(-3,true)" range="0,.01,120" option="float" />
     <setting id="Client3_latency" type="text"   label="32007" default="0" visible="eq(-4,true)" enable="false"/>
     <setting id="Client4" type="bool"   label="32006" default="false" visible="eq(-5,true)"/>
     <setting id="Client4_IPP" subsetting="true" type="text"  label="32004" visible="eq(-1,true)" default="0.0.0.0:8080" />
     <setting id="Client4_UPW" subsetting="true" type="text"   label="32005" option="" visible="eq(-2,true)" default="kodi:kodi" />
-    <setting id="Client4_offSet" type="slider"   label="32003"default="0.1" visible="eq(-3,true)" range="0,.01,120" option="float" />
+    <setting id="Client4_offSet" type="slider"   label="32003" default="0.1" visible="eq(-3,true)" range="0,.01,120" option="float" />
     <setting id="Client4_latency" type="text"   label="32007" default="0" visible="eq(-4,true)" enable="false"/>
     <setting id="Client5" type="bool"   label="32006" default="false" visible="eq(-5,true)"/>
     <setting id="Client5_IPP" subsetting="true" type="text"  label="32004" visible="eq(-1,true)" default="0.0.0.0:8080" />
     <setting id="Client5_UPW" subsetting="true" type="text"   label="32005" option="" visible="eq(-2,true)" default="kodi:kodi" />
-    <setting id="Client5_offSet" type="slider"   label="32003"default="0.1" visible="eq(-3,true)" range="0,.01,120" option="float" />
+    <setting id="Client5_offSet" type="slider"   label="32003" default="0.1" visible="eq(-3,true)" range="0,.01,120" option="float" />
     <setting id="Client5_latency" type="text"   label="32007" default="0" visible="eq(-4,true)" enable="false"/>
 </settings>

@@ -12,8 +12,7 @@
         <description lang="en_GB">Mike Massé is a former public defender turned full-time musician known for his acoustic covers of some of the best music ever written. His channel features many live performances filmed at the Pie Pizzeria in Salt Lake City. Mike now resides in the Denver area with his family.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/plugin.audio.mikemassetv</source>
-        <news></news>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.audio.mikemassetv</source>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>

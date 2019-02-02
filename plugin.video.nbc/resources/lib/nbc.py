@@ -86,11 +86,11 @@ class NBC(object):
                 responce = urllib2.urlopen(request, timeout = TIMEOUT).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, responce, expiration=datetime.timedelta(hours=1))
             return self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except socket.timeout, e:
+        except socket.timeout as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except Exception, e:
+        except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
             return ''

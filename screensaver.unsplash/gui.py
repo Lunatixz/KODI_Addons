@@ -94,6 +94,6 @@ class GUI(xbmcgui.WindowXMLDialog):
             url = page.geturl()
             self.log("openURL return url = " + url)
             return url
-        except urllib2.URLError, e: self.log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except socket.timeout, e: self.log("openURL Failed! " + str(e), xbmc.LOGERROR)
+        except urllib2.URLError as e: self.log("openURL Failed! " + str(e), xbmc.LOGERROR)
+        except socket.timeout as e: self.log("openURL Failed! " + str(e), xbmc.LOGERROR)
         return ''

@@ -94,7 +94,7 @@ class Gizmodo(object):
         if len(videos) == 0: self.addDir(LANGUAGE(30009), '', '')
         for video in videos:
             try: link = re.findall("u'permalink': u'(.+?)'",str(video['posts'][0]),flags=re.DOTALL)[0]
-            except: print video
+            except: print(video)
             try: thumb = video['externalThumbnail']
             except: thumb = 'https://i.kinja-img.com/gawker-media/image/upload/%s'%video['thumbnail']['id']
             label = video['title']

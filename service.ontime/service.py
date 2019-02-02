@@ -111,7 +111,7 @@ class Service():
                 sing = item['type'] == 'single' #single - delete entry from json after eval
                 tag  = item['tag']
                 args = item['args']
-                print date, sing, tag, args
+                print(date, sing, tag, args)
                 if sing == False: tag = ''
                 args.append(tag)
                 if job is None: continue

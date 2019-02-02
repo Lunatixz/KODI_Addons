@@ -15,7 +15,7 @@
         <platform>android freebsd ios linux osx windows</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.multichannel</source>
-        <website>http://multichannel.com</website>
+        <website>https://www.multichannel.com/</website>
         <news>v.1.0.2[CR]-Fixed Parsing Error[CR]v.1.0.1[CR]-Fixed Parsing Error</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=326555</forum>
         <assets>

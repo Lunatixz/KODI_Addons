@@ -13,9 +13,8 @@
         <description lang="en_GB">The world's largest online music catalogue, powered by your scrobbles and paired with YouTube.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/plugin.audio.lastfmtube</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.audio.lastfmtube</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=315688</forum>
-        <news></news>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>

@@ -8,7 +8,7 @@
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Create a screensaver from any Kodi video source.</summary>
         <description lang="en_GB">Dynamic screensaver using Local content, SmartPlaylists, Plugins and UPNP Servers.</description>
-		<summary lang="es_ES">Crea un protector de pantalla de cualquier fuente de vídeo en Kodi.</summary>
+	<summary lang="es_ES">Crea un protector de pantalla de cualquier fuente de vídeo Kodi.</summary>
         <description lang="es_ES">Protector de pantalla dinámico que utiliza contenido local, listas de reproducción inteligentes, complementos y servidores UPNP.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>

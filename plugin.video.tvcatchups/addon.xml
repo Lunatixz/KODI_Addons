@@ -19,6 +19,7 @@
         <website>https://www.tvcatchup.com</website>
         <news>v1.0.6[CR]- Added redirect to Transponder.TV plugin[CR]v1.0.5[CR]- Fixed Image Download[CR]- Corrected missing lineups[CR]v1.0.4[CR]- Updated Parser, Fixed Localtime and EPG Timeline[CR]v1.0.2[CR]- Fixed EPG Timezone Offsets[CR]v1.0.1[CR]- Added EPG[CR] - Improved interface[CR]</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=330887</forum>
+        <broken>Deprecated... Use Transponder.TV</broken>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

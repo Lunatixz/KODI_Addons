@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+﻿#   Copyright (C) 2018 Lunatixz
 #
 #
 # This file is part of Media Maintenance.
@@ -18,7 +18,7 @@
 
 # -*- coding: utf-8 -*-
 import os, sys, time, datetime, re, traceback
-import urlparse, urllib, urllib2, socket, json
+import urlparse, urllib, urllib2, socket, json, schedule
 import xbmc, xbmcgui, xbmcplugin, xbmcaddon, default
 from simplecache import SimpleCache, use_cache
 
@@ -33,6 +33,7 @@ ICON          = REAL_SETTINGS.getAddonInfo('icon')
 FANART        = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE      = REAL_SETTINGS.getLocalizedString
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
+PTVL_RUNNING  = xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True"
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -47,64 +48,89 @@ class Player(xbmc.Player):
         
         
     def onPlayBackStarted(self):
+        xbmc.sleep(1000)
+        if not self.isPlaying(): return
         self.playingTime  = 0
         self.playingTTime = self.getTotalTime()
-        self.playingItem  = self.service.myUtils.requestItem()
+        self.playingItem  = self.myService.myUtils.requestItem()
         log('onPlayBackStarted, playingItem = ' + json.dumps(self.playingItem))
 
         
     def onPlayBackEnded(self):
         log('onPlayBackEnded')
-        try: 
-            if (self.playingTime * 100 / self.playingTTime) >= float(REAL_SETTINGS.getSetting('Play_Percentage')): 
-                self.service.myUtils.removeContent(self.playingItem)
-        except: pass
+        self.chkContent()
         
         
     def onPlayBackStopped(self):
         log('onPlayBackStopped')
+        self.chkContent()
+        
+
+    def chkContent(self):
+        if PTVL_RUNNING: return
         try: 
-            if (self.playingTime * 100 / self.playingTTime) >= float(REAL_SETTINGS.getSetting('Play_Percentage')): 
-                self.service.myUtils.removeContent(self.playingItem)
-        except: pass
-
-
+            if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": self.myService.myUtils.removeSeason(self.playingItem)
+            elif (self.playingTime * 100 / self.playingTTime) >= float(REAL_SETTINGS.getSetting('Play_Percentage')): self.myService.myUtils.removeContent(self.playingItem)
+        except Exception as e: log("chkContent Failed! " + str(e), xbmc.LOGERROR)
+        self.playingItem = {}
+        
+        
 class Monitor(xbmc.Monitor):
     def __init__(self):
         self.pendingChange = False
         
         
+    def onScanFinished(self, library):
+        log('onScanFinished')
+        
+        
+    def onCleanFinished(self, library):
+        log('onCleanFinished')
+        
+        
+    def onDatabaseUpdated(self, database):
+        log('onDatabaseUpdated')
+        
+                
+    
     def onSettingsChanged(self):
         log('onSettingsChanged')
+        if self.pendingChange == True: return
         self.pendingChange = True
+        self.onChange()
+        
+        
+    def onChange(self):
+        log('onChange')
+        if self.myService.loadMySchedule(): self.pendingChange = False
         
         
 class Service(object):
     def __init__(self):
         self.running   = False
-        self.myUtils   = default.MM() 
+        self.myUtils   = default.MM()
         self.myMonitor = Monitor()
+        self.myMonitor.myService = self
         self.myPlayer  = Player()
-        self.myPlayer.service = self
+        self.myPlayer.myService = self
         self.startService()
     
     
-    def chkTimer(self, method, args=None, timer=datetime.timedelta(minutes=30)):
-        if self.running: pass
-        self.running = True
-        name    = method.func_name
-        now     = datetime.datetime.now()
-        next    = now + timer
-        nextRun = (self.timers.get(name,'') or now)
-        if now >= nextRun:
-            try:
-                self.log("chkTimer, method = " + name)
-                self.timers[name] = next
-                if isinstance(args,tuple): method(*args)
-                elif args and len(args) > 0: method(args[0])
-                else: method()
-            except Exception as e: self.log('chkTimer, failed! ' + str(e), xbmc.LOGERROR)
-        self.running = False
+    def scanLibrary(self):
+        xbmc.executebuiltin('UpdateLibrary("video")')
+        
+        
+    def cleanLibrary(self):
+        xbmc.executebuiltin('CleanLibrary("video")')
+        
+        
+    def loadMySchedule(self):
+        log('loadMySchedule')
+        schedule.clear()
+        scanTime  = [0,1,6,24][int(REAL_SETTINGS.getSetting('Enable_Scan'))]
+        cleanTime = [0,1,6,24,168][int(REAL_SETTINGS.getSetting('Enable_Clean'))]
+        if scanTime  > 0: schedule.every(scanTime).hour.do(self.scanLibrary)
+        if cleanTime > 0: schedule.every(cleanTime).hour.do(self.cleanLibrary)
         
         
     def chkSettings(self):
@@ -113,12 +139,13 @@ class Service(object):
         
     def startService(self):
         log('startService')
+        self.loadMySchedule()
         while not self.myMonitor.abortRequested():
             if self.myMonitor.pendingChange and xbmcgui.getCurrentWindowDialogId() != 10140: self.chkSettings()
             if self.myMonitor.waitForAbort(5): break
-            if self.myPlayer.isPlaying(): 
+            elif self.myPlayer.isPlaying(): 
                 if len(self.myPlayer.playingItem) == 0: self.myPlayer.onPlayBackStarted()
                 self.myPlayer.playingTime = self.myPlayer.getTime()
-            # self.chkTimer(self.runner,timer=datetime.timedelta(minutes=30))
+            else: schedule.run_pending()
 
 if __name__ == '__main__': Service()

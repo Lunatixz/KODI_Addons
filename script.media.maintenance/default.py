@@ -38,8 +38,7 @@ RADARR_URL    = '%s/api/movie?apikey=%s'%(REAL_SETTINGS.getSetting('Radarr_IP'),
 TIMEOUT       = 15
 NOTIFY        = True
 JSON_ENUM     = '["genre","studio","mpaa","premiered","file","art","thumbnail"]'
-ITEM_ENUM     = '["genre","studio","mpaa","premiered","file","art","thumbnail","title","episode","season","showtitle"]'
-
+ITEM_ENUM     = '["genre","studio","mpaa","premiered","file","art","thumbnail","title","episode","season","showtitle","playcount"]'
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -48,7 +47,7 @@ def log(msg, level=xbmc.LOGDEBUG):
 
 class MM(object):
     def __init__(self):
-        self.cache = SimpleCache()
+        self.cache      = SimpleCache()
         self.TVShowList = self.getTVShows()
         self.MoviesList = self.getMovies()
         
@@ -81,6 +80,7 @@ class MM(object):
             setSetting = 'ScanRadarr'
         results  = self.openURL(url)
         if not results: return
+        self.notificationDialog(LANGUAGE(30003))
         userList = self.getUserList(type)
         for idx, item in enumerate(results):
             updateDialogProgress = (idx) * 100 // len(results)
@@ -136,6 +136,8 @@ class MM(object):
         log('setUserList, UserList = ' + userList + ', type = ' + type)
         REAL_SETTINGS.setSetting(setSetting1,userList)
         REAL_SETTINGS.setSetting(setSetting2,msg)
+        if len(userList) == 0: REAL_SETTINGS.openSettings()
+            
         
         
     def hasMovie(self):
@@ -150,32 +152,50 @@ class MM(object):
         log('sendJSON, command = ' + str(command))
         return json.loads(unicode(xbmc.executeJSONRPC(command), 'utf-8', errors='ignore'))
 
-        
+    
+    def removeSeason(self, playingItem):
+        self.notificationDialog('Coming Soon')
+        #todo 
+        #fetch tvshowid from seasonid, check season episode total to sonarr, if playcount > 0 on all remove.
+        # {"jsonrpc":"2.0","method":"VideoLibrary.GetSeasonDetails","params":{"seasonid":2075,"properties":["episode","tvshowid"]},"id":6}
+    
+
     def removeContent(self, playingItem, silent=False):
+        print playingItem
         type = playingItem["type"]
         dbid = playingItem["id"]
         log("removeContent, type = " + type + ", dbid = " + str(dbid)) 
-        param  = {'episode':'episodeid','movie':'movieid'}[type]
-        method = {'episodeid':'RemoveEpisode','movieid':'RemoveMovie'}[param]
-        json_query = '{"jsonrpc":"2.0","method":"VideoLibrary.%s","params":{"%s":%s},"id":1}'%(method, param, str(dbid))
-        file = playingItem["file"]
+        param  = {'episode':'episodeid','movie':'movieid','movie':'movieid','tvshow':'tvshowid','season':'seasonid'}[type]
+        method = {'episodeid':'RemoveEpisode','movieid':'RemoveMovie','tvshowid':'RemoveTVShow','seasonid':''}[param]
+        file = playingItem.get("file","")
+        mediaInfo = playingItem["label"]
         if type == 'movie':
             if REAL_SETTINGS.getSetting('Monitor_Movies') == 'false': return 
-            mediaInfo = playingItem["label"]
-        else: 
+        elif type == 'season': return self.removeSeason(playingItem)
+        else:
             tvshow   = playingItem["showtitle"]
             userList = self.getUserList()
             if tvshow not in userList: return
             mediaInfo = '%s - %sx%s - %s'%(tvshow,playingItem["season"],playingItem["episode"],playingItem["label"])
         if silent == False:
             if not self.yesnoDialog(mediaInfo, file, header='%s - %s'%(ADDON_NAME,LANGUAGE(30021)), yes='Remove', no='Keep', autoclose=15000): return
-        if REAL_SETTINGS.getSetting('Enable_Removal') == 'true': 
+        if REAL_SETTINGS.getSetting('Enable_Removal') == 'true':
+            json_query = '{"jsonrpc":"2.0","method":"VideoLibrary.%s","params":{"%s":%s},"id":1}'%(method, param, str(dbid))
             self.sendJSON(json_query)
-            xbmcvfs.delete(file)
-            self.notificationDialog(LANGUAGE(30023)%mediaInfo)
-        else: self.notificationDialog(LANGUAGE(30022))
+            if self.deleteFile(file):
+                self.notificationDialog(LANGUAGE(30023)%mediaInfo)
+                return
+        self.notificationDialog(LANGUAGE(30022))
 
-                
+        
+    def deleteFile(self, file):
+        for i in range(3):
+            try: 
+                if xbmcvfs.delete(file): return True
+            except: pass
+        return False
+
+        
     def cleanLibrary(self, type="video"):
         type = {'video':'video','episode':'tvshows','movie':'movies'}[type]
         json_query = '{"jsonrpc":"2.0","method":"VideoLibrary.Clean","params":{"showdialogs":false,"content":"5s"},"id":1}'%type
@@ -196,7 +216,28 @@ class MM(object):
         json_response = self.sendJSON(json_query)
         if 'result' not in json_response: return {}
         return json_response['result'].get('item',{})
-         
+        
+        
+    def requestFile(self, file, media='video', fallback=None):
+        log("requestFile, file = " + file + ", media = " + media) 
+        json_query = ('{"jsonrpc":"2.0","method":"Files.GetFileDetails","params":{"file":"%s","media":"%s","properties":%s},"id":1}' % (self.escapeDirJSON(file), media, ITEM_ENUM))
+        json_response = self.sendJSON(json_query)
+        if 'result' not in json_response: return fallback
+        return json_response['result'].get('filedetails',fallback)
+        
+        
+    def requestDetails(self, dbtype, dbid):
+        log("requestDetails, dbtype = " + dbtype + ", dbid = " + str(dbid)) 
+        json_query = ('{"jsonrpc":"2.0","method":"Files.GetFileDetails","params":{"file":"%s","media":"%s","properties":%s},"id":1}' % (self.escapeDirJSON(file), media, ITEM_ENUM))
+        json_response = self.sendJSON(json_query)
+        if 'result' not in json_response: return {"type":xbmc.getInfoLabel('ListItem.DBTYPE'),"id":xbmc.getInfoLabel('ListItem.DBID'),"label":xbmc.getInfoLabel('ListItem.Label'),"showtitle":xbmc.getInfoLabel('ListItem.TVShowTitle'),"episodes":xbmc.getInfoLabel('ListItem.Property(TotalEpisodes)')}
+        return json_response['result'].get('filedetails',{"folder":file})
+    
+        
+    def escapeDirJSON(self, mydir):
+        if (mydir.find(":")): mydir = mydir.replace("\\", "\\\\")
+        return mydir
+        
         
     def getTVShows(self):
         TVShowList = []
@@ -204,13 +245,13 @@ class MM(object):
         json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetTVShows","params":{"properties":%s}, "id": 1}'%(JSON_ENUM))
         json_response = self.sendJSON(json_query)
         if 'result' not in json_response: return []
-        busy = self.busyDialog(0)
+        busy = self.progressDialogBG(0)
         for idx, item in enumerate(json_response['result']['tvshows']):
             updateDialogProgress = (idx) * 100 // len(json_response)
-            self.busyDialog(updateDialogProgress, busy)
+            self.progressDialogBG(updateDialogProgress, busy)
             TVShowList.append({'label':item['label'],'label2':item['file'],'thumb':(item['art'].get('poster','') or item['thumbnail'])})
         TVShowList.sort(key=lambda x:x['label'])
-        self.busyDialog(100, busy)
+        self.progressDialogBG(100, busy)
         log("getTVShows, found tvshows "  + str(len(TVShowList)))
         return [self.getListitem(show['label'],show['label2'],show['thumb']) for show in TVShowList]
         
@@ -221,13 +262,13 @@ class MM(object):
         json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetMovies","params":{"properties":%s}, "id": 1}'%(JSON_ENUM))
         json_response = self.sendJSON(json_query)
         if 'result' not in json_response: return []
-        busy = self.busyDialog(0)
+        busy = self.progressDialogBG(0)
         for idx, item in enumerate(json_response['result']['movies']):
             updateDialogProgress = (idx) * 100 // len(json_response)
-            self.busyDialog(updateDialogProgress, busy)
+            self.progressDialogBG(updateDialogProgress, busy)
             MoviesList.append({'label':item['label'],'label2':item['file'],'thumb':(item['art'].get('poster','') or item['thumbnail'])})
         MoviesList.sort(key=lambda x:x['label'])
-        self.busyDialog(100, busy)
+        self.progressDialogBG(100, busy)
         log("getMovies, found movies "  + str(len(MoviesList)))
         return [self.getListitem(show['label'],show['label2'],show['thumb']) for show in MoviesList]
     
@@ -259,16 +300,7 @@ class MM(object):
         elif control: control.update(percent, string1)
         return control
         
-        
-    def busyDialog(self, percent=0, control=None):
-        if percent == 0 and not control:
-            control = xbmcgui.DialogBusy()
-            control.create()
-        elif percent == 100 and control: return control.close()
-        elif control: control.update(percent)
-        return control
-    
-    
+
     def notificationDialog(self, message, header=ADDON_NAME, show=NOTIFY, sound=False, time=1000, icon=ICON):
         log('notificationDialog: ' + message)
         if not show: return
@@ -289,4 +321,3 @@ if __name__ == '__main__':
     elif arg == '-clearTVShows': MM().setUserList([])
     elif arg == '-scanRadarr':   MM().getMonitored('movie')
     elif arg == '-clearMovies':  MM().setUserList([], 'movie')
-        

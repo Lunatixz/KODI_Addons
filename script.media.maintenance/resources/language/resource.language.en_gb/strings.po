@@ -73,7 +73,7 @@ msgid "Enable add-on to [B]DELETE[/B] your media"
 msgstr ""
 
 msgctxt "#30014"
-msgid "Warning!! "Remove" will [B]PERMANENTLY DELETE[/B] media"
+msgid "Warning!! Selecting "Remove" will [B]PERMANENTLY DELETE[/B] media"
 msgstr ""
 
 msgctxt "#30015"
@@ -130,4 +130,20 @@ msgstr ""
 
 msgctxt "#30028"
 msgid "Monitors"
+msgstr ""
+
+msgctxt "#30029"
+msgid "Only Remove TV episodes after completing the season"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Scheduling"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Scan Library"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Clean Library"
 msgstr ""

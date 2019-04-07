@@ -1828,7 +1828,7 @@
     </extension>
 </addon>
 
-<addon id="script.media.maintenance" version="1.0.2" name="Media Maintenance" provider-name="Lunatixz">
+<addon id="script.media.maintenance" version="1.0.3" name="Media Maintenance" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.schedule" version="0.5.0"/>
@@ -1850,7 +1850,7 @@
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.media.maintenance</source>
         <website></website>
         <forum>https://forum.kodi.tv/showthread.php?tid=331996</forum>
-        <news>v.1.0.1[CR]-Added "Remove Media?" context menu option.[CR]-Improved usability.[CR]-Added scan/clean library scheduling.</news>
+        <news>v.1.0.3[CR]-Added Duplicate Movie finder[CR]v.1.0.2[CR]-Misc. Improvements[CR]v.1.0.1[CR]-Added "Remove Media?" context menu option.[CR]-Improved usability.[CR]-Added scan/clean library scheduling.</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <icon>resources/images/fanart.jpg</icon>

@@ -98,7 +98,6 @@ class Monitor(xbmc.Monitor):
         
     def onDatabaseUpdated(self, database):
         log('onDatabaseUpdated')
-        
                 
     
     def onSettingsChanged(self):

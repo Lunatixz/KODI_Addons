@@ -18,7 +18,7 @@
 
 # -*- coding: utf-8 -*-
 import os, sys, time, datetime, re, traceback
-import urlparse, urllib, urllib2, socket, json
+import urlparse, urllib, urllib2, socket, json, collections
 import xbmc, xbmcgui, xbmcplugin, xbmcaddon, xbmcvfs
 from simplecache import SimpleCache, use_cache
 
@@ -44,18 +44,33 @@ def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
     xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
+    
+def uni(string, encoding = 'utf-8'):
+    if isinstance(string, basestring):
+        if not isinstance(string, unicode): string = unicode(string, encoding, errors='ignore')
+        elif isinstance(string, unicode): string = string.encode('ascii', 'replace')
+    return string
 
 class MM(object):
     def __init__(self):
         self.cache      = SimpleCache()
-        self.TVShowList = self.getTVShows()
-        self.MoviesList = self.getMovies()
         
         
+    def sendJSON(self, command, cache=True):
+        log('sendJSON, command = ' + str(command))
+        cacheresponse = self.cache.get(ADDON_NAME + '.sendJSON, command = %s'%json.dumps(command))
+        if DEBUG or not cache: cacheresponse = None
+        if not cacheresponse:
+            cacheresponse = uni(xbmc.executeJSONRPC(command))
+            self.cache.set(ADDON_NAME + '.sendJSON, command = %s'%json.dumps(command), cacheresponse, expiration=datetime.timedelta(hours=12))
+        return json.loads(cacheresponse)
+    
+    
     def openURL(self, url):
         try:
             log('openURL, url = ' + str(url))
             cacheresponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
+            if DEBUG: cacheresponse = None
             if not cacheresponse:
                 request = urllib2.Request(url)
                 request.add_header('User-Agent','Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)')
@@ -71,11 +86,11 @@ class MM(object):
     def getMonitored(self, type='series'):
         log('getMonitored, type = ' + type)
         if type == 'series': 
-            mediaList = self.TVShowList
+            mediaList = self.getTVShows()
             url = SONARR_URL
             setSetting = 'ScanSonarr'
         else: 
-            mediaList = self.MoviesList
+            mediaList = self.getMovies()
             url = RADARR_URL
             setSetting = 'ScanRadarr'
         results  = self.openURL(url)
@@ -148,11 +163,6 @@ class MM(object):
         return bool(xbmc.getCondVisibility('Library.HasContent(TVShows)'))
 
         
-    def sendJSON(self, command):
-        log('sendJSON, command = ' + str(command))
-        return json.loads(unicode(xbmc.executeJSONRPC(command), 'utf-8', errors='ignore'))
-
-    
     def removeSeason(self, playingItem):
         self.notificationDialog('Coming Soon')
         #todo 
@@ -161,7 +171,6 @@ class MM(object):
     
 
     def removeContent(self, playingItem, silent=False):
-        print playingItem
         type = playingItem["type"]
         dbid = playingItem["id"]
         log("removeContent, type = " + type + ", dbid = " + str(dbid)) 
@@ -248,7 +257,7 @@ class MM(object):
         busy = self.progressDialogBG(0)
         for idx, item in enumerate(json_response['result']['tvshows']):
             updateDialogProgress = (idx) * 100 // len(json_response)
-            self.progressDialogBG(updateDialogProgress, busy)
+            busy = self.progressDialogBG(updateDialogProgress, busy)
             TVShowList.append({'label':item['label'],'label2':item['file'],'thumb':(item['art'].get('poster','') or item['thumbnail'])})
         TVShowList.sort(key=lambda x:x['label'])
         self.progressDialogBG(100, busy)
@@ -259,14 +268,19 @@ class MM(object):
     def getMovies(self):
         MoviesList = []
         if not self.hasMovie(): return MoviesList
-        json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetMovies","params":{"properties":%s}, "id": 1}'%(JSON_ENUM))
-        json_response = self.sendJSON(json_query)
+        json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetMovies","params":{"properties":%s}, "id": 1}'%(JSON_ENUM.replace(']',',"streamdetails"]')))
+        json_response = self.sendJSON(json_query,cache=False)
         if 'result' not in json_response: return []
         busy = self.progressDialogBG(0)
         for idx, item in enumerate(json_response['result']['movies']):
             updateDialogProgress = (idx) * 100 // len(json_response)
-            self.progressDialogBG(updateDialogProgress, busy)
-            MoviesList.append({'label':item['label'],'label2':item['file'],'thumb':(item['art'].get('poster','') or item['thumbnail'])})
+            busy = self.progressDialogBG(updateDialogProgress, busy)
+            video = item['streamdetails']['video']
+            audio = item['streamdetails']['audio']
+            label = item['label']
+            if len(video) > 0: label = '%s - Video [Codec: [B]%s[/B]|Height: [B]%s[/B]|Runtime: [B]%s[/B]]'%(label,video[0]['codec'].upper(),video[0]['height'],video[0]['duration'])
+            if len(audio) > 0: label = '%s - Audio [Codec: [B]%s[/B]|Channels: [B]%s[/B]|Language: [B]%s[/B]]'%(label,audio[0]['codec'].upper(),audio[0]['channels'],audio[0]['language'].title())
+            MoviesList.append({'label':label,'label2':item['file'],'thumb':(item['art'].get('poster','') or item['thumbnail'])})
         MoviesList.sort(key=lambda x:x['label'])
         self.progressDialogBG(100, busy)
         log("getMovies, found movies "  + str(len(MoviesList)))
@@ -274,8 +288,9 @@ class MM(object):
     
     
     def viewTVShows(self):
-        select = self.selectDialog(self.TVShowList, 'Select one or multiple TV Shows', preselect=self.findItemLens(self.TVShowList,self.getUserList()))
-        if select is not None: self.setUserList([self.TVShowList[idx].getLabel() for idx in select])
+        TVShowList = self.getTVShows()
+        select = self.selectDialog(TVShowList, LANGUAGE(30037), preselect=self.findItemLens(TVShowList,self.getUserList()))
+        if select is not None: self.setUserList([TVShowList[idx].getLabel() for idx in select])
 
         
     def getListitem(self, label1="", label2="", iconImage="", thumbnailImage="", path="", offscreen=False):
@@ -287,20 +302,50 @@ class MM(object):
         return [idx for idx, tvshow in enumerate(tvlist) for usershow in userlist if tvshow.getLabel() == usershow]
     
     
-    def selectDialog(self, list, header=ADDON_NAME, autoclose=0, preselect=[], useDetails=True):
-        return xbmcgui.Dialog().multiselect(header, list, autoclose, preselect, useDetails)
+    def selectDialog(self, list, header=ADDON_NAME, autoclose=0, preselect=None, multi=True, useDetails=True):
+        if preselect is None: preselect = {True:[],False:-1}[multi]
+        if multi: return xbmcgui.Dialog().multiselect(header, list, autoclose, preselect, useDetails)
+        else: return xbmcgui.Dialog().select(header, list, autoclose, preselect, useDetails)
+        
+
+    def scanDuplicates(self):
+        dupLST = []
+        delLST = []
+        MoviesList = self.getMovies()
+        if len(MoviesList) > 0:
+            duplicates = [item for item, count in collections.Counter([movie.getLabel() for movie in MoviesList]).items() if count > 1]
+            for item in duplicates:
+                for movie in MoviesList:
+                    title = movie.getLabel()
+                    if item.lower() == title.lower(): dupLST.append(movie)
+        if len(dupLST) > 0:
+            items = self.selectDialog(dupLST,LANGUAGE(30036))
+            if items:
+                delLST = [self.requestFile(dupLST[item].getLabel2()) for item in items]
+                busy = self.progressDialogBG(0)
+                for idx, movie in enumerate(delLST):
+                    updateDialogProgress = (idx) * 100 // len(delLST)
+                    busy = self.progressDialogBG(updateDialogProgress, busy)
+                    self.removeContent(movie)
+                self.progressDialogBG(100, busy)
+        else: self.notificationDialog(LANGUAGE(30033))
+        
+        
+    def buildMenu(self):
+        items  = [LANGUAGE(30002),LANGUAGE(30034),LANGUAGE(30035)]
+        {None:sys.exit,-1:sys.exit,0:self.viewTVShows,1:self.scanDuplicates,2:REAL_SETTINGS.openSettings}[self.selectDialog(items,multi=False,useDetails=False)]()
         
         
     def progressDialogBG(self, percent=0, control=None, string1='', header=ADDON_NAME, notice=NOTIFY):
         if not notice: return
-        if percent == 0 and not control:
+        if percent == 0 and control is None:
             control = xbmcgui.DialogProgressBG()
             control.create(header, string1)
-        elif percent == 100 and control: return control.close()
-        elif control: control.update(percent, string1)
+        elif percent == 100 and control is not None: return control.close()
+        if control is not None: control.update(percent, string1)
         return control
         
-
+        
     def notificationDialog(self, message, header=ADDON_NAME, show=NOTIFY, sound=False, time=1000, icon=ICON):
         log('notificationDialog: ' + message)
         if not show: return
@@ -315,7 +360,7 @@ class MM(object):
 if __name__ == '__main__':
     try: arg = sys.argv[1]
     except: arg = None    
-    if arg is None: REAL_SETTINGS.openSettings()
+    if arg is None: MM().buildMenu()
     elif arg == '-viewTVShows':  MM().viewTVShows()
     elif arg == '-scanSonarr':   MM().getMonitored()
     elif arg == '-clearTVShows': MM().setUserList([])

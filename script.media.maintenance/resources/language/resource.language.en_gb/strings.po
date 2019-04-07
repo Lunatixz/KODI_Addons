@@ -147,3 +147,23 @@ msgstr ""
 msgctxt "#30032"
 msgid "Clean Library"
 msgstr ""
+
+msgctxt "#30033"
+msgid "No Duplicates Found"
+msgstr ""
+
+msgctxt "#30034"
+msgid "Scan Library for duplicate Movies"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Open Settings"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Select duplicates to remove"
+msgstr ""
+
+msgctxt "#30037"
+msgid "Select one or multiple TV Shows"
+msgstr ""

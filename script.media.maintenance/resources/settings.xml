@@ -15,7 +15,7 @@
     <setting id="ClearTVShows"     type="action" label="30012"  subsetting="true" option="close" visible="!eq(-1,)" action="RunScript($CWD/default.py, -clearTVShows)" default="" />
     <setting id="ScanSonarr"       type="action" label="30006"  action="RunScript($CWD/default.py, -scanSonarr)" />
     <category label="30030">
-    <setting id="Enable_Scan"      type="enum"   label="30031"  values="Disable|Hourly|Quarterly|Daily"                default="0" />
+    <setting id="Enable_Scan"      type="enum"   label="30031"  values="Disable|Hourly|Quarterly|Daily"        default="0" />
     <setting id="Enable_Clean"     type="enum"   label="30032"  values="Disable|Hourly|Quarterly|Daily|Weekly" default="0" />       
     </category>
     <category label="30028">

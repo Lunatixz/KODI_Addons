@@ -42,17 +42,22 @@ def log(msg, level=xbmc.LOGDEBUG):
 
 class Player(xbmc.Player):
     def __init__(self):
-        self.playingTime  = 0
-        self.playingTTime = 0
-        self.playingItem  = {}
+        self.playingTime     = 0
+        self.playingPercent  = 0
+        self.playingTotTime  = 0
+        self.playingItem     = {}
+        self.chkRunning      = True
         
         
     def onPlayBackStarted(self):
         xbmc.sleep(1000)
         if not self.isPlaying(): return
-        self.playingTime  = 0
-        self.playingTTime = self.getTotalTime()
-        self.playingItem  = self.myService.myUtils.requestItem()
+        self.playingTime     = 0
+        self.playingPercent  = 0
+        if not self.chkRunning: self.chkContent() #catch back-2-back playback without no onPlayBackEnded/onPlayBackStopped trigger #onPlayBackEnded bug? 
+        self.chkRunning = False
+        self.playingTotTime  = self.getTotalTime()
+        self.playingItem     = self.myService.myUtils.requestItem()
         log('onPlayBackStarted, playingItem = ' + json.dumps(self.playingItem))
 
         
@@ -67,12 +72,15 @@ class Player(xbmc.Player):
         
 
     def chkContent(self):
+        log('chkContent')
+        self.chkRunning = True
         if PTVL_RUNNING: return
-        try: 
-            if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": self.myService.myUtils.removeSeason(self.playingItem)
-            elif (self.playingTime * 100 / self.playingTTime) >= float(REAL_SETTINGS.getSetting('Play_Percentage')): self.myService.myUtils.removeContent(self.playingItem)
+        try:
+            if (self.playingTime * 100 / self.playingTotTime) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
+                if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": self.myService.myUtils.removeSeason(self.playingItem)
+                else:self.myService.myUtils.removeContent(self.playingItem)
         except Exception as e: log("chkContent Failed! " + str(e), xbmc.LOGERROR)
-        self.playingItem = {}
+        
         
         
 class Monitor(xbmc.Monitor):
@@ -117,10 +125,12 @@ class Service(object):
     
     
     def scanLibrary(self):
+        log('scanLibrary')
         xbmc.executebuiltin('UpdateLibrary("video")')
         
         
     def cleanLibrary(self):
+        log('cleanLibrary')
         xbmc.executebuiltin('CleanLibrary("video")')
         
         
@@ -146,6 +156,6 @@ class Service(object):
             elif self.myPlayer.isPlaying(): 
                 if len(self.myPlayer.playingItem) == 0: self.myPlayer.onPlayBackStarted()
                 self.myPlayer.playingTime = self.myPlayer.getTime()
-            else: schedule.run_pending()
+            else: schedule.run_pending() #run scans when idle
 
 if __name__ == '__main__': Service()

@@ -95,11 +95,10 @@ class MM(object):
             setSetting = 'ScanRadarr'
         results  = self.openURL(url)
         if not results: return
-        self.notificationDialog(LANGUAGE(30003))
         userList = self.getUserList(type)
         for idx, item in enumerate(results):
             updateDialogProgress = (idx) * 100 // len(results)
-            REAL_SETTINGS.setSetting('setSetting','Scanning... (%d'%(updateDialogProgress)+'%)')
+            REAL_SETTINGS.setSetting(setSetting,'Scanning... (%d'%(updateDialogProgress)+'%)')
             match = False
             show  = item["title"]
             for kodititle in userList:
@@ -115,7 +114,6 @@ class MM(object):
                         log('getMonitored, kodi match: show = ' + show + ', title = ' + title)
                         userList.append(title)
                         break
-        self.notificationDialog(LANGUAGE(30004))
         if type == 'series': REAL_SETTINGS.setSetting(setSetting,LANGUAGE(30011)%(datetime.datetime.now().strftime('%Y-%m-%d')))
         else: REAL_SETTINGS.setSetting(setSetting,LANGUAGE(30011)%(datetime.datetime.now().strftime('%Y-%m-%d')))
         if len(userList) > 0: self.setUserList(userList, type)

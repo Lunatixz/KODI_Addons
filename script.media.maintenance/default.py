@@ -23,22 +23,24 @@ import xbmc, xbmcgui, xbmcplugin, xbmcaddon, xbmcvfs
 from simplecache import SimpleCache, use_cache
 
 # Plugin Info
-ADDON_ID      = 'script.media.maintenance'
-REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
-ADDON_NAME    = REAL_SETTINGS.getAddonInfo('name')
-SETTINGS_LOC  = REAL_SETTINGS.getAddonInfo('profile')
-ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path').decode('utf-8')
-ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
-ICON          = REAL_SETTINGS.getAddonInfo('icon')
-FANART        = REAL_SETTINGS.getAddonInfo('fanart')
-LANGUAGE      = REAL_SETTINGS.getLocalizedString
-DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-SONARR_URL    = '%s/api/series?apikey=%s'%(REAL_SETTINGS.getSetting('Sonarr_IP'),REAL_SETTINGS.getSetting('Sonarr_API'))
-RADARR_URL    = '%s/api/movie?apikey=%s'%(REAL_SETTINGS.getSetting('Radarr_IP'),REAL_SETTINGS.getSetting('Radarr_API'))
-TIMEOUT       = 15
-NOTIFY        = True
-JSON_ENUM     = '["genre","studio","mpaa","premiered","file","art","thumbnail"]'
-ITEM_ENUM     = '["genre","studio","mpaa","premiered","file","art","thumbnail","title","episode","season","showtitle","playcount"]'
+ADDON_ID       = 'script.media.maintenance'
+REAL_SETTINGS  = xbmcaddon.Addon(id=ADDON_ID)
+ADDON_NAME     = REAL_SETTINGS.getAddonInfo('name')
+SETTINGS_LOC   = REAL_SETTINGS.getAddonInfo('profile')
+ADDON_PATH     = REAL_SETTINGS.getAddonInfo('path').decode('utf-8')
+ADDON_VERSION  = REAL_SETTINGS.getAddonInfo('version')
+ICON           = REAL_SETTINGS.getAddonInfo('icon')
+FANART         = REAL_SETTINGS.getAddonInfo('fanart')
+LANGUAGE       = REAL_SETTINGS.getLocalizedString
+DEBUG          = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
+SONARR_URL     = '%s/api/series?apikey=%s'%(REAL_SETTINGS.getSetting('Sonarr_IP'),REAL_SETTINGS.getSetting('Sonarr_API'))
+RADARR_URL     = '%s/api/movie?apikey=%s'%(REAL_SETTINGS.getSetting('Radarr_IP'),REAL_SETTINGS.getSetting('Radarr_API'))
+TIMEOUT        = 15
+NOTIFY         = True
+JSON_TV_ENUMS  = '["title", "genre", "year", "rating", "plot", "studio", "mpaa", "cast", "playcount", "episode", "imdbnumber", "premiered", "votes", "lastplayed", "fanart", "thumbnail", "file", "originaltitle", "sorttitle", "episodeguide", "season", "watchedepisodes", "dateadded", "tag", "art", "userrating", "ratings", "runtime", "uniqueid" ]'
+JSON_MV_ENUMS  = '["title", "genre", "year", "rating", "director", "trailer", "tagline", "plot", "plotoutline", "originaltitle", "lastplayed", "playcount", "writer", "studio", "mpaa", "cast", "country", "imdbnumber", "runtime", "set", "showlink", "streamdetails", "top250", "votes", "fanart", "thumbnail", "file", "sorttitle", "resume", "setid", "dateadded", "tag", "art", "userrating", "ratings", "premiered", "uniqueid"]'
+JSON_IT_ENUMS  = '["title","artist","albumartist","genre","year","rating","album","track","duration","comment","lyrics","musicbrainztrackid","musicbrainzartistid","musicbrainzalbumid","musicbrainzalbumartistid","playcount","fanart","director","trailer","tagline","plot","plotoutline","originaltitle","lastplayed","writer","studio","mpaa","cast","country","imdbnumber","premiered","productioncode","runtime","set","showlink","streamdetails","top250","votes","firstaired","season","episode","showtitle","thumbnail","file","resume","artistid","albumid","tvshowid","setid","watchedepisodes","disc","tag","art","genreid","displayartist","albumartistid","description","theme","mood","style","albumlabel","sorttitle","episodeguide","uniqueid","dateadded","channel","channeltype","hidden","locked","channelnumber","starttime","endtime","specialsortseason","specialsortepisode","compilation","releasetype","albumreleasetype","contributors","displaycomposer","displayconductor","displayorchestra","displaylyricist","userrating"]'
+JSON_FL_ENUMS  = '["title","artist","albumartist","genre","year","rating","album","track","duration","comment","lyrics","musicbrainztrackid","musicbrainzartistid","musicbrainzalbumid","musicbrainzalbumartistid","playcount","fanart","director","trailer","tagline","plot","plotoutline","originaltitle","lastplayed","writer","studio","mpaa","cast","country","imdbnumber","premiered","productioncode","runtime","set","showlink","streamdetails","top250","votes","firstaired","season","episode","showtitle","thumbnail","file","resume","artistid","albumid","tvshowid","setid","watchedepisodes","disc","tag","art","genreid","displayartist","albumartistid","description","theme","mood","style","albumlabel","sorttitle","episodeguide","uniqueid","dateadded","size","lastmodified","mimetype","specialsortseason","specialsortepisode"]'
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -56,7 +58,7 @@ class MM(object):
         self.cache      = SimpleCache()
         
         
-    def sendJSON(self, command, cache=True):
+    def sendJSON(self, command, cache=False):
         log('sendJSON, command = ' + str(command))
         cacheresponse = self.cache.get(ADDON_NAME + '.sendJSON, command = %s'%json.dumps(command))
         if DEBUG or not cache: cacheresponse = None
@@ -167,33 +169,46 @@ class MM(object):
         #fetch tvshowid from seasonid, check season episode total to sonarr, if playcount > 0 on all remove.
         # {"jsonrpc":"2.0","method":"VideoLibrary.GetSeasonDetails","params":{"seasonid":2075,"properties":["episode","tvshowid"]},"id":6}
     
+    
+    def splitStack(self, file):
+        path = file.replace(',,',',').split(' , ')
+        return '|'.join(path).replace('stack://','').split(', media = video')[0].split('|')
+
 
     def removeContent(self, playingItem, silent=False):
-        type = playingItem["type"]
-        dbid = playingItem["id"]
-        log("removeContent, type = " + type + ", dbid = " + str(dbid)) 
-        param  = {'episode':'episodeid','movie':'movieid','movie':'movieid','tvshow':'tvshowid','season':'seasonid'}[type]
-        method = {'episodeid':'RemoveEpisode','movieid':'RemoveMovie','tvshowid':'RemoveTVShow','seasonid':''}[param]
-        file = playingItem.get("file","")
-        mediaInfo = playingItem["label"]
-        if type == 'movie':
-            if REAL_SETTINGS.getSetting('Monitor_Movies') == 'false': return 
-        elif type == 'season': return self.removeSeason(playingItem)
-        else:
-            tvshow   = playingItem["showtitle"]
-            userList = self.getUserList()
-            if tvshow not in userList: return
-            mediaInfo = '%s - %sx%s - %s'%(tvshow,playingItem["season"],playingItem["episode"],playingItem["label"])
-        if silent == False:
-            if not self.yesnoDialog(mediaInfo, file, header='%s - %s'%(ADDON_NAME,LANGUAGE(30021)), yes='Remove', no='Keep', autoclose=15000): return
-        if REAL_SETTINGS.getSetting('Enable_Removal') == 'true':
-            json_query = '{"jsonrpc":"2.0","method":"VideoLibrary.%s","params":{"%s":%s},"id":1}'%(method, param, str(dbid))
-            self.sendJSON(json_query)
-            if self.deleteFile(file):
-                self.notificationDialog(LANGUAGE(30023)%mediaInfo)
-                return
-        self.notificationDialog(LANGUAGE(30022))
-
+        try:
+            type = playingItem["type"]
+            dbid = playingItem["id"]
+            log("removeContent, type = " + type + ", dbid = " + str(dbid)) 
+            param  = {'episode':'episodeid','movie':'movieid','movie':'movieid','tvshow':'tvshowid','season':'seasonid'}[type]
+            method = {'episodeid':'RemoveEpisode','movieid':'RemoveMovie','tvshowid':'RemoveTVShow','seasonid':''}[param]
+            file = playingItem.get("file","")
+            mediaInfo = playingItem["label"]
+            if type == 'movie':
+                if REAL_SETTINGS.getSetting('Monitor_Movies') == 'false': return
+            elif type == 'season': return self.removeSeason(playingItem)
+            else:
+                tvshow   = playingItem["showtitle"]
+                userList = self.getUserList()
+                if tvshow not in userList: return
+                mediaInfo = '%s - %sx%s - %s'%(tvshow,playingItem["season"],playingItem["episode"],playingItem["label"])
+            if silent == False:
+                if not self.yesnoDialog(mediaInfo, file, header='%s - %s'%(ADDON_NAME,LANGUAGE(30021)%(type)), yes='Remove', no='Keep', autoclose=15000): return
+            if REAL_SETTINGS.getSetting('Enable_Removal') == 'true':
+                json_query = '{"jsonrpc":"2.0","method":"VideoLibrary.%s","params":{"%s":%s},"id":1}'%(method, param, str(dbid))
+                self.sendJSON(json_query)
+                    # if path.startswith('stack://'):
+                        # files = self.splitStack(path)
+                        # for file in files: MoviesList.append({'label':label,'label2':file,'thumb':(item['art'].get('poster','') or item['thumbnail'])})
+                    # else:
+                if self.deleteFile(file):
+                    self.notificationDialog(LANGUAGE(30023)%mediaInfo)
+                    return
+            self.notificationDialog(LANGUAGE(30022))
+        except Exception as e:
+            log("removeContent Failed! " + str(e), xbmc.LOGERROR)
+            log('removeContent, playingItem = ' + json.dumps(playingItem))
+        
         
     def deleteFile(self, file):
         for i in range(3):
@@ -219,27 +234,19 @@ class MM(object):
         
         
     def requestItem(self):
-        json_query = ('{"jsonrpc":"2.0","method":"Player.GetItem","params":{"playerid":%d,"properties":%s}, "id": 1}'%(self.getActivePlayer(), ITEM_ENUM))
+        json_query = ('{"jsonrpc":"2.0","method":"Player.GetItem","params":{"playerid":%d,"properties":%s}, "id": 1}'%(self.getActivePlayer(), JSON_IT_ENUMS))
         json_response = self.sendJSON(json_query)
         if 'result' not in json_response: return {}
         return json_response['result'].get('item',{})
         
         
-    def requestFile(self, file, media='video', fallback=None):
+    def requestFile(self, file, media='video', fallback={}):
         log("requestFile, file = " + file + ", media = " + media) 
-        json_query = ('{"jsonrpc":"2.0","method":"Files.GetFileDetails","params":{"file":"%s","media":"%s","properties":%s},"id":1}' % (self.escapeDirJSON(file), media, ITEM_ENUM))
+        json_query = ('{"jsonrpc":"2.0","method":"Files.GetFileDetails","params":{"file":"%s","media":"%s","properties":%s},"id":1}' % (self.escapeDirJSON(file), media, JSON_FL_ENUMS))
         json_response = self.sendJSON(json_query)
         if 'result' not in json_response: return fallback
         return json_response['result'].get('filedetails',fallback)
         
-        
-    def requestDetails(self, dbtype, dbid):
-        log("requestDetails, dbtype = " + dbtype + ", dbid = " + str(dbid)) 
-        json_query = ('{"jsonrpc":"2.0","method":"Files.GetFileDetails","params":{"file":"%s","media":"%s","properties":%s},"id":1}' % (self.escapeDirJSON(file), media, ITEM_ENUM))
-        json_response = self.sendJSON(json_query)
-        if 'result' not in json_response: return {"type":xbmc.getInfoLabel('ListItem.DBTYPE'),"id":xbmc.getInfoLabel('ListItem.DBID'),"label":xbmc.getInfoLabel('ListItem.Label'),"showtitle":xbmc.getInfoLabel('ListItem.TVShowTitle'),"episodes":xbmc.getInfoLabel('ListItem.Property(TotalEpisodes)')}
-        return json_response['result'].get('filedetails',{"folder":file})
-    
         
     def escapeDirJSON(self, mydir):
         if (mydir.find(":")): mydir = mydir.replace("\\", "\\\\")
@@ -247,46 +254,52 @@ class MM(object):
         
         
     def getTVShows(self):
-        TVShowList = []
-        if not self.hasTV(): return TVShowList
-        json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetTVShows","params":{"properties":%s}, "id": 1}'%(JSON_ENUM))
-        json_response = self.sendJSON(json_query)
-        if 'result' not in json_response: return []
-        busy = self.progressDialogBG(0)
-        for idx, item in enumerate(json_response['result']['tvshows']):
-            updateDialogProgress = (idx) * 100 // len(json_response)
-            busy = self.progressDialogBG(updateDialogProgress, busy)
-            TVShowList.append({'label':item['label'],'label2':item['file'],'thumb':(item['art'].get('poster','') or item['thumbnail'])})
-        TVShowList.sort(key=lambda x:x['label'])
+        if not self.hasTV(): return []
+        busy = self.progressDialogBG(0, string1=LANGUAGE(30038))
+        json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetTVShows","params":{"properties":%s}, "id": 1}'%(JSON_TV_ENUMS))
+        json_response = self.sendJSON(json_query,cache=True)
+        if not 'result' in json_response: return []
         self.progressDialogBG(100, busy)
-        log("getTVShows, found tvshows "  + str(len(TVShowList)))
-        return [self.getListitem(show['label'],show['label2'],show['thumb']) for show in TVShowList]
+        return sorted(json_response['result']['tvshows'], key=lambda x:x['label']) 
         
         
     def getMovies(self):
-        MoviesList = []
-        if not self.hasMovie(): return MoviesList
-        json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetMovies","params":{"properties":%s}, "id": 1}'%(JSON_ENUM.replace(']',',"streamdetails"]')))
-        json_response = self.sendJSON(json_query,cache=False)
-        if 'result' not in json_response: return []
-        busy = self.progressDialogBG(0)
-        for idx, item in enumerate(json_response['result']['movies']):
-            updateDialogProgress = (idx) * 100 // len(json_response)
-            busy = self.progressDialogBG(updateDialogProgress, busy)
-            video = item['streamdetails']['video']
-            audio = item['streamdetails']['audio']
-            label = item['label']
-            if len(video) > 0: label = '%s - Video [Codec: [B]%s[/B]|Height: [B]%s[/B]|Runtime: [B]%s[/B]]'%(label,video[0]['codec'].upper(),video[0]['height'],video[0]['duration'])
-            if len(audio) > 0: label = '%s - Audio [Codec: [B]%s[/B]|Channels: [B]%s[/B]|Language: [B]%s[/B]]'%(label,audio[0]['codec'].upper(),audio[0]['channels'],audio[0]['language'].title())
-            MoviesList.append({'label':label,'label2':item['file'],'thumb':(item['art'].get('poster','') or item['thumbnail'])})
-        MoviesList.sort(key=lambda x:x['label'])
+        if not self.hasMovie(): return []
+        busy = self.progressDialogBG(0, string1=LANGUAGE(30039))
+        json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetMovies","params":{"properties":%s}, "id": 1}'%(JSON_MV_ENUMS))
+        json_response = self.sendJSON(json_query)
         self.progressDialogBG(100, busy)
-        log("getMovies, found movies "  + str(len(MoviesList)))
-        return [self.getListitem(show['label'],show['label2'],show['thumb']) for show in MoviesList]
-    
+        if not 'result' in json_response: return []
+        return sorted(json_response['result']['movies'], key=lambda x:x['label']) 
+        
+        
+    def buildListitem(self, list, TV=False): #todo move to window UI and control panel
+        mediaLST = []
+        msg = LANGUAGE(30039)
+        if TV: msg = LANGUAGE(30038)
+        busy = self.progressDialogBG(0, string1=msg)
+        for idx, item in enumerate(list):
+            try:
+                label = item['label']
+                path  = item['file']
+                updateDialogProgress = (idx) * 100 // len(list)
+                busy = self.progressDialogBG(updateDialogProgress, busy, string1=label)
+                if TV: mediaLST.append({'label':label,'label2':path,'thumb':(item['art'].get('poster','') or item['thumbnail'])})
+                else:
+                    video = item['streamdetails']['video']
+                    audio = item['streamdetails']['audio']
+                    if path.startswith('stack://'): label = ' %s [[B]STACK[/B]]'%label
+                    if len(video) > 0: label = '%s - Video [Codec: [B]%s[/B]|Height: [B]%s[/B]|Runtime: [B]%s[/B]]'%(label,video[0]['codec'].upper(),video[0]['height'],video[0]['duration'])
+                    if len(audio) > 0: label = '%s - Audio [Codec: [B]%s[/B]|Channels: [B]%s[/B]|Language: [B]%s[/B]]'%(label,audio[0]['codec'].upper(),audio[0]['channels'],audio[0]['language'].title())
+                    mediaLST.append({'label':label,'label2':path,'thumb':(item['art'].get('poster','') or item['thumbnail'])})
+            except Exception as e: log("buildListitem Failed! %s , item = %s"%(str(e),item), xbmc.LOGERROR)
+        self.progressDialogBG(100, busy)
+        log("buildListitem, found tvshows "  + str(len(mediaLST)))
+        return [self.getListitem(show['label'],show['label2'],show['thumb']) for show in mediaLST]
+
     
     def viewTVShows(self):
-        TVShowList = self.getTVShows()
+        TVShowList = self.buildListitem(self.getTVShows(),TV=True)
         select = self.selectDialog(TVShowList, LANGUAGE(30037), preselect=self.findItemLens(TVShowList,self.getUserList()))
         if select is not None: self.setUserList([TVShowList[idx].getLabel() for idx in select])
 
@@ -311,16 +324,18 @@ class MM(object):
         delLST = []
         MoviesList = self.getMovies()
         if len(MoviesList) > 0:
-            duplicates = [item for item, count in collections.Counter([movie.getLabel() for movie in MoviesList]).items() if count > 1]
+            duplicates = [item for item, count in collections.Counter([movie['label'] for movie in MoviesList]).items() if count > 1]
             for item in duplicates:
                 for movie in MoviesList:
-                    title = movie.getLabel()
+                    title = movie['label'] 
                     if item.lower() == title.lower(): dupLST.append(movie)
         if len(dupLST) > 0:
-            items = self.selectDialog(dupLST,LANGUAGE(30036))
+            dupLST.sort(key=lambda x:x['label'])
+            items = self.selectDialog(self.buildListitem(dupLST),LANGUAGE(30036))
             if items:
+                busy = self.progressDialogBG(0, string1=LANGUAGE(30040))
+                # delLST = [self.requestFile(dupLST[item].getLabel2()) for item in items if not dupLST[item].getLabel2().startswith('stack://')]
                 delLST = [self.requestFile(dupLST[item].getLabel2()) for item in items]
-                busy = self.progressDialogBG(0)
                 for idx, movie in enumerate(delLST):
                     updateDialogProgress = (idx) * 100 // len(delLST)
                     busy = self.progressDialogBG(updateDialogProgress, busy)
@@ -331,14 +346,19 @@ class MM(object):
         
     def buildMenu(self):
         items  = [LANGUAGE(30002),LANGUAGE(30034),LANGUAGE(30035)]
-        {None:sys.exit,-1:sys.exit,0:self.viewTVShows,1:self.scanDuplicates,2:REAL_SETTINGS.openSettings}[self.selectDialog(items,multi=False,useDetails=False)]()
+        {None:sys.exit,
+        -1:sys.exit,
+        0:self.viewTVShows,
+        1:self.scanDuplicates,
+        2:REAL_SETTINGS.openSettings}[self.selectDialog(items,multi=False,useDetails=False)]()
         
         
     def progressDialogBG(self, percent=0, control=None, string1='', header=ADDON_NAME, notice=NOTIFY):
         if not notice: return
         if percent == 0 and control is None:
             control = xbmcgui.DialogProgressBG()
-            control.create(header, string1)
+            control.create(header, ADDON_NAME)
+            control.update(percent, string1)
         elif percent == 100 and control is not None: return control.close()
         if control is not None: control.update(percent, string1)
         return control

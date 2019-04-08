@@ -42,25 +42,25 @@ def log(msg, level=xbmc.LOGDEBUG):
 
 class Player(xbmc.Player):
     def __init__(self):
+        self.resetMeta()
+        
+        
+    def resetMeta(self):
         self.playingTime     = 0
         self.playingPercent  = 0
         self.playingTotTime  = 0
         self.playingItem     = {}
-        self.chkRunning      = True
         
         
     def onPlayBackStarted(self):
         xbmc.sleep(1000)
         if not self.isPlaying(): return
-        self.playingTime     = 0
-        self.playingPercent  = 0
-        if not self.chkRunning: self.chkContent() #catch back-2-back playback without no onPlayBackEnded/onPlayBackStopped trigger #onPlayBackEnded bug? 
-        self.chkRunning = False
+        self.resetMeta()
         self.playingTotTime  = self.getTotalTime()
         self.playingItem     = self.myService.myUtils.requestItem()
         log('onPlayBackStarted, playingItem = ' + json.dumps(self.playingItem))
 
-        
+         
     def onPlayBackEnded(self):
         log('onPlayBackEnded')
         self.chkContent()
@@ -73,14 +73,12 @@ class Player(xbmc.Player):
 
     def chkContent(self):
         log('chkContent')
-        self.chkRunning = True
-        if PTVL_RUNNING: return
-        try:
-            if (self.playingTime * 100 / self.playingTotTime) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
-                if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": self.myService.myUtils.removeSeason(self.playingItem)
-                else:self.myService.myUtils.removeContent(self.playingItem)
-        except Exception as e: log("chkContent Failed! " + str(e), xbmc.LOGERROR)
-        
+        if PTVL_RUNNING or len(self.playingItem) == 0: return
+        if self.playingItem.get["file"].startswith(('plugin://','upnp://','pvr://')): return
+        if (self.playingTime * 100 / self.playingTotTime) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
+            if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": self.myService.myUtils.removeSeason(self.playingItem)
+            else:self.myService.myUtils.removeContent(self.playingItem)
+        self.resetMeta()
         
         
 class Monitor(xbmc.Monitor):
@@ -140,21 +138,23 @@ class Service(object):
         cleanTime = [0,1,6,24,168][int(REAL_SETTINGS.getSetting('Enable_Clean'))]
         if scanTime  > 0: schedule.every(scanTime).hour.do(self.scanLibrary)
         if cleanTime > 0: schedule.every(cleanTime).hour.do(self.cleanLibrary)
+        return True
         
         
-    def chkSettings(self):
-        self.myMonitor.pendingChange = False
+    # def chkSettings(self):
+        # self.myMonitor.pendingChange = False
         
         
     def startService(self):
         log('startService')
+        self.myMonitor.waitForAbort(5)
         self.loadMySchedule()
         while not self.myMonitor.abortRequested():
-            if self.myMonitor.pendingChange and xbmcgui.getCurrentWindowDialogId() != 10140: self.chkSettings()
+            # if self.myMonitor.pendingChange and xbmcgui.getCurrentWindowDialogId() != 10140: self.chkSettings()
             if self.myMonitor.waitForAbort(5): break
             elif self.myPlayer.isPlaying(): 
                 if len(self.myPlayer.playingItem) == 0: self.myPlayer.onPlayBackStarted()
                 self.myPlayer.playingTime = self.myPlayer.getTime()
-            else: schedule.run_pending() #run scans when idle
+            else: schedule.run_pending() #run scan/clean when idle
 
 if __name__ == '__main__': Service()

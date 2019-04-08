@@ -1828,7 +1828,7 @@
     </extension>
 </addon>
 
-<addon id="script.media.maintenance" version="1.0.3" name="Media Maintenance" provider-name="Lunatixz">
+<addon id="script.media.maintenance" version="1.0.4" name="Media Maintenance" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.schedule" version="0.5.0"/>
@@ -1838,7 +1838,7 @@
     <extension point="xbmc.service" library="service.py" start="login"/>
     <extension point="kodi.context.item" library="context.py">
         <item>
-            <label>30021</label>
+            <label>Remove $INFO[ListItem.DBTYPE]</label>
             <visible>[!String.IsEmpty(ListItem.DBID)|String.IsEqual(ListItem.DBTYPE,season)]</visible>
         </item>
     </extension>

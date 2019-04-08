@@ -101,7 +101,7 @@ msgid "Watched after"
 msgstr ""
 
 msgctxt "#30021"
-msgid "Remove Media?"
+msgid "Remove (%s)"
 msgstr ""
 
 msgctxt "#30022"
@@ -166,4 +166,16 @@ msgstr ""
 
 msgctxt "#30037"
 msgid "Select one or multiple TV Shows"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Scanning TV Shows..."
+msgstr ""
+
+msgctxt "#30039"
+msgid "Scanning Movies..."
+msgstr ""
+
+msgctxt "#30040"
+msgid "Removing duplicate Movies..."
 msgstr ""

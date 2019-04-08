@@ -12,8 +12,8 @@
     <!-- <setting id="ClearMovies"      type="action" label=""       subsetting="true" visible="!eq(-1,)"                action="RunScript($CWD/default.py, -clearMovies)" default="" /> -->
     <setting id="ViewTVShows"      type="action" label="30002"  action="RunScript($CWD/default.py, -viewTVShows)"   enable="Library.HasContent(TVShows)" default="" />
     <setting id="ClearTVShows"     type="action" label="30012"  subsetting="true" option="close" visible="!eq(-1,)" action="RunScript($CWD/default.py, -clearTVShows)" default="" />
-    <setting id="ScanSonarr"       type="action" label="30006"  subsetting="true" visible="!eq(6,)" action="RunScript($CWD/default.py, -scanSonarr)" />
-    <setting id="Wait_4_Season"    type="bool"   label="30029"  subsetting="true" visible="!eq(7,)" default="false" />
+    <setting id="ScanSonarr"       type="action" label="30006"  subsetting="true" action="RunScript($CWD/default.py, -scanSonarr)" />
+    <setting id="Wait_4_Season"    type="bool"   label="30029"  subsetting="true" default="false" />
     <category label="30030">
     <setting id="Enable_Scan"      type="enum"   label="30031"  values="Disable|Hourly|Quarterly|Daily"        default="0" />
     <setting id="Enable_Clean"     type="enum"   label="30032"  values="Disable|Hourly|Quarterly|Daily|Weekly" default="0" />       

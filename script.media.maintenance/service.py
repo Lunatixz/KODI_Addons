@@ -74,7 +74,7 @@ class Player(xbmc.Player):
     def chkContent(self):
         log('chkContent')
         if PTVL_RUNNING or len(self.playingItem) == 0: return
-        if self.playingItem.get["file"].startswith(('plugin://','upnp://','pvr://')): return
+        if self.playingItem.get("file","").startswith(('plugin://','upnp://','pvr://')): return
         if (self.playingTime * 100 / self.playingTotTime) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
             if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": self.myService.myUtils.removeSeason(self.playingItem)
             else:self.myService.myUtils.removeContent(self.playingItem)

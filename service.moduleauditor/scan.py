@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Kodi Module Auditor.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, re, traceback, json, urlparse, datetime, urllib, urllib2
+import sys, re, traceback, json, urlparse, datetime, urllib, urllib2, zlib
 import xbmc, xbmcplugin, xbmcaddon, xbmcgui
 import xml.etree.ElementTree as ET
 
@@ -37,7 +37,7 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 TIMEOUT       = 15
 BUILDS        = {18:'leia',17:'krypton',16:'jarvis',15:'isengard',14:'helix',13:'gotham'}
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == "true"
-BASE_URL      = 'http://mirrors.kodi.tv/addons/%s/addons.xml'
+BASE_URL      = 'http://mirrors.kodi.tv/addons/%s/addons.xml.gz'
 MOD_QUERY     = '{"jsonrpc":"2.0","method":"Addons.GetAddons","params":{"type":"xbmc.python.module","enabled":true,"properties":["name","version","author","enabled"]},"id":1}'
 VER_QUERY     = '{"jsonrpc":"2.0","method":"Application.GetProperties","params":{"properties":["version"]},"id":1}'
 MENU_ITEMS    = [LANGUAGE(32021),LANGUAGE(32022)]
@@ -201,8 +201,15 @@ class SCAN(object):
         try:
             log('openURL, url = ' + str(url))
             cacheresponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
+            if DEBUG: cacheresponse = None
             if not cacheresponse:
-                cacheresponse = (urllib2.urlopen(urllib2.Request(url), timeout=TIMEOUT)).read()
+                headers = {'User-Agent':'Kodi-Auditor'}
+                req = urllib2.Request(url, None, headers)
+                page = urllib2.urlopen(req, timeout=TIMEOUT)
+                if page.headers.get('Content-Type').find('gzip') >= 0 or page.headers.get('Content-Type').find('application/octet-stream') >= 0:
+                  d = zlib.decompressobj(16+zlib.MAX_WBITS)
+                  cacheresponse = d.decompress(page.read())
+                else: cacheresponse = page.read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=datetime.timedelta(hours=12))
             return cacheresponse
         except Exception as e:
@@ -214,7 +221,8 @@ class SCAN(object):
     def preliminary(self): 
         self.silent = True
         self.validate()
-        if self.errorCNT > 0: notificationDialog(LANGUAGE(32006)%(self.errorCNT),time=8000)
+        plural = 's' if self.errorCNT > 0 else '' 
+        if self.errorCNT > 0: notificationDialog(LANGUAGE(32006)%(self.errorCNT,plural),time=8000)
         
             
     def validate(self):

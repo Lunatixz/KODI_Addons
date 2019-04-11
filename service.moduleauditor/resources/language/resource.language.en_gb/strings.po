@@ -41,7 +41,7 @@ msgid "Silently run scan every x days"
 msgstr ""
 
 msgctxt "#32006"
-msgid "found [B]%d[/B] issues, Manually run for more details ..."
+msgid "found [B]%d[/B] issue%s, Manually run for more details ..."
 msgstr ""
 
 msgctxt "#32007"

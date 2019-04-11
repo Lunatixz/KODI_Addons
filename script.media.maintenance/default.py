@@ -175,7 +175,7 @@ class MM(object):
         return '|'.join(path).replace('stack://','').split(', media = video')[0].split('|')
 
 
-    def removeContent(self, playingItem, silent=False):
+    def removeContent(self, playingItem, silent=False, bypass=False):
         try:
             type = playingItem["type"]
             dbid = playingItem["id"]
@@ -190,8 +190,8 @@ class MM(object):
             else:
                 tvshow   = playingItem["showtitle"]
                 userList = self.getUserList()
-                if tvshow not in userList: return
-                mediaInfo = '%s - %sx%s - %s'%(tvshow,playingItem["season"],playingItem["episode"],playingItem["label"])
+                if tvshow not in userList and not bypass: return
+                mediaInfo = '%s - %sx%s - %s'%(tvshow,playingItem["season"],playingItem["episode"],mediaInfo)
             if silent == False:
                 if not self.yesnoDialog(mediaInfo, file, header='%s - %s'%(ADDON_NAME,LANGUAGE(30021)%(type)), yes='Remove', no='Keep', autoclose=15000): return
             if REAL_SETTINGS.getSetting('Enable_Removal') == 'true':
@@ -211,6 +211,7 @@ class MM(object):
         
         
     def deleteFile(self, file):
+        log("deleteFile")
         for i in range(3):
             try: 
                 if xbmcvfs.delete(file): return True

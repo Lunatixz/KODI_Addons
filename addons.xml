@@ -1829,7 +1829,7 @@
     </extension>
 </addon>
 
-<addon id="script.media.maintenance" version="1.0.6" name="Media Maintenance" provider-name="Lunatixz">
+<addon id="script.media.maintenance" version="1.0.7" name="Media Maintenance" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.schedule" version="0.5.0"/>
@@ -1956,7 +1956,7 @@
     </extension>
 </addon>
 
-<addon id="script.module.uepg" version="1.0.5d" name="uEPG" provider-name="Lunatixz">
+<addon id="script.module.uepg" version="1.0.5e" name="uEPG" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.pyhdhr" version="1.0.0"/>
@@ -2154,7 +2154,7 @@
     </extension>
 </addon>
 
-<addon id="service.moduleauditor" version="0.1.2" name="Kodi Module Auditor" provider-name="Team Kodi">
+<addon id="service.moduleauditor" version="0.1.3" name="Kodi Module Auditor" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.schedule" version="0.5.0"/>

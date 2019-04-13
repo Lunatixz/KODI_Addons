@@ -4,6 +4,7 @@
     <setting                       type="lsep" />
     <setting id="Enable_Removal"   type="bool"   label="30013"  default="false" />
     <setting id="Removal_Warning"  type="text"   label="30014"  visible="eq(-1,true)" enable="false" />
+    <setting id="Duplicate_Match"  type="enum"   label="30041"  values="Title (Year)|Title" default="0" />
     <setting id="Play_Percentage"  type="slider" label="30020"  range="0,100"         option="percent"  default="85" />
     <setting                       type="lsep" />
     <setting id="Monitor_Movies"   type="bool"   label="30024"  default="true"                                      enable="Library.HasContent(Movies)" />

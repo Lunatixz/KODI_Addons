@@ -33,6 +33,7 @@ ICON           = REAL_SETTINGS.getAddonInfo('icon')
 FANART         = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE       = REAL_SETTINGS.getLocalizedString
 DEBUG          = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
+DUPMATCH       = int(REAL_SETTINGS.getSetting('Duplicate_Match'))
 SONARR_URL     = '%s/api/series?apikey=%s'%(REAL_SETTINGS.getSetting('Sonarr_IP'),REAL_SETTINGS.getSetting('Sonarr_API'))
 RADARR_URL     = '%s/api/movie?apikey=%s'%(REAL_SETTINGS.getSetting('Radarr_IP'),REAL_SETTINGS.getSetting('Radarr_API'))
 TIMEOUT        = 15
@@ -111,7 +112,7 @@ class MM(object):
             if match: continue
             if item["monitored"]: 
                 for title in mediaList:
-                    title = title.getLabel()
+                    title = title['title']
                     if title.lower() == show.lower(): 
                         log('getMonitored, kodi match: show = ' + show + ', title = ' + title)
                         userList.append(title)
@@ -142,8 +143,9 @@ class MM(object):
             setSetting1 = 'MoviesList'
             setSetting2 = 'ViewMovies'
             
+        plural = 's' if len(userList) > 1 else '' 
         if len(userList) > 0: 
-            msg = LANGUAGE(30010)%(len(userList))
+            msg = LANGUAGE(30010)%(len(userList),plural)
         else: 
             self.notificationDialog(LANGUAGE(30017))
             REAL_SETTINGS.setSetting(setSetting0,'')
@@ -165,7 +167,7 @@ class MM(object):
         
     def removeSeason(self, playingItem):
         self.notificationDialog('Coming Soon')
-        #todo 
+        #todo check "watch" flag counts
         #fetch tvshowid from seasonid, check season episode total to sonarr, if playcount > 0 on all remove.
         # {"jsonrpc":"2.0","method":"VideoLibrary.GetSeasonDetails","params":{"seasonid":2075,"properties":["episode","tvshowid"]},"id":6}
     
@@ -176,6 +178,11 @@ class MM(object):
 
 
     def removeContent(self, playingItem, silent=False, bypass=False):
+        #todo parse kodis watched % value then set to settings.xml
+        #todo if trakt installed mark watched b4 delete
+        #todo mark watched in kodi b4 delete.
+        #todo allow option to ignore tvshow delete if watch flag count > 1.
+        #todo add "select all" option in tvshow monitor list. or move option to settings bypassing monitor list
         try:
             type = playingItem["type"]
             dbid = playingItem["id"]
@@ -281,7 +288,8 @@ class MM(object):
         busy = self.progressDialogBG(0, string1=msg)
         for idx, item in enumerate(list):
             try:
-                label = item['label']
+                if TV: label = item['label']
+                else: label = '%s (%d)'%(item['label'],item['year'])
                 path  = item['file']
                 updateDialogProgress = (idx) * 100 // len(list)
                 busy = self.progressDialogBG(updateDialogProgress, busy, string1=label)
@@ -325,18 +333,19 @@ class MM(object):
         delLST = []
         MoviesList = self.getMovies()
         if len(MoviesList) > 0:
-            duplicates = [item for item, count in collections.Counter([movie['label'] for movie in MoviesList]).items() if count > 1]
+            duplicates = [item for item, count in collections.Counter([{0:'%s (%d)'%(movie['label'],movie['year']),1:movie['label']}[DUPMATCH] for movie in MoviesList]).items() if count > 1]
             for item in duplicates:
                 for movie in MoviesList:
-                    title = movie['label'] 
+                    title = {0:'%s (%d)'%(movie['label'],movie['year']),1:movie['label']}[DUPMATCH]
                     if item.lower() == title.lower(): dupLST.append(movie)
         if len(dupLST) > 0:
             dupLST.sort(key=lambda x:x['label'])
-            items = self.selectDialog(self.buildListitem(dupLST),LANGUAGE(30036))
-            if items:
+            listitem = self.buildListitem(dupLST)
+            selects = self.selectDialog(listitem,LANGUAGE(30036))
+            if selects:
                 busy = self.progressDialogBG(0, string1=LANGUAGE(30040))
-                # delLST = [self.requestFile(dupLST[item].getLabel2()) for item in items if not dupLST[item].getLabel2().startswith('stack://')]
-                delLST = [self.requestFile(dupLST[item].getLabel2()) for item in items]
+                delLST = [self.requestFile(listitem[select].getLabel2()) for select in selects if not listitem[select].getLabel2().startswith('stack://')]
+                # delLST = [self.requestFile(dupLST[item].getLabel2()) for item in items]
                 for idx, movie in enumerate(delLST):
                     updateDialogProgress = (idx) * 100 // len(delLST)
                     busy = self.progressDialogBG(updateDialogProgress, busy)
@@ -354,14 +363,13 @@ class MM(object):
         2:REAL_SETTINGS.openSettings}[self.selectDialog(items,multi=False,useDetails=False)]()
         
         
-    def progressDialogBG(self, percent=0, control=None, string1='', header=ADDON_NAME, notice=NOTIFY):
-        if not notice: return
+    def progressDialogBG(self, percent=0, control=None, string1='', header=ADDON_NAME):
         if percent == 0 and control is None:
             control = xbmcgui.DialogProgressBG()
             control.create(header, ADDON_NAME)
             control.update(percent, string1)
-        elif percent == 100 and control is not None: return control.close()
-        if control is not None: control.update(percent, string1)
+        if percent == 100 and control is not None: return control.close()
+        elif control is not None: control.update(percent, string1)
         return control
         
         

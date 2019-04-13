@@ -705,7 +705,7 @@ class uEPG(xbmcgui.WindowXML):
                 self.setChannelButtons(self.shownTime - 1800, self.centerChannel)
                 curbutidx = self.findButtonAtTime(self.focusRow, starttime + 30)
                 if(curbutidx - 1) >= 0: self.focusIndex = curbutidx - 1
-                else: elf.focusIndex = 0
+                else: self.focusIndex = 0
             else: self.focusIndex -= 1
             left, top = self.channelButtons[self.focusRow][self.focusIndex].getPosition()
             width = self.channelButtons[self.focusRow][self.focusIndex].getWidth()

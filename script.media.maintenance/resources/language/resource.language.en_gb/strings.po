@@ -57,7 +57,7 @@ msgid "Scanning Sonnarr"
 msgstr ""
 
 msgctxt "#30010"
-msgid "Monitoring [B](%s)[/B] TV Shows"
+msgid "Monitoring [B](%s)[/B] TV Show%s"
 msgstr ""
 
 msgctxt "#30011"
@@ -178,4 +178,8 @@ msgstr ""
 
 msgctxt "#30040"
 msgid "Removing duplicate Movies..."
+msgstr ""
+
+msgctxt "#30041"
+msgid "Match duplicate Movies by"
 msgstr ""

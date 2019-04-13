@@ -100,8 +100,7 @@ def notificationDialog(message, header=ADDON_NAME, sound=False, time=4000, icon=
     try: xbmcgui.Dialog().notification(header, message, icon, time, sound)
     except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
     
-def textViewer(string1, header=ADDON_NAME, usemono=True, silent=False):
-    if silent: return
+def textViewer(string1, header=ADDON_NAME, usemono=True):
     xbmcgui.Dialog().textviewer(header, uni(string1), usemono)
     
 def selectDialog(list, header='', autoclose=0, preselect=None, useDetails=True):
@@ -110,17 +109,27 @@ def selectDialog(list, header='', autoclose=0, preselect=None, useDetails=True):
     if select > -1: return select
     return None
 
-def progressDialog(percent=0, control=None, string1='', string2='', string3='', header=ADDON_NAME, silent=False):
+def progressDialog(percent=0, control=None, string1='', string2='', string3='', header=ADDON_NAME, silent=True):
     if silent: return
-    if control is None:
-        if percent == 0: control = xbmcgui.DialogProgress()
-        if control is not None:control.create(header, string1, string2, string3)
-    else:
-        if control.iscanceled(): return False
-        if percent == 100: return control.close()
+    elif percent == 0 and control is None:
+        control = xbmcgui.DialogProgress()
+        control.create(header, string1, string2, string3)
         control.update(percent, string1, string2, string3)
+    if control is not None and control.iscanceled(): return control.close()
+    elif control is not None and percent == 100: return control.close()
+    elif control is not None: control.update(percent, string1, string2, string3)
     return control
     
+def busyDialogBG(percent=0, control=None):
+    if percent == 0 and control is None:
+        control = xbmcgui.DialogBusy()
+        control.create()
+        control.update(percent)
+    if control is not None and control.iscanceled: return control.close()
+    elif control is not None and percent == 100: return control.close()
+    elif control is not None: control.update(percent)
+    return control
+        
 def buildListItem(item):
     log('buildListItem, item = ' + str(item))
     try: 
@@ -234,8 +243,8 @@ class SCAN(object):
         summary = self.scanModules()
         setProperty('Running','False')
         if self.silent: return
-        if yesnoDialog(LANGUAGE(32009), yes=LANGUAGE(32008), no=LANGUAGE(32007)): self.buildDetails(filterErrors(summary))
-        else: textViewer('\n'.join([item['label'] for item in summary]), silent=self.silent)
+        elif yesnoDialog(LANGUAGE(32009), yes=LANGUAGE(32008), no=LANGUAGE(32007)): self.buildDetails(filterErrors(summary))
+        else: textViewer('\n'.join([item['label'] for item in summary]))
         
 
     def buildDetails(self, items):
@@ -272,6 +281,8 @@ class SCAN(object):
         log('scanModules')
         summary    = []
         progCNT    = 0
+        # self.pDialog  = progressDialog(0, string1=LANGUAGE(32014), silent=self.silent)
+        # self.pDialog  = progressDialog(0, string2=LANGUAGE(32015)%(repository.title()), silent=self.silent)
         repository = self.buildRepo()
         whiteList  = getWhiteList()['modules']
         myModules  = self.sendJSON(MOD_QUERY)['result']['addons']
@@ -325,18 +336,20 @@ class SCAN(object):
 
         
     def buildRepo(self):
-        self.pDialog  = progressDialog(0, string1=LANGUAGE(32014), silent=self.silent)
-        repository    = BUILDS[self.sendJSON(VER_QUERY)['result']['version']['major']]
+        self.busy = busyDialogBG()
+        repository = BUILDS[self.sendJSON(VER_QUERY)['result']['version']['major']]
+        self.busy = busyDialogBG(1, self.busy)
         log('buildRepo, repository = %s'%(repository))
-        self.pDialog  = progressDialog(0, string2=LANGUAGE(32015)%(repository.title()), silent=self.silent)
         self.kodiModules[repository] = list(self.buildModules(repository))
+        self.busy = busyDialogBG(100, self.busy)
         return repository
         
                 
     def buildModules(self, branch):
         log('buildModules, branch = ' + (branch))
         tree = ET.fromstring (self.openURL(BASE_URL%(branch)))
-        for elem in tree.iter():
+        for idx, elem in enumerate(tree.iter()):
+            self.busy = busyDialogBG(idx + 1, self.busy)
             if elem.tag == 'addon': addon = elem.attrib.copy()
             if elem.tag == 'extension' and elem.attrib.copy()['point'] == 'xbmc.python.module': yield (addon)
             

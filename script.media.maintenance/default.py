@@ -82,7 +82,7 @@ class MM(object):
             return json.loads(cacheresponse)
         except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
-            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
+            self.notificationDialog(LANGUAGE(30001))
             return ''
             
             
@@ -149,7 +149,7 @@ class MM(object):
         else: 
             self.notificationDialog(LANGUAGE(30017))
             REAL_SETTINGS.setSetting(setSetting0,'')
-        userList = ','.join(userList)
+        userList = ','.join(list(set(userList)))
         log('setUserList, UserList = ' + userList + ', type = ' + type)
         REAL_SETTINGS.setSetting(setSetting1,userList)
         REAL_SETTINGS.setSetting(setSetting2,msg)
@@ -223,8 +223,9 @@ class MM(object):
             try: 
                 if xbmcvfs.delete(file): return True
             except: pass
-        return False
-
+        if xbmcvfs.exists(file): return False
+        return True
+        
         
     def cleanLibrary(self, type="video"):
         type = {'video':'video','episode':'tvshows','movie':'movies'}[type]

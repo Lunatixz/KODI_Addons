@@ -22,5 +22,10 @@ import xbmc
 import default
 
 if __name__ == '__main__':
-    selectItem = {"folder":xbmc.getInfoLabel('ListItem.Path'),"file":xbmc.getInfoLabel('ListItem.FileNameAndPath'),"type":xbmc.getInfoLabel('ListItem.DBTYPE'),"id":xbmc.getInfoLabel('ListItem.DBID'),"label":xbmc.getInfoLabel('ListItem.Label'),"showtitle":xbmc.getInfoLabel('ListItem.TVShowTitle'),"episodes":xbmc.getInfoLabel('ListItem.Property(TotalEpisodes)')}
-    default.MM().removeContent(default.MM().requestFile(xbmc.getInfoLabel('ListItem.FileNameAndPath'),fallback=selectItem),bypass=True)
+    selectItem = {"type":xbmc.getInfoLabel('ListItem.DBTYPE'),"id":xbmc.getInfoLabel('ListItem.DBID'),"label":xbmc.getInfoLabel('ListItem.Label'),"showtitle":xbmc.getInfoLabel('ListItem.TVShowTitle')}
+    tvshow = selectItem['showtitle']
+    if selectItem['type'] in ['tvshow','season','episode'] and len(tvshow) > 0:
+        TVShowList = default.MM().getUserList()
+        TVShowList.append(tvshow)
+        default.MM().setUserList(TVShowList)
+        default.MM().notificationDialog(default.LANGUAGE(30043)%(tvshow))

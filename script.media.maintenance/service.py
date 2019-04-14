@@ -46,36 +46,33 @@ class Player(xbmc.Player):
         
         
     def resetMeta(self):
-        self.playingTime     = 0
-        self.playingPercent  = 0
-        self.playingTotTime  = 0
-        self.playingItem     = {}
+        self.playingTime = 0
+        self.playingItem = {}
         
         
     def onPlayBackStarted(self):
         xbmc.sleep(1000)
         if not self.isPlaying(): return
-        self.resetMeta()
-        self.playingTotTime  = self.getTotalTime()
-        self.playingItem     = self.myService.myUtils.requestItem()
+        self.playingItem = self.myService.myUtils.requestItem()
+        self.playingItem['TotalTime'] = self.getTotalTime()
         log('onPlayBackStarted, playingItem = ' + json.dumps(self.playingItem))
 
          
     def onPlayBackEnded(self):
         log('onPlayBackEnded')
-        self.chkContent()
+        self.chkContent(self.playingItem)
         
         
     def onPlayBackStopped(self):
         log('onPlayBackStopped')
-        self.chkContent()
+        self.chkContent(self.playingItem)
         
 
-    def chkContent(self):
-        log('chkContent')
-        if PTVL_RUNNING or len(self.playingItem) == 0: return
-        if self.playingItem.get("file","").startswith(('plugin://','upnp://','pvr://')): return
-        if (self.playingTime * 100 / self.playingTotTime) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
+    def chkContent(self, playingItem={}):
+        log('chkContent, playingItem = %s'%(json.dumps(self.playingItem)))
+        if PTVL_RUNNING or self.playingItem['TotalTime'] <= 0: return
+        elif self.playingItem.get("file","").startswith(('plugin://','upnp://','pvr://')): return
+        elif (self.playingTime * 100 / self.playingItem['TotalTime']) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
             if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": self.myService.myUtils.removeSeason(self.playingItem)
             else:self.myService.myUtils.removeContent(self.playingItem)
         self.resetMeta()

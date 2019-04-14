@@ -105,11 +105,11 @@ msgid "Remove (%s)"
 msgstr ""
 
 msgctxt "#30022"
-msgid "Permission required, check settings."
+msgid "Permission required, Check file access."
 msgstr ""
 
 msgctxt "#30023"
-msgid "%s Removed"
+msgid ""%s" Removed"
 msgstr ""
 
 msgctxt "#30024"
@@ -182,4 +182,12 @@ msgstr ""
 
 msgctxt "#30041"
 msgid "Match duplicate Movies by"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Add to Monitor List"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Add "%s" to Monitored TV Shows"
 msgstr ""

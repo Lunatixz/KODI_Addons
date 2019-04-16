@@ -45,12 +45,14 @@ PASSWORD     = REAL_SETTINGS.getSetting('User_Password')
 LAST_TOKEN   = REAL_SETTINGS.getSetting('User_Token')
 if REAL_SETTINGS.getSetting('User_Device') == "": REAL_SETTINGS.setSetting('User_Device',str(uuid.uuid4()))
 BOX_ID       = REAL_SETTINGS.getSetting('User_Device')
+USER_PACKAGE = REAL_SETTINGS.getSetting('User_Package')
 DEV_ID       = 5
 DEV_TYPE     = 5
 IMG_PATH     = os.path.join(ADDON_PATH,'resources','images')
 BASEWEB      = 'https://plus.%s.com'%(BRAND)
 BASEAPI      = 'https://teleupapi.revlet.net'
 BASEIMG      = 'https://d229kpbsb5jevy.cloudfront.net/teleup/320/280/content/common/'
+FREE_CHANNEL = ['ABC','CBS','CW','PBS WPSU','My Network TV']
 
 MAIN_MENU    =  [(LANGUAGE(30032), '', 0),
                  (LANGUAGE(30033), '', 3)]
@@ -85,6 +87,7 @@ class USTVnow(object):
         log('__init__, sysARG = ' + str(sysARG))
         self.sysARG    = sysARG
         self.cache     = SimpleCache()
+        self.packages  = json.loads(USER_PACKAGE)
         self.header    = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
                           'content-type': 'application/json; charset=utf8',
                           'tenant-code': '%s'%BRAND,
@@ -126,25 +129,37 @@ class USTVnow(object):
         
         
     def login(self, user, password):
-        log('login, user = %s'%user)
-        info = (self.getURL(BASEAPI + '/service/api/auth/user/info', headers=self.header) or {'message':LANGUAGE(30007),'response':''})
-        if info['status']:
-            # notificationDialog('%s, %s'%(LANGUAGE(30006),info['response']['firstName']))
+        if len(user) > 0:
+            log('login, user = %s'%user)
+            info = (self.getURL(BASEAPI + '/service/api/auth/user/info', headers=self.header) or {'message':LANGUAGE(30007),'response':''})
+            self.packages = info.get('response',{}).get('packages',[])
+            REAL_SETTINGS.setSetting('User_Package',json.dumps(self.packages))
+            if not self.packages: log('login, FREE ACCOUNT')
+            if info.get('status',False): return True
+            session = self.getURL(BASEAPI + '/service/api/v1/get/token', {'tenant_code':'%s'%BRAND,'product':'%s'%BRAND,'box_id':BOX_ID,'device_id':DEV_ID,'device_sub_type':DEV_TYPE})
+            if not session.get('status',False):
+                notificationDialog(info.get('error',{}).get('message','') or info.get('message','') or LANGUAGE(30007))
+                return False
+            token = session['response']['sessionId']
+            self.header['session-id'] = token
+            REAL_SETTINGS.setSetting('User_Token',token)
+            signin = self.postURL(BASEAPI + '/service/api/auth/signin', params={'login_id':user,'login_key':password,'login_mode':1,'manufacturer':'Kodi'}, headers=self.header)
+            if not signin.get('status',False):
+                notificationDialog(signin.get('error',{}).get('message','') or signin.get('message','') or LANGUAGE(30007))
+                return False
+            notificationDialog('%s, %s'%(LANGUAGE(30006),signin['response']['firstName']))
             return True
-        session = self.getURL(BASEAPI + '/service/api/v1/get/token', {'tenant_code':'%s'%BRAND,'product':'%s'%BRAND,'box_id':BOX_ID,'device_id':DEV_ID,'device_sub_type':DEV_TYPE})
-        if not session.get('status',False):
-            notificationDialog(info.get('error',{}).get('message','') or info.get('message','') or LANGUAGE(30007))
-            return False
-        token = session['response']['sessionId']
-        self.header['session-id'] = token
-        REAL_SETTINGS.setSetting('User_Token',token)
-        signin = self.postURL(BASEAPI + '/service/api/auth/signin', params={'login_id':user,'login_key':password,'login_mode':1,'manufacturer':'Kodi'}, headers=self.header)
-        if not signin.get('status',False):
-            notificationDialog(signin.get('error',{}).get('message','') or signin.get('message','') or LANGUAGE(30007))
-            return False
-        notificationDialog('%s, %s'%(LANGUAGE(30006),signin['response']['firstName']))
-        return True
-        
+        else:
+            #firstrun wizard
+            if yesnoDialog(LANGUAGE(30008),no=LANGUAGE(30009), yes=LANGUAGE(30010)):
+                user     = inputDialog(LANGUAGE(30001))
+                password = inputDialog(LANGUAGE(30002),opt=xbmcgui.ALPHANUM_HIDE_INPUT)
+                REAL_SETTINGS.setSetting('User_Email'   ,user)
+                REAL_SETTINGS.setSetting('User_Password',password)
+                return self.login(user, password)
+            else:
+                okDialog(LANGUAGE(30003))
+                return False
     
     def buildMenu(self):
         log('buildMenu')
@@ -172,11 +187,13 @@ class USTVnow(object):
   
     def resolveURL(self, path):
         stream = self.getURL(path, headers=self.header)
-        if not stream.get('status',False): pass
+        if not stream.get('status',False): 
+            notificationDialog(stream.get('error',{}).get('message','') or stream.get('message','') or LANGUAGE(30005))
+            return None
         feeds = stream.get('response',{}).get('streams',{})
-        return [feed['url'] for feed in feeds if feed.get('streamType','') == 'akamai'][0]
-  
-  
+        return [feed.get('url',None) for feed in feeds if feed.get('streamType','') == 'akamai'][0]
+        
+        
     def buildMeta(self, chname, chlogo, item, opt='guide'):
         sview  = item['display']['layout']
         title  = uni(item['display']['title'])
@@ -210,31 +227,34 @@ class USTVnow(object):
             data  = section.get('sectionData',{}).get('data',{})
             provider = info['name']
             for item in data:
-                chname = item['display']['parentName']
-                if chname in filter: continue
-                filter.append(chname)
-                chlogo = BASEIMG + item['display']['imageUrl'].split(',')[1]
-                chpath = BASEAPI + '/service/api/v1/page/content?path=%s'%(item['display']['subtitle5'])
-                label, path, liz = self.buildMeta(chname, chlogo, item, 'live')
-                self.addLink(label, path, '9', liz, len(data))
+                try:
+                    chname = item['display']['parentName']
+                    if not self.packages and chname not in FREE_CHANNEL: continue
+                    if chname in filter: continue
+                    filter.append(chname)
+                    chlogo = BASEIMG + (item.get('display',{}).get('imageUrl','') or item.get('display',{}).get('parentIcon',',')).split(',')[1]
+                    chpath = BASEAPI + '/service/api/v1/page/content?path=%s'%(item['display']['subtitle5'])
+                    label, path, liz = self.buildMeta(chname, chlogo, item, 'live')
+                    self.addLink(label, path, '9', liz, len(data))
+                except Exception as e: log("buildLive, Failed! %s, Item = %s"%(e,json.dumps(item)), xbmc.LOGERROR)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_LABEL)
-                
-
+        
         
     def buildGuide(self, name=None):
         log('buildGuide, name = %s'%(name))
         channels = self.getChanneldata()
         for channel in channels:
             chname = channel['channel']['display']['title']
-            chlogo = BASEIMG + channel['channel']['display']['imageUrl'].split(',')[1]
+            chlogo = BASEIMG + (channel.get('channel',{}).get('display',{}).get('imageUrl','') or channel.get('channel',{}).get('display',{}).get('parentIcon',',')).split(',')[1]
             chpath = BASEAPI + '/service/api/v1/page/content?path=%s'%(channel['channel']['target']['path'])
+            if not self.packages and chname not in FREE_CHANNEL: continue
             if name is not None:
                 if name.lower() == chname.lower():
                     lineup = channel['programs']
                     for item in lineup:
                         label, path, liz = self.buildMeta(chname, chlogo, item)
                         if label is None: continue
-                        self.addLink(label, '', '9', liz, len(lineup))
+                        self.addLink(label, path, '9', liz, len(lineup))
                     xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_DATEADDED)
             else: 
                 self.addDir(chname, chname, '3', infoArt={"thumb":chlogo,"poster":chlogo,"fanart":chlogo})
@@ -248,16 +268,20 @@ class USTVnow(object):
             genre = content['section']['sectionInfo']['name']
             items = content['section']['sectionData']['data']
             for item in items:
-                chname = item['display']['title']
-                chlogo = BASEIMG + item['display']['imageUrl'].split(',')[1]
-                chpath = BASEAPI + '/service/api/v1/page/content?path=%s'%(item['target']['path'])
-                label, path, liz = self.buildMeta(chname, chlogo, item)
-                self.addLink(label, chpath, '9', liz, len(items))
-        
+                try:
+                    chname = item['display']['title']
+                    if not self.packages and chname not in FREE_CHANNEL: continue
+                    chlogo = BASEIMG + (item.get('display',{}).get('imageUrl','') or item.get('display',{}).get('parentIcon',',')).split(',')[1]
+                    chpath = BASEAPI + '/service/api/v1/page/content?path=%s'%(item['target']['path'])
+                    label, path, liz = self.buildMeta(chname, chlogo, item)
+                    self.addLink(label, chpath, '9', liz, len(items))
+                except Exception as e: log("buildContent, Failed! %s, Item = %s"%(e,json.dumps(item)), xbmc.LOGERROR)
+                    
         
     def playVideo(self, name, url):
         log('playVideo')
         url = self.resolveURL(url)
+        if url is None: return
         liz = xbmcgui.ListItem(name, path=url)
         if 'm3u8' in url.lower():
             if not inputstreamhelper.Helper('hls').check_inputstream(): sys.exit()

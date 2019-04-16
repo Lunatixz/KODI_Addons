@@ -122,12 +122,11 @@ class NewsOn(object):
                 title  = channel['title']
                 icon   = (channel['icon'] or ICON)
                 for idx, stream in enumerate(channel['streams']):
-                    streamType = stream['StreamType']
-                    if streamType == 'website': continue
+                    if stream['StreamType'] == 'website': continue
                     url = stream['Url']
                     offset = stream['OffsetFromNow']
-                    delay  = url+'&delay=%d'  #todo do something with delay option?
-                    if url in urls: continue
+                    delay  = url+'&delay=%d' # todo do something with delay option?
+                    if url in urls: continue # filter duplicate feeds
                     if url not in urls: urls.append(url)
                     chid = chid+'.%d'%idx if idx > 0 else chid
                     label      = "%s - %s" % (chid, title)
@@ -186,10 +185,10 @@ class NewsOn(object):
     def playVideo(self, name, url, live=False):
         log('playVideo')
         liz = xbmcgui.ListItem(name, path=url)
-        if 'm3u8' in url.lower():
-            if not inputstreamhelper.Helper('hls').check_inputstream(): sys.exit()
-            liz.setProperty('inputstreamaddon','inputstream.adaptive')
-            liz.setProperty('inputstream.adaptive.manifest_type','hls')
+        # if 'm3u8' in url.lower():
+            # if not inputstreamhelper.Helper('hls').check_inputstream(): sys.exit()
+            # liz.setProperty('inputstreamaddon','inputstream.adaptive')
+            # liz.setProperty('inputstream.adaptive.manifest_type','hls')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
 
            

@@ -6,4 +6,5 @@
     <setting id="uEPG_Settings"    type="action" label="30030" default=""  action="RunPlugin(plugin://plugin.video.ustvnow/?mode=22)" option="close" />  
     <setting id="User_Token"       type="text"   label="30002" default=""  visible="false"/>
     <setting id="User_Device"      type="text"   label="30002" default=""  visible="false"/>
+    <setting id="User_Package"     type="text"   label="30002" default="[]"  visible="false"/>
 </settings>

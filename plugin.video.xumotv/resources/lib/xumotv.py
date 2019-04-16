@@ -75,7 +75,9 @@ class XumoTV(object):
             log('openURL, url = ' + str(url))
             cacheresponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
             if not cacheresponse:
-                cacheresponse = urllib2.urlopen(urllib2.Request(url), timeout=TIMEOUT).read()
+                request = urllib2.Request(url)
+                request.add_header('User-Agent','Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)')
+                cacheresponse = urllib2.urlopen(request, timeout=TIMEOUT).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=datetime.timedelta(minutes=5))
             return cacheresponse
         except Exception as e:

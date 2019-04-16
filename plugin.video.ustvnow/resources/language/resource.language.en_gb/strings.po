@@ -151,3 +151,7 @@ msgstr ""
 msgctxt "#30033"
 msgid "Lineup"
 msgstr ""
+
+msgctxt "#30034"
+msgid "Channel not available, please check your subscription package."
+msgstr ""

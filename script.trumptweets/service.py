@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of Trump Tweets.
@@ -70,7 +70,7 @@ class Service(object):
             if self.myMonitor.pendingChange == True:
                 self.myMonitor.pendingChange = False
                 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
-                waitTime   = [300,600,900,1800][int(REAL_SETTINGS.getSetting('Wait_Time'))]
+                waitTime   = [300,600,900,1800][int(REAL_SETTINGS.getSetting('Wait_Time'))] if not DEBUG else 5
                 ignorePlay = REAL_SETTINGS.getSetting('Not_While_Playing') == 'true'
             
             # Don't run while playing.
@@ -119,7 +119,7 @@ class Service(object):
             pdate    = self.correctTime(item.get('published','').split('+')[0].rstrip())
             if getProperty('%s.pdate' %ADDON_ID) == pdate: return
             setProperty('%s.title'%ADDON_ID,title)
-            setProperty('%s.pdate'%ADDON_ID,pdate)
+            if not DEBUG: setProperty('%s.pdate'%ADDON_ID,pdate)
             ui = gui.GUI("default.xml", ADDON_PATH, "default")
             ui.doModal()
             del ui

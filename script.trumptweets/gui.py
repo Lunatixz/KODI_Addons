@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of Trump Tweets.
@@ -32,7 +32,7 @@ CLOSE_TIME     = [2,5,10,15,30,60,120][int(REAL_SETTINGS.getSetting('Close_Time'
 ID_LIST        = [30100,30200,30300]
 IMG_LIST       = {30101:'TrumpSign_%d.png'  %random.randint(1,4),
                   30201:'TrumpTweet_%d.png' %random.randint(1,5),
-                  30301:'TrumpSpeech_%d.png'%random.randint(1,7)}
+                  30301:'TrumpSpeech_%d.png'%random.randint(1,23)}
 
 class GUI(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs ):
@@ -45,7 +45,6 @@ class GUI(xbmcgui.WindowXMLDialog):
             
             
     def onInit(self):
-        random.seed()
         self.lockAction = True
         select = random.choice(ID_LIST)
         for id in ID_LIST: 
@@ -55,7 +54,7 @@ class GUI(xbmcgui.WindowXMLDialog):
         width = self.getControl(select + 1).getWidth()
         xmin = 0 + int(width)
         xmax = 1920 - int(width)
-        self.getControl(select).setPosition(random.randrange(xmin,xmax,int(width//4)), ypos)
+        self.getControl(select).setPosition(random.randrange(xmin,xmax,int(width//8)), ypos)
         self.getControl(select).setVisible(True)
         xbmc.sleep(1500)
         self.lockAction = False

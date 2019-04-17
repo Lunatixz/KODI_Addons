@@ -173,9 +173,12 @@ class USTVnow(object):
     def getChanneldata(self, dtime=3):
         stime = self.getcurrentTime()
         etime = calendar.timegm((datetime.datetime.fromtimestamp(stime) + datetime.timedelta(days=dtime)).timetuple())
-        for page in range(20):#todo find channel range
-            try: 
-                items = self.getURL(BASEAPI + '/service/api/v1/tv/guide', {'page':page,'pagesize':10}, headers=self.header, life=datetime.timedelta(hours=1))['response']['data']
+        tabs = getURL(BASEAPI + '/service/api/v1/tv/guide',{'page':0,'pagesize':12}, headers=header, life=datetime.timedelta(hours=1))['response']['tabs']
+        for page in tabs:
+            try:
+                stime = page['startTime']
+                etime = page['endTime']
+                items = getURL(BASEAPI + '/service/api/v1/tv/guide',{'start_time':stime,'end_time':etime,'page':0,'pagesize':12}, headers=header, life=datetime.timedelta(hours=1))['response']['data']
                 for item in items: yield item
             except: break
             

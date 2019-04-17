@@ -294,24 +294,26 @@ class MM(object):
                 path  = item['file']
                 updateDialogProgress = (idx) * 100 // len(list)
                 busy = self.progressDialogBG(updateDialogProgress, busy, string1=label)
-                if TV: mediaLST.append({'label':label,'label2':path,'thumb':(item['art'].get('poster','') or item['thumbnail'])})
-                else:
+                if not TV:
                     video = item['streamdetails']['video']
                     audio = item['streamdetails']['audio']
                     if path.startswith('stack://'): label = ' %s [[B]STACK[/B]]'%label
                     if len(video) > 0: label = '%s - Video [Codec: [B]%s[/B]|Height: [B]%s[/B]|Runtime: [B]%s[/B]]'%(label,video[0]['codec'].upper(),video[0]['height'],video[0]['duration'])
                     if len(audio) > 0: label = '%s - Audio [Codec: [B]%s[/B]|Channels: [B]%s[/B]|Language: [B]%s[/B]]'%(label,audio[0]['codec'].upper(),audio[0]['channels'],audio[0]['language'].title())
-                    mediaLST.append({'label':label,'label2':path,'thumb':(item['art'].get('poster','') or item['thumbnail'])})
+                mediaLST.append(self.getListitem(label, path, (item['art'].get('poster','') or item['thumbnail'])))
             except Exception as e: log("buildListitem Failed! %s , item = %s"%(str(e),item), xbmc.LOGERROR)
         self.progressDialogBG(100, busy)
-        log("buildListitem, found tvshows "  + str(len(mediaLST)))
-        return [self.getListitem(show['label'],show['label2'],show['thumb']) for show in mediaLST]
+        log("buildListitem, found "  + str(len(mediaLST)))
+        return mediaLST
 
     
     def viewTVShows(self):
         TVShowList = self.buildListitem(self.getTVShows(),TV=True)
-        select = self.selectDialog(TVShowList, LANGUAGE(30037), preselect=self.findItemLens(TVShowList,self.getUserList()))
-        if select is not None: self.setUserList([TVShowList[idx].getLabel() for idx in select])
+        TVShowList.insert(0, self.getListitem(LANGUAGE(30044),LANGUAGE(30045),ICON, ICON))
+        select = self.selectDialog(TVShowList, LANGUAGE(30037), preselect=self.findItemIDX(TVShowList,self.getUserList()))
+        if select is None or select < 0: return
+        elif 0 in select: self.setUserList([TVShowList[idx].getLabel() for idx in range(1,len(TVShowList))])
+        elif select is not None: self.setUserList([TVShowList[idx].getLabel() for idx in select])
 
         
     def getListitem(self, label1="", label2="", iconImage="", thumbnailImage="", path="", offscreen=False):
@@ -319,7 +321,7 @@ class MM(object):
         except: return xbmcgui.ListItem(label1, label2, iconImage, thumbnailImage, path)
     
    
-    def findItemLens(self, tvlist, userlist):
+    def findItemIDX(self, tvlist, userlist):
         return [idx for idx, tvshow in enumerate(tvlist) for usershow in userlist if tvshow.getLabel() == usershow]
     
     

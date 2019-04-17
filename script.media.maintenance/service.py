@@ -54,9 +54,11 @@ class Player(xbmc.Player):
         xbmc.sleep(1000)
         if not self.isPlaying(): return
         self.playingItem = self.myService.myUtils.requestItem()
+        xbmc.sleep(1000)
         self.playingItem['TotalTime'] = self.getTotalTime()
         log('onPlayBackStarted, playingItem = ' + json.dumps(self.playingItem))
-
+        #todo add wait for playlist option, save playing playlist, monitor position and watched status; on stop prompt to delete watched items if match.
+        
          
     def onPlayBackEnded(self):
         log('onPlayBackEnded')
@@ -70,7 +72,7 @@ class Player(xbmc.Player):
 
     def chkContent(self, playingItem={}):
         log('chkContent, playingItem = %s'%(json.dumps(self.playingItem)))
-        if PTVL_RUNNING or self.playingItem['TotalTime'] <= 0: return
+        if PTVL_RUNNING or self.playingItem.get('TotalTime',0) <= 0: return
         elif self.playingItem.get("file","").startswith(('plugin://','upnp://','pvr://')): return
         elif (self.playingTime * 100 / self.playingItem['TotalTime']) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
             if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": self.myService.myUtils.removeSeason(self.playingItem)

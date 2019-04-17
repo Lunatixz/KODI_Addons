@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
+    <category label="30046">
     <setting id="Enable_Debugging" type="bool"   label="30000"  default="false" />
     <setting                       type="lsep" />
     <setting id="Enable_Removal"   type="bool"   label="30013"  default="false" />
@@ -15,9 +16,10 @@
     <setting id="ClearTVShows"     type="action" label="30012"  subsetting="true" option="close" visible="!eq(-1,)" action="RunScript($CWD/default.py, -clearTVShows)" default="" />
     <setting id="ScanSonarr"       type="action" label="30006"  subsetting="true" action="RunScript($CWD/default.py, -scanSonarr)" />
     <setting id="Wait_4_Season"    type="bool"   label="30029"  subsetting="true" default="false" />
+    </category>
     <category label="30030">
     <setting id="Enable_Scan"      type="enum"   label="30031"  values="Disable|Hourly|Quarterly|Daily"        default="0" />
-    <setting id="Enable_Clean"     type="enum"   label="30032"  values="Disable|Hourly|Quarterly|Daily|Weekly" default="0" />       
+    <setting id="Enable_Clean"     type="enum"   label="30032"  values="Disable|Hourly|Quarterly|Daily|Weekly" default="0" />
     </category>
     <category label="30028">
     <setting label="30016"         type="lsep" />

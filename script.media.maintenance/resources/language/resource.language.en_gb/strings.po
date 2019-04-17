@@ -191,3 +191,15 @@ msgstr ""
 msgctxt "#30043"
 msgid "Add "%s" to Monitored TV Shows"
 msgstr ""
+
+msgctxt "#30044"
+msgid "Select All"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Monitor all TV Shows"
+msgstr ""
+
+msgctxt "#30046"
+msgid "General"
+msgstr ""

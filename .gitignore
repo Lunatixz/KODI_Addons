@@ -1,3 +1,5 @@
 *.pyo
 *.pyc
 /.vs
+*.db
+*.db

@@ -1399,7 +1399,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.ustvnow" name="USTVnow" provider-name="Lunatixz" version="2019.04.16">
+<addon id="plugin.video.ustvnow" name="USTVnow" provider-name="Lunatixz" version="2019.04.20">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.requests" version="2.7.0"/>

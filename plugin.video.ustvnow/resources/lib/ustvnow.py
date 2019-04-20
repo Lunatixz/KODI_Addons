@@ -106,7 +106,9 @@ class USTVnow(object):
                 r = requests.get(url, params, headers=headers)
                 self.cache.set(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,params,headers), r.text, expiration=life)
                 return r.json()
-            except Exception as e: log("getURL, Failed! %s"%(e), xbmc.LOGERROR)
+            except Exception as e: 
+                log("getURL, Failed! %s"%(e), xbmc.LOGERROR)
+                return {}
         else: return json.loads(cacheresponse)
         
         
@@ -119,7 +121,9 @@ class USTVnow(object):
                 r = requests.post(url, json=params, headers=headers)
                 self.cache.set(ADDON_NAME + '.postURL, url = %s.%s.%s'%(url,params,headers), r.text, expiration=life)
                 return r.json()
-            except Exception as e: log("postURL, Failed! %s"%(e), xbmc.LOGERROR)
+            except Exception as e: 
+                log("postURL, Failed! %s"%(e), xbmc.LOGERROR)
+                return {}
         else: return json.loads(cacheresponse)
     
 
@@ -170,12 +174,15 @@ class USTVnow(object):
         return int(str(self.getURL(BASEAPI + '/service/api/current/epoch',life=datetime.timedelta(seconds=60)))[:-3])
         
        
-    def getChanneldata(self, dtime=3):
+    def getChanneldata(self, dtime=1):
         stime = self.getcurrentTime()
         etime = calendar.timegm((datetime.datetime.fromtimestamp(stime) + datetime.timedelta(days=dtime)).timetuple())
-        for page in range(20):#todo find channel range
-            try: 
-                items = self.getURL(BASEAPI + '/service/api/v1/tv/guide', {'page':page,'pagesize':10}, headers=self.header, life=datetime.timedelta(hours=1))['response']['data']
+        tabs = self.getURL(BASEAPI + '/service/api/v1/tv/guide',{'page':0,'pagesize':12}, headers=self.header, life=datetime.timedelta(hours=1))['response']['tabs']
+        for page in tabs:
+            try:
+                stime = page['startTime']
+                etime = page['endTime']
+                items = self.getURL(BASEAPI + '/service/api/v1/tv/guide',{'start_time':stime,'end_time':etime,'page':0,'pagesize':12}, headers=self.header, life=datetime.timedelta(hours=1))['response']['data']
                 for item in items: yield item
             except: break
             
@@ -283,10 +290,10 @@ class USTVnow(object):
         url = self.resolveURL(url)
         if url is None: return
         liz = xbmcgui.ListItem(name, path=url)
-        if 'm3u8' in url.lower():
-            if not inputstreamhelper.Helper('hls').check_inputstream(): sys.exit()
-            liz.setProperty('inputstreamaddon','inputstream.adaptive')
-            liz.setProperty('inputstream.adaptive.manifest_type','hls')
+        # if 'm3u8' in url.lower():
+            # if not inputstreamhelper.Helper('hls').check_inputstream(): sys.exit()
+            # liz.setProperty('inputstreamaddon','inputstream.adaptive')
+            # liz.setProperty('inputstream.adaptive.manifest_type','hls')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
 
 

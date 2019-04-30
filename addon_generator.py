@@ -23,15 +23,14 @@
  
 """ addons.xml generator """
  
-import os
-import sys
-import fnmatch
+import os, sys, fnmatch
 import xml.etree.ElementTree
 from zipfile import ZipFile
 from shutil import copyfile
 
-GITPATH = 'C:/GitHub/KODI_Addons/'
-ZIPPATH = os.path.join(GITPATH,'zips','')
+GITPATH    = 'C:/GitHub/KODI_Addons/'
+ZIPPATH    = os.path.join(GITPATH,'zips','')
+DELETE_EXT = ('.pyc', '.pyo', '.db')
 
 # Compatibility with 3.0, 3.1 and 3.2 not supporting u"" literals
 if sys.version < '3':
@@ -42,13 +41,13 @@ else:
     def u(x):
         return x
 
-class Generator:
+class Generator(object):
     """
         Generates a new addons.xml file from each addons addon.xml file
         and a new addons.xml.md5 hash file. Must be run from the root of
         the checked-out repo. Only handles single depth folder structure.
     """
-    def __init__( self ):
+    def __init__(self):
         # generate files
         self._clean_addons()
         self._generate_addons_file()
@@ -57,6 +56,15 @@ class Generator:
         # notify user
         print("Finished updating addons xml and md5 files")
     
+    
+    def _clean_addons(self):
+        for root, dirnames, filenames in os.walk(GITPATH):
+            for filename in filenames:
+                if filename.endswith(DELETE_EXT):
+                    print("removing: " + filename)
+                    os.remove(os.path.join(root, filename))
+                 
+                 
     def _generate_addons_file( self ):
         # addon list
         addons = os.listdir(GITPATH)
@@ -92,6 +100,7 @@ class Generator:
         # save file
         self._save_file( addons_xml.encode( "UTF-8" ), file="addons.xml" )
     
+    
     def _generate_md5_file( self ):
         # create a new md5 hash
         try:
@@ -116,6 +125,7 @@ class Generator:
             # oops
             print("An error occurred saving %s file!\n%s" % ( file, e ))
             
+            
     def get_plugin_version( self, addon_dir):
         addon_file = os.path.join(addon_dir, 'addon.xml')
         if(not os.path.exists(addon_file)) :
@@ -130,17 +140,6 @@ class Generator:
             print( e.message)
 
             
-    def _clean_addons(self):
-        matches = []
-        for root, dirnames, filenames in os.walk(GITPATH):
-            for filename in fnmatch.filter(filenames, '*.pyc'):
-                matches.append(os.path.join(root, filename))
-            for filename in fnmatch.filter(filenames, '*.pyo'):
-                matches.append(os.path.join(root, filename))
-        for filename in matches: 
-            print("removing: " + filename)
-            os.remove(filename)
-                 
     def create_zip_file( self, fpath, addon):
         print("addon_dir: " + addon)
         version = self.get_plugin_version(os.path.join(fpath,addon))

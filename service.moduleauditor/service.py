@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Team-Kodi
+#   Copyright (C) 2019 Team-Kodi
 #
 #
 # This file is part of Kodi Module Auditor
@@ -18,14 +18,14 @@
 
 import schedule
 import xbmc
-
 from scan import *
 
 class Monitor(xbmc.Monitor):
     def __init__(self):
-        xbmc.Monitor.__init__(self, xbmc.Monitor())
+        xbmc.Monitor.__init__(self)
         self.pendingChange = False
         self.optOut = REAL_SETTINGS.getSetting('Disable_Service') == "true"
+        
         
     def onSettingsChanged(self):
         log("onSettingsChanged")
@@ -33,6 +33,7 @@ class Monitor(xbmc.Monitor):
         REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
         self.optOut = REAL_SETTINGS.getSetting('Disable_Service') == "true"
          
+        
 class Service(object):
     def __init__(self):
         self.myMonitor = Monitor()
@@ -50,7 +51,7 @@ class Service(object):
         while not self.myMonitor.abortRequested():
             if self.myMonitor.waitForAbort(30) or self.myMonitor.pendingChange: break
             if xbmc.getGlobalIdleTime() >= 900: continue # do not notify when idle
-            if not self.myMonitor.optOut: schedule.run_pending()
+            if not self.myMonitor.optOut and not xbmc.Player().isPlaying(): schedule.run_pending()
         if self.myMonitor.pendingChange: self.startService()
         
 if __name__ == '__main__': Service()

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.hdhomerun.simple" name="HDHomerun Simple" provider-name="Lunatixz" version="1.0.2">
+<addon id="plugin.video.hdhomerun.simple" name="HDHomerun Simple" provider-name="Lunatixz" version="1.0.3">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/> 
-        <import addon="script.module.pyhdhr" version="1.0.5"/>
+        <import addon="script.module.pyhdhr" version="1.0.7"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.uepg" version="1.0.3"/>
+        <import addon="script.module.uepg" version="1.0.6"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
@@ -17,7 +17,7 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.hdhomerun.simple</source>
-        <website>https://www.silicondust.com/</website>
+        <website>https://www.hdhomerun.com</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=327117</forum>
         <news>v1.0.2[CR]- Fixed Recordings[CR]</news>
         <assets>

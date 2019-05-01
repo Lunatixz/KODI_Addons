@@ -19,10 +19,10 @@
 # -*- coding: utf-8 -*-
 import os, sys, time, datetime, traceback, feedparser, random, inputstreamhelper
 import urlparse, urllib, urllib2, socket, json, collections, gzip
-import xbmc, xbmcgui, xbmcplugin, xbmcaddon
+import xbmc, xbmcgui, xbmcplugin, xbmcaddon, xbmcvfs
 
 from StringIO import StringIO
-from simplecache import SimpleCache
+from simplecache import SimpleCache, use_cache
 # Plugin Info
 ADDON_ID      = 'plugin.video.newson'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
@@ -35,13 +35,17 @@ FANART        = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE      = REAL_SETTINGS.getLocalizedString
 NEWSART       = os.path.join(ADDON_PATH,'resources','images','newscast.jpg')
 CLIPART       = os.path.join(ADDON_PATH,'resources','images','videoclips.jpg')
+MAP_PATH      = os.path.join(xbmc.translatePath(SETTINGS_LOC),'cache','maps')
 
 ## GLOBALS ##
 TIMEOUT       = 15
 CONTENT_TYPE  = 'episodes'
+APIKEY        = REAL_SETTINGS.getSetting('MAPQUEST_API')
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 BASE_API      = 'http://watchnewson.com/api/linear/channels'
 LOGO_URL      = 'https://dummyimage.com/512x512/035e8b/FFFFFF.png&text=%s'
+FAN_URL       = 'https://dummyimage.com/1280x720/035e8b/FFFFFF.png&text=%s'
+MAP_URL       = 'https://www.mapquestapi.com/staticmap/v5/map?key=%s&center=%s&size=1280,720&zoom=14&type=dark'
 MENU          = [(LANGUAGE(30002), '0', 0, False, {"thumb":NEWSART,"poster":NEWSART,"fanart":FANART,"icon":ICON,"logo":ICON}),
                  (LANGUAGE(30003), '2', 2, False, {"thumb":CLIPART,"poster":CLIPART,"fanart":FANART,"icon":ICON,"logo":ICON})]
            
@@ -54,10 +58,24 @@ socket.setdefaulttimeout(TIMEOUT)
 class NewsOn(object):
     def __init__(self, sysARG):
         log('__init__, sysARG = ' + str(sysARG))
+        if not xbmcvfs.exists(MAP_PATH): xbmcvfs.mkdirs(MAP_PATH)
         self.sysARG    = sysARG
         self.cache     = SimpleCache()
         self.stateMenu = self.getStates()
 
+
+    def getMAP(self, args):
+        try:
+            if len(args) == 2: 
+                lat, lon = tuple(args)
+                dest = os.path.join(MAP_PATH,'%s.%s.jpg'%(lat, lon))
+                if not xbmcvfs.exists(dest): urllib.urlretrieve(MAP_URL%(APIKEY, '%s,%s'%(lat, lon)),dest)
+            else: 
+                dest = os.path.join(MAP_PATH,'%s.jpg'%(args))
+                if not xbmcvfs.exists(dest): urllib.urlretrieve(MAP_URL%(APIKEY, args),dest)
+            return dest
+        except: return FANART
+            
         
     def openURL(self, url):
         try:
@@ -88,7 +106,8 @@ class NewsOn(object):
     def browseMenu(self, id=1):
         log('browseMenu, id = ' + str(id))
         self.stateMenu = [tuple(s.format(id) for s in tup) for tup in self.stateMenu]
-        for item in self.stateMenu: self.addDir(item[0], item[1], item[2], False, {"thumb":LOGO_URL%item[0],"poster":LOGO_URL%item[0],"fanart":FANART,"icon":ICON,"logo":ICON})
+        for item in self.stateMenu: 
+            self.addDir(item[0], item[1], item[2], False, {"thumb":LOGO_URL%item[0],"poster":LOGO_URL%item[0],"fanart":FAN_URL%(item[0]),"icon":ICON,"logo":ICON})
 
 
     def cleanState(self, state):
@@ -120,6 +139,8 @@ class NewsOn(object):
             if state in states:
                 chid   = channel['identifier']
                 title  = channel['title']
+                lat    = channel['config']['latitude']
+                lon    = channel['config']['longitude']
                 icon   = (channel['icon'] or ICON)
                 for idx, stream in enumerate(channel['streams']):
                     if stream['StreamType'] == 'website': continue
@@ -130,8 +151,8 @@ class NewsOn(object):
                     if url not in urls: urls.append(url)
                     chid = chid+'.%d'%idx if idx > 0 else chid
                     label      = "%s - %s" % (chid, title)
-                    infoLabels ={"mediatype":"episodes","label":label,"title":label}
-                    infoArt    ={"thumb":icon,"poster":icon,"fanart":FANART,"icon":icon,"logo":icon} 
+                    infoLabels ={"mediatype":"episodes","label":label,"title":label,'plot':label}
+                    infoArt    ={"thumb":icon,"poster":icon,"fanart":self.getMAP((lat, lon)),"icon":icon,"logo":icon} 
                     self.addLink(title, url, 9, infoLabels, infoArt)
         
         
@@ -147,10 +168,12 @@ class NewsOn(object):
                     vidURL = channel['config']['localvodfeed']
                     chid   = channel['identifier']
                     title  = channel['title']
+                    lat    = channel['config']['latitude']
+                    lon    = channel['config']['longitude']
                     icon   = (channel['icon'] or ICON)
                     label  = "%s - %s" % (chid, title)
                     infoLabels ={"mediatype":"video","label":label,"title":label}
-                    infoArt    ={"thumb":icon,"poster":icon,"fanart":FANART,"icon":ICON,"logo":ICON} 
+                    infoArt    ={"thumb":icon,"poster":icon,"fanart":self.getMAP((lat, lon)),"icon":ICON,"logo":ICON} 
                     self.addDir(label, vidURL, 4, infoLabels, infoArt)
                 except: continue
 
@@ -177,7 +200,7 @@ class NewsOn(object):
                             for tag in item['tags']: tagLST.append(((tag['term']).split('/')[0]).title())
                         if len(tagLST) > 0: genre = (tagLST[0] or '')
                         infoLabels ={"mediatype":"episode","label":title,"title":title,"plot":plot,"aired":aired,'genre':genre,'tags':tagLST}
-                        infoArt    ={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON} 
+                        infoArt    ={"thumb":thumb,"poster":thumb,"fanart":thumb,"icon":ICON,"logo":ICON} 
                         self.addLink(title, url, 8, infoLabels, infoArt)
                     except: continue
                     
@@ -185,10 +208,9 @@ class NewsOn(object):
     def playVideo(self, name, url, live=False):
         log('playVideo')
         liz = xbmcgui.ListItem(name, path=url)
-        # if 'm3u8' in url.lower():
-            # if not inputstreamhelper.Helper('hls').check_inputstream(): sys.exit()
-            # liz.setProperty('inputstreamaddon','inputstream.adaptive')
-            # liz.setProperty('inputstream.adaptive.manifest_type','hls')
+        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
+            liz.setProperty('inputstreamaddon','inputstream.adaptive')
+            liz.setProperty('inputstream.adaptive.manifest_type','hls')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
 
            

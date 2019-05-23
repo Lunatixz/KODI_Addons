@@ -1,5 +1,5 @@
 # Lunatixz Beta Repository 
-### Stable code submitted to the [Kodi repository](https://kodi.tv/addons/browse?keyword=&category=All&author=Lunatixz&sort=field_last_update_value+DESC); Please do not add my beta reposotry or plugins to any "Wizards", "Builds", "APKs" or website indexers. Thank You!
+### Stable code submitted to the [Kodi repository](https://kodi.tv/addons/browse?keyword=&category=All&author=Lunatixz&sort=field_last_update_value+DESC); Please do not add my beta repository and/or plugins to any "Wizards", "Builds", "APKs" or website indexers. Thank You!
 
 [![Codacy Badge](https://img.shields.io/codacy/grade/efcc007bd689449f8cf89569ac6a311b.svg?style=flat-square)](https://www.codacy.com/app/Lunatixz/KODI_Addon/dashboard)
 [![GitHub last commit](https://img.shields.io/github/last-commit/Lunatixz/KODI_Addons.svg?style=flat-square)](https://github.com/Lunatixz/KODI_Addons/commits/master)

@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of Locast.
@@ -18,7 +18,7 @@
 
 # -*- coding: utf-8 -*-
 import os, sys, time, datetime, re, traceback, calendar, collections
-import urlparse, urllib, urllib2, socket, json, net
+import urlparse, urllib, urllib2, socket, json, net, inputstreamhelper
 import xbmc, xbmcgui, xbmcplugin, xbmcaddon, xbmcvfs
 
 from simplecache import SimpleCache, use_cache
@@ -95,6 +95,7 @@ class Locast(object):
         self.sysARG = sysARG
         self.cache  = SimpleCache()
         self.net    = net.Net(cookie_file=COOKIE_JAR,http_debug=DEBUG)
+        self.now    = datetime.datetime.now()
         self.lat, self.lon = self.setRegion()
         if self.login(USER_EMAIL, PASSWORD) == False: sys.exit()  
 
@@ -115,14 +116,12 @@ class Locast(object):
         if len(user) > 0:
             try: xbmcvfs.rmdir(COOKIE_JAR)
             except: pass
-            
             if xbmcvfs.exists(COOKIE_JAR) == False:
                 try:
                     xbmcvfs.mkdirs(SETTINGS_LOC)
                     f = xbmcvfs.File(COOKIE_JAR, 'w')
                     f.close()
                 except: log('login, Unable to create the storage directory', xbmc.LOGERROR)
-                
             data = json.loads(self.net.http_POST(BASE_API, form_data={'action':'member_login','username':user,'password':password}, headers=self.buildHeader()).content.encode("utf-8").rstrip())
             '''{u'token': u'', u'role': 1}'''
             if data and 'token' in data: 
@@ -229,23 +228,22 @@ class Locast(object):
                 else: continue
             self.addLink(label, path, 9, infoLabels, infoArt, infoVideo, infoAudio, total=len(listings))
         
-        
+  
     def uEPG(self):
         log('uEPG')
-        #support for uEPG universal epg framework module. #https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.uepg
-        return self.poolList(self.buildGuide, self.getEPG(self.getRegion()))
+        stations = self.getEPG(self.getRegion())
+        return self.poolList(self.buildStation, stations)
         
         
-    def buildGuide(self, station):
-        log('buildGuide')
-        now        = datetime.datetime.now()
+    def buildStation(self, station):
+        log('buildStation')                   
         chname     = (station.get('affiliateName','') or station.get('affiliate','') or station.get('callSign','') or station.get('name',''))
         chnum      = station['id']
         link       = str(chnum)
         chlogo     = station['logoUrl']
-        isFavorite = False 
-        newChannel = {}
+        isFavorite = False
         guidedata  = []
+        newChannel = {}
         newChannel['channelname']   = chname
         newChannel['channelnumber'] = chnum
         newChannel['channellogo']   = chlogo
@@ -257,12 +255,12 @@ class Locast(object):
             label = listing['title']
             plot  = (listing.get('description','') or label)
             try: aired = datetime.datetime.fromtimestamp(int(str(listing['airdate'])[:-3]))
-            except: aired = now
+            except: aired = self.now
             duration  = listing.get('duration',0)
             tmpdata   = {"mediatype":type,"label":label,"title":label,'duration':duration,'plot':plot,'genre':listing.get('genres',[]),"aired":aired.strftime('%Y-%m-%d')}
             starttime = datetime.datetime.fromtimestamp(int(str(listing['startTime'])[:-3]))
             endtime   = starttime + datetime.timedelta(seconds=duration)
-            if now > endtime: continue
+            if self.now > endtime or starttime < self.now: continue
             tmpdata['starttime'] = time.mktime((starttime).timetuple())
             tmpdata['url'] = self.sysARG[0]+'?mode=9&name=%s&url=%s'%(chname,link)
             tmpdata['art'] = {"thumb":chlogo,"poster":chlogo,"fanart":FANART,"icon":chlogo,"logo":chlogo}
@@ -290,11 +288,11 @@ class Locast(object):
 
         
     def playLive(self, name, url):
-        log('playLive')
+        log('playLive')     
         liz  = xbmcgui.ListItem(name, path=self.resolveURL(int(url))['streamUrl'])
-        if url.endswith('m3u8'):
+        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
             liz.setProperty('inputstreamaddon','inputstream.adaptive')
-            liz.setProperty('inputstream.adaptive.manifest_type','hls') 
+            liz.setProperty('inputstream.adaptive.manifest_type','hls')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
     
            
@@ -348,11 +346,12 @@ class Locast(object):
         elif mode == 4: self.getStations(name, url, 'Lineups')
         elif mode == 5: self.getStations(name, url, 'Lineup')
         elif mode == 9: self.playLive(name, url)
-        elif mode == 20:xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&refresh_path=%s&refresh_interval=%s)"%(urllib.quote(json.dumps(list(self.uEPG()))),urllib.quote(json.dumps(self.sysARG[0]+"?mode=20")),urllib.quote(json.dumps("7200"))))
+        elif mode == 20:xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&refresh_path=%s&refresh_interval=%s)"%(urllib.quote(json.dumps(list(self.uEPG()))),urllib.quote(json.dumps(self.sysARG[0]+"?mode=20")),"7200"))
 
+            
         xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_NONE)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_TITLE)
-        xbmcplugin.endOfDirectory(int(self.sysARG[1]), cacheToDisc=True)
+        xbmcplugin.endOfDirectory(int(self.sysARG[1]), cacheToDisc=False)

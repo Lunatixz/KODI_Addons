@@ -67,3 +67,15 @@ msgstr "
 msgctxt "#30013"
 msgid "Guide"
 msgstr "
+
+msgctxt "#30014"
+msgid "All Channels"
+msgstr "
+
+msgctxt "#30015"
+msgid ">> Next"
+msgstr "
+
+msgctxt "#30016"
+msgid "Featured"   
+msgstr "

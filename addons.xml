@@ -1268,6 +1268,29 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.trekyards" version="1.0.0" name="TrekYards - YouTube" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="plugin.video.youtube" version="5.3.10"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">If you love Star Trek, Star Wars, or just great Sci-Fi then this channel is for you.</summary>
+        <description lang="en_GB">This is the domain for the Trekyards Webseries, where we examine the ships and tech from the Star Trek Universe.  We interview the people behind Star Trek (past, present and future) and get their exclusive and interesting perspectives on the designs and history of this amazing franchise.  Industry greats like Doug Drexler, Rick Sternbach, John Eaves, Andrew Probert,  Rob Bonchune,  Tobias Richter, Alec Peters, Larry Nemecek, Rob Burnett, Scott Nakada and many more join us on a regular basis to talk Trek and allow you, the viewers to gain a unique perspective on the world both in universe and behind the scenes.  The channel focus's on Stuart "Captain" Foley and Samuel "Commander" Cockings lives, including product reviews, unboxings, Captains Log's (a behind the scenes look at Trekyards), Fleetyards (sci-fi ships from all franchises) model building videos and assorted other goodies.  If you love Star Trek, Star Wars, or just great Sci-Fi then this channel is for you.  Welcome and enjoy!</description>
+        <platform>all</platform>
+        <website>http://trekyards.com</website>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.trekyards</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=323520</forum>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.video.tufftv" version="1.0.2" name="Tuff.TV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1321,29 +1344,6 @@
             <screenshot>resources/images/screenshot01.png</screenshot>
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="plugin.video.trekyards" version="1.0.0" name="TrekYards - YouTube" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="plugin.video.youtube" version="5.3.10"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">If you love Star Trek, Star Wars, or just great Sci-Fi then this channel is for you.</summary>
-        <description lang="en_GB">This is the domain for the Trekyards Webseries, where we examine the ships and tech from the Star Trek Universe.  We interview the people behind Star Trek (past, present and future) and get their exclusive and interesting perspectives on the designs and history of this amazing franchise.  Industry greats like Doug Drexler, Rick Sternbach, John Eaves, Andrew Probert,  Rob Bonchune,  Tobias Richter, Alec Peters, Larry Nemecek, Rob Burnett, Scott Nakada and many more join us on a regular basis to talk Trek and allow you, the viewers to gain a unique perspective on the world both in universe and behind the scenes.  The channel focus's on Stuart "Captain" Foley and Samuel "Commander" Cockings lives, including product reviews, unboxings, Captains Log's (a behind the scenes look at Trekyards), Fleetyards (sci-fi ships from all franchises) model building videos and assorted other goodies.  If you love Star Trek, Star Wars, or just great Sci-Fi then this channel is for you.  Welcome and enjoy!</description>
-        <platform>all</platform>
-        <website>http://trekyards.com</website>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.trekyards</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=323520</forum>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
         </assets>
     </extension>
 </addon>
@@ -1606,60 +1606,6 @@
     </extension>
 </addon>
 
-<addon id="screensaver.nasa" name="NASA - Images of the Day" version="0.0.1" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-    </requires>
-    <extension point="xbmc.ui.screensaver" library="default.py"/>
-    <extension point="xbmc.python.script"  library="default.py"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Get the latest images from America's space agency. Get the ... NASA Images of the Day.</summary>
-        <description lang="en_GB"></description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <website>https://unsplash.com/</website>
-        <forum>https://forum.kodi.tv/showthread.php?tid=339148</forum>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.nasa</source>
-        <news>Pre-Release Beta</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="screensaver.system47" name="System 47 - Star Trek LCARS ScreenSaver" version="2.2g" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="plugin.video.youtube" version="5.3.10"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-    </requires>
-    <extension point="xbmc.ui.screensaver" library="default.py"/>
-    <extension point="xbmc.python.script"  library="default.py"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">System 47 - Star Trek LCARS ScreenSaver</summary>
-        <description lang="en_GB">What is LCARS? LCARS is an acronym for "Library Computer Access and Retrieval System", which is the primary computer system in the universe of Star Trek's Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There's actually another name for this type of graphical displays. It's "Okudagram". It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation.</description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <website>http://www.mewho.com/system47/</website>
-        <forum>https://forum.kodi.tv/showthread.php?tid=323285</forum>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.system47</source>
-        <disclaimer lang="en_GB" >Streaming not recommend for metered Internet, choose download option under settings.</disclaimer>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="script.media.maintenance" version="1.0.9" name="Media Maintenance" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1791,6 +1737,60 @@
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pyhdhr</source>
         <assets>
             <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="screensaver.nasa" name="NASA - Images of the Day" version="0.0.1" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+    </requires>
+    <extension point="xbmc.ui.screensaver" library="default.py"/>
+    <extension point="xbmc.python.script"  library="default.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Get the latest images from America's space agency. Get the ... NASA Images of the Day.</summary>
+        <description lang="en_GB"></description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <website>https://unsplash.com/</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=339148</forum>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.nasa</source>
+        <news>Pre-Release Beta</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="screensaver.system47" name="System 47 - Star Trek LCARS ScreenSaver" version="2.2g" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="plugin.video.youtube" version="5.3.10"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+    </requires>
+    <extension point="xbmc.ui.screensaver" library="default.py"/>
+    <extension point="xbmc.python.script"  library="default.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">System 47 - Star Trek LCARS ScreenSaver</summary>
+        <description lang="en_GB">What is LCARS? LCARS is an acronym for "Library Computer Access and Retrieval System", which is the primary computer system in the universe of Star Trek's Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There's actually another name for this type of graphical displays. It's "Okudagram". It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation.</description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <website>http://www.mewho.com/system47/</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=323285</forum>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.system47</source>
+        <disclaimer lang="en_GB" >Streaming not recommend for metered Internet, choose download option under settings.</disclaimer>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
     </extension>
 </addon>
@@ -2046,7 +2046,7 @@
     </extension>
 </addon>
 
-<addon id="script.module.uepg" version="1.0.6" name="uEPG" provider-name="Lunatixz">
+<addon id="script.module.uepg" version="1.0.5e" name="uEPG" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.pyhdhr" version="1.0.0"/>

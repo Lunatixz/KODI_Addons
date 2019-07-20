@@ -523,39 +523,6 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.hdhomerun.simple" name="HDHomerun Simple" provider-name="Lunatixz" version="1.0.3">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.pyhdhr" version="1.0.7"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.uepg" version="1.0.6"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.service" library="service.py" start="login"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Simple HDHomeRun Interface.</summary>
-        <description lang="en_GB">Automatically find all the compatible HDHomeRun devices on your network, Simple and Easy HDHomeRun Interface.</description>
-        <disclaimer lang="en_GB">Requires a compatible HDHomeRun device</disclaimer>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.hdhomerun.simple</source>
-        <website>https://www.hdhomerun.com</website>
-        <forum>https://forum.kodi.tv/showthread.php?tid=327117</forum>
-        <news>v1.0.2[CR]- Fixed Recordings[CR]</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-            <screenshot>resources/images/screenshot05.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="plugin.video.hsn" version="1.0.2" name="HSN" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1325,29 +1292,6 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.trekyards" version="1.0.0" name="TrekYards - YouTube" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="plugin.video.youtube" version="5.3.10"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">If you love Star Trek, Star Wars, or just great Sci-Fi then this channel is for you.</summary>
-        <description lang="en_GB">This is the domain for the Trekyards Webseries, where we examine the ships and tech from the Star Trek Universe.  We interview the people behind Star Trek (past, present and future) and get their exclusive and interesting perspectives on the designs and history of this amazing franchise.  Industry greats like Doug Drexler, Rick Sternbach, John Eaves, Andrew Probert,  Rob Bonchune,  Tobias Richter, Alec Peters, Larry Nemecek, Rob Burnett, Scott Nakada and many more join us on a regular basis to talk Trek and allow you, the viewers to gain a unique perspective on the world both in universe and behind the scenes.  The channel focus's on Stuart "Captain" Foley and Samuel "Commander" Cockings lives, including product reviews, unboxings, Captains Log's (a behind the scenes look at Trekyards), Fleetyards (sci-fi ships from all franchises) model building videos and assorted other goodies.  If you love Star Trek, Star Wars, or just great Sci-Fi then this channel is for you.  Welcome and enjoy!</description>
-        <platform>all</platform>
-        <website>http://trekyards.com</website>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.trekyards</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=323520</forum>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="plugin.video.tvland" version="1.0.0" name="TV Land" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1371,6 +1315,29 @@
             <screenshot>resources/images/screenshot01.png</screenshot>
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="plugin.video.trekyards" version="1.0.0" name="TrekYards - YouTube" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="plugin.video.youtube" version="5.3.10"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">If you love Star Trek, Star Wars, or just great Sci-Fi then this channel is for you.</summary>
+        <description lang="en_GB">This is the domain for the Trekyards Webseries, where we examine the ships and tech from the Star Trek Universe.  We interview the people behind Star Trek (past, present and future) and get their exclusive and interesting perspectives on the designs and history of this amazing franchise.  Industry greats like Doug Drexler, Rick Sternbach, John Eaves, Andrew Probert,  Rob Bonchune,  Tobias Richter, Alec Peters, Larry Nemecek, Rob Burnett, Scott Nakada and many more join us on a regular basis to talk Trek and allow you, the viewers to gain a unique perspective on the world both in universe and behind the scenes.  The channel focus's on Stuart "Captain" Foley and Samuel "Commander" Cockings lives, including product reviews, unboxings, Captains Log's (a behind the scenes look at Trekyards), Fleetyards (sci-fi ships from all franchises) model building videos and assorted other goodies.  If you love Star Trek, Star Wars, or just great Sci-Fi then this channel is for you.  Welcome and enjoy!</description>
+        <platform>all</platform>
+        <website>http://trekyards.com</website>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.trekyards</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=323520</forum>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
         </assets>
     </extension>
 </addon>
@@ -1662,6 +1629,32 @@
     </extension>
 </addon>
 
+<addon id="screensaver.unsplash" name="Unsplash Photo Screensaver" version="1.0.4" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+    </requires>
+    <extension point="xbmc.ui.screensaver" library="default.py"/>
+    <extension point="xbmc.python.script"  library="default.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</summary>
+        <description lang="en_GB"></description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <website>https://unsplash.com/</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=320095</forum>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.unsplash</source>
+        <news>v.1.0.4[CR]- Added "Preferred Resolution" setting.[CR]v.1.0.3[CR]- Leia compatibility.[CR]v.1.0.2[CR]- Added Image pre-cashing and fallback.[CR]v.1.0.1[CR]- Added User and Collection Mode</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="script.media.maintenance" version="1.0.9" name="Media Maintenance" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1797,21 +1790,27 @@
     </extension>
 </addon>
 
-<addon id="screensaver.unsplash" name="Unsplash Photo Screensaver" version="1.0.4" provider-name="Lunatixz">
+<addon id="plugin.video.hdhomerun.simple" name="HDHomerun Simple" provider-name="Lunatixz" version="1.0.4">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.pyhdhr" version="1.0.7"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.uepg" version="1.0.6"/>
     </requires>
-    <extension point="xbmc.ui.screensaver" library="default.py"/>
-    <extension point="xbmc.python.script"  library="default.py"/>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py" start="login"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</summary>
-        <description lang="en_GB"></description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <summary lang="en_GB">Simple HDHomeRun Interface.</summary>
+        <description lang="en_GB">Automatically find all the compatible HDHomeRun devices on your network, Simple and Easy HDHomeRun Interface.</description>
+        <disclaimer lang="en_GB">Requires a compatible HDHomeRun device</disclaimer>
         <platform>all</platform>
-        <website>https://unsplash.com/</website>
-        <forum>https://forum.kodi.tv/showthread.php?tid=320095</forum>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.unsplash</source>
-        <news>v.1.0.4[CR]- Added "Preferred Resolution" setting.[CR]v.1.0.3[CR]- Leia compatibility.[CR]v.1.0.2[CR]- Added Image pre-cashing and fallback.[CR]v.1.0.1[CR]- Added User and Collection Mode</news>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.hdhomerun.simple</source>
+        <website>https://www.hdhomerun.com</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=327117</forum>
+        <news>v1.0.2[CR]- Fixed Recordings[CR]</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -1819,6 +1818,7 @@
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
+            <screenshot>resources/images/screenshot05.png</screenshot>
         </assets>
     </extension>
 </addon>

@@ -67,11 +67,12 @@ socket.setdefaulttimeout(TIMEOUT)
 class HDHR(object):
     def __init__(self, sysARG):
         log('__init__, sysARG = ' + str(sysARG))
-        self.sysARG  = sysARG
-        self.cache  = SimpleCache()
-        self.pyHDHR = PyHDHR.PyHDHR()
-        self.tuners = self.getTuners()
-        self.hasDVR = self.pyHDHR.hasSDDVR()
+        self.cacheToDisc = True
+        self.sysARG      = sysARG
+        self.cache       = SimpleCache()
+        self.pyHDHR      = PyHDHR.PyHDHR()
+        self.tuners      = self.getTuners()
+        self.hasDVR      = self.pyHDHR.hasSDDVR()
         
         
     def browseTuners(self):
@@ -93,6 +94,7 @@ class HDHR(object):
     def browseLive(self, tunerkey):
         self.setDevice(tunerkey)
         progs  = self.pyHDHR.getWhatsOn()
+        self.cacheToDisc = False
         for channel in progs:
             try:
                 label, liz = self.buildChannelListItem(channel, progs[channel])
@@ -102,7 +104,6 @@ class HDHR(object):
             
             
     def browseGuide(self, mydata):
-        log('browseGuide, mydata = ' + mydata)
         try:
             mydata   = json.loads(mydata)
             chnum    = mydata['chnum']
@@ -188,24 +189,29 @@ class HDHR(object):
         if kb.isConfirmed():
             query = kb.getText()
             progs = (self.pyHDHR.searchWhatsOn(query))
-            if progs is not None: 
-                print progs
+            if progs is not None:
                 for prog in progs:
-                    print prog
-                    label, liz = self.buildChannelListItem(prog, progs[prog], opt='searchWhatsOn')
-                    self.addLink(label, prog, 9, liz, len(progs))
+                    try:
+                        label, liz = self.buildChannelListItem(prog, progs[prog], opt='searchWhatsOn')
+                        self.addLink(label, prog, 9, liz, len(progs))
+                    except: pass
 
             progs = (self.pyHDHR.search(query))
             if progs is not None: 
                 for prog in progs:
-                    label, liz = self.buildChannelListItem(prog, progs[prog], opt='search')
-                    self.addLink(label, prog, 9, liz, len(progs))
+                    try:
+                        label, liz = self.buildChannelListItem(prog, progs[prog], opt='search')
+                        self.addLink(label, prog, 9, liz, len(progs))
+                    except: pass
+                    
             if not self.hasDVR: return
             progs = self.pyHDHR.searchRecorded(query)
             for prog in progs:
                 if progs is not None: 
-                    label, liz = self.buildRecordListItem(progs[prog], opt='searchRecorded')
-                    self.addLink(label, prog, 9, liz, len(progs))
+                    try:
+                        label, liz = self.buildRecordListItem(progs[prog], opt='searchRecorded')
+                        self.addLink(label, prog, 9, liz, len(progs))
+                    except: pass
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_LABEL)
         
             
@@ -215,8 +221,8 @@ class HDHR(object):
         
     def buildChannelListItem(self, channel, item=None, label=None, opt='Live'):
         info   = self.getChannelInfo(channel)
-        if info is None: pass
-        if info.getDRM(): pass
+        if info is None: return
+        elif info.getDRM(): return
         chlogo = (info.getImageURL() or ICON)
         chname = (info.getAffiliate() or info.getGuideName() or info.getGuideNumber() or 'N/A')
         liz    = xbmcgui.ListItem(label)
@@ -283,7 +289,6 @@ class HDHR(object):
 
         
     def setDevice(self, tunerkey):
-        log('setDevice, tunerkey = ' + tunerkey)
         if tunerkey != 'All': self.pyHDHR.setManualTunerList(tunerkey)
         
     
@@ -380,8 +385,7 @@ class HDHR(object):
         elif mode == 8: self.playVideo(name, url)
         elif mode == 9: self.playChannel(name, url)
         elif mode == 11: self.browseSearch()
-        elif mode == 20:xbmc.executebuiltin("RunScript(script.module.uepg,listitem=%s&refresh_path=%s&refresh_interval=%s&row_count=%s)"%(urllib.quote(json.dumps(self.sysARG[0]+"?mode=4")),urllib.quote(json.dumps(self.sysARG[0]+"?mode=4")),"7200","5"))
-        #pass invalid listitem to uEPG to load built-in HDHR support.
+        elif mode == 20:xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&refresh_path=%s&refresh_interval=%s&row_count=%s)"%("[]",urllib.quote(self.sysARG[0]+"?mode=20"),"7200","5"))
 
         xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)
-        xbmcplugin.endOfDirectory(int(self.sysARG[1]), cacheToDisc=False)
+        xbmcplugin.endOfDirectory(int(self.sysARG[1]), cacheToDisc=self.cacheToDisc)

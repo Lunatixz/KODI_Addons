@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of uEPG.
@@ -102,6 +102,8 @@ class uEPG(xbmcgui.WindowXML):
             self.pastColor      = hex(int((utils.getProperty("uEPG.pastColor")          or "0xFF0f85a5"),16))[2:]
             self.timeColor      = hex(int((utils.getProperty("uEPG.timeColor")          or "0xFF0f85a5"),16))[2:]
             self.futureColor    = hex(int((utils.getProperty("uEPG.futureColor")        or "0xFF0f85a5"),16))[2:]
+            self.favColor       = hex(int((utils.getProperty("uEPG.favColor")           or "0xFFFFD700"),16))[2:]
+            self.favDefault     = hex(int((utils.getProperty("uEPG.favDefault")         or "0x00000000"),16))[2:]
             self.singleLineFade = (utils.getProperty("uEPG.singleLineFade")             or "false") == "true"
             self.textFont       = (utils.getProperty("uEPG.timeCount")                  or "font12")
             self.timeFormat     = (urllib.unquote(utils.getProperty("uEPG.timeFormat")) or "%A, %B %d")
@@ -307,12 +309,12 @@ class uEPG(xbmcgui.WindowXML):
             
         self.currentHighLT.setVisible(False)
         for i in range(self.rowCount):
-            chanColor = {True:utils.COLOR_FAVORITE,False:''}[self.channelLST.channels[curchannel - 1].isFavorite]
             chnumber  = self.channelLST.channels[curchannel - 1].number
-            if isinstance(chnumber, float): label = "[COLOR=%s][B]%.1f[/COLOR] |[/B]"%(chanColor, chnumber)
-            else: label = "[COLOR=%s][B]%d[/COLOR] |[/B]"%(chanColor, chnumber)
+            if self.channelLST.channels[curchannel - 1].isHDHR: label = "[COLOR=%s][B]%s[/COLOR] |[/B]"%('green', str(chnumber))
+            else: label = '[B]%s |[/B]'%(str(chnumber))
             self.getControl(33111 + i).setLabel(label)
             self.getControl(33411 + i).setImage(self.channelLST.channels[curchannel - 1].logo)
+            utils.setProperty('FavColor',{True:self.favColor,False:self.favDefault}[self.channelLST.channels[curchannel - 1].isFavorite])
             
             if curchannel == self.currentChannel:
                 utils.log('setChannelButtons, current playing channel row')

@@ -130,7 +130,7 @@ class PlutoTV(object):
                     f = xbmcvfs.File(COOKIE_JAR, 'w')
                     f.close()
                 except: log('login, Unable to create the storage directory', xbmc.LOGERROR)
-            
+
             form_data = ({'optIn': 'true', 'password': PASSWORD,'synced': 'false', 'userIdentity': USER_EMAIL})
             self.net.set_cookies(COOKIE_JAR)
             try:
@@ -193,9 +193,9 @@ class PlutoTV(object):
         data = self.openURL(BASE_LINEUP)
         for channel in data: collect.append(channel['category'])
         counter = collections.Counter(collect)
-        for key, value in sorted(counter.iteritems()): lineup.append(("%s"%(key)  , BASE_LINEUP, 2))
-        lineup.insert(0,(LANGUAGE(30016), BASE_LINEUP, 2))
-        lineup.insert(2,(LANGUAGE(30014), BASE_LINEUP, 2))
+        for key, value in sorted(counter.iteritems()): lineup.append(("%s"%(key) , BASE_LINEUP, 2))
+        lineup.insert(0,("Featured", BASE_LINEUP, 2))
+        # lineup.insert(2,(LANGUAGE(30014), BASE_LINEUP, 2))
         return lineup
         
         
@@ -218,8 +218,10 @@ class PlutoTV(object):
             id      = channel['_id']
             cat     = channel['category']
             number  = channel['number']
-            region  = channel['regionFilter']['include']
-            exclude = channel['regionFilter']['exclude']
+            filter  = channel.get('regionFilter',{})
+            if isinstance(filter, list): filter = dict(filter)
+            region  = filter.get('include','US')
+            exclude = filter.get('exclude','')
             name    = channel['name']
             plot    = channel['description']
             feat    = (channel.get('featured','') or 0) == -1
@@ -236,7 +238,7 @@ class PlutoTV(object):
             if 'featuredImage' in channel: land = (channel['featuredImage'].get('path',FANART) or FANART)
             logo = ICON
             if 'logo' in channel: logo   = (channel['logo']['path'] or ICON)
-            if chname == "All Channels":
+            if chname == LANGUAGE(30014):
                 title = "%s - %s: %s" % (cat, number, name)
                 infoLabels ={"mediatype":self.mediaType[cat],"label":title ,"title":title  ,"plot":plot, "code":number, "genre":cat, "imdbnumber":id}
                 infoArt    ={"thumb":thumb,"poster":thumb,"fanart":land,"icon":logo,"logo":logo}
@@ -264,18 +266,19 @@ class PlutoTV(object):
         data    = list(self.pagination((self.openURL(BASE_LINEUP)), end))
         start   = 0 if start >= len(data) else start
         link    = self.getGuidedata()
-        if start == 0 and end == 14: self.addDir(LANGUAGE(30014), '', 10)
+        # if start == 0 and end == 14: self.addDir(LANGUAGE(30014), '', 10)
         for channel in data[start]:
             chid    = channel['_id']
             chcat   = channel['category']
             chnum   = channel['number']
-            region  = channel['regionFilter']['include']
-            exclude = channel['regionFilter']['exclude']
+            filter  = channel.get('regionFilter',{})
+            if isinstance(filter, list): filter = dict(filter)
+            region  = filter.get('include','US')
+            exclude = filter.get('exclude','')
             chname  = channel['name']
             chplot  = channel['description']
             chthumb = ICON
             if 'thumbnail' in channel: chthumb = ((channel['thumbnail'].get('path','')).replace(' ','%20') or ICON)
-            print chnum, chthumb
             feat = (channel.get('featured','') or 0) == -1
             if self.filter == True and (self.region in exclude or self.region not in region):
                 if geowarn == False:
@@ -394,7 +397,7 @@ class PlutoTV(object):
         provider = url['provider']
         url = url['url']
         if liz is None: liz = xbmcgui.ListItem(name, path=self.resolveURL(provider, url))
-        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
+        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream() and not DEBUG:
             liz.setProperty('inputstreamaddon','inputstream.adaptive')
             liz.setProperty('inputstream.adaptive.manifest_type','hls')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
@@ -442,13 +445,13 @@ class PlutoTV(object):
         return (self.openURL(BASE_GUIDE % (datetime.datetime.now().strftime('%Y-%m-%dT%H:00:00'),(datetime.datetime.now() + datetime.timedelta(hours=8)).strftime('%Y-%m-%dT%H:00:00')), life=datetime.timedelta(hours=6)))
         
         
-    @buildChannels({'refresh_path':urllib.quote(json.dumps("plugin://%s?mode=20"%ADDON_ID)),'refresh_interval':"7200"})
+    # @buildChannels({'refresh_path':urllib.quote("plugin://%s?mode=20"%ADDON_ID),'refresh_interval':"7200"})
     def uEPG(self):
         log('uEPG')
         #support for uEPG universal epg framework module available from the Kodi repository. https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.uepg
         data      = (self.openURL(BASE_LINEUP))
         self.link = self.getGuidedata()
-        return [self.buildGuide(channel) for channel in data]
+        return self.poolList(self.buildGuide, data)
         
         
     def buildGuide(self, channel):
@@ -457,8 +460,10 @@ class PlutoTV(object):
         chid       = channel['_id']
         chcat      = channel['category']
         chnum      = channel['number']
-        region     = channel['regionFilter']['include']
-        exclude    = channel['regionFilter']['exclude']
+        filter     = channel.get('regionFilter',{})
+        if isinstance(filter, list): filter = dict(filter)
+        region     = filter.get('include','US')
+        exclude    = filter.get('exclude','')
         chname     = channel['name']
         chplot     = channel['description']
         isFavorite = False #(channel.get('featured','') or 0) == -1
@@ -534,8 +539,7 @@ class PlutoTV(object):
         elif mode == 8:  self.playContent(name, url)
         elif mode == 9:  self.playChannel(name, url)
         elif mode == 10: self.browseGuide(end=5000)
-        elif mode == 20: self.uEPG()
-        # elif mode == 20: xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&skin_path=%s&refresh_path=%s&refresh_interval=%s&row_count=%s)"%(urllib.quote(json.dumps(list(self.uEPG()))),urllib.quote(json.dumps(ADDON_PATH)),urllib.quote(json.dumps(self.sysARG[0]+"?mode=20")),"7200","5"))
+        elif mode == 20: xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&skin_path=%s&refresh_path=%s&refresh_interval=%s&row_count=%s)"%(urllib.quote(json.dumps(list(self.uEPG()))),urllib.quote(ADDON_PATH),urllib.quote(self.sysARG[0]+"?mode=20"),"7200","5"))
 
         xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_UNSORTED)

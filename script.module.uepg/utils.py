@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of uEPG.
@@ -20,7 +20,7 @@
 import os, json, urllib, epg, traceback, ast, time, datetime, random, itertools, calendar
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs, xbmcaddon
 
-from simplecache import SimpleCache
+from simplecache import SimpleCache, use_cache
 from metadatautils import MetadataUtils
 from pyhdhr import PyHDHR
 
@@ -28,6 +28,7 @@ from pyhdhr import PyHDHR
 ADDON_ID      = 'script.module.uepg'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME    = REAL_SETTINGS.getAddonInfo('name')
+ADDON_AUTHOR  = REAL_SETTINGS.getAddonInfo('author')
 SETTINGS_LOC  = REAL_SETTINGS.getAddonInfo('profile')
 ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path').decode('utf-8')
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
@@ -49,7 +50,6 @@ ALL_PARAMS      = list(set(FILE_PARAMS+PVR_PARAMS+ART_PARAMS))
 IGNORE_VALUES   = ['',[],-1,{},None]
 MEDIA_TYPES     = {'SP':'video','SH':'episode','EP':'episode','MV':'movie'}
 EPGGENRE_LOC    = 'epg-genres'
-COLOR_FAVORITE  = 'gold'
 TIME_BAR        = 'TimeBar.png'
 BUTTON_FOCUS    = 'ButtonFocus.png'
 PAST_FADE       = 'PastFade.png'
@@ -156,6 +156,8 @@ def getGenreColor(genre):
     else:                              return 'ButtonNoFocus'
      
 def getPluginMeta(plugin):
+    log('getPluginMeta: ' + plugin)
+    if '?' in plugin: plugin = plugin.split('?')[0]
     if plugin[0:9] == 'plugin://':
         plugin = plugin.replace("plugin://","")
         plugin = splitall(plugin)[0]
@@ -211,7 +213,7 @@ def dumpJson(mydict, sortkey=True):
 
 def getProperty(string1):
     try: 
-        state = xbmcgui.Window(10000).getProperty((string1))
+        state = xbmcgui.Window(10000).getProperty(string1)
         log("getProperty, string1 = " + string1 + ", state = " + state)
         return state
     except Exception as e:
@@ -219,11 +221,12 @@ def getProperty(string1):
         return ''
           
 def setProperty(string1, string2):
-    try: xbmcgui.Window(10000).setProperty((string1), (string2))
+    log("setProperty, string1 = " + string1 + ", string2 = " + string2)
+    try: xbmcgui.Window(10000).setProperty(string1, string2)
     except Exception as e: log("setProperty, Failed! " + str(e), xbmc.LOGERROR)
 
-def clearProperty(string):
-    xbmcgui.Window(10000).clearProperty((string))
+def clearProperty(string1):
+    xbmcgui.Window(10000).clearProperty(string1)
      
 def unquote(string):
     return urllib.unquote(string)
@@ -289,7 +292,7 @@ def buildListItem(item, mType='video'):
     streamInfo = (dict(item).get('streamdetails','') or {})
     item.pop('art',{})
     item.pop('streamdetails',{})
-    isHDHR = (item.get('ishdhomerun','') or 'False')
+    isHDHR = (item.get('ishdhomerun','False'))
     listitem = xbmcgui.ListItem()
     #todo json query returns invalid formats not compatiblity with xbmcgui.iistitems
     #clean and check json compatiblity. todo ast? eval? dict value comparison?
@@ -322,39 +325,40 @@ class RPCHelper(object):
         return mydir
 
         
-    def getFileList(self, path, life, media='video', ignore='false', method='random', order='ascending', end=0, start=0, filter={}):  
-        fileList = []
+    def getFileList(self, path, life, media='video', ignore='false', method='random', order='ascending', end=0, start=0, filter={}):
         log('getFileList, path = ' + path)
         json_response = self.requestList(path, life, media='video', ignore='false', method='random', order='ascending', end=0, start=0, filter={})
         if 'result' in json_response and 'files' in json_response['result']:
             items = json_response['result']['files']
-            for idx, item in enumerate(items):
-                try:
-                    file     = item.get('file','')
-                    label    = (item.get('label','')    or item.get('title',''))
-                    fileType = (item.get('filetype','') or '')
-                    if fileType == 'file':
-                        item["duration"]      = int(item.get('duration','')            or item.get('runtime','')  or '0')
-                        try: dataTags = loadJson(unquote((item.get('tagline','')       or {})))
-                        except: dataTags = {}
-                        item["channelname"]   = (dataTags.get('channelname','')        or self.channelname)
-                        item["channellogo"]   = (dataTags.get('channellogo','')        or '')
-                        item["channelnumber"] = (dataTags.get('channelnumber','')      or '')
-                        item["starttime"]     = (dataTags.get('starttime','')          or '')
-                        item["isnew"]         = (dataTags.get('isnew','')              or False)
-                        item["isfavorite"]    = (dataTags.get('isfavorite','')         or False)
-                        item["label"]         = (dataTags.get('label','')              or label)
-                        item["label"]         = (dataTags.get('label','')              or label)
-                        item["label2"]        = (dataTags.get('label2','')             or item.get('label2','')   or '')
-                        item["rating"]        = float(item.get('rating','0')           or '0')
-                        # self.duration += item["duration"]
-                        fileList.append(item)
-                    elif fileType == 'directory':
-                        # self.duration    = 0
-                        self.channelname = label
-                        fileList.extend(self.getFileList(file, life, media, ignore, method, order, end, start, filter))
-                except Exception as e: log("getFileList, failed! " + str(e), xbmc.LOGERROR)
-        return fileList
+            return poolList(RPCHelper().buildFileList, items)
+            
+            
+    def buildFileList(self, item):
+        try:
+            file     = item.get('file','')
+            label    = (item.get('label','')    or item.get('title',''))
+            fileType = (item.get('filetype','') or '')
+            if fileType == 'file':
+                item["duration"]      = int(item.get('duration','')            or item.get('runtime','')  or '0')
+                try: dataTags = loadJson(unquote((item.get('tagline','')       or {})))
+                except: dataTags = {}
+                item["channelname"]   = (dataTags.get('channelname','')        or self.channelname)
+                item["channellogo"]   = (dataTags.get('channellogo','')        or '')
+                item["channelnumber"] = (dataTags.get('channelnumber','')      or '')
+                item["starttime"]     = (dataTags.get('starttime','')          or '')
+                item["isnew"]         = (dataTags.get('isnew','')              or False)
+                item["isfavorite"]    = (dataTags.get('isfavorite','')         or False)
+                item["label"]         = (dataTags.get('label','')              or label)
+                item["label"]         = (dataTags.get('label','')              or label)
+                item["label2"]        = (dataTags.get('label2','')             or item.get('label2','')   or '')
+                item["rating"]        = float(item.get('rating','0')           or '0')
+                # self.duration += item["duration"]
+                return item
+            elif fileType == 'directory':
+                # self.duration    = 0
+                self.channelname = label
+                return self.getFileList(file, datetime.timedelta(minutes=15))
+        except Exception as e: log("getFileList, failed! " + str(e), xbmc.LOGERROR)
 
         
     def requestList(self, path, life, media='video', ignore='false', method='random', order='ascending', end=0, start=0, filter={}):
@@ -398,47 +402,52 @@ class HDHR(object):
         
         
     def getChannelItems(self):
-        for channel in self.pyHDHR.getChannelList():
-            try:
-                newChannel = {}
-                guidedata  = []
-                chan       = self.getChannelInfo(str(channel))
-                isFavorite = chan.getFavorite() == 1
-                if not isFavorite: continue
-                isHD       = chan.getHD() == 1
-                hasCC      = True
-                logo       = (chan.getImageURL() or ICON)
-                newChannel['channelname']   = (chan.getAffiliate() or chan.getGuideName() or chan.getGuideNumber() or 'N/A')
-                newChannel['channelnumber'] = float(chan.getGuideNumber())
-                newChannel['channellogo']   = logo
-                newChannel['isfavorite']    = isFavorite
-                for program in chan.getProgramInfos():
-                    tmpdata = {}
-                    starttime              = float(program.getStartTime())
-                    endtime                = float(program.getEndTime())
-                    runtime                = int(endtime - starttime)
-                    airdate                = float(program.getOriginalAirdate())
-                    if (starttime + runtime) < time.time(): continue
-                    tmpdata['label']       = program.getTitle()
-                    tmpdata['title']       = '%s - %s'%(program.getTitle(), program.getEpisodeTitle()) if len(program.getEpisodeTitle() or '') > 0 else program.getTitle()
-                    tmpdata['endtime']     = endtime
-                    tmpdata['starttime']   = starttime
-                    tmpdata['duration']    = runtime
-                    try: mtype             = MTYPES[program.getEpisodeNumber()[:2]]
-                    except: mtype = 'episode'
-                    tmpdata['mediatype']   = mtype
-                    tmpdata['url']         = chan.getURL()
-                    tmpdata['label2']      = "HD" if isHD else ""
-                    tmpdata['aired']       = (datetime.datetime.fromtimestamp((airdate or starttime))).strftime('%Y-%m-%d')
-                    thumb                  = (program.getImageURL() or logo)
-                    tmpdata['art']         = {"thumb":thumb,"poster":thumb,"clearlogo":logo}
-                    tmpdata['genre']       = []
-                    tmpdata['plot']        = trimString(program.getSynopsis())
-                    tmpdata['ishdhomerun'] = 'okay'
-                    isNEW = False
-                    if airdate > 0: isNEW  = ((int(airdate)) + 48*60*60) > int(starttime)
-                    if "*" in tmpdata['label'] and isNEW == False: isNEW = True
-                    guidedata.append(tmpdata)
-                newChannel['guidedata'] = guidedata
-                yield newChannel
-            except Exception as e: log("getChannelItems failed! " + str(e), xbmc.LOGERROR)
+        channels = self.pyHDHR.getChannelList()
+        return poolList(HDHR().buildChannelItems, channels)
+        
+        
+    def buildChannelItems(self, channel):
+        try:
+            newChannel = {}
+            guidedata  = []
+            chan       = self.getChannelInfo(str(channel))
+            isFavorite = chan.getFavorite() == 1
+            if not isFavorite: return
+            isHD       = chan.getHD() == 1
+            hasCC      = True
+            logo       = (chan.getImageURL() or ICON)
+            newChannel['channelname']   = (chan.getAffiliate() or chan.getGuideName() or chan.getGuideNumber() or 'N/A')
+            newChannel['channelnumber'] = ('%f' % float(chan.getGuideNumber())).rstrip('0').rstrip('.')
+            newChannel['channellogo']   = logo
+            newChannel['isfavorite']    = isFavorite
+            newChannel['ishdhr']        = True
+            for program in chan.getProgramInfos():
+                tmpdata = {}
+                starttime              = float(program.getStartTime())
+                endtime                = float(program.getEndTime())
+                runtime                = int(endtime - starttime)
+                airdate                = float(program.getOriginalAirdate())
+                if (starttime + runtime) < time.time(): continue
+                tmpdata['label']       = program.getTitle()
+                tmpdata['title']       = '%s - %s'%(program.getTitle(), program.getEpisodeTitle()) if len(program.getEpisodeTitle() or '') > 0 else program.getTitle()
+                tmpdata['endtime']     = endtime
+                tmpdata['starttime']   = starttime
+                tmpdata['duration']    = runtime
+                try: mtype             = MTYPES[program.getEpisodeNumber()[:2]]
+                except: mtype = 'episode'
+                tmpdata['mediatype']   = mtype
+                tmpdata['url']         = chan.getURL()
+                tmpdata['label2']      = "HD" if isHD else ""
+                tmpdata['aired']       = (datetime.datetime.fromtimestamp((airdate or starttime))).strftime('%Y-%m-%d')
+                thumb                  = (program.getImageURL() or logo)
+                tmpdata['art']         = {"thumb":thumb,"poster":thumb,"clearlogo":logo}
+                tmpdata['genre']       = []
+                tmpdata['plot']        = trimString(program.getSynopsis())
+                tmpdata['ishdhomerun'] = 'okay'
+                isNEW = False
+                if airdate > 0: isNEW  = ((int(airdate)) + 48*60*60) > int(starttime)
+                if "*" in tmpdata['label'] and isNEW == False: isNEW = True
+                guidedata.append(tmpdata)
+            newChannel['guidedata'] = guidedata
+            return newChannel
+        except Exception as e: log("getChannelItems failed! " + str(e), xbmc.LOGERROR)

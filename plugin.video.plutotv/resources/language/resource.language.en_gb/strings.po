@@ -58,24 +58,24 @@ msgstr ""
 
 msgctxt "#30011"
 msgid "Channels"
-msgstr "
+msgstr ""
 
 msgctxt "#30012"
 msgid "OnDemand"
-msgstr "
+msgstr ""
 
 msgctxt "#30013"
 msgid "Guide"
-msgstr "
+msgstr ""
 
 msgctxt "#30014"
 msgid "All Channels"
-msgstr "
+msgstr ""
 
 msgctxt "#30015"
 msgid ">> Next"
-msgstr "
+msgstr ""
 
 msgctxt "#30016"
 msgid "Featured"   
-msgstr "
+msgstr ""

@@ -61,15 +61,16 @@ class Disclose(object):
         self.cache  = SimpleCache()
            
            
-    def openURL(self, url):
+    def openURL(self, url, life=datetime.timedelta(minutes=15)):
         log('openURL, url = ' + str(url))
         try:
-            cacheresponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
+            if DEBUG: cacheresponse = None
+            else: cacheresponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
             if not cacheresponse:
                 request = urllib2.Request(url)
                 request.add_header('User-Agent','Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)')
                 cacheresponse = urllib2.urlopen(request, timeout = TIMEOUT).read()
-                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=datetime.timedelta(hours=12))
+                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=life)
             return cacheresponse
         except Exception as e: log("openURL Failed! " + str(e), xbmc.LOGERROR)
         xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
@@ -107,9 +108,11 @@ class Disclose(object):
                     m, s = runtime
                     duration = (int(m) * 60) + int(s)
             except: duration = 0
-            infoLabels = {"mediatype":"episode","label":label ,"title":label,"duration":duration,"plot":plot,"genre":genre,"aired":aired}
-            infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
-            self.addLink(label, vid_url, 9, infoLabels, infoArt, len(videos))
+            liz, vid_url = self.resolveURL(label, vid_url)
+            if vid_url is None: continue
+            liz.setInfo(type="Video", infoLabels={"mediatype":"episode","label":label ,"title":label,"duration":duration,"plot":plot,"genre":genre,"aired":aired})
+            liz.setArt({"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON})
+            self.addLink(label, vid_url, 9, liz, len(videos))
         next = soup('li', {'class': 'more-container__button m-auto'})
         if len(next) == 0: return
         next_url   = BASE_URL.rstrip('/') + next[0].find('a').attrs['href']
@@ -119,7 +122,7 @@ class Disclose(object):
             
     def resolveURL(self, name, url):
         log('resolveURL, url = %s'%url)
-        soup  = BeautifulSoup(self.openURL(url), "html.parser")
+        soup  = BeautifulSoup(self.openURL(url,life=datetime.timedelta(days=28)), "html.parser")
         vid_url = url
         for element in soup('iframe'):
             video = element.get('data-src','')
@@ -132,18 +135,18 @@ class Disclose(object):
                 if video: 
                     vid_url = video
                     break
-        print vid_url
                     
         if 'youtube' in vid_url:
-            yt_id = re.search('embed\/([-\w]+)', vid_url).group(1)
-            if not yt_id: yt_id = re.search('youtube.com\/watch\?v=([-\w]+)', vid_url).group(1)
-            elif not yt_id: yt_id = re.search('youtube.be\/watch\?v=([-\w]+)', vid_url).group(1)
-            if yt_id: vid_url = YTURL%(yt_id)
+            try:
+                yt_id = re.search('embed\/([-\w]+)', vid_url).group(1)
+                if not yt_id: yt_id = re.search('youtube.com\/watch\?v=([-\w]+)', vid_url).group(1)
+                elif not yt_id: yt_id = re.search('youtube.be\/watch\?v=([-\w]+)', vid_url).group(1)
+                if yt_id: vid_url = YTURL%(yt_id)
+            except: pass
         
         if vid_url == url and not isUWP():
-            from YDStreamExtractor import getVideoInfo
-            info = getVideoInfo(url,QUALITY,True)
-            if info is None: return
+            info = self.getInfo(url)
+            if info is None: return xbmcgui.ListItem(name), None
             info = info.streams()
             url  = info[0]['xbmc_url']
         else: url = vid_url
@@ -151,12 +154,23 @@ class Disclose(object):
         try: 
             if 'subtitles' in info[0]['ytdl_format']: liz.setSubtitles([x['url'] for x in info[0]['ytdl_format']['subtitles'].get('en','') if 'url' in x])
         except: pass
-        return liz
+        return liz, url
 
-            
+
+    @use_cache(28)
+    def getInfo(self, url):
+        log('getInfo, url = %s'%url)
+        from YDStreamExtractor import getVideoInfo
+        return getVideoInfo(url,QUALITY,True)
+    
+    
     def playVideo(self, name, url):
-        log('playVideo')
-        xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, self.resolveURL(name, url))
+        log('playVideo')       
+        liz  = xbmcgui.ListItem(name, path=url)
+        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream() and not DEBUG:
+            liz.setProperty('inputstreamaddon','inputstream.adaptive')
+            liz.setProperty('inputstream.adaptive.manifest_type','hls')
+        xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
         
         
     def addYoutube(self, name, url):
@@ -167,15 +181,14 @@ class Disclose(object):
         xbmcplugin.addDirectoryItem(handle=int(self.sysARG[1]),url=url,listitem=liz,isFolder=True)
         
            
-    def addLink(self, name, u, mode, infoList=False, infoArt=False, total=0):
+    def addLink(self, name, u, mode, liz=None, total=0):
         name = name.encode("utf-8")
         log('addLink, name = ' + name)
-        liz=xbmcgui.ListItem(name)
+        if liz is None: 
+            liz=xbmcgui.ListItem(name)
+            liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
+            liz.setArt({'thumb':ICON,'fanart':FANART})
         liz.setProperty('IsPlayable', 'true')
-        if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
-        else: liz.setInfo(type="Video", infoLabels=infoList)
-        if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
-        else: liz.setArt(infoArt)
         u=self.sysARG[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
         xbmcplugin.addDirectoryItem(handle=int(self.sysARG[1]),url=u,listitem=liz,totalItems=total)
 

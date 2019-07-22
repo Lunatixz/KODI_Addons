@@ -57,8 +57,8 @@ msgid "Multiple Videos"
 msgstr "Multiples vídeos"
 
 msgctxt "#32011"
-msgid "Mute ScreenSaver"
-msgstr "Silenciar Salvapantallas"
+msgid "Set ScreenSaver Volume"
+msgstr "Establecer el volumen del protector de pantalla"
 
 msgctxt "#32012"
 msgid "Enable Debugging [Log errors]"

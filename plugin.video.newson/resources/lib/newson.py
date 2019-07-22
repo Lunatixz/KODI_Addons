@@ -17,7 +17,7 @@
 # along with NewsOn.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import os, sys, time, datetime, traceback, feedparser, random, inputstreamhelper
+import os, sys, time, datetime, traceback, feedparser, random
 import urlparse, urllib, urllib2, socket, json, collections, gzip
 import xbmc, xbmcgui, xbmcplugin, xbmcaddon, xbmcvfs
 
@@ -35,7 +35,6 @@ FANART        = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE      = REAL_SETTINGS.getLocalizedString
 NEWSART       = os.path.join(ADDON_PATH,'resources','images','newscast.jpg')
 CLIPART       = os.path.join(ADDON_PATH,'resources','images','videoclips.jpg')
-MAP_PATH      = os.path.join(xbmc.translatePath(SETTINGS_LOC),'cache','maps')
 
 ## GLOBALS ##
 TIMEOUT       = 15
@@ -58,7 +57,6 @@ socket.setdefaulttimeout(TIMEOUT)
 class NewsOn(object):
     def __init__(self, sysARG):
         log('__init__, sysARG = ' + str(sysARG))
-        if not xbmcvfs.exists(MAP_PATH): xbmcvfs.mkdirs(MAP_PATH)
         self.sysARG    = sysARG
         self.cache     = SimpleCache()
         self.stateMenu = self.getStates()
@@ -66,15 +64,9 @@ class NewsOn(object):
 
     def getMAP(self, args):
         try:
-            if len(args) == 2: 
-                lat, lon = tuple(args)
-                dest = os.path.join(MAP_PATH,'%s.%s.jpg'%(lat, lon))
-                if not xbmcvfs.exists(dest): urllib.urlretrieve(MAP_URL%(APIKEY, '%s,%s'%(lat, lon)),dest)
-            else: 
-                dest = os.path.join(MAP_PATH,'%s.jpg'%(args))
-                if not xbmcvfs.exists(dest): urllib.urlretrieve(MAP_URL%(APIKEY, args),dest)
-            return dest
-        except: return dest
+            if len(args) == 2: return MAP_URL%(APIKEY, '%s,%s'%(tuple(args)))
+            else: return MAP_URL%(APIKEY, args)
+        except: return FANART
             
         
     def openURL(self, url):
@@ -209,9 +201,6 @@ class NewsOn(object):
     def playVideo(self, name, url, live=False):
         log('playVideo')
         liz = xbmcgui.ListItem(name, path=url)
-        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream() and not DEBUG:
-            liz.setProperty('inputstreamaddon','inputstream.adaptive')
-            liz.setProperty('inputstream.adaptive.manifest_type','hls')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
 
            

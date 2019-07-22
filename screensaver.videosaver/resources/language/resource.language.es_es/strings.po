@@ -56,7 +56,7 @@ msgctxt "#32010"
 msgid "Multiple Videos"
 msgstr "Multiples vídeos"
 
-msgctxt "#30011"
+msgctxt "#32011"
 msgid "Mute ScreenSaver"
 msgstr "Silenciar Salvapantallas"
 

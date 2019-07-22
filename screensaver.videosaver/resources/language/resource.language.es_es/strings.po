@@ -62,7 +62,7 @@ msgstr "Silenciar Salvapantallas"
 
 msgctxt "#32012"
 msgid "Enable Debugging [Log errors]"
-msgstr "Habilitar modo depuración (errores en log)"
+msgstr "Habilitar modo depuración (registro de errores)"
 
 msgctxt "#32013"
 msgid "Building Playlist"

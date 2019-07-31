@@ -27,7 +27,7 @@ import os, sys, fnmatch
 import xml.etree.ElementTree
 from zipfile import ZipFile
 from shutil import copyfile
-
+CHKPATH    = 'C:/GitHub/addon-check/'
 GITPATH    = 'C:/GitHub/KODI_Addons/'
 ZIPPATH    = os.path.join(GITPATH,'zips','')
 DELETE_EXT = ('.pyc', '.pyo', '.db')
@@ -53,9 +53,17 @@ class Generator(object):
         self._generate_addons_file()
         self._generate_md5_file()
         self._zipit(GITPATH)
+        self.runCheck():
         # notify user
         print("Finished updating addons xml and md5 files")
     
+    
+    def runCheck(self):
+        
+        print 'runCheck'
+        # for path in self.newPaths:
+            
+        # kodi-addon-checker <path-to-addon>
     
     def _clean_addons(self):
         for root, dirnames, filenames in os.walk(GITPATH):

@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
+<addon id="repository.lunatixz.jarvis" name="Lunatixz Jarvis Beta Repository" version="1.0.2" provider-name="Lunatixz">
+    <extension point="xbmc.addon.repository" name="Lunatixz Jarvis Beta Repository">
+        <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml</info>
+        <checksum>http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml.md5</checksum>
+        <datadir zip="true">http://raw.github.com/Lunatixz/KODI_Addons/jarvis/zips</datadir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB"></summary>
+        <description lang="en_GB"></description>
+        <platform>all</platform>
+        <source>http://raw.github.com/Lunatixz/KODI_Addons/jarvis</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.1.1" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.24.0"/>

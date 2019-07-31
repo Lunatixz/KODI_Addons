@@ -1,9 +1,0 @@
-<settings>
-    <category label="Config">
-        <setting id="IP" label="TV IP" type="ipaddress" default="192.168.0.20" />
-        <setting id="Night_VOL" label="Night Volume" type="slider" default="25" range="5,5,100" option="int" />
-        <setting id="Day_VOL" label="Day Volume" type="slider" default="75" range="5,5,100" option="int" />
-        <setting id="Toggle_MUTE" label="Toggle Mute on ping" type="bool" default="true" />
-        <setting id="Poll_TIME" label="Ping Every X secs" type="slider" default="15" range="1,1,900" option="int" />
-    </category>
-</settings>

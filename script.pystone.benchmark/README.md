@@ -1,1 +1,0 @@
-# PYSTONE CPU Benchmark

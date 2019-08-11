@@ -10,9 +10,9 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
-        <description lang="en_GB"></description>
-        <platform>all</platform>
+        <summary lang="en_GB">Watch full episodes of current and classic NBC shows online.</summary>
+        <description lang="en_GB">Watch full episodes of current and classic NBC shows online. Plus find clips, previews and exclusive online features on NBC.com.</description>
+        <platform>android freebsd ios linux osx windows</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.nbc</source>
         <website>http://nbc.com</website>

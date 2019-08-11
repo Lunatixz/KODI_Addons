@@ -59,9 +59,16 @@ class NBC(object):
     def __init__(self, sysARG):
         log('__init__, sysARG = ' + str(sysARG))
         self.sysARG = sysARG
+        if self.chkUWP(): return
         self.cache  = SimpleCache()
            
            
+    def chkUWP(self):
+        isUWP = (xbmc.getCondVisibility("system.platform.uwp") or sys.platform == "win10" or re.search(r"[/\\]WindowsApps[/\\]XBMCFoundation\.Kodi_", xbmc.translatePath("special://xbmc/")))
+        if isUWP: return xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30006), ICON, 4000)
+        return isUWP
+        
+        
     def openURL(self, url):
         try:
             log('openURL, url = ' + str(url))

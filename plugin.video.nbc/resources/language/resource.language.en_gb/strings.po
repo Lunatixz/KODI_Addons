@@ -39,3 +39,7 @@ msgstr ""
 msgctxt "#30005"
 msgid "Select Preferred Quality"
 msgstr ""
+
+msgctxt "#30006"
+msgid "Windows UWP not supported."
+msgstr ""

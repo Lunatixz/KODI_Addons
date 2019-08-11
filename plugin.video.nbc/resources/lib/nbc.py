@@ -1,4 +1,4 @@
-#   Copyright (C) 2017 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of NBC.
@@ -17,12 +17,12 @@
 # along with NBC.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import sys, time, datetime, re, traceback
-import urllib, urllib2, socket, json
-import xbmc, xbmcgui, xbmcplugin, xbmcaddon
+import sys, time, datetime, re, traceback, inputstreamhelper
+import urllib, urllib2, socket, json, urlparse
+import xbmc, xbmcaddon, xbmcplugin, xbmcgui
 
-from youtube_dl import YoutubeDL
-from simplecache import SimpleCache
+from YDStreamExtractor import getVideoInfo
+from simplecache import SimpleCache, use_cache
 
 # Plugin Info
 ADDON_ID      = 'plugin.video.nbc'
@@ -39,57 +39,38 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 TIMEOUT       = 15
 CONTENT_TYPE  = 'files'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
+QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
 BASE_URL      = 'http://www.nbc.com'
 SHOW_URL      = 'https://api.nbc.com/v3.14/aggregatesShowProperties/%s'
 SHOWS_URL     = 'https://api.nbc.com/v3.14/shows?filter[active]=1&include=image&page[size]=30&sort=sortTitle'
 VIDEO_URL     = 'https://api.nbc.com/v3.14/videos?filter[entitlement]=free&filter[published]=1&include=image&page[size]=30&sort=-airdate'
 FILTER        = '&filter[%s]=%s'
 
-MAIN_MENU = [("Latest Episodes", "", 1),
-             ("Browse Shows", "", 2)]
+MAIN_MENU = [(LANGUAGE(30002), "", 1),
+             (LANGUAGE(30003), "", 2)]
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
     xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
-    
-def getParams():
-    param=[]
-    if len(sys.argv[2])>=2:
-        params=sys.argv[2]
-        cleanedparams=params.replace('?','')
-        if (params[len(params)-1]=='/'):
-            params=params[0:len(params)-2]
-        pairsofparams=cleanedparams.split('&')
-        param={}
-        for i in range(len(pairsofparams)):
-            splitparams={}
-            splitparams=pairsofparams[i].split('=')
-            if (len(splitparams))==2:
-                param[splitparams[0]]=splitparams[1]
-    return param
-                 
+  
 socket.setdefaulttimeout(TIMEOUT)
 class NBC(object):
-    def __init__(self):
-        log('__init__')
-        self.cache = SimpleCache()
-        self.ydl   = YoutubeDL()
+    def __init__(self, sysARG):
+        log('__init__, sysARG = ' + str(sysARG))
+        self.sysARG = sysARG
+        self.cache  = SimpleCache()
            
            
     def openURL(self, url):
-        log('openURL, url = ' + str(url))
         try:
-            cacheResponce = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-            if not cacheResponce:
-                request = urllib2.Request(url)
-                responce = urllib2.urlopen(request, timeout = TIMEOUT).read()
-                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, responce, expiration=datetime.timedelta(hours=1))
-            return self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-        except urllib2.URLError as e:
-            log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except socket.timeout as e:
-            log("openURL Failed! " + str(e), xbmc.LOGERROR)
+            log('openURL, url = ' + str(url))
+            if DEBUG: cacheresponse = None
+            else: cacheresponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
+            if not cacheresponse:
+                cacheresponse = urllib2.urlopen(urllib2.Request(url), timeout=TIMEOUT).read()
+                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=datetime.timedelta(minutes=15))
+            return cacheresponse
         except Exception as e:
             log("openURL Failed! " + str(e), xbmc.LOGERROR)
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
@@ -97,15 +78,13 @@ class NBC(object):
          
          
     def buildMenu(self, items):
-        for item in items:
-            self.addDir(*item)
-        self.addYoutube("Browse Youtube" , 'plugin://plugin.video.youtube/user/NBC/')
+        for item in items: self.addDir(*item)
+        self.addYoutube(LANGUAGE(30004), 'plugin://plugin.video.youtube/user/NBC/')
 
             
     def browseEpisodes(self, url=None):
         log('browseEpisodes')
-        if url is None:
-            url = VIDEO_URL+FILTER%('type','Full%20Episode')
+        if url is None: url = VIDEO_URL+FILTER%('type','Full%20Episode')
         items = json.loads(self.openURL(url))
         if items and 'data' in items:
             for item in items['data']:
@@ -148,8 +127,7 @@ class NBC(object):
                  
     def browseShows(self, url=None):
         log('browseShows')
-        if url is None:
-            url = SHOWS_URL
+        if url is None: url = SHOWS_URL
         items = json.loads(self.openURL(url))
         if items and 'data' in items:
             for item in items['data']:
@@ -177,8 +155,8 @@ class NBC(object):
                  self.addDir('>> Next',next_page, 2)
  
 
-    def resolveURL(self, url):
-        log('resolveURL')
+    def buildShow(self, url):
+        log('buildShow')
         myURL = json.loads(url)
         items = json.loads(self.openURL(SHOW_URL%myURL['vidID']))
         if items and 'data' in items:
@@ -186,14 +164,23 @@ class NBC(object):
                 self.browseEpisodes(myURL['url']+FILTER%('type',urllib2.quote(item)))
                 
                 
-    def playVideo(self, name, url, liz=None):
+    @use_cache(28)
+    def resolveURL(self, url):
+        log('resolveURL')
+        return getVideoInfo(url,QUALITY,True).streams()
+    
+    
+    def playVideo(self, name, url):
         log('playVideo')
-        self.ydl.add_default_info_extractors()
-        with self.ydl:
-            result = self.ydl.extract_info(url, download=False)
-            url = result['manifest_url']
-            liz = xbmcgui.ListItem(name, path=url)
-            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
+        info = self.resolveURL(url)
+        if info is None: return
+        url = info[0]['xbmc_url']
+        liz = xbmcgui.ListItem(name, path=url)
+        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream() and not DEBUG:
+            liz.setProperty('inputstreamaddon','inputstream.adaptive')
+            liz.setProperty('inputstream.adaptive.manifest_type','hls')
+        if 'subtitles' in info[0]['ytdl_format']: liz.setSubtitles([x['url'] for x in info[0]['ytdl_format']['subtitles'].get('en','') if 'url' in x])
+        xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
 
             
     def addYoutube(self, name, url):
@@ -201,7 +188,7 @@ class NBC(object):
         liz.setProperty('IsPlayable', 'false')
         liz.setInfo(type="Video", infoLabels={"label":name,"title":name} )
         liz.setArt({'thumb':ICON,'fanart':FANART})
-        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=liz,isFolder=True)
+        xbmcplugin.addDirectoryItem(handle=int(self.sysARG[1]),url=url,listitem=liz,isFolder=True)
         
            
     def addLink(self, name, u, mode, infoList=False, infoArt=False, total=0):
@@ -209,17 +196,12 @@ class NBC(object):
         log('addLink, name = ' + name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'true')
-        if infoList == False:
-            liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"genre":"News"})
-        else:
-            liz.setInfo(type="Video", infoLabels=infoList)
-            
-        if infoArt == False:
-            liz.setArt({'thumb':ICON,'fanart':FANART})
-        else:
-            liz.setArt(infoArt)
-        u=sys.argv[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
-        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,totalItems=total)
+        if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"genre":"News"})
+        else: liz.setInfo(type="Video", infoLabels=infoList)
+        if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
+        else: liz.setArt(infoArt)
+        u=self.sysARG[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
+        xbmcplugin.addDirectoryItem(handle=int(self.sysARG[1]),url=u,listitem=liz,totalItems=total)
 
 
     def addDir(self, name, u, mode, infoList=False, infoArt=False):
@@ -227,44 +209,39 @@ class NBC(object):
         log('addDir, name = ' + name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'false')
-        if infoList == False:
-            liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"genre":"News"})
-        else:
-            liz.setInfo(type="Video", infoLabels=infoList)
-        if infoArt == False:
-            liz.setArt({'thumb':ICON,'fanart':FANART})
-        else:
-            liz.setArt(infoArt)
-        u=sys.argv[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
-        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=True)
+        if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"genre":"News"})
+        else: liz.setInfo(type="Video", infoLabels=infoList)
+        if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
+        else: liz.setArt(infoArt)
+        u=self.sysARG[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
+        xbmcplugin.addDirectoryItem(handle=int(self.sysARG[1]),url=u,listitem=liz,isFolder=True)
 
-params=getParams()
-try:
-    url=urllib.unquote_plus(params["url"])
-except:
-    url=None
-try:
-    name=urllib.unquote_plus(params["name"])
-except:
-    name=None
-try:
-    mode=int(params["mode"])
-except:
-    mode=None
-    
-log("Mode: "+str(mode))
-log("URL : "+str(url))
-log("Name: "+str(name))
 
-if mode==None:  NBC().buildMenu(MAIN_MENU)
-elif mode == 0: NBC().resolveURL(url)
-elif mode == 1: NBC().browseEpisodes(url)
-elif mode == 2: NBC().browseShows(url)
-elif mode == 9: NBC().playVideo(name, url)
+    def getParams(self):
+        return dict(urlparse.parse_qsl(self.sysARG[2][1:]))
 
-xbmcplugin.setContent(int(sys.argv[1])    , CONTENT_TYPE)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_NONE)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_LABEL)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_TITLE)
-xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
+            
+    def run(self):  
+        params=self.getParams()
+        try:url=urllib.unquote_plus(params["url"])
+        except: url=None
+        try: name=urllib.unquote_plus(params["name"])
+        except: name=None
+        try: mode=int(params["mode"])
+        except: mode=None
+        log("Mode: "+str(mode))
+        log("URL : "+str(url))
+        log("Name: "+str(name))
+
+        if mode==None:  self.buildMenu(MAIN_MENU)
+        elif mode == 0: self.buildShow(url)
+        elif mode == 1: self.browseEpisodes(url)
+        elif mode == 2: self.browseShows(url)
+        elif mode == 9: self.playVideo(name, url)
+            
+        xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_NONE)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_LABEL)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_TITLE)
+        xbmcplugin.endOfDirectory(int(self.sysARG[1]), cacheToDisc=True)

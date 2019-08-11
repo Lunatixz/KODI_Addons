@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.nbc" version="1.0.4" name="NBC" provider-name="Lunatixz">
+<addon id="plugin.video.nbc" version="1.0.5" name="NBC" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="script.module.youtube.dl" version="17.0.0"/>
-        
+        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
@@ -15,7 +15,7 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.nbc</source>
-        <website>https://www.nbc.com/</website>
+        <website>http://nbc.com</website>
         <news>[CR]1.0.1[CR]- Fixed Parsing Error</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=321811</forum>
         <assets>

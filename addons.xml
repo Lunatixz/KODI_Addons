@@ -1,157 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.1.1" provider-name="Team Kodi">
-    <requires>
-        <import addon="xbmc.python" version="2.24.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-    </requires>
-    <extension point="xbmc.python.script" library="default.py"/>
-    <extension point="xbmc.service" library="service.py" start="login"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Download and Install Kodi packages.</summary>
-        <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>android</platform>
-        <website>https://kodi.tv/</website>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.android.update</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=322783</forum>
-        <news>v1.1.1[CR]-Temp Fix[CR]v1.1.0[CR]-Crash Fix[CR]v1.0.9[CR]-Improved UI[CR]v1.0.5[CR]-Moved to Jarvis[CR]-Android Platform Detection[CR]-Streamlined Navigation[CR]v1.0.4[CR]-Android Version Detection[CR]- Improved Error Handling[CR]v1.0.3[CR]-Improved functionality[CR]v1.0.1[CR]-Added After Install Cleanup.</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.module.pyqrcode" version="0.0.2" name="pyQRcode" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.24.0" />
-    </requires>
-    <extension library="lib" point="xbmc.python.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_US">A Python interface to generate QR Code</summary>
-        <description lang="en_US">A Python interface to generate QR Code</description>
-        <forum></forum>
-        <website>https://pypi.org/project/PyQRCode/</website>
-        <license>Apache2</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pyqrcode</source>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="plugin.video.nbc" version="1.0.5" name="NBC" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.youtube.dl" version="17.0.0"/>
-        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Watch full episodes of current and classic NBC shows online.</summary>
-        <description lang="en_GB">Watch full episodes of current and classic NBC shows online. Plus find clips, previews and exclusive online features on NBC.com.</description>
-        <platform>android freebsd ios linux osx windows</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.nbc</source>
-        <website>http://nbc.com</website>
-        <news>[CR]1.0.1[CR]- Fixed Parsing Error</news>
-        <forum>https://forum.kodi.tv/showthread.php?tid=321811</forum>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="repository.lunatixz.jarvis" name="Lunatixz Jarvis Beta Repository" version="1.0.2" provider-name="Lunatixz">
-    <extension point="xbmc.addon.repository" name="Lunatixz Jarvis Beta Repository">
-        <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml</info>
-        <checksum>http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml.md5</checksum>
-        <datadir zip="true">http://raw.github.com/Lunatixz/KODI_Addons/jarvis/zips</datadir>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
-        <description lang="en_GB"></description>
-        <platform>all</platform>
-        <source>http://raw.github.com/Lunatixz/KODI_Addons/jarvis</source>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="plugin.video.plutotv" version="1.1.4" name="Pluto.TV" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.youtube.dl" version="17.0.0"/>
-        <import addon="script.module.uepg" version="1.0.6"/>
-        <import addon="plugin.video.youtube" version="5.1.8" optional="true"/>
-        <import addon="plugin.video.vimeo" version="4.1.4" optional="true"/>
-        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
-        <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV's 100+ channels of news, sports, and the Internet's best, completely free on your Kodi device.</description>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.plutotv</source>
-        <website>http://pluto.tv/</website>
-        <forum>http://forum.kodi.tv/showthread.php?tid=315513</forum>
-        <news>v1.1.4[CR]- Back-end updates[CR]-v1.1.2[CR]- Improved usability[CR]v1.1.0[CR]- Improved UWP check [CR]- Added automatic region detection[CR]- Improved guide load times[CR]- Improved overall performance[CR]v1.0.9[CR]- Added UWP check[CR]- Improved Playback[CR]v1.0.8[CR]- Fixed parsing errors[CR]- Added uEPG guide[CR]v1.0.7[CR]- init. uEPG support.[CR]- New menu items.[CR]- Misc. Tweaks.[CR]v1.0.7[CR]- Improved browsing speed[CR]- General tweaks and improvements.[CR]v1.0.6[CR]- Added Guest Login.[CR]- Added Geoblock warning.[CR]v1.0.5[CR]- Fixed Android Login[CR]v1.0.4[CR]- Added Region Selection and Improved Region Filter[CR]- Added Startup Wizard and Improved Login Verification.[CR]v1.0.3[CR]- Fixed Menu and Tweaked cache.[CR]v1.0.2[CR]- Fixed cookie issue on android devices.[CR]- Updated cache life.[CR]v1.0.1[CR]- Fixed login cache issue.</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="screensaver.google.earth" name="Google Earth" version="1.0.5" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-    </requires>
-    <extension point="xbmc.ui.screensaver" library="default.py"/>
-    <extension point="xbmc.python.script"  library="default.py"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
-        <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.google.earth</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=321718</forum>
-        <news>v.1.0.4[CR]- Parser update[CR]v.1.0.4[CR]- Core Update[CR]v.1.0.3[CR]- Leia compatibility.</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="context.altmovie.posters" name="Alternative Movie Posters" version="1.0.0" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -935,6 +783,35 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.nbc" version="1.0.5" name="NBC" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.youtube.dl" version="17.0.0"/>
+        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Watch full episodes of current and classic NBC shows online.</summary>
+        <description lang="en_GB">Watch full episodes of current and classic NBC shows online. Plus find clips, previews and exclusive online features on NBC.com.</description>
+        <platform>android freebsd ios linux osx windows</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.nbc</source>
+        <website>http://nbc.com</website>
+        <news>[CR]1.0.1[CR]- Fixed Parsing Error</news>
+        <forum>https://forum.kodi.tv/showthread.php?tid=321811</forum>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.video.news12" version="1.0.2" name="News12" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1129,6 +1006,39 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.plutotv" version="1.1.4" name="Pluto.TV" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.youtube.dl" version="17.0.0"/>
+        <import addon="script.module.uepg" version="1.0.6"/>
+        <import addon="plugin.video.youtube" version="5.1.8" optional="true"/>
+        <import addon="plugin.video.vimeo" version="4.1.4" optional="true"/>
+        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
+        <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV's 100+ channels of news, sports, and the Internet's best, completely free on your Kodi device.</description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.plutotv</source>
+        <website>http://pluto.tv/</website>
+        <forum>http://forum.kodi.tv/showthread.php?tid=315513</forum>
+        <news>v1.1.4[CR]- Back-end updates[CR]-v1.1.2[CR]- Improved usability[CR]v1.1.0[CR]- Improved UWP check [CR]- Added automatic region detection[CR]- Improved guide load times[CR]- Improved overall performance[CR]v1.0.9[CR]- Added UWP check[CR]- Improved Playback[CR]v1.0.8[CR]- Fixed parsing errors[CR]- Added uEPG guide[CR]v1.0.7[CR]- init. uEPG support.[CR]- New menu items.[CR]- Misc. Tweaks.[CR]v1.0.7[CR]- Improved browsing speed[CR]- General tweaks and improvements.[CR]v1.0.6[CR]- Added Guest Login.[CR]- Added Geoblock warning.[CR]v1.0.5[CR]- Fixed Android Login[CR]v1.0.4[CR]- Added Region Selection and Improved Region Filter[CR]- Added Startup Wizard and Improved Login Verification.[CR]v1.0.3[CR]- Fixed Menu and Tweaked cache.[CR]v1.0.2[CR]- Fixed cookie issue on android devices.[CR]- Updated cache life.[CR]v1.0.1[CR]- Fixed login cache issue.</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.video.screenrant" version="1.0.1" name="Screen Rant" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1184,24 +1094,25 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.skynews" version="1.0.2" name="Sky News" provider-name="Lunatixz">
+<addon id="screensaver.videosaver" name="Video ScreenSaver" version="1.0.7" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-        <import addon="plugin.video.youtube" version="5.1.8" optional="true"/>
     </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
+    <extension point="xbmc.ui.screensaver" library="default.py"/>
+    <extension point="xbmc.python.script"  library="default.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Sky News is a 24-hour international multimedia news organisation based in the U.K. that started as a 24-hour television news channel.</summary>
-        <description lang="en_GB">Sky News - First for Breaking News, video, headlines, analysis and top stories from business, politics, entertainment and more in the UK and worldwide.</description>
-        <platform>all</platform>
+        <summary lang="en_GB">Create a screensaver from any Kodi video source.</summary>
+        <description lang="en_GB">Dynamic screensaver using Local content, SmartPlaylists, Plugins and UPNP Servers.</description>
+		<summary lang="es_ES">Crea un protector de pantalla de cualquier fuente de vídeo en Kodi.</summary>
+        <description lang="es_ES">Protector de pantalla dinámico que utiliza contenido local, listas de reproducción inteligentes, complementos y servidores UPNP.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/plugin.video.skynews</source>
-        <website>https://news.sky.com/</website>
-        <forum>https://forum.kodi.tv/showthread.php?tid=320938</forum>
+        <platform>all</platform>
+        <forum>https://forum.kodi.tv/showthread.php?tid=319730</forum>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/screensaver.videosaver</source>
+        <disclaimer lang="en_GB" >Streaming sources not recommend for metered Internet.</disclaimer>
+		<disclaimer lang="es_ES" >Se recomienda no usar recursos en Streaming para conexiones a Internet de uso medido.</disclaimer>
+        <news>v.1.0.4[CR]- Added volume control[CR]v.1.0.3[CR]- Fixed PVR playback[CR]- Fixed Auto Repeat[CR]- v.1.0.2[CR]- Misc. Improvements[CR]- Added Mute Audio[CR]- Spanish Translation (Thanks roliverosc).[CR]v.1.0.1[CR]- Fixed MultiVideo[CR]- Added RepeatOFF</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -1594,6 +1505,23 @@
     </extension>
 </addon>
 
+<addon id="repository.lunatixz.jarvis" name="Lunatixz Jarvis Beta Repository" version="1.0.2" provider-name="Lunatixz">
+    <extension point="xbmc.addon.repository" name="Lunatixz Jarvis Beta Repository">
+        <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml</info>
+        <checksum>http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml.md5</checksum>
+        <datadir zip="true">http://raw.github.com/Lunatixz/KODI_Addons/jarvis/zips</datadir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB"></summary>
+        <description lang="en_GB"></description>
+        <platform>all</platform>
+        <source>http://raw.github.com/Lunatixz/KODI_Addons/jarvis</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="screensaver.bing" name="Bing: Photos of the Week" version="1.0.3" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1639,6 +1567,32 @@
             <fanart>fanart.jpg</fanart>
             <screenshot>screenshot01.png</screenshot>
             <screenshot>screenshot02.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="screensaver.google.earth" name="Google Earth" version="1.0.5" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+    </requires>
+    <extension point="xbmc.ui.screensaver" library="default.py"/>
+    <extension point="xbmc.python.script"  library="default.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
+        <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.google.earth</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=321718</forum>
+        <news>v.1.0.4[CR]- Parser update[CR]v.1.0.4[CR]- Core Update[CR]v.1.0.3[CR]- Leia compatibility.</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
     </extension>
 </addon>
@@ -1751,31 +1705,6 @@
     </extension>
 </addon>
 
-<addon id="screensaver.videosaver" name="Video ScreenSaver" version="1.0.4" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-    </requires>
-    <extension point="xbmc.ui.screensaver" library="default.py"/>
-    <extension point="xbmc.python.script"  library="default.py"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Create a screensaver from any Kodi video source.</summary>
-        <summary lang="es_ES">Crea un protector de pantalla de cualquier recurso de vídeo en Kodi.</summary>
-	<description lang="en_GB">Dynamic screensaver using Local content, SmartPlaylists, Plugins and UPNP Servers.</description>
-        <description lang="es_ES">Protector de pantalla dinámico que utiliza contenido local, listas de reproducción inteligentes, complementos y servidores UPNP.</description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <forum>https://forum.kodi.tv/showthread.php?tid=319730</forum>
-        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/screensaver.videosaver</source>
-        <disclaimer lang="en_GB" >Streaming sources not recommend for metered Internet.</disclaimer>
-	<disclaimer lang="es_ES" >Se recomienda no usar recursos en Streaming para conexiones a Internet de uso medido.</disclaimer>
-        <news>v.1.0.4[CR]- Added volume control[CR]v.1.0.3[CR]- Fixed PVR playback[CR]- Fixed Auto Repeat[CR]- v.1.0.2[CR]- Misc. Improvements[CR]- Added Mute Audio[CR]- Spanish Translation (Thanks roliverosc).[CR]v.1.0.1[CR]- Fixed MultiVideo[CR]- Added RepeatOFF</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="script.enableit" version="0.0.2" name="Enable it!" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1799,44 +1728,30 @@
     </extension>
 </addon>
 
-<addon id="script.io.benchmark" name="I/O Benchmark" version="1.1.0" provider-name="Lunatixz">
+<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.1.1" provider-name="Team Kodi">
     <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="xbmc.python" version="2.24.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
     </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>executable</provides>
-    </extension>
+    <extension point="xbmc.python.script" library="default.py"/>
+    <extension point="xbmc.service" library="service.py" start="login"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Test your devices read/write performance.</summary>
-        <description lang="en_GB">How fast does your device read and write?</description>
-        <license>The MIT License (MIT)</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.io.benchmark</source>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-            <screenshot>screenshot01.png</screenshot>
-            <screenshot>screenshot02.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.kitchen.service" version="0.0.3" name="Kitchen Service" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.14.0"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="service.py">
-        <provides>executable</provides>
-    </extension>
-    <extension point="xbmc.service" library="service.py" start="startup"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en">Custom Script - For My Needs!</summary>
-        <description lang="en">Toggle Kitchen Kodi Mute by ping state of adjacent TV. Set Kitchen Kodi TV Volume by Day/Night</description>
-        <disclaimer lang="en" >This software is a BETA release, bugs maybe common until final release.</disclaimer>
-        <platform>all</platform>
+        <summary lang="en_GB">Download and Install Kodi packages.</summary>
+        <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>android</platform>
+        <website>https://kodi.tv/</website>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.android.update</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=322783</forum>
+        <news>v1.1.1[CR]-Temp Fix[CR]v1.1.0[CR]-Crash Fix[CR]v1.0.9[CR]-Improved UI[CR]v1.0.5[CR]-Moved to Jarvis[CR]-Android Platform Detection[CR]-Streamlined Navigation[CR]v1.0.4[CR]-Android Version Detection[CR]- Improved Error Handling[CR]v1.0.3[CR]-Improved functionality[CR]v1.0.1[CR]-Added After Install Cleanup.</news>
         <assets>
-            <icon>icon.png</icon>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
     </extension>
 </addon>
@@ -1965,6 +1880,25 @@
 		<assets>
 			<icon>icon.png</icon>
 		</assets>
+    </extension>
+</addon>
+
+<addon id="script.module.pyqrcode" version="0.0.2" name="pyQRcode" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.24.0" />
+    </requires>
+    <extension library="lib" point="xbmc.python.module" />
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_US">A Python interface to generate QR Code</summary>
+        <description lang="en_US">A Python interface to generate QR Code</description>
+        <forum></forum>
+        <website>https://pypi.org/project/PyQRCode/</website>
+        <license>Apache2</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pyqrcode</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
     </extension>
 </addon>
 
@@ -2166,27 +2100,6 @@
     </extension>
 </addon>
 
-<addon id="service.mediamirror" version="0.0.1" name="Media Mirror" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-    </requires>
-    <extension point="xbmc.python.script" library="settings.py"/>
-    <extension point="xbmc.service" library="service.py" start="startup"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Effortlessly create multiroom sharing with Kodi clients throughout your network.</summary>
-        <description lang="en_GB">Share what your viewing with multiple Kodi clients throughout your network.[CR]Share local content, plugins, UPNP and PVR backends. Share one central experience throughout your home.</description>
-        <disclaimer lang="en_GB" >*Requires all Kodi instances configured with a centralized file server and database.[CR]Each client requires identical configuration "InSync" with the master, same access to files, plugins and PVR backend sources. *See: http://kodi.wiki/view/Syncing_and_sharing</disclaimer>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.mediamirror</source>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="service.moduleauditor" version="0.1.4" name="Kodi Module Auditor" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -2257,6 +2170,69 @@
     </extension>
 </addon>
 
+<addon id="script.io.benchmark" name="I/O Benchmark" version="1.1.0" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Test your devices read/write performance.</summary>
+        <description lang="en_GB">How fast does your device read and write?</description>
+        <license>The MIT License (MIT)</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.io.benchmark</source>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+            <screenshot>screenshot01.png</screenshot>
+            <screenshot>screenshot02.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="script.kitchen.service" version="0.0.3" name="Kitchen Service" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.14.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="service.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Custom Script - For My Needs!</summary>
+        <description lang="en">Toggle Kitchen Kodi Mute by ping state of adjacent TV. Set Kitchen Kodi TV Volume by Day/Night</description>
+        <disclaimer lang="en" >This software is a BETA release, bugs maybe common until final release.</disclaimer>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="service.mediamirror" version="0.0.1" name="Media Mirror" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.requests" version="2.7.0"/>
+    </requires>
+    <extension point="xbmc.python.script" library="settings.py"/>
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Effortlessly create multiroom sharing with Kodi clients throughout your network.</summary>
+        <description lang="en_GB">Share what your viewing with multiple Kodi clients throughout your network.[CR]Share local content, plugins, UPNP and PVR backends. Share one central experience throughout your home.</description>
+        <disclaimer lang="en_GB" >*Requires all Kodi instances configured with a centralized file server and database.[CR]Each client requires identical configuration "InSync" with the master, same access to files, plugins and PVR backend sources. *See: http://kodi.wiki/view/Syncing_and_sharing</disclaimer>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.mediamirror</source>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="service.ontime" version="0.0.1b" name="OnTime" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -2306,6 +2282,31 @@
             <screenshot>resources/images/screenshot01.png</screenshot>
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="plugin.video.skynews" version="1.0.2" name="Sky News" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+        <import addon="plugin.video.youtube" version="5.1.8" optional="true"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Sky News is a 24-hour international multimedia news organisation based in the U.K. that started as a 24-hour television news channel.</summary>
+        <description lang="en_GB">Sky News - First for Breaking News, video, headlines, analysis and top stories from business, politics, entertainment and more in the UK and worldwide.</description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/plugin.video.skynews</source>
+        <website>https://news.sky.com/</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=320938</forum>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
         </assets>
     </extension>
 </addon>

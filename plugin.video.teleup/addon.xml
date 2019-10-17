@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.teleup" name="TeleUp" provider-name="Lunatixz" version="2018.01.08">
+<addon id="plugin.video.teleup" name="TeleUp" provider-name="Lunatixz" version="2019.10.05">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/> 
         <import addon="script.module.requests" version="2.7.0"/> 

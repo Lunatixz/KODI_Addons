@@ -37,7 +37,7 @@ msgid "Select User Region"
 msgstr ""
 
 msgctxt "#30006"
-msgid "Welcome Back "
+msgid "Welcome Back %s"
 msgstr ""
 
 msgctxt "#30007"
@@ -57,7 +57,7 @@ msgid "Sign-In"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Channels"
+msgid "LiveTV"
 msgstr ""
 
 msgctxt "#30012"
@@ -77,5 +77,13 @@ msgid ">> Next"
 msgstr ""
 
 msgctxt "#30016"
-msgid "Featured"   
+msgid "Featured"
+msgstr ""
+
+msgctxt "#30017"
+msgid "Categories"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Lineup"
 msgstr ""

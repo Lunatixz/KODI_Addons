@@ -812,7 +812,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.news12" version="1.0.2" name="News12" provider-name="Lunatixz">
+<addon id="plugin.video.news12" version="1.0.4" name="News12" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -823,6 +823,7 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
+        <broken>Site Moved Behind Paywall</broken>
         <summary lang="en_GB">Welcome to News 12!</summary>
         <description lang="en_GB">News 12, a cable network exclusive to seven regions of the New York tri-state area. Please select an region to get the latest local news and information.</description>
         <platform>all</platform>
@@ -1006,7 +1007,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.plutotv" version="1.1.4" name="Pluto.TV" provider-name="Lunatixz">
+<addon id="plugin.video.plutotv" version="1.1.5" name="Pluto.TV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -1027,7 +1028,7 @@
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.plutotv</source>
         <website>http://pluto.tv/</website>
         <forum>http://forum.kodi.tv/showthread.php?tid=315513</forum>
-        <news>v1.1.4[CR]- Back-end updates[CR]-v1.1.2[CR]- Improved usability[CR]v1.1.0[CR]- Improved UWP check [CR]- Added automatic region detection[CR]- Improved guide load times[CR]- Improved overall performance[CR]v1.0.9[CR]- Added UWP check[CR]- Improved Playback[CR]v1.0.8[CR]- Fixed parsing errors[CR]- Added uEPG guide[CR]v1.0.7[CR]- init. uEPG support.[CR]- New menu items.[CR]- Misc. Tweaks.[CR]v1.0.7[CR]- Improved browsing speed[CR]- General tweaks and improvements.[CR]v1.0.6[CR]- Added Guest Login.[CR]- Added Geoblock warning.[CR]v1.0.5[CR]- Fixed Android Login[CR]v1.0.4[CR]- Added Region Selection and Improved Region Filter[CR]- Added Startup Wizard and Improved Login Verification.[CR]v1.0.3[CR]- Fixed Menu and Tweaked cache.[CR]v1.0.2[CR]- Fixed cookie issue on android devices.[CR]- Updated cache life.[CR]v1.0.1[CR]- Fixed login cache issue.</news>
+        <news>v1.1.5[CR]- Moved to API v2+[CR]- Added PY3 Support[CR]- Major Code Refactoring[CR]v1.1.4[CR]- Back-end updates[CR]-v1.1.2[CR]- Improved usability[CR]v1.1.0[CR]- Improved UWP check [CR]- Added automatic region detection[CR]- Improved guide load times[CR]- Improved overall performance[CR]v1.0.9[CR]- Added UWP check[CR]- Improved Playback[CR]v1.0.8[CR]- Fixed parsing errors[CR]- Added uEPG guide[CR]v1.0.7[CR]- init. uEPG support.[CR]- New menu items.[CR]- Misc. Tweaks.[CR]v1.0.7[CR]- Improved browsing speed[CR]- General tweaks and improvements.[CR]v1.0.6[CR]- Added Guest Login.[CR]- Added Geoblock warning.[CR]v1.0.5[CR]- Fixed Android Login[CR]v1.0.4[CR]- Added Region Selection and Improved Region Filter[CR]- Added Startup Wizard and Improved Login Verification.[CR]v1.0.3[CR]- Fixed Menu and Tweaked cache.[CR]v1.0.2[CR]- Fixed cookie issue on android devices.[CR]- Updated cache life.[CR]v1.0.1[CR]- Fixed login cache issue.</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -1183,7 +1184,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.teleup" name="TeleUp" provider-name="Lunatixz" version="2018.01.08">
+<addon id="plugin.video.teleup" name="TeleUp" provider-name="Lunatixz" version="2019.10.05">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.requests" version="2.7.0"/>

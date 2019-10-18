@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.plutotv" version="1.1.5" name="Pluto.TV" provider-name="Lunatixz">
+<addon id="plugin.video.plutotv" version="1.1.5a" name="Pluto.TV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.youtube.dl" version="17.0.0"/>
         <import addon="script.module.uepg" version="1.0.6"/>
-        <import addon="plugin.video.youtube" version="5.1.8" optional="true"/>
-        <import addon="plugin.video.vimeo" version="4.1.4" optional="true"/>
         <import addon="script.module.inputstreamhelper" version="0.3.3"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>
+    <extension point="xbmc.service" library="pseudotv_recommended.py" start="startup"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
         <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV's 100+ channels of news, sports, and the Internet's best, completely free on your Kodi device.</description>

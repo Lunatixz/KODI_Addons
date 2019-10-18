@@ -57,7 +57,7 @@ msgid "Sign-In"
 msgstr ""
 
 msgctxt "#30011"
-msgid "LiveTV"
+msgid "Live"
 msgstr ""
 
 msgctxt "#30012"

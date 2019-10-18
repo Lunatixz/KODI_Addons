@@ -30,7 +30,7 @@ except NameError: unicode = str # py3
 try:
     from urllib.parse import parse_qsl  # py3
 except ImportError:
-    from urlparse import parse_qsl  
+    from urlparse import parse_qsl # py2
     
 try:
     from multiprocessing import cpu_count 
@@ -60,14 +60,13 @@ PASSWORD     = REAL_SETTINGS.getSetting('User_Password')
 DEBUG        = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 COOKIE_JAR   = xbmc.translatePath(os.path.join(SETTINGS_LOC, "cookiejar.lwp"))
 PTVL_RUN     = xbmcgui.Window(10000).getProperty('PseudoTVRunning') == 'True'
-BASE_URL     = 'http://pluto.tv/'#'http://silo.pluto.tv/'
 BASE_API     = 'https://api.pluto.tv'
 BASE_LINEUP  = BASE_API + '/v2/channels.json'
 BASE_GUIDE   = BASE_API + '/v2/channels?start=%s&stop=%s&%s'
 LOGIN_URL    = BASE_API + '/v1/auth/local'
 BASE_CLIPS   = BASE_API + '/v2/episodes/%s/clips.json'
 BASE_VOD     = BASE_API + '/v3/vod/categories?includeItems=true&deviceType=web&%s'
-REGION_URL   = 'http://ip-api.com/json'
+SEAONS_VOD   = BASE_API + '/v3/vod/series/%s/seasons?includeItems=true&deviceType=web&%s'
 PLUTO_MENU   = [(LANGUAGE(30011), '', 0),
                 (LANGUAGE(30018), '', 1),
                 (LANGUAGE(30017), '', 2),
@@ -79,16 +78,11 @@ def isUWP():
     
 def inputDialog(heading=ADDON_NAME, default='', key=xbmcgui.INPUT_ALPHANUM, opt=0, close=0):
     retval = xbmcgui.Dialog().input(heading, default, key, opt, close)
-    if len(retval) > 0:
-        return retval    
-                    
-def busyDialog(percent=0, control=None):
-    if percent == 0 and not control:
-        control = xbmcgui.DialogBusy()
-        control.create()
-    elif percent == 100 and control: return control.close()
-    elif control: control.update(percent)
-    return control
+    if len(retval) > 0: return retval    
+        
+def notificationDialog(message, header=ADDON_NAME, show=True, sound=False, time=1000, icon=ICON):
+    try: xbmcgui.Dialog().notification(header, message, icon, time, sound=False)
+    except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
      
 def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', autoclose=0):
     return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
@@ -103,46 +97,37 @@ def timezone():
     
 def setUUID():
     if REAL_SETTINGS.getSetting("sid"): return
+    log('setUUID, creating uuid')
     REAL_SETTINGS.setSetting("sid",uuid.uuid1().hex[:18])
     REAL_SETTINGS.setSetting("deviceId",uuid.uuid4().hex[:18])
+
+def cookieJar():
+    if not xbmcvfs.exists(COOKIE_JAR):
+        try:
+            xbmcvfs.mkdirs(SETTINGS_LOC)
+            f = xbmcvfs.File(COOKIE_JAR, 'w')
+            f.close()
+        except: log('login, Unable to create cookie folder', xbmc.LOGERROR)
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
     xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
    
-setUUID()             
+setUUID()    
+cookieJar()
 socket.setdefaulttimeout(TIMEOUT)
 class PlutoTV(object):
     def __init__(self, sysARG):
         log('__init__, sysARG = ' + str(sysARG))
         self.sysARG  = sysARG
-        self.cookieJar()
         self.net     = net.Net()
         self.cache   = SimpleCache()
-        # self.region  = self.getRegion()
-        # self.filter  = False if self.region == 'US' else True
-        # log('__init__, region = ' + self.region)
-        
-        
-    def cookieJar(self):
-        try: xbmcvfs.rmdir(COOKIE_JAR)
-        except: pass
-        if xbmcvfs.exists(COOKIE_JAR) == False:
-            try:
-                xbmcvfs.mkdirs(SETTINGS_LOC)
-                f = xbmcvfs.File(COOKIE_JAR, 'w')
-                f.close()
-            except: 
-                log('login, Unable to create the storage directory', xbmc.LOGERROR)
-                return False
-        return True
-        
+
 
     def login(self):
         log('login')
-        #ignore guest login
-        if USER_EMAIL == LANGUAGE(30009): return
+        if USER_EMAIL == LANGUAGE(30009): return #ignore, using guest login
         if len(USER_EMAIL) > 0:
             header_dict               = {}
             header_dict['Accept']     = 'application/json, text/javascript, */*; q=0.01'
@@ -156,10 +141,10 @@ class PlutoTV(object):
             try:
                 loginlink = json.loads(self.net.http_POST(LOGIN_URL, form_data=form_data, headers=header_dict).content.encode("utf-8").rstrip())
                 if loginlink and loginlink['email'].lower() == USER_EMAIL.lower():
-                    xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30006)%(loginlink['displayName']), ICON, 4000)
+                    notificationDialog(LANGUAGE(30006)%(loginlink['displayName']), time=4000)
                     self.net.save_cookies(COOKIE_JAR)
-                else: xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30007), ICON, 4000)
-            except Exception as e: log('login, Unable to create the storage directory ' + str(e), xbmc.LOGERROR)
+                else: notificationDialog(LANGUAGE(30007), time=4000)
+            except Exception as e: log('login, failed! ' + str(e), xbmc.LOGERROR)
         else:
             #firstrun wizard
             if yesnoDialog(LANGUAGE(30008),no=LANGUAGE(30009), yes=LANGUAGE(30010)):
@@ -168,7 +153,7 @@ class PlutoTV(object):
             else: REAL_SETTINGS.setSetting('User_Email',LANGUAGE(30009))
             
             
-    def openURL(self, url, life=datetime.timedelta(minutes=1)):
+    def openURL(self, url, life=datetime.timedelta(minutes=15)):
         log('openURL, url = ' + url)
         try:
             header_dict               = {}
@@ -190,7 +175,7 @@ class PlutoTV(object):
             return cacheResponse
         except Exception as e:
             log('openURL, Unable to open url ' + str(e), xbmc.LOGERROR)
-            xbmcgui.Dialog().notification(ADDON_NAME, 'Unable to Connect, Check User Credentials', ICON, 4000)
+            notificationDialog(LANGUAGE(30028), time=4000)
             return {}
             
 
@@ -206,21 +191,22 @@ class PlutoTV(object):
         for item in categoryMenu: self.addDir(*item)
 
 
-    def getRegion(self):
-        return (self.openURL(REGION_URL, life=datetime.timedelta(hours=12)).get('countryCode','') or 'US')
-        
-
     def getOndemand(self):
-        devid = 'sid=%s&deviceId=%s'%(REAL_SETTINGS.getSetting("sid"),REAL_SETTINGS.getSetting("deviceId"))
-        return self.openURL(BASE_VOD%(devid), life=datetime.timedelta(hours=2))
+        devid = LANGUAGE(30022)%(REAL_SETTINGS.getSetting("sid"),REAL_SETTINGS.getSetting("deviceId"))
+        return self.openURL(BASE_VOD%(devid), life=datetime.timedelta(hours=4))
+
+
+    def getVOD(self, epid):
+        devid = LANGUAGE(30022)%(REAL_SETTINGS.getSetting("sid"),REAL_SETTINGS.getSetting("deviceId"))
+        return self.openURL(SEAONS_VOD%(epid,devid), life=datetime.timedelta(hours=4))
         
         
     def getClips(self, epid):
-        return self.openURL(BASE_CLIPS%(epid), life=datetime.timedelta(hours=2))
+        return self.openURL(BASE_CLIPS%(epid), life=datetime.timedelta(hours=4))
         
         
     def getChannels(self):
-        return sorted(self.openURL(BASE_LINEUP, life=datetime.timedelta(hours=4)), key=lambda i: i['number'])
+        return sorted(self.openURL(BASE_LINEUP, life=datetime.timedelta(hours=2)), key=lambda i: i['number'])
         
         
     def getGuidedata(self):
@@ -228,7 +214,7 @@ class PlutoTV(object):
         start = datetime.datetime.now().strftime('%Y-%m-%dT%H:00:00').replace('T','%20').replace(':00:00','%3A00%3A00.000'+tz)
         stop  = (datetime.datetime.now() + datetime.timedelta(hours=4)).strftime('%Y-%m-%dT%H:00:00').replace('T','%20').replace(':00:00','%3A00%3A00.000'+tz)
         devid = 'sid=%s&deviceId=%s'%(REAL_SETTINGS.getSetting("sid"),REAL_SETTINGS.getSetting("deviceId"))
-        return sorted((self.openURL(BASE_GUIDE %(start,stop,devid), life=datetime.timedelta(hours=2))), key=lambda i: i['number'])
+        return sorted((self.openURL(BASE_GUIDE %(start,stop,devid), life=datetime.timedelta(hours=1))), key=lambda i: i['number'])
 
 
     def getCategories(self):
@@ -237,8 +223,7 @@ class PlutoTV(object):
         data = self.getChannels()
         for channel in data: collect.append(channel['category'])
         counter = collections.Counter(collect)
-        for key, value in sorted(counter.iteritems()): 
-            yield (key,'categories', 0)
+        for key, value in sorted(counter.iteritems()): yield (key,'categories', 0)
         
         
     def getMediaTypes(self):
@@ -258,15 +243,15 @@ class PlutoTV(object):
 
             
     def buildGuide(self, data):
-        SORT = xbmcplugin.SORT_METHOD_LABEL
         channel, name, opt = data
+        SORT = xbmcplugin.SORT_METHOD_LABEL
         log('buildGuide, name=%s,opt=%s'%(name, opt))
         urls      = []
         guidedata = []
         newChannel= {}
         mtype     = 'videos'
-        chid      = channel['_id']
-        chname    = channel['name']
+        chid      = channel.get('_id','')
+        chname    = channel.get('name','')
         chnum     = channel.get('number','')
         chplot    = (channel.get('description','') or channel.get('summary',''))
         chgeo     = channel.get('visibility','everyone') != 'everyone'
@@ -280,26 +265,39 @@ class PlutoTV(object):
         timelines = channel.get('timelines',[])
 
         if   name == 'featured'   and not featured: return None
+        elif name == 'favorite'   and not favorite: return None
         elif name == 'categories' and chcat != opt: return None
         elif name == 'lineup'     and chid  != opt: return None
-        elif name == 'favorite'   and not favorite: return None
         elif name == 'livetv':
             DISC_CACHE = False
             if isinstance(timelines, list) and len(timelines) > 0: 
                 timelines = [timelines[0]]#todo parse start/stop find actual live
              
-        if name in ['channels','categories','ondemand']:
-            if name == 'ondemand': 
-                mode  = 3
-                label = chname
-            else:  
-                mode  = 1
-                label = '%s| %s'%(chnum,chname)
-            infoLabels = {"mediatype":mtype,"label":label,"label2":label,"title":label,"plot":chplot, "code":chid, "genre":[chcat]}
-            infoArt    = {"thumb":chthumb,"poster":chthumb,"fanart":chfanart,"icon":chlogo,"logo":chlogo}
-            self.addDir(label, chid, mode, infoLabels, infoArt)
-            
-        else:    
+        if name in ['channels','categories','ondemand','season']:
+            if name == 'season':
+                seasons    = (channel.get('seasons',{}))
+                vodimages  = channel.get('covers',[])
+                try: vodlogo      = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '1:1'][0]
+                except: vodlogo   = ICON
+                try:    vodfanart = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '16:9'][0]
+                except: vodfanart = FANART
+                for season in seasons:
+                    mtype = 'episodes'
+                    label = 'Season %s'%(season['number'])
+                    infoLabels = {"mediatype":mtype,"label":label,"label2":label,"title":chname,"plot":chplot, "code":chid, "genre":[chcat]}
+                    infoArt    = {"thumb":vodlogo,"poster":vodlogo,"fanart":vodfanart,"icon":vodlogo,"logo":vodlogo}
+                    self.addDir(label, chid, 5, infoLabels, infoArt)
+            else:
+                if name == 'ondemand': 
+                    mode  = 3
+                    label = chname
+                else:  
+                    mode  = 1
+                    label = '%s| %s'%(chnum,chname)
+                infoLabels = {"mediatype":mtype,"label":label,"label2":label,"title":label,"plot":chplot, "code":chid, "genre":[chcat]}
+                infoArt    = {"thumb":chthumb,"poster":chthumb,"fanart":chfanart,"icon":chlogo,"logo":chlogo}
+                self.addDir(label, chid, mode, infoLabels, infoArt)
+        else:
             newChannel['channelname']   = chname
             newChannel['channelnumber'] = chnum
             newChannel['channellogo']   = chlogo
@@ -307,17 +305,18 @@ class PlutoTV(object):
             urls = channel.get('stitched',{}).get('urls',[])
             if not timelines:
                 name = 'ondemand'
-                timelines = channel.get('items',[])
+                timelines = (channel.get('items',[]) or channel.get('episodes',[]))
                 
             now = datetime.datetime.now()
             totstart = now
             tz = (timezone()//100)*60*60
+            
             for item in timelines:
                 episode    = (item.get('episode',{})   or item)
                 series     = (episode.get('series',{}) or item)
-                if len(urls) == 0: urls = item.get('stitched',{}).get('urls',[])
-                    
+                urls       = (item.get('stitched',{}).get('urls',[]) or urls)
                 epdur      = int(episode.get('duration','0') or '0') // 1000
+                
                 try:
                     start  = strpTime(item['start'],'%Y-%m-%dT%H:%M:00.000Z') + datetime.timedelta(seconds=tz)
                     stop   = start + datetime.timedelta(seconds=epdur)
@@ -327,79 +326,92 @@ class PlutoTV(object):
                 totstart   = stop  
                 
                 type       = series.get('type','')
-                tvtitle    = series.get('name','')
-                title      = (item.get('title','') or tvtitle)
-                tvplot     = (series.get('description','') or series.get('summary',''))
-                tvoutline  = (series.get('summary','') or series.get('description',''))
-                tvthumb    = (series.get('title',{}).get('path','') or chthumb)
+                tvtitle    = series.get('name',''                           or chname)
+                title      = (item.get('title',''))
+                tvplot     = (series.get('description','')                  or series.get('summary','')      or chplot)
+                tvoutline  = (series.get('summary','')                      or series.get('description','')  or chplot)
+                tvthumb    = (series.get('title',{}).get('path','')         or chthumb)
                 tvfanart   = (series.get('featuredImage',{}).get('path','') or chfanart)
-                
                 epid       = episode['_id']
-                epnumber   = episode.get('number','')
-                epname     = episode['name']
+                epnumber   = episode.get('number',0)
+                epseason   = episode.get('season',0)
+                epname     = (episode['name'])
                 epplot     = (episode.get('description','') or tvplot or epname)
-                epgenre    = [episode.get('genre','')]
-                eptag      = [episode.get('subGenre','')]
+                epgenre    = (episode.get('genre','')       or chcat)
+                eptag      = episode.get('subGenre','')
                 epmpaa     = episode.get('rating','')
+                
                 vodimages  = episode.get('covers',[])
-                vodposter = ''
-                vodfanart = ''
-                vodfthumb = ''
+                vodposter = vodfanart = vodthumb = vodlogo = ''
                 if vodimages:
                     try:    vodposter = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '347:500'][0]
                     except: pass
                     try:    vodfanart = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '16:9'][0]
                     except: pass
-                    try:    vodfthumb = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '4:3'][0]
+                    try:    vodthumb  = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '4:3'][0]
                     except: pass
-                epposter   = (episode.get('poster',{}).get('path','')        or vodposter or tvthumb)
-                epthumb    = (episode.get('thumbnail',{}).get('path','')     or vodfthumb or  tvthumb)
+                    try:    vodlogo   = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '1:1'][0]
+                    except: pass
+
+                chlogo     = (vodlogo or chlogo)
+                epposter   = (episode.get('poster',{}).get('path','')        or vodlogo or vodposter or vodthumb  or tvthumb)
+                epthumb    = (episode.get('thumbnail',{}).get('path','')     or vodlogo or vodthumb  or vodposter or tvthumb)
                 epfanart   = (episode.get('featuredImage',{}).get('path','') or vodfanart or tvfanart)
                 epislive   = episode.get('liveBroadcast','false') == 'true'
-                label = title
-                thumb = chthumb
                 
-                if name == 'lineup':
-                    if now > stop: continue
-                    elif type in ['movie','film']:
-                        mtype = 'movies'
-                        thumb = epposter
-                    elif type in ['tv','series']:
-                        mtype = 'episodes'
-                        thumb = epposter
-                        label = "%s - %s" % (tvtitle,epname)
-                    if now >= start and now < stop: label = '%s - [B]%s[/B]'%(start.strftime('%I:%M %p').lstrip('0'),label)
-                    else: label = '%s - %s'%(start.strftime('%I:%M %p').lstrip('0'),label)
+                label      = title
+                thumb      = chthumb
+                if type in ['movie','film']:
+                    mtype  = 'movies'
+                    thumb  = epposter
+                elif type in ['tv','episode','series']:
+                    mtype  = 'episodes'
+                    thumb  = epposter
+                    if epseason > 0 and epnumber > 0:
+                        label  = '%sx%s'%(epseason, epnumber)
+                        label  = '%s - %s'%(label, epname)
+                        # else: label  = '%s - %s'%(tvtitle, label)
+                    else: label = epname
                     epname = label
                     
-                elif name == 'livetv':
-                    label = '%s| %s: [B]%s[/B]'%(chnum,chname,title)
+                if name == 'livetv':
+                    label = '%s| %s'%(chnum,chname)
                     if type in ['movie','film']:
                         mtype = 'movies'
                         thumb = epposter
+                        label = '%s :[B]%s[/B]'%(label, title)
                     elif type in ['tv','series']:
                         mtype = 'episodes'
                         thumb = epposter
-                        label = "%s| %s: [B]%s - %s[/B]" % (chnum,chname,tvtitle,epname)
+                        label = "%s :[B]%s - %s[/B]" % (label, tvtitle, epname)
                     epname = label
-                    
+
+                elif name == 'lineup':
+                    if now > stop: continue
+                    if now >= start and now < stop: label = '%s - [B]%s[/B]'%(start.strftime('%I:%M %p').lstrip('0'),label)
+                    else: label = '%s - %s'%(start.strftime('%I:%M %p').lstrip('0'),label)
+                    epname = label
+
                 if len(urls) == 0: continue
-                if isinstance(urls, list):
-                    urls  = [url['url'] for url in urls if url['type'].lower() == 'hls'][0]
-                    
-                # start = start.strftime("%Y-%m-%d %H:%M:%S")
-                # stop  = stop.strftime("%Y-%m-%d %H:%M:%S")
-                tmpdata = {"mediatype":mtype,"label":label,"title":label,'duration':epdur,'plot':epplot,'genre':epgenre}
+                if isinstance(urls, list): urls  = [url['url'] for url in urls if url['type'].lower() == 'hls'][0]
+                
+                tmpdata = {"mediatype":mtype,"label":label,"title":label,'duration':epdur,'plot':epplot,'genre':[epgenre],'season':epseason,'episode':epnumber}
                 tmpdata['starttime'] = time.mktime((start).timetuple())
                 tmpdata['url'] = self.sysARG[0]+'?mode=9&name=%s&url=%s'%(title,urls)
                 tmpdata['art'] = {"thumb":thumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo}
                 guidedata.append(tmpdata)
                 
-                if name != 'guide':
-                    infoLabels = {"mediatype":mtype,"label":label,"label2":label,"tvshowtitle":tvtitle,"title":epname,"plot":epplot, "code":epid, "genre":epgenre, "duration":epdur}
+                if name == 'ondemand' and type == "series":
+                    mtype = 'seasons'
+                    infoLabels = {"mediatype":mtype,"label":label,"label2":label,"title":label,"plot":epplot, "code":chid, "genre":[epgenre]}
+                    infoArt    = {"thumb":epthumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo}
+                    self.addDir(label, epid, 4, infoLabels, infoArt)
+                elif name != 'guide':
+                    infoLabels = {"mediatype":mtype,"label":label,"label2":label,"tvshowtitle":tvtitle,"title":epname,"plot":epplot, "code":epid, "genre":[epgenre], "duration":epdur,'season':epseason,'episode':epnumber}
                     infoArt    = {"thumb":thumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo}
                     self.addLink(title, urls, 9, infoLabels, infoArt)
-            
+                    
+            CONTENT_TYPE = mtype
             if len(guidedata) > 0:
                 newChannel['guidedata'] = guidedata
                 return newChannel
@@ -426,13 +438,7 @@ class PlutoTV(object):
         else: name = 'lineup'
         self.browseGuide(name, opt)
         
-             
-    def browseCategories(self):
-        log('browseCategories')
-        data = list(self.getCategories())
-        for item in data: self.addDir(*item)
-            
-        
+      
     def browseOndemand(self, opt=None):
         log('browseOndemand')
         data = self.getOndemand()['categories']
@@ -441,10 +447,28 @@ class PlutoTV(object):
         self.browseGuide(name, opt, data)
         
         
+    def browseSeason(self, opt=None):
+        log('browseSeason')
+        data = [self.getVOD(opt)]
+        self.browseGuide('season', opt, data)
+        
+        
+    def browseEpisodes(self, name, opt=None):
+        log('browseEpisodes')
+        season = int(name.split('Season ')[1])
+        data = [self.getVOD(opt).get('seasons',[])[season - 1]]
+        self.browseGuide('episode', opt, data)
+                
+                
+    def browseCategories(self):
+        log('browseCategories')
+        data = list(self.getCategories())
+        for item in data: self.addDir(*item) 
+       
+        
     def playVideo(self, name, url, liz=None):
-        if '&deviceMake=&deviceModel=&sid' not in url:
-            devid = '&deviceMake=&deviceModel=&sid=%s&deviceId=%s'%(REAL_SETTINGS.getSetting("sid"),REAL_SETTINGS.getSetting("deviceId"))
-            url  = '%s%s&deviceVersion=unknown&appVersion=unknown&deviceDNT=0&userId=&advertisingId=&deviceLat=40.6805&deviceLon=-73.8442&app_name=&appName=&buildVersion=&appStoreUrl=&architecture='%(url,devid)
+        if LANGUAGE(30019) not in url:
+            url = LANGUAGE(30021)%(url,LANGUAGE(30020)%(REAL_SETTINGS.getSetting("sid"),REAL_SETTINGS.getSetting("deviceId")))
         log('playVideo, url = %s'%url)
         if liz is None: liz = xbmcgui.ListItem(name, path=url)
         if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream() and not DEBUG:
@@ -481,7 +505,7 @@ class PlutoTV(object):
 
     def poolList(self, method, items):
         results = []
-        if ENABLE_POOL:
+        if ENABLE_POOL and not DEBUG:
             pool = ThreadPool(CORES)
             results = pool.imap_unordered(method, items)
             pool.close()
@@ -512,9 +536,12 @@ class PlutoTV(object):
         elif mode == 1:  self.browseLineup(name, url)
         elif mode == 2:  self.browseCategories()
         elif mode == 3:  self.browseOndemand(url)
+        elif mode == 4:  self.browseSeason(url)
+        elif mode == 5:  self.browseEpisodes(name, url)
         elif mode == 9:  self.playVideo(name, url)
-        elif mode == 20: xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&skin_path=%s&refresh_path=%s&refresh_interval=%s&row_count=%s)"%(self.uEPG(),urllib.quote(ADDON_PATH),urllib.quote(self.sysARG[0]+"?mode=20"),"7200","5"))
+        elif mode == 20: xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&skin_path=%s&refresh_path=%s&refresh_interval=%s&row_count=%s&include_hdhr=false)"%(self.uEPG(),urllib.quote(ADDON_PATH),urllib.quote(self.sysARG[0]+"?mode=20"),"7200","5"))
 
+        if DEBUG: DISC_CACHE = False
         xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , SORT)
         xbmcplugin.endOfDirectory(int(self.sysARG[1]), cacheToDisc=DISC_CACHE)

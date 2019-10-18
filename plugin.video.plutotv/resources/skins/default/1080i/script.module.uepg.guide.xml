@@ -80,7 +80,7 @@
             <width>148</width>
             <height>148</height>
             <aspectratio scalediffuse="true" align="center" aligny="center">keep</aspectratio>
-            <texture fallback="PlutoTV.png" background="true">$INFO[Container(40000).ListItem.Art(thumb)]</texture>
+            <texture fallback="PlutoTV.png" background="true">$INFO[Container(40000).ListItem.Art(clearart)]</texture>
             <animation effect="fade" time="500">VisibleChange</animation> 
             <animation effect="fade" start="85" end="85" condition="True">Conditional</animation>
         </control>

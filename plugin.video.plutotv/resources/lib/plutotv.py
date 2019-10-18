@@ -123,7 +123,7 @@ class PlutoTV(object):
         self.sysARG  = sysARG
         self.net     = net.Net()
         self.cache   = SimpleCache()
-
+        
 
     def login(self):
         log('login')
@@ -268,11 +268,8 @@ class PlutoTV(object):
         elif name == 'favorite'   and not favorite: return None
         elif name == 'categories' and chcat != opt: return None
         elif name == 'lineup'     and chid  != opt: return None
-        elif name == 'livetv':
-            DISC_CACHE = False
-            if isinstance(timelines, list) and len(timelines) > 0: 
-                timelines = [timelines[0]]#todo parse start/stop find actual live
-             
+        elif name == 'live': DISC_CACHE = False
+            
         if name in ['channels','categories','ondemand','season']:
             if name == 'season':
                 seasons    = (channel.get('seasons',{}))
@@ -285,7 +282,7 @@ class PlutoTV(object):
                     mtype = 'episodes'
                     label = 'Season %s'%(season['number'])
                     infoLabels = {"mediatype":mtype,"label":label,"label2":label,"title":chname,"plot":chplot, "code":chid, "genre":[chcat]}
-                    infoArt    = {"thumb":vodlogo,"poster":vodlogo,"fanart":vodfanart,"icon":vodlogo,"logo":vodlogo}
+                    infoArt    = {"thumb":vodlogo,"poster":vodlogo,"fanart":vodfanart,"icon":vodlogo,"logo":vodlogo,"clearart":chthumb}
                     self.addDir(label, chid, 5, infoLabels, infoArt)
             else:
                 if name == 'ondemand': 
@@ -295,7 +292,7 @@ class PlutoTV(object):
                     mode  = 1
                     label = '%s| %s'%(chnum,chname)
                 infoLabels = {"mediatype":mtype,"label":label,"label2":label,"title":label,"plot":chplot, "code":chid, "genre":[chcat]}
-                infoArt    = {"thumb":chthumb,"poster":chthumb,"fanart":chfanart,"icon":chlogo,"logo":chlogo}
+                infoArt    = {"thumb":chthumb,"poster":chthumb,"fanart":chfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
                 self.addDir(label, chid, mode, infoLabels, infoArt)
         else:
             newChannel['channelname']   = chname
@@ -374,7 +371,8 @@ class PlutoTV(object):
                     else: label = epname
                     epname = label
                     
-                if name == 'livetv':
+                if name == 'live':
+                    if stop < now or start > now: continue
                     label = '%s| %s'%(chnum,chname)
                     if type in ['movie','film']:
                         mtype = 'movies'
@@ -398,17 +396,17 @@ class PlutoTV(object):
                 tmpdata = {"mediatype":mtype,"label":label,"title":label,'duration':epdur,'plot':epplot,'genre':[epgenre],'season':epseason,'episode':epnumber}
                 tmpdata['starttime'] = time.mktime((start).timetuple())
                 tmpdata['url'] = self.sysARG[0]+'?mode=9&name=%s&url=%s'%(title,urls)
-                tmpdata['art'] = {"thumb":thumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo}
+                tmpdata['art'] = {"thumb":thumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
                 guidedata.append(tmpdata)
                 
                 if name == 'ondemand' and type == "series":
                     mtype = 'seasons'
                     infoLabels = {"mediatype":mtype,"label":label,"label2":label,"title":label,"plot":epplot, "code":chid, "genre":[epgenre]}
-                    infoArt    = {"thumb":epthumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo}
+                    infoArt    = {"thumb":epthumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
                     self.addDir(label, epid, 4, infoLabels, infoArt)
                 elif name != 'guide':
                     infoLabels = {"mediatype":mtype,"label":label,"label2":label,"tvshowtitle":tvtitle,"title":epname,"plot":epplot, "code":epid, "genre":[epgenre], "duration":epdur,'season':epseason,'episode':epnumber}
-                    infoArt    = {"thumb":thumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo}
+                    infoArt    = {"thumb":thumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
                     self.addLink(title, urls, 9, infoLabels, infoArt)
                     
             CONTENT_TYPE = mtype
@@ -507,7 +505,7 @@ class PlutoTV(object):
         results = []
         if ENABLE_POOL and not DEBUG:
             pool = ThreadPool(CORES)
-            results = pool.imap_unordered(method, items)
+            results = pool.imap(method, items, chunksize=25)
             pool.close()
             pool.join()
         else: results = [method(item) for item in items]

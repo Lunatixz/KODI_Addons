@@ -54,7 +54,6 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 TIMEOUT      = 15
 CONTENT_TYPE = 'files'
 DISC_CACHE   = True
-SORT         = xbmcplugin.SORT_METHOD_UNSORTED
 USER_EMAIL   = REAL_SETTINGS.getSetting('User_Email')
 PASSWORD     = REAL_SETTINGS.getSetting('User_Password')
 DEBUG        = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
@@ -244,7 +243,6 @@ class PlutoTV(object):
             
     def buildGuide(self, data):
         channel, name, opt = data
-        SORT = xbmcplugin.SORT_METHOD_LABEL
         log('buildGuide, name=%s,opt=%s'%(name, opt))
         urls      = []
         guidedata = []
@@ -505,7 +503,7 @@ class PlutoTV(object):
         results = []
         if ENABLE_POOL and not DEBUG:
             pool = ThreadPool(CORES)
-            results = pool.imap(method, items, chunksize=25)
+            results = pool.imap_unordered(method, items, chunksize=25)
             pool.close()
             pool.join()
         else: results = [method(item) for item in items]
@@ -539,7 +537,9 @@ class PlutoTV(object):
         elif mode == 9:  self.playVideo(name, url)
         elif mode == 20: xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&skin_path=%s&refresh_path=%s&refresh_interval=%s&row_count=%s&include_hdhr=false)"%(self.uEPG(),urllib.quote(ADDON_PATH),urllib.quote(self.sysARG[0]+"?mode=20"),"7200","5"))
 
-        if DEBUG: DISC_CACHE = False
         xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)
-        xbmcplugin.addSortMethod(int(self.sysARG[1]) , SORT)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_NONE)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_LABEL)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_TITLE)
         xbmcplugin.endOfDirectory(int(self.sysARG[1]), cacheToDisc=DISC_CACHE)

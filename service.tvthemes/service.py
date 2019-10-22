@@ -58,11 +58,6 @@ class Monitor(xbmc.Monitor):
          
     def onSettingsChanged(self):
         log('onSettingsChanged')
-        REAL_SETTINGS = xbmcaddon.Addon(id='service.tvthemes')
-        FFMPEG_PATH = REAL_SETTINGS.getSetting("FFMPEG_PATH")
-        DL_FOLDER = (REAL_SETTINGS.getSetting("dl_folder") or SETTINGS_LOC)
-        self.myService.DLpath = os.path.join(DL_FOLDER,'%s.%s')
-        self.myService.binPath, self.myService.exe = self.getBinPath()
         
         
 class Service(object):

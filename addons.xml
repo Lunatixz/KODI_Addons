@@ -1093,6 +1093,65 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.skynews" version="1.0.2" name="Sky News" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+        <import addon="plugin.video.youtube" version="5.1.8" optional="true"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Sky News is a 24-hour international multimedia news organisation based in the U.K. that started as a 24-hour television news channel.</summary>
+        <description lang="en_GB">Sky News - First for Breaking News, video, headlines, analysis and top stories from business, politics, entertainment and more in the UK and worldwide.</description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/plugin.video.skynews</source>
+        <website>https://news.sky.com/</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=320938</forum>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="plugin.video.slingtv" version="1.0.2" name="Sling.TV" provider-name="Lunatixz, eracknaphobia, d21spike">
+    <requires>
+        <import addon="xbmc.python" version="2.26.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.requests" version="2.7.0"/>
+        <import addon="script.module.pytz" version="2014.2"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+        <import addon="script.module.uepg" version="1.0.5"/>
+        <import addon="script.module.mechanize" version="0.2.6"/>
+        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
+        <import addon="script.module.requests_oauthlib" version="0.7.0"/>
+        <import addon="script.module.xmltodict" version="0.11.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <description lang="en_GB"></description>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/plugin.video.slingtv</source>
+        <website>https://www.sling.com</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=340715</forum>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="screensaver.videosaver" name="Video ScreenSaver" version="1.0.7" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1138,40 +1197,6 @@
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="plugin.video.slingtv" version="1.0.2" name="Sling.TV" provider-name="Lunatixz, eracknaphobia, d21spike">
-    <requires>
-        <import addon="xbmc.python" version="2.26.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.pytz" version="2014.2"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-        <import addon="script.module.uepg" version="1.0.5"/>
-        <import addon="script.module.mechanize" version="0.2.6"/>
-        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
-        <import addon="script.module.requests_oauthlib" version="0.7.0"/>
-        <import addon="script.module.xmltodict" version="0.11.0"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <description lang="en_GB"></description>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/plugin.video.slingtv</source>
-        <website>https://www.sling.com</website>
-        <forum>https://forum.kodi.tv/showthread.php?tid=340715</forum>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
     </extension>
 </addon>
@@ -1701,7 +1726,7 @@
     </extension>
 </addon>
 
-<addon id="screensaver.unsplash" name="Unsplash Photo Screensaver" version="1.0.4" provider-name="Lunatixz">
+<addon id="screensaver.unsplash" name="Unsplash Photo Screensaver" version="1.0.5" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
     </requires>
@@ -2321,31 +2346,6 @@
             <screenshot>resources/images/screenshot01.png</screenshot>
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="plugin.video.skynews" version="1.0.2" name="Sky News" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-        <import addon="plugin.video.youtube" version="5.1.8" optional="true"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Sky News is a 24-hour international multimedia news organisation based in the U.K. that started as a 24-hour television news channel.</summary>
-        <description lang="en_GB">Sky News - First for Breaking News, video, headlines, analysis and top stories from business, politics, entertainment and more in the UK and worldwide.</description>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/plugin.video.skynews</source>
-        <website>https://news.sky.com/</website>
-        <forum>https://forum.kodi.tv/showthread.php?tid=320938</forum>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
         </assets>
     </extension>
 </addon>

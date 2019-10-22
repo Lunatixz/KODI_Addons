@@ -1,4 +1,4 @@
-#   Copyright (C) 2017 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of Unsplash Photo ScreenSaver.
@@ -36,14 +36,15 @@ URL_PARAMS     = '/%s'%PHOTO_TYPE
 TIMER          = [30,60,120,240][int(REAL_SETTINGS.getSetting("RotateTime"))]
 ANIMATION      = 'okay' if REAL_SETTINGS.getSetting("Animate") == 'true' else 'nope'
 TIME           = 'okay' if REAL_SETTINGS.getSetting("Time") == 'true' else 'nope'
+OVERLAY        = 'okay' if REAL_SETTINGS.getSetting("Overlay") == 'true' else 'nope'
 IMG_CONTROLS   = [30000,30001]
 CYC_CONTROL    = itertools.cycle(IMG_CONTROLS).next
 KODI_MONITOR   = xbmc.Monitor()
 RES            = ['1280x720','1920x1080','3840x2160'][int(REAL_SETTINGS.getSetting("Resolution"))]
 
-if PHOTO_TYPE in ['featured','random']: IMAGE_URL  = BASE_URL + URL_PARAMS + '/%s/?%s'%(RES, KEYWORDS if ENABLE_KEYS else BASE_URL + URL_PARAMS)
-elif PHOTO_TYPE == 'user': IMAGE_URL  = BASE_URL + URL_PARAMS + '/%s/%s' %(USER, RES)
-else: IMAGE_URL  = BASE_URL + URL_PARAMS + '/%s/%s' %(COLLECTION, RES)
+if PHOTO_TYPE in ['featured','random']: IMAGE_URL = '%s%s/%s/?%s'%(BASE_URL, URL_PARAMS, RES, KEYWORDS if ENABLE_KEYS else BASE_URL + URL_PARAMS)
+elif PHOTO_TYPE == 'user': IMAGE_URL = '%s%s/%s/%s' %(BASE_URL, URL_PARAMS, USER, RES)
+else: IMAGE_URL = '%s%s/%s/%s' %(BASE_URL, URL_PARAMS, COLLECTION, RES)
     
 class GUI(xbmcgui.WindowXMLDialog):
     def __init__( self, *args, **kwargs ):
@@ -58,6 +59,7 @@ class GUI(xbmcgui.WindowXMLDialog):
         self.winid = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
         self.winid.setProperty('unsplash_animation', ANIMATION)
         self.winid.setProperty('unsplash_time', TIME)
+        self.winid.setProperty('unsplash_overlay', OVERLAY)
         self.startRotation()
 
          

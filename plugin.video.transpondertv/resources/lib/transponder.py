@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of Transponder.tv.
@@ -18,17 +18,27 @@
 
 # -*- coding: utf-8 -*-
 import os, sys, time, _strptime, datetime, re, traceback, pytz, calendar
-import urlparse, urllib, urllib2, socket, json, requests, mechanize, cookielib
+import urllib, urllib2, socket, json, requests, mechanize, cookielib
 import xbmc, xbmcgui, xbmcplugin, xbmcaddon, xbmcvfs
 
 from bs4 import BeautifulSoup
 from simplecache import SimpleCache, use_cache
 
+try: unicode # py2
+except NameError: unicode = str # py3
+    
+try:
+    from urllib.parse import parse_qsl  # py3
+except ImportError:
+    from urlparse import parse_qsl # py2
+    
 try:
     from multiprocessing import cpu_count 
     from multiprocessing.pool import ThreadPool 
     ENABLE_POOL = True
+    CORES = cpu_count()
 except: ENABLE_POOL = False
+    
 
 # Plugin Info
 ADDON_ID      = 'plugin.video.transpondertv'
@@ -81,7 +91,7 @@ def inputDialog(heading=ADDON_NAME, default='', key=xbmcgui.INPUT_ALPHANUM, opt=
     if len(retval) > 0: return retval    
     
 def okDialog(str1, str2='', str3='', header=ADDON_NAME):
-    xbmcgui.Dialog().ok(header, str1, str2, str3)
+    return xbmcgui.Dialog().ok(header, str1, str2, str3)
 
 def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', autoclose=0):
     return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
@@ -242,6 +252,16 @@ class Transponder(object):
         return (record or {})
         
         
+    def getLineups(self, days=1):
+        log('getLineups, days = ' + str(days))
+        for i in range(days):
+            if i == 0: offset = ''
+            else: offset = '/%'+ str(self.getLocalNow(i).date())
+            soup = BeautifulSoup(self.openURL(GUIDE_URL%(offset),datetime.timedelta(days=1)), "html.parser")
+            items = (soup('div' , {'class': 'tvguideChannelListings noselect'}))
+            yield items
+        
+
     def buildSchedules(self):
         log('buildSchedules')
         items = self.recordings['Schedules']
@@ -320,19 +340,7 @@ class Transponder(object):
             self.addLink(label, link, 9, infoLabels, infoArt, len(results))
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_NONE)
         
-        
-    def buildLineups(self, days=1):
-        log('buildLineups, days = ' + str(days))
-        progs = []
-        for i in range(days):
-            if i == 0: offset = ''
-            else: offset = '/%'+ str(self.getLocalNow(i).date())
-            soup = BeautifulSoup(self.openURL(GUIDE_URL%(offset),datetime.timedelta(days=(i+1))), "html.parser")
-            items = (soup('div' , {'class': 'tvguideChannelListings noselect'}))
-            progs.append(items)
-        return progs
-        
-        
+
     def buildLineup(self, name=None, url=None):
         log('buildLineup, name = ' + str(name))
         if url is None:
@@ -346,7 +354,7 @@ class Transponder(object):
                 self.addDir(chname, link, 2, infoLabels, infoArt)
             xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_TRACKNUM	)
         else:
-            datas = (self.buildLineups(MAX_LINEUP))
+            datas = list(self.getLineups(MAX_LINEUP))
             for idx, data in enumerate(datas):
                 now = datetime.datetime.now() + datetime.timedelta(days=idx)
                 for item in data:
@@ -363,7 +371,7 @@ class Transponder(object):
                             try: title  = cleanString(listing.find_all('h3')[0].find_all('a')[0].get_text())
                             except: title = cleanString(item.find_all('h3')[0].get_text())
                             if idx == 0 and now > end: continue
-                            if idx == 0 and now >= start and now < end: title = '[B]%s[/B]'%title
+                            elif idx == 0 and now >= start and now < end: title = '[B]%s[/B]'%title
                             # if now < end: mode = 21 # call contextMenu
                             aired  = start.strftime('%Y-%m-%d')
                             start  = start.strftime('%I:%M %p')
@@ -389,8 +397,8 @@ class Transponder(object):
     def uEPG(self):
         log('uEPG')
         #support for uEPG universal epg framework module available from the Kodi repository. https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.uepg
-        lineup = (self.buildLineups(MAX_LINEUP))
-        return self.poolList(self.buildGuide, [(self.channels[channel]['number'], self.channels[channel], lineup) for channel in self.channels])
+        lineup = list(self.getLineups(MAX_LINEUP))
+        return urllib.quote(json.dumps(list(self.poolList(self.buildGuide, [(self.channels[channel]['number'], self.channels[channel], lineup) for channel in self.channels]))))
         
         
     def buildGuide(self, data):
@@ -407,8 +415,10 @@ class Transponder(object):
         newChannel['isfavorite']    = isFavorite
         for idx, data in enumerate(datas):
             now = datetime.datetime.now() + datetime.timedelta(days=idx)
+            if idx > 1: break #parse two days.
             for item in data:
                 if chname.lower().replace('  1',' +1') == item.find_all('h3')[0].get_text().lower():
+                    totalDur = 0
                     listings = (item('div' , {'class': re.compile(r'programme\s')}))
                     for listing in listings:
                         stime = listing.find_all('p')
@@ -418,17 +428,23 @@ class Transponder(object):
                         start  = self.getLocaltime(stime.split('-')[0], offset=idx)
                         end    = start + datetime.timedelta(seconds=dur)
                         aired  = start.strftime('%Y-%m-%d')
+                        totalDur += dur
                         try: label  = listing.find_all('h3')[0].find_all('a')[0].get_text()
                         except: label = item.find_all('h3')[0].get_text()
                         if idx == 0 and now > end: continue
+                        elif totalDur >= 14400: break
                         thumb  = chlogo
                         plot   = label
                         genre  = 'Live'
                         contextMenu = []
                         # try: thumb, plot, genre = self.buildProgram(listing.find_all('h3')[0].attrs['href'])
                         # except: pass
+                        # try:
+                            # contextMenu = [(LANGUAGE(30011),'XBMC.RunPlugin(%s)'%(self.sysARG[0]+"?url="+urllib.quote(listing.find_all('h3')[2].attrs['href'])+"&mode="+str(5)+"&name="+urllib.quote(label)))]
+                            # plot = '%s [CR]%s'%(plot,LANGUAGE(30023))
+                        # except: pass
                         try:
-                            contextMenu = [(LANGUAGE(30011),'XBMC.RunPlugin(%s)'%(self.sysARG[0]+"?url="+urllib.quote(listing.find_all('h3')[2].attrs['href'])+"&mode="+str(5)+"&name="+urllib.quote(label)))]
+                            contextMenu = [(LANGUAGE(30011),'XBMC.RunPlugin(%s)'%(self.sysARG[0]+"?url="+urllib.quote(listing.find_all('a')[2].attrs['href'])+"&mode="+str(5)+"&name="+urllib.quote(label)))]
                             plot = '%s [CR]%s'%(plot,LANGUAGE(30023))
                         except: pass
                         tmpdata = {"mediatype":"episode","label":label ,"title":label,"plot":plot,"duration":dur,"aired":aired,"genre":genre}
@@ -445,8 +461,8 @@ class Transponder(object):
     def poolList(self, method, items):
         results = []
         if ENABLE_POOL:
-            pool = ThreadPool(cpu_count())
-            results = pool.imap_unordered(method, items)
+            pool = ThreadPool(CORES)
+            results = pool.imap_unordered(method, items, chunksize=25)
             pool.close()
             pool.join()
         else: results = [method(item) for item in items]
@@ -497,7 +513,7 @@ class Transponder(object):
 
 
     def getParams(self):
-        return dict(urlparse.parse_qsl(self.sysARG[2][1:]))
+        return dict(parse_qsl(self.sysARG[2][1:]))
 
             
     def run(self):  
@@ -520,7 +536,7 @@ class Transponder(object):
         elif mode == 5: self.setRecording(name, url)
         elif mode == 6: self.delRecording(name, url)
         elif mode == 9: self.playVideo(name, url)
-        elif mode == 20:xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&refresh_path=%s&refresh_interval=%s&row_count=%s)"%(urllib.quote(json.dumps(list(self.uEPG()))),urllib.quote(json.dumps(self.sysARG[0]+"?mode=20")),urllib.quote(json.dumps("10800")),urllib.quote(json.dumps("7"))))
+        elif mode == 20:xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&refresh_path=%s&refresh_interval=%s&row_count=%s)"%(self.uEPG(),urllib.quote(self.sysARG[0]+"?mode=20"),"7200","7"))
         elif mode == 21:xbmc.executebuiltin("action(ContextMenu)")
         
         xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)

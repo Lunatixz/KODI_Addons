@@ -273,7 +273,7 @@ def poolList(method, items):
     results = []
     if ENABLE_POOL:
         pool = ThreadPool(cpu_count())
-        results = pool.imap_unordered(method, items)
+        results = pool.imap_unordered(method, items, chunksize=25)
         pool.close()
         pool.join()
     else:

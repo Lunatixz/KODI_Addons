@@ -148,24 +148,6 @@
             <animation effect="fade" start="85" end="85" condition="True">Conditional</animation>
             <texture colordiffuse="E6FFFFFF">Panel.png</texture>
         </control>
-        <control type="image" id="33009">     
-            <description>Optional Channel Focus Highlight</description>
-            <posx>0</posx>       
-            <posy>-1000</posy>  
-            <width>408</width>
-            <height>72</height>
-            <texture>ButtonFocus.png</texture>
-            <animation effect="fade" start="85" end="85" condition="True">Conditional</animation>
-        </control> 
-        <control type="image" id="33010">     
-            <description>Optional Channel Playing Highlight</description>
-            <posx>0</posx>  
-            <posy>-1000</posy>  
-            <width>408</width>
-            <height>72</height>
-            <texture>FocusHighlight.png</texture>
-            <animation effect="fade" start="85" end="85" condition="True">Conditional</animation>
-        </control>
         <control type="group">
             <posx>0</posx>
             <posy>-50</posy>
@@ -621,6 +603,24 @@
                 <width>1515</width>
                 <height>74</height>
             </control>
+        </control>        
+        <control type="image" id="33009">     
+            <description>Optional Channel Focus Highlight</description>
+            <posx>0</posx>       
+            <posy>-1000</posy>  
+            <width>408</width>
+            <height>72</height>
+            <texture>pstvButtonFocus.png</texture>
+            <animation effect="fade" start="85" end="85" condition="True">Conditional</animation>
+        </control> 
+        <control type="image" id="33010">     
+            <description>Optional Channel Playing Highlight</description>
+            <posx>0</posx>  
+            <posy>-1000</posy>  
+            <width>408</width>
+            <height>72</height>
+            <texture>pstvFocusHighlight.png</texture>
+            <animation effect="fade" start="85" end="85" condition="True">Conditional</animation>
         </control>
         <control type="image" id="33011"> 
             <description>Timebar Optional past fade</description>

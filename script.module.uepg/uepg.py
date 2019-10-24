@@ -20,6 +20,16 @@
 import xbmc, xbmcgui, xbmcvfs
 import sys, os, collections, threading, datetime, time, epg, utils
 
+from contextlib import contextmanager
+
+@contextmanager
+def busy_dialog():
+    xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+    try:
+        yield
+    finally:
+        xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+
 class Channel(object):
     def __init__(self):
         name        = ''
@@ -207,43 +217,44 @@ def buildChannels(params):
        
 def initChannels(params, data, dataType):
     utils.log('initChannels, params = ' + str(params))
-    hasChannels = False
-    channelLST = ChannelList()
-    channelLST.incHDHR      = (utils.loadJson(params.get('include_hdhr',''))                         or channelLST.incHDHR)
-    channelLST.skinPath     = (utils.unquote(params.get('skin_path',''))                             or channelLST.chkSkinPath())
-    channelLST.mediaFolder  = os.path.join(channelLST.skinPath,'resources','skins','default','media')
-    channelLST.refreshPath  = (utils.unquote(params.get('refresh_path',''))                          or utils.ADDON_ID)
-    channelLST.refreshIntvl = int(params.get('refresh_interval','')                                  or '0')
-    channelLST.skinFolder   = os.path.join(channelLST.skinPath,'resources','skins','default','1080i',) if xbmcvfs.exists(os.path.join(channelLST.skinPath,'resources','skins','default','1080i','%s.guide.xml'%utils.ADDON_ID)) else os.path.join(channelLST.skinPath,'resources','skins','default','720p')
-    utils.setProperty('uEPG.rowCount',(params.get('row_count','')                                    or '9'))
-    channelLST.pluginName, channelLST.pluginAuthor, channelLST.pluginIcon, channelLST.pluginFanart, channelLST.pluginPath = utils.getPluginMeta(channelLST.refreshPath)
-    
-    utils.log('dataType = '     + str(dataType))
-    utils.log('skinPath = '     + str(channelLST.skinPath))
-    utils.log('skinFolder = '   + str(channelLST.skinFolder))
-    utils.log('rowCount = '     + utils.getProperty('uEPG.rowCount'))
-    utils.log('refreshPath = '  + str(channelLST.refreshPath))
-    utils.log('refreshIntvl = ' + str(channelLST.refreshIntvl))
-    utils.setProperty('PluginName'   ,channelLST.pluginName)
-    utils.setProperty('PluginIcon'   ,channelLST.pluginIcon)
-    utils.setProperty('PluginFanart' ,channelLST.pluginFanart)
-    utils.setProperty('PluginAuthor' ,channelLST.pluginAuthor)
-    utils.setProperty('pluginPath'   ,channelLST.pluginPath)
-    
-    #show optional load screen
-    # if channelLST.uEPGRunning == False and utils.getProperty('uEPGSplash') != 'True' and xbmcvfs.exists(os.path.join(channelLST.skinFolder,'%s.splash.xml'%utils.ADDON_ID)) == True:
-        # mySplash   = epg.Splash('%s.splash.xml'%utils.ADDON_ID,channelLST.skinPath,'default')
-        # mySplash.show()
-        # xbmc.sleep(100)
+    with busy_dialog():
+        hasChannels = False
+        channelLST = ChannelList()
+        channelLST.incHDHR      = (params.get('include_hdhr','')                                         or utils.REAL_SETTINGS.getSetting('Enable_HDHR')) == 'true'
+        channelLST.skinPath     = (utils.unquote(params.get('skin_path',''))                             or channelLST.chkSkinPath())
+        channelLST.mediaFolder  = os.path.join(channelLST.skinPath,'resources','skins','default','media')
+        channelLST.refreshPath  = (utils.unquote(params.get('refresh_path',''))                          or utils.ADDON_ID)
+        channelLST.refreshIntvl = int(params.get('refresh_interval','')                                  or '0')
+        channelLST.skinFolder   = os.path.join(channelLST.skinPath,'resources','skins','default','1080i',) if xbmcvfs.exists(os.path.join(channelLST.skinPath,'resources','skins','default','1080i','%s.guide.xml'%utils.ADDON_ID)) else os.path.join(channelLST.skinPath,'resources','skins','default','720p')
+        utils.setProperty('uEPG.rowCount',(params.get('row_count','')                                    or '9'))
+        channelLST.pluginName, channelLST.pluginAuthor, channelLST.pluginIcon, channelLST.pluginFanart, channelLST.pluginPath = utils.getPluginMeta(channelLST.refreshPath)
+
+        utils.log('dataType = '     + str(dataType))
+        utils.log('skinPath = '     + str(channelLST.skinPath))
+        utils.log('skinFolder = '   + str(channelLST.skinFolder))
+        utils.log('rowCount = '     + utils.getProperty('uEPG.rowCount'))
+        utils.log('refreshPath = '  + str(channelLST.refreshPath))
+        utils.log('refreshIntvl = ' + str(channelLST.refreshIntvl))
+        utils.setProperty('PluginName'   ,channelLST.pluginName)
+        utils.setProperty('PluginIcon'   ,channelLST.pluginIcon)
+        utils.setProperty('PluginFanart' ,channelLST.pluginFanart)
+        utils.setProperty('PluginAuthor' ,channelLST.pluginAuthor)
+        utils.setProperty('pluginPath'   ,channelLST.pluginPath)
         
-    if utils.HDHR().hasHDHR():
-        if utils.REAL_SETTINGS.getSetting('FirstTime_HDHR') == "true" and not channelLST.incHDHR:
-            utils.REAL_SETTINGS.setSetting('FirstTime_HDHR','false')
-            if utils.yesnoDialog((utils.LANGUAGE(30012)%(channelLST.pluginName)),custom='Later'):
-                utils.REAL_SETTINGS.setSetting('Enable_HDHR','true')
-                channelLST.incHDHR = True
-    utils.log('incHDHR = ' + str(channelLST.incHDHR))
-    
+        #show optional load screen
+        # if channelLST.uEPGRunning == False and utils.getProperty('uEPGSplash') != 'True' and xbmcvfs.exists(os.path.join(channelLST.skinFolder,'%s.splash.xml'%utils.ADDON_ID)) == True:
+            # mySplash   = epg.Splash('%s.splash.xml'%utils.ADDON_ID,channelLST.skinPath,'default')
+            # mySplash.show()
+            # xbmc.sleep(100)
+            
+        if utils.HDHR().hasHDHR():
+            if utils.REAL_SETTINGS.getSetting('FirstTime_HDHR') == "true" and not channelLST.incHDHR:
+                utils.REAL_SETTINGS.setSetting('FirstTime_HDHR','false')
+                if utils.yesnoDialog((utils.LANGUAGE(30012)%(channelLST.pluginName)),custom='Later'):
+                    utils.REAL_SETTINGS.setSetting('Enable_HDHR','true')
+                    channelLST.incHDHR = True
+        utils.log('incHDHR = ' + str(channelLST.incHDHR))
+            
     if dataType     == 'wrap':     hasChannels = channelLST.prepareJson(data)
     elif dataType   == 'json':     hasChannels = channelLST.prepareJson(utils.loadJson(utils.unquote(data)))
     elif dataType   == 'property': hasChannels = channelLST.prepareJson(utils.loadJson(utils.unquote(utils.getProperty(data))))
@@ -273,15 +284,16 @@ def initChannels(params, data, dataType):
     del utils.KODI_MONITOR
     
 if __name__ == '__main__':
-    try: params = dict(arg.split('=') for arg in sys.argv[1].split('&'))
-    except: params = {}
-    data = dataType = None
-    for type in ['json','property','listitem']:
-        try:
-            data = params[type]
-            dataType = type
-            break
-        except: 
-            utils.notificationDialog(utils.LANGUAGE(30002)%(utils.ADDON_NAME,utils.ADDON_AUTHOR),icon=utils.ICON)
-            utils.log('__main__, params = ' + str(params))
+    with busy_dialog():
+        try: params = dict(arg.split('=') for arg in sys.argv[1].split('&'))
+        except: params = {}
+        data = dataType = None
+        for type in ['json','property','listitem']:
+            try:
+                data = params[type]
+                dataType = type
+                break
+            except: 
+                utils.notificationDialog(utils.LANGUAGE(30002)%(utils.ADDON_NAME,utils.ADDON_AUTHOR),icon=utils.ICON)
+                utils.log('__main__, params = ' + str(params))
     if data is not None: initChannels(params, data, dataType)

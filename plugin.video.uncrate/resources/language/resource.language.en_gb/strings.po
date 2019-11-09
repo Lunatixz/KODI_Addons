@@ -41,5 +41,13 @@ msgid "Channels"
 msgstr ""
 
 msgctxt "#30006"
+msgid "Random"
+msgstr ""
+
+msgctxt "#30007"
 msgid "Youtube"
+msgstr ""
+
+msgctxt "#30008"
+msgid "More..."
 msgstr ""

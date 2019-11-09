@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of Uncrate.
@@ -19,5 +19,6 @@
 # -*- coding: utf-8 -*-
 
 #entrypoint
-if __name__ == '__main__':
-    from resources.lib import uncrate
+import sys
+from resources.lib import uncrate
+if __name__ == '__main__': uncrate.Uncrate(sys.argv).run()

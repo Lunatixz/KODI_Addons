@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Kodi Module Auditor.  If not, see <http://www.gnu.org/licenses/>.
 
-import schedule
+import time
 import xbmc
 from scan import *
 
@@ -29,6 +29,7 @@ class Monitor(xbmc.Monitor):
         
     def onSettingsChanged(self):
         log("onSettingsChanged")
+        if self.pendingChange: return
         self.pendingChange = True
         REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
         self.optOut = REAL_SETTINGS.getSetting('Disable_Service') == "true"
@@ -42,16 +43,20 @@ class Service(object):
             self.myMonitor.waitForAbort(30) # startup delay
             self.myScanner.preliminary()    # initial scan
         self.startService()
-
+         
          
     def startService(self):
-        schedule.clear()
         self.myMonitor.pendingChange = False
-        if not self.myMonitor.optOut: schedule.every(int(REAL_SETTINGS.getSetting('Scan_Wait'))).days.do(self.myScanner.preliminary) # run every x days
         while not self.myMonitor.abortRequested():
-            if self.myMonitor.waitForAbort(30) or self.myMonitor.pendingChange: break
-            if xbmc.getGlobalIdleTime() >= 900: continue # do not notify when idle
-            if not self.myMonitor.optOut and not xbmc.Player().isPlaying(): schedule.run_pending()
+            if self.myMonitor.waitForAbort(30)   or self.myMonitor.pendingChange: break 
+            elif xbmc.getGlobalIdleTime() >= 900 or xbmc.Player().isPlaying(): continue # do not notify when idle or playback, wait for user attention.
+            elif not self.myMonitor.optOut:
+                now       = time.time()
+                lastCheck = float(REAL_SETTINGS.getSetting('Last_Scan') or now)
+                scanWait  = (int(REAL_SETTINGS.getSetting('Scan_Wait')) * 86400)
+                if now >= (lastCheck + scanWait):
+                    REAL_SETTINGS.setSetting('Last_Scan',str(now))
+                    self.myScanner.preliminary()
         if self.myMonitor.pendingChange: self.startService()
         
 if __name__ == '__main__': Service()

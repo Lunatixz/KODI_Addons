@@ -1423,22 +1423,25 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.uncrate" version="1.0.0" name="Uncrate" provider-name="Lunatixz">
+<addon id="plugin.video.uncrate" version="1.0.2" name="Uncrate" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="script.module.youtube.dl" version="17.0.0"/>
         <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>
+    <extension point="xbmc.service" library="pseudotv_recommended.py" start="startup"/>
     <extension point="xbmc.addon.metadata">
         <description lang="en_GB">Uncrate is the leading buyer's guide for men. With over 9,000 items covered and more than 1.5 million monthly readers, Uncrate is widely known for digging up the best of the best men's products. With new gear posted every weekday, Uncrate has quickly become one of the largest men's publications, both online and in print, with over 10 million page views each month. Since 2005, Uncrate's dedicated readers have visited multiple times per day to find out about the latest stuff for guys. Uncrate's insightful and daily updates, with near real-time coverage of new product launches, has gained the site an audience of discerning men who turn to Uncrate for the next great thing.</description>
-        <platform>all</platform>
+        <platform>android freebsd ios linux osx windows</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.uncrate</source>
-        <website>https://uncrate.com</website>
+        <website>https://www.uncrate.com</website>
+        <news>v.1.0.1[CR] - Added Random Browse</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=331316</forum>
         <assets>
             <icon>resources/images/icon.png</icon>
@@ -2147,23 +2150,22 @@
     </extension>
 </addon>
 
-<addon id="service.moduleauditor" version="0.1.4" name="Kodi Module Auditor" provider-name="Team Kodi">
+<addon id="service.moduleauditor" version="0.1.5" name="Kodi Module Auditor" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.schedule" version="0.5.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
     </requires>
     <extension point="xbmc.python.script" library="scan.py"/>
     <extension point="xbmc.service" library="service.py" start="startup"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository. </summary>
-        <description lang="en_GB"></description>
+        <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</summary>
+        <description lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.moduleauditor</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=335539</forum>
         <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
-        <news></news>
+        <news>Matrix Branch Added</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

@@ -842,7 +842,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.newsblender" version="1.0.2" name="News Blender" provider-name="Lunatixz">
+<addon id="plugin.video.newsblender" version="1.0.3" name="News Blender" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -857,7 +857,7 @@
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.newsblender</source>
-        <website>https://newsapi.org/</website>
+        <website>http://newsapi.org</website>
         <news>v.1.0.2[CR]-Fixed parsing errors[CR]v.1.0.1[CR]-Added Parsing Dialog</news>
         <forum>https://forum.kodi.tv/showthread.php?tid=326129</forum>
         <assets>

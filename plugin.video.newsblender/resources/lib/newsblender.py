@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of News Blender.
@@ -18,12 +18,25 @@
 
 # -*- coding: utf-8 -*-
 import os, sys, time, datetime, re, traceback
-import urlparse, urllib, urllib2, socket, json, collections
+import urllib, urllib2, socket, json, collections
 import xbmc, xbmcvfs, xbmcgui, xbmcplugin, xbmcaddon
 
 from YDStreamExtractor import getVideoInfo
 from simplecache import SimpleCache, use_cache
+from contextlib import contextmanager
 
+try:
+    from multiprocessing import cpu_count 
+    from multiprocessing.pool import ThreadPool 
+    ENABLE_POOL = True
+    CORES = cpu_count()
+except: ENABLE_POOL = False
+
+try:
+    from urllib.parse import parse_qsl  # py3
+except ImportError:
+    from urlparse import parse_qsl # py2
+    
 # Plugin Info
 ADDON_ID      = 'plugin.video.newsblender'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
@@ -49,43 +62,63 @@ BASE_URL      = 'http://newsapi.org/v2'
 SOURCES_URL   = BASE_URL + '/sources?apiKey=%s'%API_KEY #?language=en&country=us
 HEADLINE_URL  = BASE_URL + '/top-headlines?apiKey=%s'%API_KEY
 EVRYTHING_URL = BASE_URL + '/everything?apiKey=%s'%API_KEY #'&sources=%s','&q=%s','&category=%s','&sortBy=%s' #popularity,top,latest
-LOGO_URL      = 'http://icons.better-idea.org/icon?url=%s&size=70..120..200'
+LOGO_URL      = 'https://i.olsh.me/icon?url=%s&size=80..120..200'
+THUMB_URL     = 'https://dummyimage.com/512x512/035e8b/FFFFFF.png&text=%s'
+FANART_URL    = 'https://dummyimage.com/1280x720/035e8b/FFFFFF.png&text=%s'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 QUALITY       = int(REAL_SETTINGS.getSetting('Quality'))
-MAIN_MENU     = ["Browse by Category","Browse by Source","Browse by Country","Browse by Language"]
-ITEM_MENU     = ["All","Top","Latest","Popular","Search"]
+MAIN_MENU     = [LANGUAGE(30006),LANGUAGE(30007),LANGUAGE(30008),LANGUAGE(30009)]
+ITEM_MENU     = [LANGUAGE(30010),LANGUAGE(30011),LANGUAGE(30012),LANGUAGE(30013),LANGUAGE(30014)]
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
     xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
-    
-def getParams():
-    return dict(urlparse.parse_qsl(sys.argv[2][1:]))
-    
-def getRegionName(region):
-    for item in COUNTRY_LIST:
-        if item['alpha_2'].lower() == region.lower(): return item['name']
-    return region
-        
-def getLanguageName(language):
-    for item in LANGUAGE_LIST:
-        if item['code'].lower() == language.lower(): return item['name']
-    return language
-               
-def busyDialog(percent=0, control=None):
-    if percent == 0 and not control:
-        control = xbmcgui.DialogBusy()
-        control.create()
-    elif percent == 100 and control: return control.close()
-    elif control: control.update(percent)
-    return control
-         
+   
+def cleanhtml(raw_html):
+  cleanr = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
+  cleantext = re.sub(cleanr, '', raw_html)
+  return cleantext
+  
+@contextmanager
+def busy_dialog():
+    xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+    try: yield
+    finally: xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+
 socket.setdefaulttimeout(TIMEOUT)
 class NewsBlender(object):
-    def __init__(self):
+    def __init__(self, sysARG):
+        log('__init__, sysARG = ' + str(sysARG))
+        self.sysARG  = sysARG
         self.cache   = SimpleCache()
         self.sources = self.openURL(SOURCES_URL).get('sources','')
+        
+            
+    @use_cache(28)
+    def getRegionName(self, region):
+        for item in COUNTRY_LIST:
+            if item['alpha_2'].lower() == region.lower(): return item['name']
+        return region
+            
+            
+    @use_cache(28)
+    def getLanguageName(self, language):
+        for item in LANGUAGE_LIST:
+            if item['code'].lower() == language.lower(): return item['name']
+        return language
+          
+          
+    def poolList(self, method, items):
+        results = []
+        if ENABLE_POOL:
+            pool = ThreadPool(CORES)
+            results = pool.imap_unordered(method, items, chunksize=25)
+            pool.close()
+            pool.join()
+        else: results = [method(item) for item in items]
+        results = filter(None, results)
+        return results
         
         
     def openURL(self, url):
@@ -116,12 +149,12 @@ class NewsBlender(object):
         
     def buildCountry(self):
         countries  = collections.Counter([x['country'] for x in self.sources])
-        for country, value in sorted(countries.iteritems()): self.addDir(getRegionName(country),country,6)
+        for country, value in sorted(countries.iteritems()): self.addDir(self.getRegionName(country),country,6, infoArt={'thumb':THUMB_URL%(country.upper()),'fanart':FANART_URL%(country.upper()),'icon':THUMB_URL%(country.upper())})
         
         
     def buildLanguage(self):
         languages  = collections.Counter([x['language'] for x in self.sources])
-        for language, value in sorted(languages.iteritems()): self.addDir(getLanguageName(language),language,7)
+        for language, value in sorted(languages.iteritems()): self.addDir(self.getLanguageName(language),language,7, infoArt={'thumb':THUMB_URL%(language.upper()),'fanart':FANART_URL%(language.upper()),'icon':THUMB_URL%(language.upper())})
 
         
     def buildSource(self, items=None):
@@ -171,43 +204,36 @@ class NewsBlender(object):
     def buildArticles(self, name, url):
         self.browseArticles(name, url, self.openURL(HEADLINE_URL + '&sources=%s'%url).get('articles',''))
 
+
+    def browseArticle(self, item):
+        info = self.getVideo(item['url'])
+        if info is None or len(info) == 0: return None
+        url    = info[0]['xbmc_url']
+        source = item['source']['name']
+        thumb  = item['urlToImage']
+        label  = cleanhtml(item['title'])
+        plot   = cleanhtml(item['description'])
+        try: aired = item['publishedAt'].split('T')[0]
+        except: aired = (datetime.datetime.now()).strftime('%Y-%m-%d')
+        try:
+            if 'subtitles' in info[0]['ytdl_format']: liz.setSubtitles([x['url'] for x in info[0]['ytdl_format']['subtitles'].get('en','') if 'url' in x])
+        except: pass
+        infoLabels = {"mediatype":"episode","label":label ,"title":label,"duration":info[0]['ytdl_format'].get('duration',0),"aired":aired,"plot":plot,"genre":"News"}
+        infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
+        self.addLink(label, url, 9, infoLabels, infoArt)
+        return True
+        
         
     def browseArticles(self, name, url, items, search=True):
-        tmpList = []
-        for idx, item in enumerate(items):
-            info = self.getVideo(item['url'])
-            if info is None or len(info) == 0: continue
-            source = item['source']['name']
-            label  = item['title']
-            thumb  = item['urlToImage']
-            plot   = item['description']
-            try: aired = item['publishedAt'].split('T')[0]
-            except: aired = (datetime.datetime.now()).strftime('%Y-%m-%d')
-            tmpList.append((source, label, thumb, plot, aired, info))
-        dlg = busyDialog(0)
-        for idx, data in enumerate(tmpList):
-            busyDialog(idx * 100 // len(tmpList),dlg)
-            try: 
-                source, label, thumb, plot, aired, info = data
-                url = info[0]['xbmc_url']
-                try:
-                    if 'subtitles' in info[0]['ytdl_format']: liz.setSubtitles([x['url'] for x in info[0]['ytdl_format']['subtitles'].get('en','') if 'url' in x])
-                except: pass
-                infoLabels = {"mediatype":"episode","label":label ,"title":label,"duration":info[0]['ytdl_format'].get('duration',0),"aired":aired,"plot":plot,"genre":"News"}
-                infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
-                self.addLink(label, url, 9, infoLabels, infoArt)
-            except: pass
-        busyDialog(100,dlg)
-        if len(tmpList) == 0: self.addLink((LANGUAGE(30003)%name), "", "")
-        elif search: self.addSearch(name, url)
+        with busy_dialog():
+            if len(self.poolList(self.browseArticle, items)) == 0: self.addLink((LANGUAGE(30003)%name), "", "")
+            elif search: self.addSearch(name, url)
        
+       
+    @use_cache(28)
     def getVideo(self, url):
-        cacheresponse = self.cache.get(ADDON_NAME + '.getVideo, url = %s'%url)
-        if not cacheresponse:
-            info = getVideoInfo(url,QUALITY,True)
-            if info is not None: info = info.streams()
-            self.cache.set(ADDON_NAME + '.getVideo, url = %s'%url, json.dumps(info), expiration=datetime.timedelta(days=14))
-        return json.loads(self.cache.get(ADDON_NAME + '.getVideo, url = %s'%url))
+        info = getVideoInfo(url,QUALITY,True)
+        if info is not None: return info.streams()
             
             
     def playVideo(self, name, url, liz=None):
@@ -240,37 +266,43 @@ class NewsBlender(object):
         liz.setProperty('IsPlayable', 'false')
         if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
         else: liz.setInfo(type="Video", infoLabels=infoList)
-        if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART}) #LOGO_URL%urllib.quote_plus(name)
+        if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART,'icon':ICON})
         else: liz.setArt(infoArt)
         u=sys.argv[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=True)
 
-params=getParams()
-try: url=urllib.unquote_plus(params["url"])
-except: url=None
-try: name=urllib.unquote_plus(params["name"])
-except: name=None
-try: mode=int(params["mode"])
-except: mode=None
-log("Mode: "+str(mode))
-log("URL : "+str(url))
-log("Name: "+str(name))
 
-if mode==None:  NewsBlender().buildMenu()
-elif mode == 0: NewsBlender().buildCategory()
-elif mode == 1: NewsBlender().buildSource()
-elif mode == 2: NewsBlender().buildCountry()
-elif mode == 3: NewsBlender().buildLanguage()
-elif mode == 4: NewsBlender().browseCategory(url)
-elif mode == 5: NewsBlender().buildArticles(name, url)
-elif mode == 6: NewsBlender().browseCountry(url)
-elif mode == 7: NewsBlender().browseLanguage(url)
-elif mode == 8: NewsBlender().search(name, url)
-elif mode == 9: NewsBlender().playVideo(name, url)
+    def getParams(self):
+        return dict(parse_qsl(self.sysARG[2][1:]))
 
-xbmcplugin.setContent(int(sys.argv[1])    , CONTENT_TYPE)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_NONE)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_LABEL)
-xbmcplugin.addSortMethod(int(sys.argv[1]) , xbmcplugin.SORT_METHOD_TITLE)
-xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
+            
+    def run(self):  
+        params=self.getParams()
+        try: url=urllib.unquote_plus(params["url"])
+        except: url=None
+        try: name=urllib.unquote_plus(params["name"])
+        except: name=None
+        try: mode=int(params["mode"])
+        except: mode=None
+        log("Mode: "+str(mode))
+        log("URL : "+str(url))
+        log("Name: "+str(name))
+
+        if mode==None:  self.buildMenu()
+        elif mode == 0: self.buildCategory()
+        elif mode == 1: self.buildSource()
+        elif mode == 2: self.buildCountry()
+        elif mode == 3: self.buildLanguage()
+        elif mode == 4: self.browseCategory(url)
+        elif mode == 5: self.buildArticles(name, url)
+        elif mode == 6: self.browseCountry(url)
+        elif mode == 7: self.browseLanguage(url)
+        elif mode == 8: self.search(name, url)
+        elif mode == 9: self.playVideo(name, url)
+
+        xbmcplugin.setContent(int(sys.argv[1])       , CONTENT_TYPE)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_NONE)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_LABEL)
+        xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_TITLE)
+        xbmcplugin.endOfDirectory(int(sys.argv[1])   , cacheToDisc=True)

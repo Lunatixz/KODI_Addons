@@ -29,7 +29,7 @@ msgid "Select Preferred Quality"
 msgstr ""
 
 msgctxt "#30003"
-msgid "No videos found in %s"
+msgid "No %s videos found"
 msgstr ""
 
 msgctxt "#30004"
@@ -38,4 +38,40 @@ msgstr ""
 
 msgctxt "#30005"
 msgid "%s - Enter Search Term"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Category"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Source"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Country"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Language"
+msgstr ""
+
+msgctxt "#30010"
+msgid "All"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Top"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Latest"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Popular"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Search"
 msgstr ""

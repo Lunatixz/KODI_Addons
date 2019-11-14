@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2019 Lunatixz
 #
 #
 # This file is part of News Blender.
@@ -19,5 +19,6 @@
 # -*- coding: utf-8 -*-
 
 #entrypoint
-if __name__ == '__main__':
-    from resources.lib import newsblender
+import sys
+from resources.lib import newsblender
+if __name__ == '__main__': newsblender.NewsBlender(sys.argv).run()

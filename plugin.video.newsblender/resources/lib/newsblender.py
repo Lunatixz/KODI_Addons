@@ -253,7 +253,9 @@ class NewsBlender(object):
         liz.setProperty('IsPlayable', 'true')
         if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
         else: liz.setInfo(type="Video", infoLabels=infoList)
-        if infoArt == False: liz.setArt({'thumb':LOGO_URL%urllib.quote_plus(name),'fanart':FANART})
+        if infoArt == False: 
+            thumb = LOGO_URL%urllib.quote_plus(name)
+            liz.setArt({"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON})
         else: liz.setArt(infoArt)
         u=sys.argv[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,totalItems=total)

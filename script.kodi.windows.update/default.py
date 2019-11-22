@@ -121,7 +121,7 @@ class Installer(object):
                 yield (xbmcgui.ListItem(label.strip(),label2.strip(),ICON))
             except: #files
                 label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
-                if label.endswith('.exe'): yield (xbmcgui.ListItem(label.strip(),label2.strip(),ICON))
+                if '.exe' in label: yield (xbmcgui.ListItem('%s.exe'%label.split('.exe')[0],'%s %s'%(label.split('.exe')[1], label2.replace('MiB','MiB ').strip()),ICON))
 
 
     def setLastPath(self, url, path):
@@ -167,10 +167,8 @@ class Installer(object):
         
         
     def deleteEXE(self, path):
-        count = 0
         #some file systems don't release the file lock instantly.
-        while not xbmc.Monitor().abortRequested() and count < 3:
-            count += 1
+        for count in range(3):
             if xbmc.Monitor().waitForAbort(1): return 
             try: 
                 if xbmcvfs.delete(path): return

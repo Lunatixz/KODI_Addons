@@ -15,8 +15,8 @@
 #
 # -*- coding: utf-8 -*-
 
-import os, time, datetime, traceback, re, fnmatch, glob, threading
-import urllib, urllib2, socket, subprocess, shutil, sys
+import os, time, datetime, traceback, re, threading, json
+import urllib, urllib2, socket, subprocess, sys
 import xbmc, xbmcgui, xbmcvfs, xbmcaddon
 
 from bs4 import BeautifulSoup
@@ -39,10 +39,11 @@ DEBUG     = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 CLEAN     = REAL_SETTINGS.getSetting('Disable_Maintenance') == 'false'
 BASE_URL  = 'http://mirrors.kodi.tv/'
 WIND_URL  = BASE_URL + '%s/windows/%s/'
-BUILD_OPT = ['nightlies','releases','snapshots','test-builds']
-BUILD_DEC = [LANGUAGE(30017),LANGUAGE(30016),LANGUAGE(30015),LANGUAGE(30018)]
-# UWP_PATH  = LANGUAGE(30010)
+BRANCHS   =  {19:'matrix',18:'leia',17:'krypton',16:'jarvis',15:'isengard',14:'helix',13:'gotham','':''}
+BUILD_OPT = {'nightlies':LANGUAGE(30017),'releases':LANGUAGE(30016),'snapshots':LANGUAGE(30015),'test-builds':LANGUAGE(30018)}
 VERSION   = REAL_SETTINGS.getSetting("Version")
+BUILD     = json.loads((REAL_SETTINGS.getSetting("Build") or {}))
+BRANCH    = BRANCHS[int(BUILD.get('major',''))]
 PLATFORM  = {True:"win64", False:"win32", None:""}[('64' in REAL_SETTINGS.getSetting("Platform") or None)]
 
 def log(msg, level=xbmc.LOGDEBUG):
@@ -99,14 +100,14 @@ class Installer(object):
         except: #files
             items = (soup.find_all('a'))
         return [x.get_text() for x in items if x.get_text() is not None]
-
+       
         
     def buildMain(self):
         tmpLST = []
-        for idx, item in enumerate(BUILD_OPT): tmpLST.append(xbmcgui.ListItem(item.title(),BUILD_DEC[idx],ICON))
+        for label in sorted(BUILD_OPT.keys()): tmpLST.append(xbmcgui.ListItem(label.title(),BUILD_OPT[label],ICON,path=WIND_URL%(label,PLATFORM)))
         select = xbmcgui.Dialog().select(ADDON_NAME, tmpLST, preselect=-1, useDetails=True)
         if select < 0: return #return on cancel.
-        return WIND_URL%(BUILD_OPT[select].lower().replace('//','/'),PLATFORM)
+        return tmpLST[select].getPath()
             
             
     def buildItems(self, url):
@@ -116,9 +117,10 @@ class Installer(object):
             try: #folders
                 if 'uwp' in item.lower(): continue #ignore UWP builds
                 label, label2 = re.compile("(.*?)/-(.*)").match(item).groups()
-                if label == PLATFORM: label2 = LANGUAGE(30014)%PLATFORM
+                if label.lower() == PLATFORM.lower(): label2 = LANGUAGE(30014)%REAL_SETTINGS.getSetting("Platform")
+                elif label.lower() == BRANCH.lower(): label2 = LANGUAGE(30021)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
                 else: label2 = '' #Don't use time-stamp for folders
-                yield (xbmcgui.ListItem(label.strip(),label2.strip(),ICON))
+                yield (xbmcgui.ListItem(label.title(),label2,ICON))
             except: #files
                 label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
                 if '.exe' in label: yield (xbmcgui.ListItem('%s.exe'%label.split('.exe')[0],'%s %s'%(label.split('.exe')[1], label2.replace('MiB','MiB ').strip()),ICON))
@@ -138,8 +140,8 @@ class Installer(object):
         newURL  = url
         while not xbmc.Monitor().abortRequested():
             items = list(self.buildItems(url))
-            if len(items) == 0: break
-            elif len(items) == 2 and not bypass and items[0].getLabel().startswith('Parent directory') and not items[1].getLabel().startswith('.exe'): select = 1 #If one folder bypass selection.
+            if   len(items) == 0: break
+            elif len(items) == 2 and not bypass and items[0].getLabel().lower().startswith('parent directory') and not items[1].getLabel().startswith('.exe'): select = 1 #If one folder bypass selection.
             else:
                 label  = url.replace(BASE_URL,'./').replace('//','/')
                 select = xbmcgui.Dialog().select(label, items, preselect=-1, useDetails=True)
@@ -152,9 +154,9 @@ class Installer(object):
                 dest = xbmc.translatePath(os.path.join(SETTINGS_LOC,label))
                 self.setLastPath(url,dest)
                 return self.downloadEXE(newURL,dest)
-            elif label.startswith('Parent directory') and "windows" in preURL:
+            elif label.lower().startswith('parent directory') and "windows" in preURL:
                 return self.selectDialog(preURL, True)
-            elif label.startswith('Parent directory') and "windows" not in preURL:
+            elif label.lower().startswith('parent directory') and "windows" not in preURL:
                 return self.selectDialog(self.buildMain(), False)
             url = newURL + '/'
         

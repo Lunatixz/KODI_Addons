@@ -319,6 +319,7 @@ class SCAN(object):
     def findModule(self, myModule, kodiModules, background=True):
         found = False
         error = False
+        whiteList  = getWhiteList()['modules']
         for kodiModule in kodiModules:
             if not background: self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string3='Checking %s ...'%((kodiModule['id'])))
             try:
@@ -326,8 +327,9 @@ class SCAN(object):
                     found = True
                     self.matchCNT += 1
                     if myModule['version'] != kodiModule['version']:
-                        error = True
-                        self.errorCNT += 1
+                        if not myModule['addonid'] in whiteList:
+                            error = True
+                            self.errorCNT += 1
                     break
             except Exception as e: log('findModule, failed parse %s - %s'%(str(myModule),str(e)), xbmc.LOGERROR)
         if found: return found, error, kodiModule
@@ -349,7 +351,7 @@ class SCAN(object):
             for idx, elem in enumerate(tree.iter()):
                 if busy: busy = busyDialog(idx + 1, busy)
                 if elem.tag == 'addon': addon = elem.attrib.copy()
-                if elem.tag == 'extension' and elem.attrib.copy()['point'] == 'xbmc.python.module': yield (addon)
+                if elem.tag == 'extension' and  elem.attrib.copy()['point'] == 'xbmc.python.module': yield (addon)
         except Exception as e: 
             log("buildModules, Failed! " + str(e), xbmc.LOGERROR)
             if busy: busyDialog(100)

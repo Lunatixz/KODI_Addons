@@ -1,4 +1,4 @@
-#   Copyright (C) 2019 Lunatixz
+#   Copyright (C) 2020 Lunatixz
 #
 #
 # This file is part of Video ScreenSaver.
@@ -42,7 +42,7 @@ DISABLE_TRAKT  = REAL_SETTINGS.getSetting("TraktDisable") == 'true'
 VIDEO_LIMIT    = int(REAL_SETTINGS.getSetting("VideoLimit"))
 VIDEO_FILE     = REAL_SETTINGS.getSetting("VideoFile")
 VIDEO_PATH     = REAL_SETTINGS.getSetting("VideoFolder")
-
+DEFAULT_REPEAT = REAL_SETTINGS.getSetting('RepeatState').lower()
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -107,11 +107,14 @@ def progressDialog(percent=0, control=None, string1='', header=ADDON_NAME):
         if control.iscanceled() or percent >= 100: return control.close()
         else: control.update(percent, string1)
     return control
-     
+
 class BackgroundWindow(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
+        if DISABLE_TRAKT: xbmcgui.Window(10000).setProperty('script.trakt.paused','true')
+        xbmcgui.Window(10000).setProperty("PseudoTVRunning", "True")
         self.myPlayer = Player()
+        setRepeat('all')
         saveVolume()
         setVolume(VOLUME)
         
@@ -119,6 +122,15 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
     def onAction(self, act):
         log('onAction')
         if KEYLOCK and act.getId() != ACTION_STOP: return
+        self.onClose()
+            
+            
+    def onClose(self):
+        log('onClose')
+        setRepeat(DEFAULT_REPEAT)
+        xbmcgui.Window(10000).clearProperty('script.trakt.paused')
+        xbmcgui.Window(10000).setProperty("PseudoTVRunning", "False")
+        xbmcgui.Window(10000).setProperty("%s.Running"%(ADDON_ID), "False")
         setVolume(int(xbmcgui.Window(10000).getProperty('%s.RESTORE'%ADDON_ID)))
         self.myPlayer.stop()
         self.close()
@@ -127,7 +139,6 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
 class Player(xbmc.Player):
     def __init__(self):
         xbmc.Player.__init__(self, xbmc.Player()) 
-        if DISABLE_TRAKT: xbmcgui.Window(10000).setProperty('script.trakt.paused','true')
 
 
     def onPlayBackError(self):
@@ -138,15 +149,12 @@ class Player(xbmc.Player):
     def onPlayBackEnded(self):
         log('onPlayBackEnded')
         # if SINGLE_FLE: exeAction('stop')
-            
         # self.myPlayer.play(self.playList)
         
         
     def onPlayBackStopped(self):
         log('onPlayBackStopped')
-        setRepeat('off')
-        xbmcgui.Window(10000).clearProperty('script.trakt.paused')
-        self.stop()  
+        self.stop()
         
         
 class Start():
@@ -244,7 +252,6 @@ class Start():
         if RANDOM_PLAY: self.playList.shuffle()
         else: self.playList.unshuffle()
         self.myPlayer.play(self.playList)
-        setRepeat('all')
         exeAction('fullscreen')
         self.background.doModal()
         self.playList.clear()

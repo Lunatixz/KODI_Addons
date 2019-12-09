@@ -1783,6 +1783,35 @@
     </extension>
 </addon>
 
+<addon id="service.smartthings" version="1.0.5" name="Smartthings Monitor" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.requests" version="2.9.1"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py" start="login"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Receive real-time updates from your Smartthings Hub.</summary>
+        <description lang="en_GB">Monitor user selected device events, receive Temperature and Battery level warnings.</description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <broken>Samsung authentication changed; No longer efficient to parse backend w/o smartapp. SmartApp negates the need for a Kodi service.</broken>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.smartthings</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=324405</forum>
+        <news>v.1.0.4[CR]-Service Improvements[CR]v.1.0.3[CR]-Service Improvements[CR]-Disabled Event Notification by default[CR]v.1.0.1[CR]-Fixed Incorrect Password Loop</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="script.io.benchmark" name="I/O Benchmark" version="1.1.0" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1825,7 +1854,7 @@
     </extension>
 </addon>
 
-<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.1.1" provider-name="Team Kodi">
+<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.1.4" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.24.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -1838,7 +1867,7 @@
         <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>android</platform>
-        <website>https://kodi.tv/</website>
+        <website>http://kodi.tv</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.android.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=322783</forum>
         <news>v1.1.1[CR]-Temp Fix[CR]v1.1.0[CR]-Crash Fix[CR]v1.0.9[CR]-Improved UI[CR]v1.0.5[CR]-Moved to Jarvis[CR]-Android Platform Detection[CR]-Streamlined Navigation[CR]v1.0.4[CR]-Android Version Detection[CR]- Improved Error Handling[CR]v1.0.3[CR]-Improved functionality[CR]v1.0.1[CR]-Added After Install Cleanup.</news>
@@ -1853,7 +1882,7 @@
     </extension>
 </addon>
 
-<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.0.7" provider-name="Team Kodi">
+<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.0.8" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -2177,35 +2206,6 @@
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="service.smartthings" version="1.0.5" name="Smartthings Monitor" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.requests" version="2.9.1"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>executable</provides>
-    </extension>
-    <extension point="xbmc.service" library="service.py" start="login"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Receive real-time updates from your Smartthings Hub.</summary>
-        <description lang="en_GB">Monitor user selected device events, receive Temperature and Battery level warnings.</description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <broken>Samsung authentication changed; No longer efficient to parse backend w/o smartapp. SmartApp negates the need for a Kodi service.</broken>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.smartthings</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=324405</forum>
-        <news>v.1.0.4[CR]-Service Improvements[CR]v.1.0.3[CR]-Service Improvements[CR]-Disabled Event Notification by default[CR]v.1.0.1[CR]-Fixed Incorrect Password Loop</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
     </extension>
 </addon>

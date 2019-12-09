@@ -1,4 +1,4 @@
-#     Copyright (C) 2019 Team-Kodi
+#     Copyright (C) 2020 Team-Kodi
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #
 # -*- coding: utf-8 -*-
 
-import platform, traceback, json
+import platform, traceback, json, sys
 import xbmc, xbmcaddon, xbmcgui, xbmcvfs
 
 # Plugin Info
@@ -42,7 +42,7 @@ class Service(object):
         self.setSettings()
         lastPath = REAL_SETTINGS.getSetting("LastPath") # CACHE = Keep last download, CLEAN = Remove all downloads
         if not CACHE and CLEAN and xbmcvfs.exists(lastPath): self.deleteLast(lastPath)
-                
+        
                 
     def deleteLast(self, lastPath):
         log('deleteLast')

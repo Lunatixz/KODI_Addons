@@ -101,7 +101,7 @@ msgid "Select File Explorer"
 msgstr ""
 
 msgctxt "#30021"
-msgid "Test File Explorer"
+msgid "File Explorer"
 msgstr ""
 
 msgctxt "#30022"

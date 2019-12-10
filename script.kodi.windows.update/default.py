@@ -183,7 +183,7 @@ class Installer(object):
         if self.fileExists(dest): return self.installEXE(dest)
         start_time = time.time()
         dia = xbmcgui.DialogProgress()
-        fle = dest.rsplit('/', 1)[1]
+        fle = dest.rsplit('\\', 1)[1]
         dia.create(ADDON_NAME, LANGUAGE(30002))
         try: urllib.urlretrieve(url.rstrip('/'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time, fle))
         except Exception as e:

@@ -1756,105 +1756,7 @@
     </extension>
 </addon>
 
-<addon id="service.moduleauditor" version="0.1.7" name="Kodi Module Auditor" provider-name="Team Kodi">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-    </requires>
-    <extension point="xbmc.python.script" library="scan.py"/>
-    <extension point="xbmc.service" library="service.py" start="startup"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</summary>
-        <description lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.moduleauditor</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=335539</forum>
-        <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
-        <news>Matrix Branch Added</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="service.smartthings" version="1.0.5" name="Smartthings Monitor" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.requests" version="2.9.1"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>executable</provides>
-    </extension>
-    <extension point="xbmc.service" library="service.py" start="login"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Receive real-time updates from your Smartthings Hub.</summary>
-        <description lang="en_GB">Monitor user selected device events, receive Temperature and Battery level warnings.</description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <broken>Samsung authentication changed; No longer efficient to parse backend w/o smartapp. SmartApp negates the need for a Kodi service.</broken>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.smartthings</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=324405</forum>
-        <news>v.1.0.4[CR]-Service Improvements[CR]v.1.0.3[CR]-Service Improvements[CR]-Disabled Event Notification by default[CR]v.1.0.1[CR]-Fixed Incorrect Password Loop</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.io.benchmark" name="I/O Benchmark" version="1.1.0" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>executable</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Test your devices read/write performance.</summary>
-        <description lang="en_GB">How fast does your device read and write?</description>
-        <license>The MIT License (MIT)</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.io.benchmark</source>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-            <screenshot>screenshot01.png</screenshot>
-            <screenshot>screenshot02.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.kitchen.service" version="0.0.3" name="Kitchen Service" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.14.0"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="service.py">
-        <provides>executable</provides>
-    </extension>
-    <extension point="xbmc.service" library="service.py" start="startup"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en">Custom Script - For My Needs!</summary>
-        <description lang="en">Toggle Kitchen Kodi Mute by ping state of adjacent TV. Set Kitchen Kodi TV Volume by Day/Night</description>
-        <disclaimer lang="en" >This software is a BETA release, bugs maybe common until final release.</disclaimer>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.1.4" provider-name="Team Kodi">
+<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.1.5" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.24.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -1882,7 +1784,7 @@
     </extension>
 </addon>
 
-<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.0.8" provider-name="Team Kodi">
+<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.0.9" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
@@ -1911,23 +1813,6 @@
     </extension>
 </addon>
 
-<addon id="script.module.pydub" version="0.23.1" name="pyDub" provider-name="jiaaro">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0" />
-    </requires>
-    <extension library="lib" point="xbmc.python.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
-        <description lang="en_GB"></description>
-        <license>MIT</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pydub</source>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="script.module.pyhdhr" version="1.0.7" name="pyHDHR" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0" />
@@ -1941,25 +1826,6 @@
         <license>MIT</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pyhdhr</source>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.module.pyqrcode" version="0.0.2" name="pyQRcode" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.24.0" />
-    </requires>
-    <extension library="lib" point="xbmc.python.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_US">A Python interface to generate QR Code</summary>
-        <description lang="en_US">A Python interface to generate QR Code</description>
-        <forum></forum>
-        <website>https://pypi.org/project/PyQRCode/</website>
-        <license>Apache2</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pyqrcode</source>
         <assets>
             <icon>icon.png</icon>
         </assets>
@@ -2069,60 +1935,6 @@
     <extension point="xbmc.service" library="service.py" start="startup"/>
 </addon>
 
-<addon id="script.trumptweets" name="Trump Tweets!!" version="1.0.4a" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.feedparser" version="5.1.3"/>
-    </requires>
-    <extension point="xbmc.python.script" library="settings.py"/>
-    <extension point="xbmc.service" library="service.py" start="login"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Love'em... Hate'em... Trump Tweets!!</summary>
-        <description lang="en_GB">Keep yourself entertained and/or enlightened by the President of the United States tweets. Receive real-time twitter updates from @realDonaldTrump. 3D images provided royalty free by the talented Denys Almaral.</description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <website>https://twitter.com/realDonaldTrump</website>
-        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/script.trumptweets</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=316555</forum>
-        <news>v.1.0.4a[CR]-Added More Images[CR]-Misc. Improvements[CR]-DEBUGGING MODE (DISABLE FOR NORMAL USE)[CR]v.1.0.4[CR]-Service Improvements[CR]v.1.0.3[CR]-Service Improvements[CR]v.1.0.2[CR]-Skin Tweaks[CR]v.1.0.1[CR]-Tweaked Timer, Code Cleanup</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.twittertweets" name="Twitter Tweets" version="1.0.4" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-    </requires>
-    <extension point="xbmc.python.script" library="settings.py"/>
-    <extension point="xbmc.service" library="service.py" start="login"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
-        <description lang="en_GB">Monitor your favorite twitter accounts, receive "realtime" tweets.</description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <website>https://twitter.com</website>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.twittertweets</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=317791</forum>
-        <news>v1.0.4[CR]-Improved Service[CR]-Added Video Attacments (Experimental)[CR]-Increased Close Times[CR]-Adjusted Refresh Rates[CR]v1.0.3[CR]-Added Ignore Pinned Tweets.[CR]-Added Account Verified Flag.[CR]-Added Option to "Display Attacment".[CR]-Added Option to "Include Retweets".[CR]-Improved service.[CR]v1.0.2[CR]-Improved service.[CR]-Corrected tweet times.[CR]-Improved overall functionality.[CR]v1.0.1[CR]-Improved Images and Service.</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="service.mediamirror" version="0.0.1" name="Media Mirror" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -2140,6 +1952,33 @@
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="service.moduleauditor" version="0.1.7" name="Kodi Module Auditor" provider-name="Team Kodi">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+    </requires>
+    <extension point="xbmc.python.script" library="scan.py"/>
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</summary>
+        <description lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.moduleauditor</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=335539</forum>
+        <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
+        <news>Matrix Branch Added</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
     </extension>
 </addon>
@@ -2206,6 +2045,167 @@
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="service.smartthings" version="1.0.5" name="Smartthings Monitor" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.requests" version="2.9.1"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py" start="login"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Receive real-time updates from your Smartthings Hub.</summary>
+        <description lang="en_GB">Monitor user selected device events, receive Temperature and Battery level warnings.</description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <broken>Samsung authentication changed; No longer efficient to parse backend w/o smartapp. SmartApp negates the need for a Kodi service.</broken>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.smartthings</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=324405</forum>
+        <news>v.1.0.4[CR]-Service Improvements[CR]v.1.0.3[CR]-Service Improvements[CR]-Disabled Event Notification by default[CR]v.1.0.1[CR]-Fixed Incorrect Password Loop</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="script.io.benchmark" name="I/O Benchmark" version="1.1.0" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Test your devices read/write performance.</summary>
+        <description lang="en_GB">How fast does your device read and write?</description>
+        <license>The MIT License (MIT)</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.io.benchmark</source>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+            <screenshot>screenshot01.png</screenshot>
+            <screenshot>screenshot02.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="script.kitchen.service" version="0.0.3" name="Kitchen Service" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.14.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="service.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Custom Script - For My Needs!</summary>
+        <description lang="en">Toggle Kitchen Kodi Mute by ping state of adjacent TV. Set Kitchen Kodi TV Volume by Day/Night</description>
+        <disclaimer lang="en" >This software is a BETA release, bugs maybe common until final release.</disclaimer>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="script.module.pydub" version="0.23.1" name="pyDub" provider-name="jiaaro">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0" />
+    </requires>
+    <extension library="lib" point="xbmc.python.module" />
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB"></summary>
+        <description lang="en_GB"></description>
+        <license>MIT</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pydub</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="script.module.pyqrcode" version="0.0.2" name="pyQRcode" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.24.0" />
+    </requires>
+    <extension library="lib" point="xbmc.python.module" />
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_US">A Python interface to generate QR Code</summary>
+        <description lang="en_US">A Python interface to generate QR Code</description>
+        <forum></forum>
+        <website>https://pypi.org/project/PyQRCode/</website>
+        <license>Apache2</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pyqrcode</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="script.trumptweets" name="Trump Tweets!!" version="1.0.4a" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.feedparser" version="5.1.3"/>
+    </requires>
+    <extension point="xbmc.python.script" library="settings.py"/>
+    <extension point="xbmc.service" library="service.py" start="login"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Love'em... Hate'em... Trump Tweets!!</summary>
+        <description lang="en_GB">Keep yourself entertained and/or enlightened by the President of the United States tweets. Receive real-time twitter updates from @realDonaldTrump. 3D images provided royalty free by the talented Denys Almaral.</description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <website>https://twitter.com/realDonaldTrump</website>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/script.trumptweets</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=316555</forum>
+        <news>v.1.0.4a[CR]-Added More Images[CR]-Misc. Improvements[CR]-DEBUGGING MODE (DISABLE FOR NORMAL USE)[CR]v.1.0.4[CR]-Service Improvements[CR]v.1.0.3[CR]-Service Improvements[CR]v.1.0.2[CR]-Skin Tweaks[CR]v.1.0.1[CR]-Tweaked Timer, Code Cleanup</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="script.twittertweets" name="Twitter Tweets" version="1.0.4" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+    </requires>
+    <extension point="xbmc.python.script" library="settings.py"/>
+    <extension point="xbmc.service" library="service.py" start="login"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB"></summary>
+        <description lang="en_GB">Monitor your favorite twitter accounts, receive "realtime" tweets.</description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <website>https://twitter.com</website>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.twittertweets</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=317791</forum>
+        <news>v1.0.4[CR]-Improved Service[CR]-Added Video Attacments (Experimental)[CR]-Increased Close Times[CR]-Adjusted Refresh Rates[CR]v1.0.3[CR]-Added Ignore Pinned Tweets.[CR]-Added Account Verified Flag.[CR]-Added Option to "Display Attacment".[CR]-Added Option to "Include Retweets".[CR]-Improved service.[CR]v1.0.2[CR]-Improved service.[CR]-Corrected tweet times.[CR]-Improved overall functionality.[CR]v1.0.1[CR]-Improved Images and Service.</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
     </extension>
 </addon>

@@ -48,6 +48,8 @@ BRANCH    = BRANCHS[int(BUILD.get('major',''))]
 DROID_URL = BASE_URL + '%s/android/%s/'
 DEVICESTR = (REAL_SETTINGS.getSetting("Platform") or None)
 USERAPP   = REAL_SETTINGS.getSetting("USERAPP")
+CUSTOM    = (REAL_SETTINGS.getSetting('Custom_Manager') or 'com.android.documentsui')
+FMANAGER  = {0:'com.android.documentsui',1:CUSTOM}[int(REAL_SETTINGS.getSetting('File_Manager'))]
 
 if DEVICESTR is None: PLATFORM = ""
 elif '64' in DEVICESTR: PLATFORM = "arm64-v8a"
@@ -231,7 +233,7 @@ class Installer(object):
             
             
     def installAPK(self, apkfile):
-        xbmc.executebuiltin('StartAndroidActivity(com.android.documentsui,,,"content://%s")'%apkfile)
+        xbmc.executebuiltin('StartAndroidActivity(%s,,,"content://%s")'%(FMANAGER,apkfile))
         # xbmc.executebuiltin('StartAndroidActivity("","android.intent.action.INSTALL_PACKAGE ","application/vnd.android.package-archive","content://%s")'%apkfile)
         # xbmc.executebuiltin('XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),0.5,true)')
 

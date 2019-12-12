@@ -60,6 +60,7 @@ def selectDialog(label, items, pselect=-1, uDetails=True):
 socket.setdefaulttimeout(TIMEOUT)
 class Installer(object):
     def __init__(self):
+        self.myMonitor = xbmc.Monitor()
         self.cache    = SimpleCache()
         if self.chkUWP(): return
         self.killKodi = threading.Timer(2.0, self.killME)
@@ -125,10 +126,10 @@ class Installer(object):
                 if label.lower() == PLATFORM.lower(): label2 = LANGUAGE(30014)%REAL_SETTINGS.getSetting("Platform")
                 elif label.lower() == BRANCH.lower(): label2 = LANGUAGE(30021)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
                 else: label2 = '' #Don't use time-stamp for folders
-                yield (xbmcgui.ListItem(label.title(),label2,ICON))
+                yield (xbmcgui.ListItem(label.title(),label2,ICON,path=(url + label)))
             except: #files
                 label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
-                if '.exe' in label: yield (xbmcgui.ListItem('%s.exe'%label.split('.exe')[0],'%s %s'%(label.split('.exe')[1], label2.replace('MiB','MiB ').strip()),ICON))
+                if '.exe' in label: yield (xbmcgui.ListItem('%s.exe'%label.split('.exe')[0],'%s %s'%(label.split('.exe')[1], label2.replace('MiB','MB ').strip()),ICON,path='%s%s.exe'%(url,label.split('.exe')[0])))
 
 
     def setLastPath(self, url, path):
@@ -143,26 +144,26 @@ class Installer(object):
     def selectPath(self, url, bypass=False):
         log('selectPath, url = ' + str(url))
         newURL  = url
-        while not xbmc.Monitor().abortRequested():
+        while not self.myMonitor.abortRequested():
             items = list(self.buildItems(url))
             if   len(items) == 0: break
-            elif len(items) == 2 and not bypass and items[0].getLabel().lower().startswith('parent directory') and not items[1].getLabel().startswith('.exe'): select = 1 #If one folder bypass selection.
+            elif len(items) == 2 and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().startswith('.exe'): select = 1 #If one folder bypass selection.
             else: select = selectDialog(url.replace(BASE_URL,'./').replace('//','/'), items)
             if select < 0: return #return on cancel.
             label  = items[select].getLabel()
-            newURL = url + items[select].getLabel()
+            newURL = items[select].getPath()
             preURL = url.rsplit('/', 2)[0] + '/'
             if newURL.endswith('.exe'): 
                 dest = xbmc.translatePath(os.path.join(SETTINGS_LOC,label))
                 self.setLastPath(url,dest)
                 return self.downloadEXE(newURL,dest)
-            elif label.lower().startswith('parent directory') and "windows" in preURL:
+            elif label.lower() == 'parent directory' and "windows" in preURL.lower():
                 return self.selectPath(preURL, True)
-            elif label.lower().startswith('parent directory') and "windows" not in preURL:
+            elif label.lower() == 'parent directory' and "windows" not in preURL.lower():
                 return self.selectPath(self.buildMain(), False)
-            url = newURL + '/'
-        
-        
+            url = newURL.replace('Master','master') + '/'
+            
+            
     def fileExists(self, dest):
         if xbmcvfs.exists(dest):
             if not xbmcgui.Dialog().yesno(ADDON_NAME, LANGUAGE(30004), dest.rsplit('/', 1)[-1], nolabel=LANGUAGE(30005), yeslabel=LANGUAGE(30006)): return False
@@ -173,7 +174,7 @@ class Installer(object):
     def deleteEXE(self, path):
         #some file systems don't release the file lock instantly.
         for count in range(3):
-            if xbmc.Monitor().waitForAbort(1): return 
+            if self.myMonitor.waitForAbort(1): return 
             try: 
                 if xbmcvfs.delete(path): return
             except: pass

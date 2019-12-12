@@ -74,12 +74,8 @@ socket.setdefaulttimeout(TIMEOUT)
 class Installer(object):
     def __init__(self):
         params = getParams()
-        if params is not None:
-            if params == 'test': self.runExplorer()
-            elif params == 'select': self.selectExplorer()
-            REAL_SETTINGS.openSettings()
-            sys.exit()
-        self.cache    = SimpleCache()
+        self.myMonitor = xbmc.Monitor()
+        self.cache = SimpleCache()
         if not self.chkVersion(): return
         self.lastURL  = (REAL_SETTINGS.getSetting("LastURL") or self.buildMain())
         self.lastPath = REAL_SETTINGS.getSetting("LastPath")
@@ -129,7 +125,7 @@ class Installer(object):
         
     def buildMain(self):
         tmpLST = []
-        for label in sorted(BUILD_OPT.keys()): tmpLST.append(xbmcgui.ListItem(label.title(),BUILD_OPT[label],ICON,path=DROID_URL%(label.lower(),PLATFORM)))
+        for label in sorted(BUILD_OPT.keys()): tmpLST.append(xbmcgui.ListItem(label.title(),BUILD_OPT[label],ICON,path=DROID_URL%(label,PLATFORM)))
         select = selectDialog(ADDON_NAME, tmpLST)
         if select < 0: return #return on cancel.
         return tmpLST[select].getPath()
@@ -144,10 +140,10 @@ class Installer(object):
                 if label == PLATFORM: label2 = LANGUAGE(30014)%PLATFORM
                 elif label.lower() == BRANCH.lower(): label2 = LANGUAGE(30022)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
                 else: label2 = '' #Don't use time-stamp for folders
-                yield (xbmcgui.ListItem(label.title(),label2,ICON))
+                yield (xbmcgui.ListItem(label.title(),label2,ICON,path=(url + label)))
             except: #files
                 label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
-                if '.apk' in label: yield (xbmcgui.ListItem('%s.apk'%label.split('.apk')[0],'%s %s'%(label.split('.apk')[1], label2.replace('MiB','MiB ').strip()),ICON))
+                if '.apk' in label: yield (xbmcgui.ListItem('%s.apk'%label.split('.apk')[0],'%s %s'%(label.split('.apk')[1], label2.replace('MiB','MB ').strip()),ICON,path='%s%s.apk'%(url,label.split('.apk')[0])))
 
 
     def setLastPath(self, url, path):
@@ -158,22 +154,22 @@ class Installer(object):
     def selectPath(self, url, bypass=False):
         log('selectPath, url = ' + str(url))
         newURL = url
-        while not xbmc.Monitor().abortRequested():
+        while not self.myMonitor.abortRequested():
             items  = list(self.buildItems(url))
             if len(items) == 0: break
-            elif len(items) == 2 and not bypass and items[0].getLabel().startswith('Parent directory') and not items[1].getLabel().startswith('.apk'): select = 1 #If one folder bypass selection.
+            elif len(items) == 2 and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().startswith('.apk'): select = 1 #If one folder bypass selection.
             else: select = selectDialog(url.replace(BASE_URL,'./').replace('//','/'), items)
             if select < 0: return #return on cancel.
             label  = items[select].getLabel()
-            newURL = url + items[select].getLabel()
+            newURL = items[select].getPath()
             preURL = url.rsplit('/', 2)[0] + '/'
             if newURL.endswith('.apk'): 
                 dest = xbmc.translatePath(os.path.join(SETTINGS_LOC,label))
                 self.setLastPath(url,dest)
                 return self.downloadAPK(newURL,dest)
-            elif label.startswith('Parent directory') and "android" in preURL:
+            elif label.lower() == 'parent directory' and "android" in preURL.lower():
                 return self.selectPath(preURL, True)
-            elif label.startswith('Parent directory') and "android" not in preURL:
+            elif label.lower() == 'parent directory' and "android" not in preURL.lower():
                 return self.selectPath(self.buildMain(), False)
             url = newURL + '/'
                 
@@ -188,9 +184,9 @@ class Installer(object):
     def deleleAPK(self, path):
         count = 0
         #some file systems don't release the file lock instantly.
-        while not xbmc.Monitor().abortRequested() and count < 3:
+        while not self.myMonitor.abortRequested() and count < 3:
             count += 1
-            if xbmc.Monitor().waitForAbort(1): return 
+            if self.myMonitor.waitForAbort(1): return 
             try: 
                 if xbmcvfs.delete(path): return
             except: pass

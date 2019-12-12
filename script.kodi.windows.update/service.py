@@ -39,6 +39,7 @@ def log(msg, level=xbmc.LOGDEBUG):
 
 class Service(object):
     def __init__(self):
+        self.myMonitor = xbmc.Monitor()
         self.setSettings()
         lastPath = REAL_SETTINGS.getSetting("LastPath") # CACHE = Keep last download, CLEAN = Remove all downloads
         if not CACHE and CLEAN and xbmcvfs.exists(lastPath): self.deleteLast(lastPath)
@@ -48,7 +49,7 @@ class Service(object):
         log('deleteLast')
         #some file systems don't release the file lock instantly.
         for count in range(3):
-            if xbmc.Monitor().waitForAbort(1): return 
+            if self.myMonitor.waitForAbort(1): return 
             try: 
                 if xbmcvfs.delete(lastPath): return
             except: pass
@@ -68,9 +69,9 @@ class Service(object):
         log('getPlatform')
         count = 0
         try:
-            while not xbmc.Monitor().abortRequested() and count < 15:
+            while not self.myMonitor.abortRequested() and count < 15:
                 count += 1 
-                if xbmc.Monitor().waitForAbort(1): return
+                if self.myMonitor.waitForAbort(1): return
                 build = platform.machine()
                 if len(build) > 0: return REAL_SETTINGS.setSetting("Platform",build)
         except Exception as e: log("getVersion Failed! " + str(e), xbmc.LOGERROR)
@@ -80,9 +81,9 @@ class Service(object):
         log('getVersion')
         count = 0
         try:
-            while not xbmc.Monitor().abortRequested() and count < 15:
+            while not self.myMonitor.abortRequested() and count < 15:
                 count += 1 
-                if xbmc.Monitor().waitForAbort(1): return
+                if self.myMonitor.waitForAbort(1): return
                 build = (xbmc.getInfoLabel('System.OSVersionInfo') or 'busy')
                 if build.lower() != 'busy': return REAL_SETTINGS.setSetting("Version",str(build))
         except Exception as e: log("getVersion Failed! " + str(e), xbmc.LOGERROR)

@@ -65,15 +65,10 @@ def selectDialog(label, items, pselect=-1, uDetails=True):
     select = xbmcgui.Dialog().select(label, items, preselect=pselect, useDetails=uDetails)
     if select >= 0: return select
     return None
-    
-def getParams():
-    try: return sys.argv[1]
-    except: return None
 
 socket.setdefaulttimeout(TIMEOUT)
 class Installer(object):
     def __init__(self):
-        params = getParams()
         self.myMonitor = xbmc.Monitor()
         self.cache = SimpleCache()
         if not self.chkVersion(): return

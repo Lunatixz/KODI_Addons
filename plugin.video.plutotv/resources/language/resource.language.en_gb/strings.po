@@ -127,3 +127,7 @@ msgstr ""
 msgctxt "#30028"
 msgid "Unable to Connect, Check User Credentials"
 msgstr ""
+
+msgctxt "#30029"
+msgid "Coming Up Next..."
+msgstr ""

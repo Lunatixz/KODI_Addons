@@ -15,7 +15,7 @@
 #
 # -*- coding: utf-8 -*-
 
-import platform, traceback, sys, json, os
+import platform, traceback, json
 import xbmc, xbmcaddon, xbmcgui, xbmcvfs
 
 # Plugin Info

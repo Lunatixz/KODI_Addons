@@ -16,18 +16,19 @@
 # -*- coding: utf-8 -*-
 
 import os, time, datetime, traceback, re
-import urllib, urllib2, socket, json
+import socket, json
 import xbmc, xbmcgui, xbmcvfs, xbmcaddon
 
 from bs4 import BeautifulSoup
 from simplecache import SimpleCache
+from six.moves import urllib
 
 # Plugin Info
 ADDON_ID      = 'script.kodi.android.update'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME    = REAL_SETTINGS.getAddonInfo('name')
 SETTINGS_LOC  = '/storage/emulated/0/download' # REAL_SETTINGS.getAddonInfo('profile').decode('utf-8')
-ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path').decode('utf-8')
+ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path')
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 ICON          = REAL_SETTINGS.getAddonInfo('icon')
 FANART        = REAL_SETTINGS.getAddonInfo('fanart')
@@ -99,8 +100,8 @@ class Installer(object):
         try:
             cacheResponce = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
             if not cacheResponce:
-                request = urllib2.Request(url)
-                cacheResponce = urllib2.urlopen(request, timeout = TIMEOUT).read()
+                request = urllib.request.Request(url)
+                cacheResponce = urllib.request.urlopen(request, timeout = TIMEOUT).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheResponce, expiration=datetime.timedelta(minutes=5))
             return BeautifulSoup(cacheResponce, "html.parser")
         except Exception as e:
@@ -193,7 +194,7 @@ class Installer(object):
         dia = xbmcgui.DialogProgress()
         fle = dest.rsplit('/', 1)[1]
         dia.create(ADDON_NAME, LANGUAGE(30002)%fle)
-        try: urllib.urlretrieve(url.rstrip('/'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time, fle))
+        try: urllib.request.urlretrieve(url.rstrip('/'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time, fle))
         except Exception as e:
             dia.close()
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
@@ -205,7 +206,7 @@ class Installer(object):
         
     def pbhook(self, numblocks, blocksize, filesize, dia, start_time, fle):
         try: 
-            percent = min(numblocks * blocksize * 100 / filesize, 100) 
+            percent = int(min(numblocks * blocksize * 100 / filesize, 100))
             currently_downloaded = float(numblocks) * blocksize / (1024 * 1024) 
             kbps_speed = numblocks * blocksize / (time.time() - start_time) 
             if kbps_speed > 0: eta = (filesize - numblocks * blocksize) / kbps_speed 

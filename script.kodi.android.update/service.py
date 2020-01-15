@@ -48,9 +48,9 @@ class Service(object):
     def deleteLast(self, lastPath):
         log('deleteLast')
         try:
-            xbmcvfs.delete(self.lastPath)
+            xbmcvfs.delete(lastPath)
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30007), ICON, 4000)
-        except Exception as e: log("deleteLast Failed! " + str(e), xbmc.LOGERROR)
+        except Exception as e: log("deleteLast Failed! " + e, xbmc.LOGERROR)
             
             
     def setSettings(self):
@@ -72,7 +72,7 @@ class Service(object):
                 if self.myMonitor.waitForAbort(1): return
                 build = platform.machine()
                 if len(build) > 0: return REAL_SETTINGS.setSetting("Platform",build)
-        except Exception as e: log("getVersion Failed! " + str(e), xbmc.LOGERROR)
+        except Exception as e: log("getVersion Failed! " + e, xbmc.LOGERROR)
               
               
     def getVersion(self):
@@ -84,7 +84,7 @@ class Service(object):
                 if self.myMonitor.waitForAbort(1): return
                 build = (xbmc.getInfoLabel('System.OSVersionInfo') or 'busy')
                 if build.lower() != 'busy': return REAL_SETTINGS.setSetting("Version",str(build))
-        except Exception as e: log("getVersion Failed! " + str(e), xbmc.LOGERROR)
+        except Exception as e: log("getVersion Failed! " + e, xbmc.LOGERROR)
         
         
 if __name__ == '__main__': Service()

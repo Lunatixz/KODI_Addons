@@ -91,7 +91,7 @@ def setUUID():
     REAL_SETTINGS.setSetting("deviceId",uuid.uuid4().hex[:18])
 
 def getUUID():
-    return REAL_SETTINGS.setSetting("sid",uuid.uuid1().hex[:18]), REAL_SETTINGS.setSetting("deviceId",uuid.uuid4().hex[:18])
+    return REAL_SETTINGS.getSetting("sid"), REAL_SETTINGS.getSetting("deviceId")
     
 def cookieJar():
     if not xbmcvfs.exists(COOKIE_JAR):
@@ -298,6 +298,7 @@ class PlutoTV(object):
                 
                 urls       = (item.get('stitched',{}).get('urls',[]) or urls)
                 if len(urls) == 0: continue
+                print 'urls',urls
                 if isinstance(urls, list): urls  = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
                 
                 try:

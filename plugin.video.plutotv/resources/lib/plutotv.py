@@ -85,13 +85,13 @@ def timezone():
     else: return time.timezone / -(60*60) * 100
     
 def setUUID():
-    if REAL_SETTINGS.getSetting("sid"): return
+    if REAL_SETTINGS.getSetting("sid1"): return
     log('setUUID, creating uuid')
-    REAL_SETTINGS.setSetting("sid",uuid.uuid1().hex[:18])
-    REAL_SETTINGS.setSetting("deviceId",uuid.uuid4().hex[:18])
+    REAL_SETTINGS.setSetting("sid1",str(uuid.uuid1()))
+    REAL_SETTINGS.setSetting("deviceId1",str(uuid.uuid4()))
 
 def getUUID():
-    return REAL_SETTINGS.getSetting("sid"), REAL_SETTINGS.getSetting("deviceId")
+    return REAL_SETTINGS.getSetting("sid1"), REAL_SETTINGS.getSetting("deviceId1")
     
 def cookieJar():
     if not xbmcvfs.exists(COOKIE_JAR):
@@ -298,7 +298,6 @@ class PlutoTV(object):
                 
                 urls       = (item.get('stitched',{}).get('urls',[]) or urls)
                 if len(urls) == 0: continue
-                print 'urls',urls
                 if isinstance(urls, list): urls  = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
                 
                 try:
@@ -469,7 +468,8 @@ class PlutoTV(object):
         
     def playVideo(self, name, url, liz=None):
         if url.lower() == 'next_show': return notificationDialog(LANGUAGE(30029), time=4000)
-        elif LANGUAGE(30019) not in url: url = LANGUAGE(30021)%(url,LANGUAGE(30020)%(getUUID()))
+        if 'sid' not in url: url = url.replace('deviceModel=&','deviceModel=&' + LANGUAGE(30022)%(getUUID()))
+        url = url.replace('deviceType=&','deviceType=web&').replace('deviceMake=&','deviceMake=Chrome&') .replace('deviceModel=&','deviceModel=Chrome&').replace('appName=&','appName=web&')#todo replace with regex!
         log('playVideo, url = %s'%url)
         if liz is None: liz = xbmcgui.ListItem(name, path=url)
         if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream() and not DEBUG:

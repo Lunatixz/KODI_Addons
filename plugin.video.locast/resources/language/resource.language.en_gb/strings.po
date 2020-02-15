@@ -95,3 +95,19 @@ msgstr ""
 msgctxt "#30020"
 msgid "Your City"
 msgstr ""
+
+msgctxt "#30021"
+msgid "Welcome Back, %s"
+msgstr ""
+
+msgctxt "#30022"
+msgid "Last Login"
+msgstr ""
+
+msgctxt "#30023"
+msgid "Donation Expired"
+msgstr ""
+
+msgctxt "#30024"
+msgid "User Information"
+msgstr ""

@@ -120,17 +120,16 @@ class Locast(object):
         else: return json.loads(cacheresponse)
 
 
-    def postURL(self, url, param={}, headers={}, life=datetime.timedelta(minutes=15)):
-        log('postURL, url = %s, headers = %s'%(url, headers))
-        cacheresponse = self.cache.get(ADDON_NAME + '.postURL, url = %s.%s.%s'%(url,param,headers))
+    def postURL(self, url, param={}, header={}, life=datetime.timedelta(minutes=15)):
+        log('postURL, url = %s, header = %s'%(url, header))
+        cacheresponse = self.cache.get(ADDON_NAME + '.postURL, url = %s.%s.%s'%(url,param,header))
         # if DEBUG: cacheresponse = None
         if not cacheresponse:
             try:#post
-                req = urllib.request(url, param, headers)
-                response = urllib.request.urlopen(req)
-                cacheresponse = json.load(response)
-                response.close()
-                self.cache.set(ADDON_NAME + '.postURL, url = %s.%s.%s'%(url,param,headers), json.dumps(cacheresponse), expiration=life)
+                req = requests.post(url, param, headers=header)
+                cacheresponse = req.json()
+                req.close()
+                self.cache.set(ADDON_NAME + '.postURL, url = %s.%s.%s'%(url,param,header), json.dumps(cacheresponse), expiration=life)
                 return cacheresponse
             except Exception as e: 
                 log("postURL, Failed! %s"%(e), xbmc.LOGERROR)
@@ -178,7 +177,7 @@ class Locast(object):
                     REAL_SETTINGS.setSetting('User_Donate',str(self.userdata.get('didDonate','False')))
                     REAL_SETTINGS.setSetting('User_LastLogin',datetime.datetime.fromtimestamp(float(str(self.userdata.get('lastlogin','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
                     self.lastDMA = self.userdata.get('lastDmaUsed','')
-                    notificationDialog(LANGUAGE(30021)%(userdata.get('name','')))
+                    notificationDialog(LANGUAGE(30021)%(self.userdata.get('name','')))
                     return True
             else: notificationDialog(LANGUAGE(30017)) 
         else:

@@ -672,7 +672,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.locast" version="1.0.8" name="Locast" provider-name="Lunatixz">
+<addon id="plugin.video.locast" version="1.0.8a" name="Locast" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.six" version="1.0.0"/>

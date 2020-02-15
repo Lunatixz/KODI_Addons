@@ -672,14 +672,16 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.locast" version="1.0.5" name="Locast" provider-name="Lunatixz">
+<addon id="plugin.video.locast" version="1.0.8" name="Locast" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.six" version="1.0.0"/>
         <import addon="script.module.requests" version="2.7.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="script.module.uepg" version="1.0.6"/>
         <import addon="script.module.inputstreamhelper" version="0.3.3"/>
     </requires>
+    <extension point="xbmc.service" library="pseudotv_recommended.py" start="login"/>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>
@@ -687,6 +689,7 @@
         <summary lang="en_GB">Locast is a public service to Americans, providing local broadcast signals over the Internet in select cities like New York, Philadelphia, Boston, Chicago, Houston and Dallas ...</summary>
         <description lang="en_GB">All you have to do is sign up online, provide your name and email address, and certify that you live in, and are logging on from, one of the select US cities (“Designated Market Area”). Then, you can select among local broadcasters and stream your favorite local station. Locast.org is a “digital translator,” meaning that Locast.org operates just like a traditional broadcast translator service, except instead of using an over-the-air signal to boost a broadcaster’s reach, we stream the signal over the Internet to consumers located within select US cities. Ever since the dawn of TV broadcasting in the mid-20th Century, non-profit organizations have provided “translator” TV stations as a public service. Where a primary broadcaster cannot reach a receiver with a strong enough signal, the translator amplifies that signal with another transmitter, allowing consumers who otherwise could not get the over-the-air signal to receive important programming, including local news, weather and of course, sports. Locast.org provides the same public service, except instead of an over-the-air signal transmitter, we provide the local broadcast signal via online streaming.</description>
         <platform>all</platform>
+        <news>v1.0.8[CR]- Updated to new API; Misc. fixes and tweaks</news>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.locast</source>
         <website>https://www.locast.org</website>
@@ -2068,6 +2071,33 @@
     </extension>
 </addon>
 
+<addon id="script.trumptweets" name="Trump Tweets!!" version="1.0.4a" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.feedparser" version="5.1.3"/>
+    </requires>
+    <extension point="xbmc.python.script" library="settings.py"/>
+    <extension point="xbmc.service" library="service.py" start="login"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Love'em... Hate'em... Trump Tweets!!</summary>
+        <description lang="en_GB">Keep yourself entertained and/or enlightened by the President of the United States tweets. Receive real-time twitter updates from @realDonaldTrump. 3D images provided royalty free by the talented Denys Almaral.</description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <website>https://twitter.com/realDonaldTrump</website>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/script.trumptweets</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=316555</forum>
+        <news>v.1.0.4a[CR]-Added More Images[CR]-Misc. Improvements[CR]-DEBUGGING MODE (DISABLE FOR NORMAL USE)[CR]v.1.0.4[CR]-Service Improvements[CR]v.1.0.3[CR]-Service Improvements[CR]v.1.0.2[CR]-Skin Tweaks[CR]v.1.0.1[CR]-Tweaked Timer, Code Cleanup</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="service.smartthings" version="1.0.5" name="Smartthings Monitor" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -2158,33 +2188,6 @@
     </extension>
 </addon>
 
-<addon id="script.trumptweets" name="Trump Tweets!!" version="1.0.4a" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.feedparser" version="5.1.3"/>
-    </requires>
-    <extension point="xbmc.python.script" library="settings.py"/>
-    <extension point="xbmc.service" library="service.py" start="login"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Love'em... Hate'em... Trump Tweets!!</summary>
-        <description lang="en_GB">Keep yourself entertained and/or enlightened by the President of the United States tweets. Receive real-time twitter updates from @realDonaldTrump. 3D images provided royalty free by the talented Denys Almaral.</description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <website>https://twitter.com/realDonaldTrump</website>
-        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/script.trumptweets</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=316555</forum>
-        <news>v.1.0.4a[CR]-Added More Images[CR]-Misc. Improvements[CR]-DEBUGGING MODE (DISABLE FOR NORMAL USE)[CR]v.1.0.4[CR]-Service Improvements[CR]v.1.0.3[CR]-Service Improvements[CR]v.1.0.2[CR]-Skin Tweaks[CR]v.1.0.1[CR]-Tweaked Timer, Code Cleanup</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="script.twittertweets" name="Twitter Tweets" version="1.0.4" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -2251,6 +2254,26 @@
     </extension>
 </addon>
 
+<addon id="script.module.pyfscache" version="0.9.14" name="File Cache" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.14.0" />
+    </requires>
+    <extension library="lib" point="xbmc.python.module" />
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_US"></summary>
+        <description lang="en_US">packed for kodi from https://github.com/jcstroud/pyfscache</description>
+        <disclaimer lang="en_US">packed for kodi from https://github.com/jcstroud/pyfscache</disclaimer>
+        <forum></forum>
+        <website>http://www.jamesstroud.com/software/pyfscache/</website>
+        <license>BSD</license>
+        <platform>all</platform>
+        <source>https://github.com/jcstroud/pyfscache</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="script.module.pylast" version="1.8.0" name="pyLastFM" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0" />
@@ -2290,26 +2313,6 @@
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.module.pyfscache" version="0.9.14" name="File Cache" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.14.0" />
-    </requires>
-    <extension library="lib" point="xbmc.python.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_US"></summary>
-        <description lang="en_US">packed for kodi from https://github.com/jcstroud/pyfscache</description>
-        <disclaimer lang="en_US">packed for kodi from https://github.com/jcstroud/pyfscache</disclaimer>
-        <forum></forum>
-        <website>http://www.jamesstroud.com/software/pyfscache/</website>
-        <license>BSD</license>
-        <platform>all</platform>
-        <source>https://github.com/jcstroud/pyfscache</source>
-        <assets>
-            <icon>icon.png</icon>
         </assets>
     </extension>
 </addon>

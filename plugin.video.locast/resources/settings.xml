@@ -4,6 +4,9 @@
     <setting id="User_Email"       type="text"   label="30006" default="" />
     <setting id="User_Password"    type="text"   label="30007" default=""  option="hidden"/>
     <setting id="User_Token"       type="text"   label="30002" default=""  visible="false"/>
-    <setting id="User_City"        type="text"   label="30020" default=""  enable="false" />
-    <setting id="User_Donate"      type="text"   label="30019" default=""  enable="false" />
+    <setting id=""                 type="lsep"   label="30024"      default="" />
+    <setting id="User_City"        type="text"   label="30020" default="Unknown"  enable="false" />
+    <setting id="User_LastLogin"   type="text"   label="30022" default="Unknown"  enable="false" />
+    <setting id="User_Donate"      type="text"   label="30019" default="Unknown"  enable="false" />
+    <setting id="User_DonateExpire"type="text"   label="30023" default="Unknown"  enable="false" />
 </settings>

@@ -16,8 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with OnTime.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, os, re, config, urlparse
+import sys, os, re, config
 import xbmc, xbmcplugin, xbmcaddon, xbmcgui, xbmcvfs
+
 from utils import *
 
 class Default(object):
@@ -26,7 +27,7 @@ class Default(object):
         self.sysARG = sysARG
     
     def getParams(self):
-        return dict(urlparse.parse_qsl(self.sysARG[2][1:]))
+        return dict(urllib.parse.parse_qsl(self.sysARG[2][1:]))
 
                 
     def run(self):  

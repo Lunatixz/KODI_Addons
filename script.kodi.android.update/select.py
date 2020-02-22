@@ -37,14 +37,14 @@ def log(msg, level=xbmc.LOGDEBUG):
 
 def selectDialog(label, items, pselect=-1, uDetails=False):
     select = xbmcgui.Dialog().select(label, items, preselect=pselect, useDetails=uDetails)
-    if select >= 0: return select
+    if select: return select
     return None
     
 class Select(object):
     def __init__(self):
         items  = xbmcvfs.listdir('androidapp://sources/apps/')[1]
         select = selectDialog(LANGUAGE(30020),items)
-        if select < 0: return #return on cancel.
+        if select is None: return #return on cancel.
         REAL_SETTINGS.setSetting("Custom_Manager","%s"%(items[select]))
 
 if __name__ == '__main__': Select()

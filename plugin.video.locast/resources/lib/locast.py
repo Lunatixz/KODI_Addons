@@ -30,7 +30,13 @@ try:
     from multiprocessing.pool import ThreadPool 
     ENABLE_POOL = True
 except: ENABLE_POOL = False
-
+        
+try:
+  basestring #py2
+except NameError: #py3
+  basestring = str
+  unicode = str
+  
 # Plugin Info
 ADDON_ID      = 'plugin.video.locast'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
@@ -60,7 +66,7 @@ MAIN_MENU     = [(LANGUAGE(30003), '' , 3),
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
+    xbmc.log('%s-%s-%s'%(ADDON_ID,ADDON_VERSION,msg), level)
     
 def uni(string1, encoding = 'utf-8'):
     if isinstance(string1, basestring):
@@ -91,7 +97,7 @@ def notificationDialog(message, header=ADDON_NAME, sound=False, time=1000, icon=
 socket.setdefaulttimeout(TIMEOUT) 
 class Locast(object):
     def __init__(self, sysARG):
-        log('__init__, sysARG = ' + str(sysARG))
+        log('__init__, sysARG = %s'%(sysARG))
         self.sysARG = sysARG
         self.cacheToDisc = True
         self.token   = (TOKEN or None)
@@ -105,7 +111,7 @@ class Locast(object):
     def getURL(self, url, param={}, header={}, life=datetime.timedelta(minutes=15)):
         log('getURL, url = %s, header = %s'%(url, header))
         cacheresponse = self.cache.get(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header))
-        # if DEBUG: cacheresponse = None
+        if DEBUG: cacheresponse = None
         if not cacheresponse:
             try:
                 req = requests.get(url, param, headers=header)
@@ -123,7 +129,7 @@ class Locast(object):
     def postURL(self, url, param={}, header={}, life=datetime.timedelta(minutes=15)):
         log('postURL, url = %s, header = %s'%(url, header))
         cacheresponse = self.cache.get(ADDON_NAME + '.postURL, url = %s.%s.%s'%(url,param,header))
-        # if DEBUG: cacheresponse = None
+        if DEBUG: cacheresponse = None
         if not cacheresponse:
             try:#post
                 req = requests.post(url, param, headers=header)
@@ -193,7 +199,7 @@ class Locast(object):
 
                                                                 
     def getEPG(self, city):
-        log("getEPG, city = " + city)
+        log("getEPG, city = %s"%city)
         '''[{"id":104,"dma":501,"name":"WCBSDT (WCBS-DT)","callSign":"WCBS","logoUrl":"https://fans.tmsimg.com/h5/NowShowing/28711/s28711_h5_aa.png","active":true,"affiliate":"CBS","affiliateName":"CBS",
              "listings":[{"stationId":104,"startTime":1535410800000,"duration":1800,"isNew":true,"audioProperties":"CC, HD 1080i, HDTV, New, Stereo","videoProperties":"CC, HD 1080i, HDTV, New, Stereo","programId":"EP000191906491","title":"Inside Edition","description":"Primary stories and alternative news.","entityType":"Episode","airdate":1535328000000,"genres":"Newsmagazine","showType":"Series"}]}'''
         now = ('{0:.23s}{1:s}'.format(datetime.datetime.now().strftime('%Y-%m-%dT00:00:00'),'-05:00'))
@@ -226,12 +232,12 @@ class Locast(object):
         
 
     def getStations(self, name, city, opt=None):
-        log("getStations, name = " + name + ", city = " + city + ", opt = " + str(opt))
+        log("getStations, name = %s, city = %s, opt = %s"%(name, city, opt))
         stations = self.getEPG(city)
         for station in stations:
             if station['active'] == False: continue
             path     = str(station['id'])
-            thumb    = station['logoUrl']
+            thumb    = (station.get('logoUrl','') or station.get('logo226Url','') or ICON)
             listings = station['listings']
             label    = (station.get('affiliateName','') or station.get('affiliate','') or station.get('callSign','') or station.get('name',''))
             stnum    = re.sub('[^\d\.]+','', label)
@@ -260,7 +266,7 @@ class Locast(object):
             
             
     def buildListings(self, listings, chname, chlogo, path, opt='uEPG'):
-        log('buildListings, chname = ' + chname + ', opt = ' + opt)
+        log('buildListings, chname = %s, opt = %s'%(chname,opt))
         now = datetime.datetime.now()
         for listing in listings:
             try: starttime  = datetime.datetime.fromtimestamp(int(str(listing['startTime'])[:-3]))
@@ -273,7 +279,7 @@ class Locast(object):
             except: aired = starttime
             try: type  = {'Series':'episode'}[listing.get('showType','Series')]
             except: type = 'video'
-            plot = (listing.get('description','') or label)
+            plot = (listing.get('description','') or listing.get('shortDescription','') or label)
             if now > endtime: continue
             elif opt == 'Live': 
                 chnum  = re.sub('[^\d\.]+','', chname)
@@ -287,10 +293,22 @@ class Locast(object):
                     label = '%s - [B]%s[/B]'%(starttime.strftime('%I:%M %p').lstrip('0'),label)
                 else: 
                     label = '%s - %s'%(starttime.strftime('%I:%M %p').lstrip('0'),label)
+                    
+            thumb      = (listing.get('preferredImage','') or chlogo)  
             infoLabels = {"mediatype":type,"label":label,"title":label,'duration':duration,'plot':plot,'genre':listing.get('genres',[]),"aired":aired.strftime('%Y-%m-%d')}
-            infoArt    = {"thumb":chlogo,"poster":chlogo,"fanart":FANART,"icon":chlogo,"logo":chlogo}
+            infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":chlogo,"logo":chlogo}
             infoVideo  = False #todo added more meta from listings, ie mpaa, isNew, video/audio codec
             infoAudio  = False #todo added more meta from listings, ie mpaa, isNew, video/audio codec
+            if type == 'episode':
+                infoLabels['tvshowtitle'] = listing.get('title',label)
+                if listing.get('seasonNumber',None):
+                    infoLabels['season']  = listing.get('seasonNumber',0)
+                    infoLabels['episode'] = listing.get('episodeNumber',0)
+                    seaep = '%sx%s'%(str(listing.get('seasonNumber','')).zfill(2),str(listing.get('episodeNumber','')).zfill(2))
+                    label = '%s - %s %s'%(label,seaep,listing.get('episodeTitle',''))
+                else: label = '%s %s'%(label,listing.get('episodeTitle',''))
+                infoLabels['title'] = label
+                infoLabels['label'] = label
             if opt == 'Live':
                 if now >= starttime and now < endtime: return self.addLink(label, path, 9, infoLabels, infoArt, infoVideo, infoAudio, total=len(listings))
                 else: continue
@@ -308,7 +326,7 @@ class Locast(object):
         chname     = (station.get('affiliateName','') or station.get('affiliate','') or station.get('callSign','') or station.get('name',''))
         chnum      = station['id']
         link       = str(chnum)
-        chlogo     = station['logoUrl']
+        chlogo     = (station.get('logoUrl','') or station.get('logo226Url','') or ICON)
         isFavorite = False
         guidedata  = []
         newChannel = {}
@@ -350,7 +368,7 @@ class Locast(object):
         
         
     def resolveURL(self, id):
-        log("resolveURL, id = " + str(id))
+        log("resolveURL, id = %s"%(id))
         '''{u'dma': 501, u'streamUrl': u'https://acdn.locastnet.org/variant/E27GYubZwfUs.m3u8', u'name': u'WNBCDT2', u'sequence': 50, u'stationId': u'44936', u'callSign': u'4.2 COZITV', u'logo226Url': u'https://fans.tmsimg.com/assets/s78851_h3_aa.png', u'logoUrl': u'https://fans.tmsimg.com/assets/s78851_h3_aa.png', u'active': True, u'id': 1574529688491L}''' 
         return self.getURL(BASE_API + '/watch/station/%s/%s/%s'%(id, self.lat, self.lon), header=self.buildHeader())
 
@@ -366,7 +384,7 @@ class Locast(object):
            
     def addLink(self, name, u, mode, infoList=False, infoArt=False, infoVideo=False, infoAudio=False, total=0):
         name = name.encode("utf-8")
-        log('addLink, name = ' + name)
+        log('addLink, name = %s'%name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'true')
         if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
@@ -381,7 +399,7 @@ class Locast(object):
 
     def addDir(self, name, u, mode, infoList=False, infoArt=False):
         name = name.encode("utf-8")
-        log('addDir, name = ' + name)
+        log('addDir, name = %s'%name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'false')
         if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
@@ -404,9 +422,9 @@ class Locast(object):
         except: name=None
         try: mode=int(params["mode"])
         except: mode=None
-        log("Mode: "+str(mode))
-        log("URL : "+str(url))
-        log("Name: "+str(name))
+        log("Mode: %s"%(mode))
+        log("URL : %s"%(url))
+        log("Name: %s"%(name))
 
         if mode==None:  self.buildMenu(self.getRegion())
         elif mode == 1: self.getStations(name, url)

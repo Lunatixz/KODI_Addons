@@ -19,6 +19,13 @@
 import sys, os, re, traceback, json, datetime, time, schedule, ast
 import xbmc, xbmcplugin, xbmcaddon, xbmcgui, xbmcvfs
 
+from six.moves import urllib
+try:
+  basestring #py2
+except NameError: #py3
+  basestring = str
+  unicode = str
+  
 # Plugin Info
 ADDON_ID       = 'service.ontime'
 REAL_SETTINGS  = xbmcaddon.Addon(id=ADDON_ID)

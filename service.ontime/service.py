@@ -111,7 +111,6 @@ class Service():
                 sing = item['type'] == 'single' #single - delete entry from json after eval
                 tag  = item['tag']
                 args = item['args']
-                print(date, sing, tag, args)
                 if sing == False: tag = ''
                 args.append(tag)
                 if job is None: continue
@@ -138,13 +137,14 @@ class Service():
             
            
     def serviceStart(self): 
-        self.loadMySchedule()
-        while not self.myMonitor.abortRequested():
-            if getProperty('MONITOR_INFOLABEL') == "True": getInfoLabel() #requires high sample rate
-            elif self.myMonitor.waitForAbort(5): break
-            elif xbmcgui.getCurrentWindowDialogId() == 10140: continue
-            elif getProperty('CONFIG_OPEN') == "True" or self.myMonitor.pendingChange == True: continue #don't run during change
-            else: schedule.run_pending()
+        print 'return'
+        # self.loadMySchedule()
+        # while not self.myMonitor.abortRequested():
+            # if getProperty('MONITOR_INFOLABEL') == "True": getInfoLabel() #requires high sample rate
+            # elif self.myMonitor.waitForAbort(5): break
+            # elif xbmcgui.getCurrentWindowDialogId() == 10140: continue
+            # elif getProperty('CONFIG_OPEN') == "True" or self.myMonitor.pendingChange == True: continue #don't run during change
+            # else: schedule.run_pending()
         
 if __name__ == '__main__': Service().serviceStart()
 

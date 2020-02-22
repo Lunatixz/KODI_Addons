@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.pyhdhr" version="1.0.7" name="pyHDHR" provider-name="Lunatixz">
+<addon id="script.module.pyhdhr" version="1.0.8" name="pyHDHR" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0" />
+        <import addon="script.module.six" version="1.0.0"/>
     </requires>
     <extension library="lib" point="xbmc.python.module" />
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">A Python interface for the HDHomeRun JSON API</summary>
         <description lang="en_GB">A Python interface for the HDHomeRun JSON API</description>
-        <forum>http://forum.kodi.tv</forum>
-        <website>https://www.silicondust.com/forum/viewtopic.php?t=42717</website>
         <license>MIT</license>
         <platform>all</platform>
+        <news>v.1.0.8[CR]- PY3[CR]</news>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pyhdhr</source>
         <assets>
             <icon>icon.png</icon>

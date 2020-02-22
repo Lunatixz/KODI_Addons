@@ -35,7 +35,7 @@ VER_QUERY     = '{"jsonrpc":"2.0","method":"Application.GetProperties","params":
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg.encode("utf-8")), level)
+    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg), level)
 
 class Service(object):
     def __init__(self):

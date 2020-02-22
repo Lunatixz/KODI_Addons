@@ -1,4 +1,4 @@
-#   Copyright (C) 2019 Lunatixz
+#   Copyright (C) 2020 Lunatixz
 #
 #
 # This file is part of Unsplash Photo ScreenSaver.
@@ -16,20 +16,22 @@
 # You should have received a copy of the GNU General Public License
 # along with Unsplash Photo ScreenSaver.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib, urllib2, socket, random, itertools
+import socket, random, itertools
 import xbmc, xbmcaddon, xbmcvfs, xbmcgui
+
+from six.moves import urllib
 
 # Plugin Info
 ADDON_ID       = 'screensaver.unsplash'
 REAL_SETTINGS  = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME     = REAL_SETTINGS.getAddonInfo('name')
 ADDON_VERSION  = REAL_SETTINGS.getAddonInfo('version')
-ADDON_PATH     = (REAL_SETTINGS.getAddonInfo('path').decode('utf-8'))
-SETTINGS_LOC   = REAL_SETTINGS.getAddonInfo('profile').decode('utf-8')
+ADDON_PATH     = REAL_SETTINGS.getAddonInfo('path')
+SETTINGS_LOC   = REAL_SETTINGS.getAddonInfo('profile')
 ENABLE_KEYS    = REAL_SETTINGS.getSetting("Enable_Keys") == 'true'
-KEYWORDS       = urllib.quote(REAL_SETTINGS.getSetting("Keywords").encode("utf-8"))
-USER           = REAL_SETTINGS.getSetting("User").encode("utf-8").replace('@','')
-COLLECTION     = REAL_SETTINGS.getSetting("Collection").encode("utf-8")
+KEYWORDS       = urllib.parse.quote(REAL_SETTINGS.getSetting("Keywords"))
+USER           = REAL_SETTINGS.getSetting("User").replace('@','')
+COLLECTION     = REAL_SETTINGS.getSetting("Collection")
 PHOTO_TYPE     = ['featured','random','user','collection'][int(REAL_SETTINGS.getSetting("PhotoType"))]
 BASE_URL       = 'https://source.unsplash.com'
 URL_PARAMS     = '/%s'%PHOTO_TYPE
@@ -38,12 +40,13 @@ ANIMATION      = 'okay' if REAL_SETTINGS.getSetting("Animate") == 'true' else 'n
 TIME           = 'okay' if REAL_SETTINGS.getSetting("Time") == 'true' else 'nope'
 OVERLAY        = 'okay' if REAL_SETTINGS.getSetting("Overlay") == 'true' else 'nope'
 IMG_CONTROLS   = [30000,30001]
-CYC_CONTROL    = itertools.cycle(IMG_CONTROLS).next
+try: CYC_CONTROL    = itertools.cycle(IMG_CONTROLS).__next__ #py3
+except: CYC_CONTROL = itertools.cycle(IMG_CONTROLS).next #py2
 KODI_MONITOR   = xbmc.Monitor()
 RES            = ['1280x720','1920x1080','3840x2160'][int(REAL_SETTINGS.getSetting("Resolution"))]
 
-if PHOTO_TYPE in ['featured','random']: IMAGE_URL = '%s%s/%s/?%s'%(BASE_URL, URL_PARAMS, RES, KEYWORDS if ENABLE_KEYS else BASE_URL + URL_PARAMS)
-elif PHOTO_TYPE == 'user': IMAGE_URL = '%s%s/%s/%s' %(BASE_URL, URL_PARAMS, USER, RES)
+if    PHOTO_TYPE in ['featured','random']: IMAGE_URL = '%s%s/%s/?%s'%(BASE_URL, URL_PARAMS, RES, KEYWORDS if ENABLE_KEYS else BASE_URL + URL_PARAMS)
+elif  PHOTO_TYPE == 'user': IMAGE_URL = '%s%s/%s/%s' %(BASE_URL, URL_PARAMS, USER, RES)
 else: IMAGE_URL = '%s%s/%s/%s' %(BASE_URL, URL_PARAMS, COLLECTION, RES)
     
 class GUI(xbmcgui.WindowXMLDialog):
@@ -82,7 +85,8 @@ class GUI(xbmcgui.WindowXMLDialog):
             if KODI_MONITOR.waitForAbort(TIMER) == True or self.isExiting == True: break
 
 
-    def onAction( self, action ):
+    def onAction(self, action):
+        self.log("onAction")
         self.isExiting = True
         self.close()
         
@@ -90,12 +94,11 @@ class GUI(xbmcgui.WindowXMLDialog):
     def openURL(self, url):
         try:
             self.log("openURL url = " + url)
-            request = urllib2.Request(url)
+            request = urllib.request.Request(url)
             request.add_header('User-Agent','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11')
-            page = urllib2.urlopen(request, timeout = 15)
+            page = urllib.request.urlopen(request, timeout = 15)
             url = page.geturl()
             self.log("openURL return url = " + url)
             return url
-        except urllib2.URLError as e: self.log("openURL Failed! " + str(e), xbmc.LOGERROR)
-        except socket.timeout as e: self.log("openURL Failed! " + str(e), xbmc.LOGERROR)
+        except Exception as e: self.log("openURL, Failed! " + str(e), xbmc.LOGERROR)
         return ''

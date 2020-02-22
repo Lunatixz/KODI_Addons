@@ -1,4 +1,4 @@
-#   Copyright (C) 2019 Lunatixz
+#   Copyright (C) 2020 Lunatixz
 #
 #
 # This file is part of Unsplash Photo ScreenSaver.
@@ -23,7 +23,7 @@ import xbmcaddon
 ADDON_ID       = 'screensaver.unsplash'
 REAL_SETTINGS  = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME     = REAL_SETTINGS.getAddonInfo('name')
-ADDON_PATH     = (REAL_SETTINGS.getAddonInfo('path').decode('utf-8'))
+ADDON_PATH     = REAL_SETTINGS.getAddonInfo('path')
 
 if __name__ == '__main__':
     ui = gui.GUI("default.xml", ADDON_PATH, "default")

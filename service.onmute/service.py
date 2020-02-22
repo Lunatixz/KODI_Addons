@@ -1,4 +1,4 @@
-#   Copyright (C) 2017 Lunatixz
+#   Copyright (C) 2020 Lunatixz
 #
 #
 # This file is part of OnMute
@@ -24,46 +24,41 @@ ADDON_ID = 'service.onmute'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 DEBUG = REAL_SETTINGS.getSetting('enableDebug') == "true"
-
+    
+try:
+  basestring #py2
+except NameError: #py3
+  basestring = str
+  unicode = str
+  
 def log(msg, level = xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR:
         return
     elif level == xbmc.LOGERROR:
         msg += ' ,' + traceback.format_exc()
     xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + str(msg), level)
-       
-def ascii(string):
+
+def uni(string, encoding='utf-8'):
     if isinstance(string, basestring):
-        if isinstance(string, unicode):
-           string = string.encode('ascii', 'ignore')
+        if not isinstance(string, unicode):
+           string = unicode(string, encoding)
+        else: 
+            string = string.encode('ascii', 'ignore')
     return string
     
-def uni(string):
-    if isinstance(string, basestring):
-        if isinstance(string, unicode):
-           string = string.encode('utf-8', 'ignore' )
-        else:
-           string = ascii(string)
-    return string
-     
-def loadJson(string):
-    if len(string) == 0:
-        return {}
-    try:
-        return json.loads(uni(string))
-    except:
-        return json.loads(ascii(string))
+def loadJSON(string):
+    try: 
+        return json.loads(string, strict=False)
+    except Exception as e: 
+        log("loadJSON failed! " + str(e), xbmc.LOGERROR)
+    return {}
         
-def dumpJson(mydict, sortkey=True):
-    return json.dumps(mydict, sort_keys=sortkey)
+def dumpJSON(mydict, sortkey=True):
+    if isinstance(string, basestring): return string
+    return (json.dumps(string, sort_keys=sortkey))
 
 def sendJSON(command):
-    data = ''
-    try:
-        data = xbmc.executeJSONRPC(uni(command))
-    except UnicodeEncodeError:
-        data = xbmc.executeJSONRPC(ascii(command))
-    return uni(data)
+    return loadJSON(xbmc.executeJSONRPC(command))
     
 class Player(xbmc.Player):
     def __init__(self):
@@ -142,7 +137,7 @@ class Service():
         # save user parsecaptions settings prior to change
         state = False
         json_query = '{"jsonrpc":"2.0","method":"Settings.GetSettingValue","params":{"setting":"subtitles.parsecaptions"}, "id": 1}'
-        json_responce = loadJson(sendJSON(json_query))
+        json_responce = sendJSON(json_query)
         if 'result' in json_responce and 'value' in json_responce:
             state = json_responce['result']['value']
         log("getCC = " + str(state))

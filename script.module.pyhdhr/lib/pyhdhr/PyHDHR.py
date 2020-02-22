@@ -19,8 +19,10 @@
 # -*- coding: utf-8 -*-
 # modified from original https://github.com/jumpmanjay/PyHDHR
 
-import time, string, urllib2, json, os, operator, re
+import time, string, json, os, operator, re
 import xbmc
+
+from six.moves import urllib
 from datetime import datetime
 from decimal import Decimal
 
@@ -602,7 +604,7 @@ class Tuner(BaseDevice):
             return True
         self.LastDiscover = time.time()
         try:
-            response = urllib2.urlopen(self.DiscoverURL,None,5)
+            response = urllib.request.urlopen(self.DiscoverURL,None,5)
             data = json.loads(response.read())
             
             if 'DeviceID' in data:

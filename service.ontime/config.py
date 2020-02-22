@@ -18,9 +18,10 @@
 
 import sys, os, re, traceback, json, time, datetime, schedule, ast, base64, random
 import xbmc, xbmcplugin, xbmcaddon, xbmcgui
+
 from utils import *
     
-class OnTime():
+class OnTime(object):
     def __init__(self):
         log('__init__')
         self.mySchedule  = getMySchedule()
@@ -37,10 +38,10 @@ class OnTime():
         if not self.mySchedule[0] == SETTING_TEMPT[0]: self.mySchedule.insert(0,SETTING_TEMPT[0])
         listitems = poolList(buildListItem, poolList(getItemInfo, self.mySchedule))
         listitems.insert(0, buildListItem(('+New Schedule', 'Create New Schedule', ICON, '', '')))
-        print('buildList', self.mySchedule, len(self.mySchedule), listitems, len(listitems))
+        print 'buildList', self.mySchedule, len(self.mySchedule), listitems, len(listitems)
         select = selectDialog(False, listitems, LANGUAGE(32026), preselect=foList)
         try:
-            print('buildList newitem', select)
+            print 'buildList newitem', select
             if select is None: setMySchedule(self.mySchedule)
             elif select == 0: self.buildNew(select)
             else: self.buildItem(select)
@@ -52,7 +53,7 @@ class OnTime():
         item = self.mySchedule[idx]
         log('buildNew, item = ' + str(item))
         for config in list(self.configItems.values()): config(item)
-        print('buildNew', self.mySchedule, len(self.mySchedule), item)
+        print 'buildNew', self.mySchedule, len(self.mySchedule), item
         self.mySchedule = setMySchedule(self.mySchedule)
         self.buildList(len(self.mySchedule))
         

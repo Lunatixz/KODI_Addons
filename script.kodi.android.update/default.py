@@ -16,18 +16,19 @@
 # -*- coding: utf-8 -*-
 
 import os, time, datetime, traceback, re
-import urllib, urllib2, socket, json
+import socket, json
 import xbmc, xbmcgui, xbmcvfs, xbmcaddon
 
 from bs4 import BeautifulSoup
 from simplecache import SimpleCache
+from six.moves import urllib
 
 # Plugin Info
 ADDON_ID      = 'script.kodi.android.update'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME    = REAL_SETTINGS.getAddonInfo('name')
-SETTINGS_LOC  = '/storage/emulated/0/download' # REAL_SETTINGS.getAddonInfo('profile').decode('utf-8')
-ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path').decode('utf-8')
+SETTINGS_LOC  = '/storage/emulated/0/download'
+ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path')
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 ICON          = REAL_SETTINGS.getAddonInfo('icon')
 FANART        = REAL_SETTINGS.getAddonInfo('fanart')
@@ -59,7 +60,7 @@ else: PLATFORM = "arm"
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg.encode("utf-8")), level)
+    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg), level)
 
 def selectDialog(label, items, pselect=-1, uDetails=True):
     select = xbmcgui.Dialog().select(label, items, preselect=pselect, useDetails=uDetails)
@@ -99,8 +100,8 @@ class Installer(object):
         try:
             cacheResponce = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
             if not cacheResponce:
-                request = urllib2.Request(url)
-                cacheResponce = urllib2.urlopen(request, timeout = TIMEOUT).read()
+                request = urllib.request.Request(url)
+                cacheResponce = urllib.request.urlopen(request, timeout = TIMEOUT).read()
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheResponce, expiration=datetime.timedelta(minutes=5))
             return BeautifulSoup(cacheResponce, "html.parser")
         except Exception as e:
@@ -122,7 +123,7 @@ class Installer(object):
         tmpLST = []
         for label in sorted(BUILD_OPT.keys()): tmpLST.append(xbmcgui.ListItem(label.title(),BUILD_OPT[label],ICON,path=DROID_URL%(label,PLATFORM)))
         select = selectDialog(ADDON_NAME, tmpLST)
-        if select < 0: return #return on cancel.
+        if select is None: return #return on cancel.
         return tmpLST[select].getPath()
         
             
@@ -135,7 +136,7 @@ class Installer(object):
                 if label == PLATFORM: label2 = LANGUAGE(30014)%PLATFORM
                 elif label.lower() == BRANCH.lower(): label2 = LANGUAGE(30022)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
                 else: label2 = '' #Don't use time-stamp for folders
-                yield (xbmcgui.ListItem(label.title(),label2,ICON,path=(url + label)))
+                yield (xbmcgui.ListItem(label.title(),label2,ICON,ICON,path=(url + label)))
             except: #files
                 label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
                 if '.apk' in label: yield (xbmcgui.ListItem('%s.apk'%label.split('.apk')[0],'%s %s'%(label.split('.apk')[1], label2.replace('MiB','MB ').strip()),ICON,path='%s%s.apk'%(url,label.split('.apk')[0])))
@@ -154,7 +155,7 @@ class Installer(object):
             if len(items) == 0: break
             elif len(items) == 2 and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().startswith('.apk'): select = 1 #If one folder bypass selection.
             else: select = selectDialog(url.replace(BASE_URL,'./').replace('//','/'), items)
-            if select < 0: return #return on cancel.
+            if select is None: return #return on cancel.
             label  = items[select].getLabel()
             newURL = items[select].getPath()
             preURL = url.rsplit('/', 2)[0] + '/'
@@ -193,7 +194,7 @@ class Installer(object):
         dia = xbmcgui.DialogProgress()
         fle = dest.rsplit('/', 1)[1]
         dia.create(ADDON_NAME, LANGUAGE(30002)%fle)
-        try: urllib.urlretrieve(url.rstrip('/'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time, fle))
+        try: urllib.request.urlretrieve(url.rstrip('/'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time, fle))
         except Exception as e:
             dia.close()
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
@@ -218,9 +219,11 @@ class Installer(object):
             label2  = '%.02f MB of %.02f MB'%(currently_downloaded,total)
             label2 += ' | [B]Speed:[/B] %.02f Kb/s'%kbps_speed
             label2 += ' | [B]ETA:[/B] %02d:%02d'%eta
-            dia.update(percent, label, fle, label2)
-        except Exception('Download Failed'): dia.update(100)
-        if dia.iscanceled(): raise Exception('Download Canceled')
+            dia.update(int(percent), label, fle, label2)
+        except Exception as e: 
+            log("pbhook failed! %s" + str(e), xbmc.LOGERROR)
+            dia.update(100)
+        if dia.iscanceled(): raise Exception
             
             
     def installAPK(self, apkfile):

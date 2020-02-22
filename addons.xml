@@ -672,7 +672,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.locast" version="1.0.8a" name="Locast" provider-name="Lunatixz">
+<addon id="plugin.video.locast" version="1.0.8b" name="Locast" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -681,10 +681,10 @@
         <import addon="script.module.uepg" version="1.0.6"/>
         <import addon="script.module.inputstreamhelper" version="0.3.3"/>
     </requires>
-    <extension point="xbmc.service" library="pseudotv_recommended.py" start="login"/>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>
+    <extension point="xbmc.service" library="pseudotv_recommended.py" start="login"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Locast is a public service to Americans, providing local broadcast signals over the Internet in select cities like New York, Philadelphia, Boston, Chicago, Houston and Dallas ...</summary>
         <description lang="en_GB">All you have to do is sign up online, provide your name and email address, and certify that you live in, and are logging on from, one of the select US cities (“Designated Market Area”). Then, you can select among local broadcasters and stream your favorite local station. Locast.org is a “digital translator,” meaning that Locast.org operates just like a traditional broadcast translator service, except instead of using an over-the-air signal to boost a broadcaster’s reach, we stream the signal over the Internet to consumers located within select US cities. Ever since the dawn of TV broadcasting in the mid-20th Century, non-profit organizations have provided “translator” TV stations as a public service. Where a primary broadcaster cannot reach a receiver with a strong enough signal, the translator amplifies that signal with another transmitter, allowing consumers who otherwise could not get the over-the-air signal to receive important programming, including local news, weather and of course, sports. Locast.org provides the same public service, except instead of an over-the-air signal transmitter, we provide the local broadcast signal via online streaming.</description>
@@ -1477,9 +1477,10 @@
     </extension>
 </addon>
 
-<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.1.7" provider-name="Team Kodi">
+<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.1.8" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.24.0"/>
+        <import addon="script.module.six" version="1.0.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="script.module.beautifulsoup4" version="4.3.2"/>
     </requires>
@@ -1489,11 +1490,11 @@
         <summary lang="en_GB">Download and Install Kodi packages.</summary>
         <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>android</platform>
+        <platform>all</platform>
         <website>http://kodi.tv</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.android.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=322783</forum>
-        <news>v1.1.1[CR]-Temp Fix[CR]v1.1.0[CR]-Crash Fix[CR]v1.0.9[CR]-Improved UI[CR]v1.0.5[CR]-Moved to Jarvis[CR]-Android Platform Detection[CR]-Streamlined Navigation[CR]v1.0.4[CR]-Android Version Detection[CR]- Improved Error Handling[CR]v1.0.3[CR]-Improved functionality[CR]v1.0.1[CR]-Added After Install Cleanup.</news>
+        <news>v1.1.8[CR]-PY3[CR]v1.1.1[CR]-Temp Fix[CR]v1.1.0[CR]-Crash Fix[CR]v1.0.9[CR]-Improved UI[CR]v1.0.5[CR]-Moved to Jarvis[CR]-Android Platform Detection[CR]-Streamlined Navigation[CR]v1.0.4[CR]-Android Version Detection[CR]- Improved Error Handling[CR]v1.0.3[CR]-Improved functionality[CR]v1.0.1[CR]-Added After Install Cleanup.</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -1505,9 +1506,10 @@
     </extension>
 </addon>
 
-<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.1.1" provider-name="Team Kodi">
+<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.1.3" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.six" version="1.0.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="script.module.beautifulsoup4" version="4.3.2"/>
     </requires>
@@ -1522,7 +1524,7 @@
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.windows.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=325226</forum>
         <disclaimer lang="en_GB">UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
-        <news>v1.0.7[CR]-UI Update[CR]v1.0.6[CR]-Fixed Listings[CR]v1.0.5[CR]-Improved UWP Detection[CR]v1.0.4[CR]-Improved UI[CR]v1.0.2[CR]-WIndows Platform Detection[CR]-Streamlined Navigation[CR]-Windows Version Detection[CR]v1.0.1[CR]-Improved functionality</news>
+        <news>v1.1.3[CR]-PY3[CR]v1.0.7[CR]-UI Update[CR]v1.0.6[CR]-Fixed Listings[CR]v1.0.5[CR]-Improved UWP Detection[CR]v1.0.4[CR]-Improved UI[CR]v1.0.2[CR]-WIndows Platform Detection[CR]-Streamlined Navigation[CR]-Windows Version Detection[CR]v1.0.1[CR]-Improved functionality</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -1551,18 +1553,18 @@
     </extension>
 </addon>
 
-<addon id="script.module.pyhdhr" version="1.0.7" name="pyHDHR" provider-name="Lunatixz">
+<addon id="script.module.pyhdhr" version="1.0.8" name="pyHDHR" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0" />
+        <import addon="script.module.six" version="1.0.0"/>
     </requires>
     <extension library="lib" point="xbmc.python.module" />
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">A Python interface for the HDHomeRun JSON API</summary>
         <description lang="en_GB">A Python interface for the HDHomeRun JSON API</description>
-        <forum>http://forum.kodi.tv</forum>
-        <website>https://www.silicondust.com/forum/viewtopic.php?t=42717</website>
         <license>MIT</license>
         <platform>all</platform>
+        <news>v.1.0.8[CR]- PY3[CR]</news>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pyhdhr</source>
         <assets>
             <icon>icon.png</icon>
@@ -1721,7 +1723,7 @@
     </extension>
 </addon>
 
-<addon id="service.onmute" version="0.0.2" name="OnMute" provider-name="Lunatixz">
+<addon id="service.onmute" version="0.0.3" name="OnMute" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
     </requires>
@@ -1732,8 +1734,9 @@
         <description lang="en_GB">Let "OnMute" toggle closed captioning and subtitles while Kodi is muted.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.onmute</source>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.onmute</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=334361</forum>
+        <news>v.0.0.3[CR]-PY3</news>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>
@@ -1763,9 +1766,10 @@
     </extension>
 </addon>
 
-<addon id="service.ontime" version="0.0.1b" name="OnTime" provider-name="Lunatixz">
+<addon id="service.ontime" version="0.0.1c" name="OnTime" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.six" version="1.0.0"/>
         <import addon="script.module.schedule" version="0.5.0"/>
     </requires>
     <extension point="xbmc.python.script" library="config.py"/>
@@ -1778,8 +1782,9 @@
         <description lang="en_GB">Let "OnTime" manage your viewing habits using schedule playback.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.ontime</source>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.ontime</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=334619</forum>
+        <news></news>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>
@@ -2045,21 +2050,22 @@
     </extension>
 </addon>
 
-<addon id="screensaver.unsplash" name="Unsplash Photo Screensaver" version="1.0.5" provider-name="Lunatixz">
+<addon id="screensaver.unsplash" name="Unsplash Photo Screensaver" version="1.0.6a" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.six" version="1.0.0"/>
     </requires>
     <extension point="xbmc.ui.screensaver" library="default.py"/>
     <extension point="xbmc.python.script"  library="default.py"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</summary>
-        <description lang="en_GB"></description>
+        <description lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <website>https://unsplash.com/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=320095</forum>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.unsplash</source>
-        <news>v.1.0.4[CR]- Added "Preferred Resolution" setting.[CR]v.1.0.3[CR]- Leia compatibility.[CR]v.1.0.2[CR]- Added Image pre-cashing and fallback.[CR]v.1.0.1[CR]- Added User and Collection Mode</news>
+        <news>v.1.0.6[CR]- Python3[CR]v.1.0.4[CR]- Added "Preferred Resolution" setting.[CR]v.1.0.3[CR]- Leia compatibility.[CR]v.1.0.2[CR]- Added Image pre-cashing and fallback.[CR]v.1.0.1[CR]- Added User and Collection Mode</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

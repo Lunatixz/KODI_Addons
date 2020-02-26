@@ -31,7 +31,7 @@ FANART         = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE       = REAL_SETTINGS.getLocalizedString
 DEBUG          = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 
-USER_IDLE           = 1#int(REAL_SETTINGS.getSetting('User_Idle_Min'))
+USER_IDLE           = int(REAL_SETTINGS.getSetting('User_Idle_Min'))
 USER_COUNTDOWN      = int(REAL_SETTINGS.getSetting('User_Countdown_Sec'))
 USER_IGNORE_MUSIC   = REAL_SETTINGS.getSetting('Ignore_Music') == "true"
 USER_SOFT_MUTE      = REAL_SETTINGS.getSetting('Soft_Mute') == "true"

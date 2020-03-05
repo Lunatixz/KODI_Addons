@@ -1813,6 +1813,29 @@
     </extension>
 </addon>
 
+<addon id="service.tvthemes" version="0.0.2" name="TV Themes" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.pydub" version="0.23.1"/>
+    </requires>
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB"></summary>
+        <description lang="en_GB"></description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.tvthemes</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=348533</forum>
+        <disclaimer lang="en_GB"></disclaimer>
+        <news></news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.video.theverge" version="1.0.0" name="The Verge - YouTube" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -2131,25 +2154,22 @@
     </extension>
 </addon>
 
-<addon id="service.tvthemes" version="0.0.2" name="TV Themes" provider-name="Lunatixz">
+<addon id="script.enableit" version="0.0.3" name="Enable it!" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.pydub" version="0.23.1"/>
+        <import addon="script.module.simplejson" version="3.3.0"/>
     </requires>
-    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.python.script" library="default.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
-        <description lang="en_GB"></description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <summary lang="en">Enable, disabled plugins...</summary>
+        <description lang="en">Kodi Krypton 17.x disables all plugins manually installed, This plugin enables all plugins within user parameters.</description>
+        <disclaimer lang="en">This software is a BETA release, bugs maybe common until final release.</disclaimer>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.tvthemes</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=348533</forum>
-        <disclaimer lang="en_GB"></disclaimer>
-        <news></news>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/script.enableit</source>
         <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
         </assets>
     </extension>
 </addon>
@@ -2318,29 +2338,6 @@
 		<assets>
 			<icon>icon.png</icon>
 		</assets>
-    </extension>
-</addon>
-
-<addon id="script.enableit" version="0.0.2" name="Enable it!" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplejson" version="3.3.0"/>
-    </requires>
-    <extension point="xbmc.python.script" library="default.py"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en">Enable, disabled plugins...</summary>
-        <description lang="en">Kodi Krypton 17.x disables all plugins manually installed, This plugin enables all plugins within user parameters.</description>
-        <disclaimer lang="en">This software is a BETA release, bugs maybe common until final release.</disclaimer>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.enableit</source>
-        <email>pseudotvlive@gmail.com</email>
-        <website>http://pseudotvlive.com</website>
-        <forum>http://pseudotvlive.com</forum>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-        </assets>
     </extension>
 </addon>
 

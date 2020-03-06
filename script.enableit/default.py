@@ -33,32 +33,39 @@ def get_Kodi_Plugin_State(type,content,enabled="false"):
 
 if xbmcgui.Dialog().yesno(ADDON_NAME,LANGUAGE(30006)):
     details = []
-    dlg     = xbmcgui.DialogProgress()
-    dlg.create(ADDON_NAME)
     Content_pselect = REAL_SETTINGS.getSetting('PreSelect_CONTENTS').split('|')
     Content_Items   = [citem for idx, citem in enumerate(CONTENTS) if str(idx) in Content_pselect]
     Types_pselect   = REAL_SETTINGS.getSetting('PreSelect_CONTENT_TYPES').split('|')
     Types_Items     = [citem for idx, citem in enumerate(CONTENT_TYPES) if str(idx) in Types_pselect]
 
-    for content in Content_Items:
-        for idx, type in enumerate(Types_Items):
-            if (dlg.iscanceled()):
-                dlg.close()
-                break
-            dlg.update(idx * 100 // len(Types_Items))
-            if ENABLE: details.append(get_Kodi_Plugin_State(type,content,"false"))
-            else: details.append(get_Kodi_Plugin_State(type,content,"true"))
+    if len(Content_Items) == 0: 
+        xbmcgui.Dialog().ok(ADDON_NAME, LANGUAGE(30008), LANGUAGE(30009), LANGUAGE(30010))
+        REAL_SETTINGS.openSettings()
+    else:
+        if ENABLE: msg = 'Enabling'
+        else: msg = 'Disabling'
             
-    for count, json_response in enumerate(details):
-        if 'result' in json_response:
-            items = json_response['result']['addons']
-            for item in items:
+        dlg = xbmcgui.DialogProgress()
+        dlg.create(ADDON_NAME)
+        for content in Content_Items:
+            for idx, type in enumerate(Types_Items):
                 if (dlg.iscanceled()):
                     dlg.close()
                     break
-                dlg.update((count * 100 // len(items)),'Checking: %s'%item['type'],'Enabling: %s'%item['addonid'])
-                if ENABLE: set_Kodi_Plugin_State(item['addonid'],"true")
-                else: set_Kodi_Plugin_State(item['addonid'],"false")
-                xbmc.sleep(10)
-    dlg.update(100)
-    dlg.close()
+                dlg.update(idx * 100 // len(Types_Items))
+                if ENABLE: details.append(get_Kodi_Plugin_State(type,content,"false"))
+                else: details.append(get_Kodi_Plugin_State(type,content,"true"))
+                
+        for count, json_response in enumerate(details):
+            if 'result' in json_response:
+                items = json_response['result'].get('addons',[])
+                for item in items:
+                    if (dlg.iscanceled()):
+                        dlg.close()
+                        break
+                    dlg.update((count * 100 // len(items)),'Checking: %s'%item['type'],'%s: %s'%(msg,item['addonid']))
+                    if ENABLE: set_Kodi_Plugin_State(item['addonid'],"true")
+                    else: set_Kodi_Plugin_State(item['addonid'],"false")
+                    xbmc.sleep(10)
+        dlg.update(100)
+        dlg.close()

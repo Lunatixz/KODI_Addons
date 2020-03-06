@@ -34,11 +34,16 @@ class Select():
         pselect = [-1]
         items   = {'CONTENTS'      :CONTENTS,
                    'CONTENT_TYPES' :CONTENT_TYPES}[param]
-        if param   == 'CONTENTS': pselect = list(map(int, REAL_SETTINGS.getSetting('PreSelect_CONTENTS').split('|')))
-        elif param == 'CONTENT_TYPES': pselect = list(map(int, REAL_SETTINGS.getSetting('PreSelect_CONTENT_TYPES').split('|')))
+        if param   == 'CONTENTS': 
+            try: pselect = list(map(int, REAL_SETTINGS.getSetting('PreSelect_CONTENTS').split('|')))
+            except: pass
+        elif param == 'CONTENT_TYPES': 
+            try: pselect = list(map(int, REAL_SETTINGS.getSetting('PreSelect_CONTENT_TYPES').split('|')))
+            except: pass
         select = selectDialog(LANGUAGE(30004),items, pselect=pselect)
-        if not select: return #return on cancel.
-        REAL_SETTINGS.setSetting("PreSelect_%s"%(param),'|'.join(map(str, select)))
+        try: sselect = '|'.join(map(str, select))
+        except: sselect = ''
+        REAL_SETTINGS.setSetting("PreSelect_%s"%(param),sselect)
         REAL_SETTINGS.openSettings()
             
 if __name__ == '__main__': Select(sys.argv).run()

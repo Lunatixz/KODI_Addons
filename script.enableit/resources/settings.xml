@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
 	<category label="30005">
+        <setting id="Enable"               type="enum"   label="30007" default="0" values="Enable|Disable"/>
         <setting id="Select_CONTENTS"      type="action" label="30002" default=""  action="RunScript($CWD/select.py, CONTENTS)"      option="close" />
         <setting id="Select_CONTENT_TYPES" type="action" label="30003" default=""  action="RunScript($CWD/select.py, CONTENT_TYPES)" option="close" />
     </category> 

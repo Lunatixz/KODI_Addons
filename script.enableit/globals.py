@@ -29,7 +29,7 @@ ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 ICON          = os.path.join(ADDON_PATH, 'icon.png')
 FANART        = os.path.join(ADDON_PATH, 'fanart.jpg')
 LANGUAGE      = REAL_SETTINGS.getLocalizedString
-ENABLE        = True #REAL_SETTINGS.getSetting('Enable') == "0" #todo allow user to disable too
+ENABLE        = REAL_SETTINGS.getSetting('Enable') == "0"
 
 CONTENTS = ["unknown",
             "video",

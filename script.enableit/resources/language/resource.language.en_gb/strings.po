@@ -43,3 +43,19 @@ msgstr "
 msgctxt "#30006"
 msgid "Enable selected plugins?"
 msgstr "
+
+msgctxt "#30007"
+msgid "Mode"
+msgstr "
+
+msgctxt "#30008"
+msgid "Plugin not configured!"
+msgstr "
+
+msgctxt "#30009"
+msgid "Please configure, then run again..."
+msgstr "
+
+msgctxt "#30010"
+msgid ""
+msgstr "

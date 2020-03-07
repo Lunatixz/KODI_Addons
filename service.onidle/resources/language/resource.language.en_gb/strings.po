@@ -91,3 +91,11 @@ msgstr ""
 msgctxt "#32019"
 msgid "Sleeping in %s seconds"
 msgstr ""
+
+msgctxt "#32020"
+msgid "Run Manually"
+msgstr ""
+
+msgctxt "#32021"
+msgid "Test Action"
+msgstr ""

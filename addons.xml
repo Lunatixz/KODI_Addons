@@ -1744,7 +1744,7 @@
     </extension>
 </addon>
 
-<addon id="service.onidle" version="0.0.2" name="OnIdle" provider-name="Lunatixz">
+<addon id="service.onidle" version="0.0.4" name="OnIdle" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.26.0"/>
     </requires>
@@ -1752,12 +1752,12 @@
     <extension point="xbmc.service" library="service.py" start="startup"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Idle Sleep Timer</summary>
-        <description lang="en_GB">Idle Sleep Timer</description>
+        <description lang="en_GB">Trigger Kodi actions when idle while playing.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.onidle</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=</forum>
-        <news></news>
+        <forum>https://forum.kodi.tv/showthread.php?tid=352082</forum>
+        <news>v.0.0.4[CR]- Added Test Button</news>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>

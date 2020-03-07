@@ -20,17 +20,18 @@ import time, traceback, json
 import xbmc, xbmcgui, xbmcaddon
 
 # Plugin Info
-ADDON_ID       = 'service.onidle'
-REAL_SETTINGS  = xbmcaddon.Addon(id=ADDON_ID)
-ADDON_NAME     = REAL_SETTINGS.getAddonInfo('name')
-SETTINGS_LOC   = REAL_SETTINGS.getAddonInfo('profile')
-ADDON_PATH     = REAL_SETTINGS.getAddonInfo('path')
-ADDON_VERSION  = REAL_SETTINGS.getAddonInfo('version')
-ICON           = REAL_SETTINGS.getAddonInfo('icon')
-FANART         = REAL_SETTINGS.getAddonInfo('fanart')
-LANGUAGE       = REAL_SETTINGS.getLocalizedString
-DEBUG          = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
+ADDON_ID            = 'service.onidle'
+REAL_SETTINGS       = xbmcaddon.Addon(id=ADDON_ID)
+ADDON_NAME          = REAL_SETTINGS.getAddonInfo('name')
+SETTINGS_LOC        = REAL_SETTINGS.getAddonInfo('profile')
+ADDON_PATH          = REAL_SETTINGS.getAddonInfo('path')
+ADDON_VERSION       = REAL_SETTINGS.getAddonInfo('version')
+ICON                = REAL_SETTINGS.getAddonInfo('icon')
+FANART              = REAL_SETTINGS.getAddonInfo('fanart')
+LANGUAGE            = REAL_SETTINGS.getLocalizedString
+DEBUG               = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 
+USER_MANUAL_RUN     = REAL_SETTINGS.getSetting('Manual_Run') == 'true'
 USER_IDLE           = int(REAL_SETTINGS.getSetting('User_Idle_Min'))
 USER_COUNTDOWN      = int(REAL_SETTINGS.getSetting('User_Countdown_Sec'))
 USER_IGNORE_MUSIC   = REAL_SETTINGS.getSetting('Ignore_Music') == "true"
@@ -62,6 +63,25 @@ def uni(string, encoding='utf-8'):
         else: string = string.encode('ascii', 'ignore')
     return string
 
+def getProperty(key, id=10000):
+    try: 
+        key = '%s.%s'%(ADDON_NAME,key)
+        value = xbmcgui.Window(id).getProperty(key)
+        if value: log("getProperty, key = " + key + ", value = " + value)
+        return value
+    except Exception as e: return ''
+          
+def setProperty(key, value, id=10000):
+    key = '%s.%s'%(ADDON_NAME,key)
+    if not isinstance(value, basestring): value = str(value)
+    log("setProperty, key = " + key + ", value = " + value)
+    try: xbmcgui.Window(id).setProperty(key, value)
+    except Exception as e: log("setProperty, Failed! " + str(e), xbmc.LOGERROR)
+
+def clearProperty(key, id=10000):
+    key = '%s.%s'%(ADDON_NAME,key)
+    xbmcgui.Window(id).clearProperty(key)
+    
 def getIdle(min=True):
     idleTime = xbmc.getGlobalIdleTime()
     if min: return int(idleTime)/60
@@ -74,6 +94,9 @@ def getVol():
     response = json.loads(xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Application.GetProperties", "params": { "properties": [ "volume"] }, "id": 1}'))
     if response and "result" in response: return response.get("result",{}).get("volume",None)
     return None
+
+def getIdleTime():
+    return (getProperty('USER_IDLE') or USER_IDLE)
 
 class Player(xbmc.Player):
     def __init__(self):
@@ -141,17 +164,22 @@ class Service(object):
         while self.myPlayer.isPlaying():
             if self.myMonitor.waitForAbort(1): break
         xbmc.executebuiltin('SetVolume(%d,showVolumeBar)' % (curVol))
+        clearProperty('USER_IDLE')
         xbmc.executebuiltin(USER_EXIT_ACTION)
-
-
+        
+        
     def startService(self):
         log('startService')
         while not self.myMonitor.abortRequested():
             if self.myMonitor.waitForAbort(5): break
             if not self.myPlayer.isPlaying() or self.myMonitor.activeScreensaver: continue #ignore when not playing or during screensaver.
             idleTime = getIdle()
-            if idleTime >= USER_IDLE:
+            if idleTime >= getIdleTime():
                 if self.checkShutdown(idleTime): self.startShutdown()
                 else: continue
+                    
+                    
+    # def run(self):
+        # if not USER_MANUAL_RUN: 
         
 if __name__ == '__main__': Service().startService()

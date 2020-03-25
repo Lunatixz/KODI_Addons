@@ -30,7 +30,6 @@ ICON                = REAL_SETTINGS.getAddonInfo('icon')
 FANART              = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE            = REAL_SETTINGS.getLocalizedString
 DEBUG               = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-
 USER_MANUAL_RUN     = REAL_SETTINGS.getSetting('Manual_Run') == 'true'
 USER_IDLE           = int(REAL_SETTINGS.getSetting('User_Idle_Min'))
 USER_COUNTDOWN      = int(REAL_SETTINGS.getSetting('User_Countdown_Sec'))
@@ -141,18 +140,17 @@ class Service(object):
         log('checkShutdown')
         if USER_IGNORE_MUSIC and self.myPlayer.isPlayingAudio(): return False
         diaProgress = xbmcgui.DialogProgress()
-        ret         = diaProgress.create(ADDON_NAME,LANGUAGE(32017))
+        diaProgress.create(ADDON_NAME,LANGUAGE(32017))
         secs        = 0
         percent     = 0
         increment   = 100*100 / USER_COUNTDOWN
-        cancelled   = False
-        while secs < USER_COUNTDOWN:
+        while not self.myMonitor.abortRequested() and secs < USER_COUNTDOWN:
+            if (diaProgress.iscanceled() or (idleTime > getIdle())): return False
             secs     = secs + 1
             percent  = int(increment*secs/100)
             waitTime = (USER_COUNTDOWN - secs)
             diaProgress.update(percent,LANGUAGE(32018),LANGUAGE(32019)%(waitTime))
             xbmc.sleep(1000)
-            if (diaProgress.iscanceled() or (idleTime > getIdle())): return False
         diaProgress.close()
         return True
 
@@ -174,12 +172,10 @@ class Service(object):
             if self.myMonitor.waitForAbort(5): break
             if not self.myPlayer.isPlaying() or self.myMonitor.activeScreensaver: continue #ignore when not playing or during screensaver.
             idleTime = getIdle()
-            if idleTime >= getIdleTime():
+            waitTime = getIdleTime()
+            if waitTime == 0: continue # 0 wait == disable
+            elif idleTime >= getIdleTime():
                 if self.checkShutdown(idleTime): self.startShutdown()
                 else: continue
                     
-                    
-    # def run(self):
-        # if not USER_MANUAL_RUN: 
-        
 if __name__ == '__main__': Service().startService()

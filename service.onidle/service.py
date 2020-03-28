@@ -129,9 +129,8 @@ class Service(object):
     def softMute(self, curVol):
         log('softMute')
         if USER_SOFT_MUTE:
-            muteVol = 10
-            for i in range(curVol - 1, muteVol - 1, -1):
-                xbmc.executebuiltin('SetVolume(%d,showVolumeBar)' % (i))
+            for vol in range(curVol, -10, -10):
+                xbmc.executebuiltin('SetVolume(%d,showVolumeBar)' % (vol))
                 xbmc.sleep(500)
         return True
         
@@ -141,15 +140,13 @@ class Service(object):
         if USER_IGNORE_MUSIC and self.myPlayer.isPlayingAudio(): return False
         diaProgress = xbmcgui.DialogProgress()
         diaProgress.create(ADDON_NAME,LANGUAGE(32017))
-        secs        = 0
-        percent     = 0
-        increment   = 100*100 / USER_COUNTDOWN
+        secs = 0
+        increment = int(100*100 / USER_COUNTDOWN)
         while not self.myMonitor.abortRequested() and secs < USER_COUNTDOWN:
             if (diaProgress.iscanceled() or (idleTime > getIdle())): return False
-            secs     = secs + 1
-            percent  = int(increment*secs/100)
+            secs += 1
             waitTime = (USER_COUNTDOWN - secs)
-            diaProgress.update(percent,LANGUAGE(32018),LANGUAGE(32019)%(waitTime))
+            diaProgress.update(int(increment*secs/100),LANGUAGE(32018),LANGUAGE(32019)%(waitTime))
             xbmc.sleep(1000)
         diaProgress.close()
         return True

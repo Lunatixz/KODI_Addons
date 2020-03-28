@@ -43,6 +43,7 @@ def selectDialog(label, items, pselect=-1, uDetails=False):
 class Select(object):
     def __init__(self):
         items  = xbmcvfs.listdir('androidapp://sources/apps/')[1]
+        print(items)
         select = selectDialog(LANGUAGE(30020),items)
         if select is None: return #return on cancel.
         REAL_SETTINGS.setSetting("Custom_Manager","%s"%(items[select]))

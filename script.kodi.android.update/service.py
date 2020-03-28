@@ -48,7 +48,7 @@ class Service(object):
     def deleteLast(self, lastPath):
         log('deleteLast')
         try:
-            xbmcvfs.delete(self.lastPath)
+            xbmcvfs.delete(lastPath)
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30007), ICON, 4000)
         except Exception as e: log("deleteLast Failed! " + str(e), xbmc.LOGERROR)
             

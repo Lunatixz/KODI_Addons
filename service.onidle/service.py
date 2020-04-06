@@ -36,6 +36,7 @@ USER_COUNTDOWN      = int(REAL_SETTINGS.getSetting('User_Countdown_Sec'))
 USER_IGNORE_MUSIC   = REAL_SETTINGS.getSetting('Ignore_Music') == "true"
 USER_SOFT_MUTE      = REAL_SETTINGS.getSetting('Soft_Mute') == "true"
 USER_DEFINED_ACTION = REAL_SETTINGS.getSetting('User_Action')
+
 USER_EXIT_ACTION    = {0:'ActivateScreensaver',
                        1:'Quit',
                        2:'ShutDown',
@@ -128,10 +129,9 @@ class Service(object):
         
     def softMute(self, curVol):
         log('softMute')
-        if USER_SOFT_MUTE:
-            for vol in range(curVol, -10, -10):
-                xbmc.executebuiltin('SetVolume(%d,showVolumeBar)' % (vol))
-                xbmc.sleep(500)
+        for vol in range(curVol, 0, -10):
+            xbmc.executebuiltin('SetVolume(%d,showVolumeBar)'%(vol))
+            xbmc.sleep(1000)
         return True
         
         
@@ -155,13 +155,13 @@ class Service(object):
     def startShutdown(self):
         log('startShutdown')
         curVol = getVol()
-        if self.softMute(curVol): self.myPlayer.stop()
-        while self.myPlayer.isPlaying():
-            if self.myMonitor.waitForAbort(1): break
-        xbmc.executebuiltin('SetVolume(%d,showVolumeBar)' % (curVol))
+        if USER_SOFT_MUTE: self.softMute(curVol)
+        if self.myPlayer.isPlaying(): self.myPlayer.stop()
+        xbmc.sleep(1000)
+        xbmc.executebuiltin('SetVolume(%d,showVolumeBar)'%(curVol))
         clearProperty('USER_IDLE')
         xbmc.executebuiltin(USER_EXIT_ACTION)
-        
+            
         
     def startService(self):
         log('startService')
@@ -170,8 +170,7 @@ class Service(object):
             if not self.myPlayer.isPlaying() or self.myMonitor.activeScreensaver: continue #ignore when not playing or during screensaver.
             idleTime = getIdle()
             waitTime = getIdleTime()
-            if waitTime == 0: continue # 0 wait == disable
-            elif idleTime >= getIdleTime():
+            if waitTime > 0 and idleTime >= waitTime:
                 if self.checkShutdown(idleTime): self.startShutdown()
                 else: continue
                     

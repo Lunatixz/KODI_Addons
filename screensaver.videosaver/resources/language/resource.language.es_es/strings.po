@@ -67,3 +67,15 @@ msgstr "Habilitar modo depuración (registro de errores)"
 msgctxt "#32013"
 msgid "Building Playlist"
 msgstr "Construyendo lista de reproducción"
+
+msgctxt "#32014"
+msgid "Select File"
+msgstr "Seleccionar archivo"
+
+msgctxt "#32015"
+msgid "Select Folder"
+msgstr "Seleccionar carpeta"
+
+msgctxt "#32016"
+msgid "Repeat Return State"
+msgstr "Repetir estado de retorno"

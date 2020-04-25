@@ -42,7 +42,7 @@
             <width>1920</width> 
             <height>1080</height> 
             <texture>overlayfade.png</texture>
-            <visible>[Control.IsVisible(30000) | Control.IsVisible(30100)]</visible>
+            <visible>String.isEqual(Window.Property(earth_overlay),okay) + [Control.IsVisible(30000)|Control.IsVisible(30100)]</visible>
         </control>
         <control type="image">
             <posx>-800</posx>
@@ -52,7 +52,7 @@
             <align>left</align>
             <texture>logo.png</texture>
             <aspectratio scalediffuse="false">keep</aspectratio>
-            <animation effect="fade" start="15" end="15" condition="True">Conditional</animation>
+            <animation effect="fade" start="50" end="50" condition="True">Conditional</animation>
             <visible>[Control.IsVisible(30000) | Control.IsVisible(30100)]</visible>
         </control>
         <control type="label" id="30001">
@@ -64,7 +64,7 @@
             <font>font10</font>
             <textcolor>ffffffff</textcolor>
             <shadowcolor>ff000000</shadowcolor>
-            <animation effect="fade" start="25" end="25" condition="True">Conditional</animation>
+            <animation effect="fade" start="50" end="50" condition="True">Conditional</animation>
             <visible>Control.IsVisible(30000)</visible>
         </control>
         <control type="label" id="30101">
@@ -76,7 +76,7 @@
             <font>font10</font>
             <textcolor>ffffffff</textcolor>
             <shadowcolor>ff000000</shadowcolor>
-            <animation effect="fade" start="25" end="25" condition="True">Conditional</animation>
+            <animation effect="fade" start="50" end="50" condition="True">Conditional</animation>
             <visible>Control.IsVisible(30100)</visible>
         </control>
         <control type="label" id="30002">
@@ -89,7 +89,7 @@
             <height>80</height>
             <width>auto</width>
             <label>[B]$INFO[System.Time][/B]</label>
-            <animation effect="fade" start="15" end="15" condition="True">Conditional</animation>
+            <animation effect="fade" start="50" end="50" condition="True">Conditional</animation>
             <visible>String.isEqual(Window.Property(earth_time),okay) + [Control.IsVisible(30000)|Control.IsVisible(30100)]</visible>
         </control>
         <control type="label">
@@ -102,7 +102,7 @@
             <height>200</height>
             <width>auto</width>
             <label>$INFO[Weather.Temperature]</label>
-            <animation effect="fade" start="25" end="25" condition="True">Conditional</animation>
+            <animation effect="fade" start="50" end="50" condition="True">Conditional</animation>
             <visible>[Weather.IsFetched + Control.IsVisible(30002)]</visible>
         </control>
     </controls>

@@ -1,4 +1,4 @@
-#   Copyright (C) 2019 Lunatixz
+#   Copyright (C) 2020 Lunatixz
 #
 #
 # This file is part of Earth View ScreenSaver.
@@ -38,6 +38,7 @@ BASE_API       = (REAL_SETTINGS.getSetting("Last") or NEXT_JSON%('marble-canyon-
 ANIMATION      = 'okay' if REAL_SETTINGS.getSetting("Animate") == 'true' else 'nope'
 TIME           = 'okay' if REAL_SETTINGS.getSetting("Time") == 'true' else 'nope'
 TIMER          = [30,60,120,240][int(REAL_SETTINGS.getSetting("RotateTime"))]
+OVERLAY        = 'okay' if REAL_SETTINGS.getSetting("Overlay") == 'true' else 'nope'
 IMG_CONTROLS   = [30000,30100]
 CYC_CONTROL    = itertools.cycle(IMG_CONTROLS).next
 
@@ -56,6 +57,7 @@ class GUI(xbmcgui.WindowXMLDialog):
         self.winid = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
         self.winid.setProperty('earth_animation', ANIMATION)
         self.winid.setProperty('earth_time', TIME)
+        self.winid.setProperty('earth_overlay', OVERLAY)
         self.startRotation()
     
     
@@ -78,7 +80,9 @@ class GUI(xbmcgui.WindowXMLDialog):
             self.getControl(id).setImage(results['photoUrl'])
             self.getControl(id+1).setLabel(('%s, %s'%(results.get('region',' '),results.get('country',''))).strip(' ,'))
             baseAPI = NEXT_JSON%(results['nextSlug'])
-        except: baseAPI = NEXT_JSON%('marble-canyon-united-states-2000')
+        except Exception as e:
+            self.log("setImage Failed! " + str(e), xbmc.LOGERROR)
+            baseAPI = NEXT_JSON%('marble-canyon-united-states-2000')
         self.baseAPI = baseAPI
         
         

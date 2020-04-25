@@ -31,3 +31,7 @@ msgstr ""
 msgctxt "#32004"
 msgid "Display Time & Weather"
 msgstr ""
+
+msgctxt "#32011"
+msgid "Use Vignette Overlay"
+msgstr ""

@@ -125,10 +125,10 @@ class MM(object):
     def getUserList(self, type='series'):
         REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
         if type == 'series': 
-            try: return (REAL_SETTINGS.getSetting('TVShowList').split(',') or [])
+            try: return (REAL_SETTINGS.getSetting('TVShowList').split(':&:') or [])
             except: return []
         else:
-            try: return (REAL_SETTINGS.getSetting('MoviesList').split(',') or [])
+            try: return (REAL_SETTINGS.getSetting('MoviesList').split(':&:') or [])
             except: return []
         
         
@@ -149,7 +149,7 @@ class MM(object):
         else: 
             self.notificationDialog(LANGUAGE(30017))
             REAL_SETTINGS.setSetting(setSetting0,'')
-        userList = ','.join(list(set(userList)))
+        userList = ':&:'.join(list(set(userList)))
         log('setUserList, UserList = ' + userList + ', type = ' + type)
         REAL_SETTINGS.setSetting(setSetting1,userList)
         REAL_SETTINGS.setSetting(setSetting2,msg)

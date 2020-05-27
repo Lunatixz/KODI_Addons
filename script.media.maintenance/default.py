@@ -19,7 +19,7 @@
 # -*- coding: utf-8 -*-
 import os, sys, time, datetime, re, traceback
 import urlparse, urllib, urllib2, socket, json, collections
-import xbmc, xbmcgui, xbmcplugin, xbmcaddon, xbmcvfs, tvmaze
+import xbmc, xbmcgui, xbmcplugin, xbmcaddon, xbmcvfs
 from simplecache import SimpleCache, use_cache
 
 # Plugin Info
@@ -125,10 +125,10 @@ class MM(object):
     def getUserList(self, type='series'):
         REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
         if type == 'series': 
-            try: return (REAL_SETTINGS.getSetting('TVShowList').split(':&:') or [])
+            try: return (REAL_SETTINGS.getSetting('TVShowList').split(',') or [])
             except: return []
         else:
-            try: return (REAL_SETTINGS.getSetting('MoviesList').split(':&:') or [])
+            try: return (REAL_SETTINGS.getSetting('MoviesList').split(',') or [])
             except: return []
         
         
@@ -149,7 +149,7 @@ class MM(object):
         else: 
             self.notificationDialog(LANGUAGE(30017))
             REAL_SETTINGS.setSetting(setSetting0,'')
-        userList = ':&:'.join(list(set(userList)))
+        userList = ','.join(list(set(userList)))
         log('setUserList, UserList = ' + userList + ', type = ' + type)
         REAL_SETTINGS.setSetting(setSetting1,userList)
         REAL_SETTINGS.setSetting(setSetting2,msg)
@@ -198,7 +198,6 @@ class MM(object):
                 tvshow   = playingItem["showtitle"]
                 userList = self.getUserList()
                 if tvshow not in userList and not bypass: return
-                self.markWatchedTVMaze( tvshow, playingItem["season"], playingItem["episode"] )
                 mediaInfo = '%s - %sx%s - %s'%(tvshow,playingItem["season"],playingItem["episode"],mediaInfo)
             if silent == False:
                 if not self.yesnoDialog(mediaInfo, file, header='%s - %s'%(ADDON_NAME,LANGUAGE(30021)%(type)), yes='Remove', no='Keep', autoclose=15000): return
@@ -218,51 +217,6 @@ class MM(object):
             log('removeContent, playingItem = ' + json.dumps(playingItem))
         
         
-    def markWatchedTVMaze ( self, show, season, episode ):
-        TVMAZE = tvmaze.API( user=REAL_SETTINGS.getSetting('TVMaze_User'), apikey=REAL_SETTINGS.getSetting('TVMaze_APIKey') )
-        show_info = {'name':show, 'season':season, 'episode':episode}
-        success, loglines, results = TVMAZE.getFollowedShows( params={'embed':'show'} )
-        if not success:
-            log( 'bad response from TV Maze, no shows returned - aborting' )
-            return
-        tvmazeid = ''
-        so_file = os.path.join( SETTINGS_LOC, 'show_override.json' )
-        if xbmcvfs.exists( so_file ):
-            thefile = xbmcvfs.File( so_file, 'r' )
-            thedata = thefile.read()
-            thefile.close()
-            show_override = json.loads( thedata )
-        else:
-            show_override = {}
-        log( 'checking to see if there is an override for %s' % show_info['name'] )
-        try:
-            show_info['name'] = show_override[show_info['name']]
-        except KeyError:
-            log( 'no show override found, using original' )
-        log( 'using show name of %s' % show_info['name'] )
-        for followed_show in results:
-            try:
-                followed_name = followed_show['_embedded']['show']['name']
-            except KeyError:
-                continue
-            if followed_name == show_info['name']:
-                log( 'found match for %s' % show_info['name'] )
-                tvmazeid = followed_show['show_id']
-                break
-        if tvmazeid:
-            params = {'season':show_info['season'], 'number':show_info['episode']}
-            success, loglines, results = TVMAZE.getEpisodeBySeasonEpNumber( tvmazeid, params )
-            try:
-                episodeid = results['id']
-            except KeyError:
-                episodeid = ''
-            if episodeid:
-                log( 'got episode id of %s' % episodeid )
-                success, loglines, results = TVMAZE.markEpisode( episodeid )
-                if not success:
-                    log( 'bad response from TV Maze, show was not marked' )
-
-
     def deleteFile(self, file):
         log("deleteFile")
         for i in range(3):

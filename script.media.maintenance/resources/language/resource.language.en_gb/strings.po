@@ -203,3 +203,15 @@ msgstr ""
 msgctxt "#30046"
 msgid "General"
 msgstr ""
+
+msgctxt "#30047"
+msgid "TV Maze Username"
+msgstr ""
+
+msgctxt "#30048"
+msgid "TV Maze API Key"
+msgstr ""
+
+msgctxt "#30049"
+msgid "TV Maze"
+msgstr ""

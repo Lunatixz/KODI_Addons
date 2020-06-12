@@ -1495,7 +1495,7 @@
     </extension>
 </addon>
 
-<addon id="repository.lunatixz" name="Lunatixz Beta Repository" version="1.0.6" provider-name="Lunatixz">
+<addon id="repository.lunatixz" name="Lunatixz Beta Repository (Master)" version="1.0.7" provider-name="Lunatixz">
     <extension point="xbmc.addon.repository" name="Lunatixz Beta Repository">
         <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml</info>
         <checksum>http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml.md5</checksum>
@@ -1512,7 +1512,10 @@
     </extension>
 </addon>
 
-<addon id="repository.lunatixz.jarvis" name="Lunatixz Jarvis Beta Repository" version="1.0.2" provider-name="Lunatixz">
+<addon id="repository.lunatixz.jarvis" name="Lunatixz Beta Repository (Jarvis)" version="1.0.7" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.24.0"/>
+    </requires>
     <extension point="xbmc.addon.repository" name="Lunatixz Jarvis Beta Repository">
         <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml</info>
         <checksum>http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml.md5</checksum>
@@ -1523,6 +1526,26 @@
         <description lang="en_GB"></description>
         <platform>all</platform>
         <source>http://raw.github.com/Lunatixz/KODI_Addons/jarvis</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="repository.lunatixz.leia" name="Lunatixz Beta Repository (Krypton/Leia)" version="1.0.7" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+    </requires>
+    <extension point="xbmc.addon.repository" name="Lunatixz Leia Beta Repository">
+        <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/leia/addons.xml</info>
+        <checksum>http://raw.github.com/Lunatixz/KODI_Addons/leia/addons.xml.md5</checksum>
+        <datadir zip="true">http://raw.github.com/Lunatixz/KODI_Addons/leia/zips</datadir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB"></summary>
+        <description lang="en_GB"></description>
+        <platform>all</platform>
+        <source>http://raw.github.com/Lunatixz/KODI_Addons/leia</source>
         <assets>
             <icon>icon.png</icon>
         </assets>
@@ -1861,7 +1884,7 @@
     </extension>
 </addon>
 
-<addon id="script.media.maintenance" version="1.0.9" name="Media Maintenance" provider-name="Lunatixz">
+<addon id="script.media.maintenance" version="1.1.1" name="Media Maintenance" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.schedule" version="0.5.0"/>

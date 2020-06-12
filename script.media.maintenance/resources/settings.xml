@@ -8,7 +8,8 @@
     <setting id="Duplicate_Match"  type="enum"   label="30041"  values="Title (Year)|Title" default="0" />
     <setting id="Play_Percentage"  type="slider" label="30020"  range="0,100"         option="percent"  default="85" />
     <setting                       type="lsep" />
-    <setting id="Monitor_Movies"   type="bool"   label="30024"  default="true"                                      enable="Library.HasContent(Movies)" />
+    <setting id="Monitor_Recordings" type="bool"   label="30047"  default="true" enable="Pvr.HasTVChannels" />
+    <setting id="Monitor_Movies"     type="bool"   label="30024"  default="true" enable="Library.HasContent(Movies)" />
     <!-- <setting id="ViewMovies"       type="action" label="30027"  subsetting="true" visible="eq(-1,true)"  action=""  default="" /> -->
     <!-- <setting id="ScanRadarr"       type="action" label="30026"  action="RunScript($CWD/default.py, -scanRadarr)"    default=""  visible="eq(-2,true)" /> -->
     <!-- <setting id="ClearMovies"      type="action" label=""       subsetting="true" visible="!eq(-1,)"                action="RunScript($CWD/default.py, -clearMovies)" default="" /> -->
@@ -29,10 +30,6 @@
     <setting label="30019"         type="lsep" />
     <setting id="Radarr_IP"        type="text"   label="30007"  subsetting="true" default="http://localhost:7878" />
     <setting id="Radarr_API"       type="text"   label="30008"  subsetting="true" default="" />
-    <setting label="30049"         type="lsep" />
-    <setting id="TVMaze_User"      type="text"   label="30047"  subsetting="true" default="" />
-    <setting id="TVMaze_APIKey"    type="text"   label="30048"  subsetting="true" default="" />
-    
     <setting id="MoviesList"       type="text"   label="30005"  enable="false"    visible="false"       default="" />
     </category>
 </settings>

@@ -1,4 +1,4 @@
-﻿#   Copyright (C) 2018 Lunatixz
+﻿#   Copyright (C) 2020 Lunatixz
 #
 #
 # This file is part of Media Maintenance.
@@ -17,8 +17,7 @@
 # along with Media Maintenance.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import os, sys, time, datetime, re, traceback
-import urlparse, urllib, urllib2, socket, json, schedule
+import os, sys, time, datetime, re, traceback,json, schedule
 import xbmc, xbmcgui, xbmcplugin, xbmcaddon, default
 from simplecache import SimpleCache, use_cache
 
@@ -33,7 +32,6 @@ ICON          = REAL_SETTINGS.getAddonInfo('icon')
 FANART        = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE      = REAL_SETTINGS.getLocalizedString
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-PTVL_RUNNING  = xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True"
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -42,6 +40,7 @@ def log(msg, level=xbmc.LOGDEBUG):
 
 class Player(xbmc.Player):
     def __init__(self):
+        xbmc.Player.__init__(self)
         self.resetMeta()
         
         
@@ -51,10 +50,9 @@ class Player(xbmc.Player):
         
         
     def onPlayBackStarted(self):
-        xbmc.sleep(1000)
+        xbmc.sleep(5000)
         if not self.isPlaying(): return
         self.playingItem = self.myService.myUtils.requestItem()
-        xbmc.sleep(1000)
         self.playingItem['TotalTime'] = self.getTotalTime()
         log('onPlayBackStarted, playingItem = ' + json.dumps(self.playingItem))
         #todo add wait for playlist option, save playing playlist, monitor position and watched status; on stop prompt to delete watched items if match.
@@ -72,8 +70,8 @@ class Player(xbmc.Player):
 
     def chkContent(self, playingItem={}):
         log('chkContent, playingItem = %s'%(json.dumps(self.playingItem)))
-        if PTVL_RUNNING or self.playingItem.get('TotalTime',0) <= 0: return
-        elif self.playingItem.get("file","").startswith(('plugin://','upnp://','pvr://')): return
+        if xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True" or self.playingItem.get('TotalTime',0) <= 0: return
+        elif self.playingItem.get("file","").startswith(('plugin://','upnp://')): return
         elif (self.playingTime * 100 / self.playingItem['TotalTime']) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
             if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": self.myService.myUtils.removeSeason(self.playingItem)
             else:self.myService.myUtils.removeContent(self.playingItem)
@@ -82,6 +80,7 @@ class Player(xbmc.Player):
         
 class Monitor(xbmc.Monitor):
     def __init__(self):
+        xbmc.Monitor.__init__(self)
         self.pendingChange = False
         
         
@@ -107,8 +106,12 @@ class Monitor(xbmc.Monitor):
     def onChange(self):
         log('onChange')
         if self.myService.loadMySchedule(): self.pendingChange = False
+                
         
-        
+    def onNotification(self, sender, method, data):
+        log("onNotification, sender %s - method: %s  - data: %s" % (sender, method, data))
+                
+ 
 class Service(object):
     def __init__(self):
         self.running   = False
@@ -152,7 +155,8 @@ class Service(object):
             # if self.myMonitor.pendingChange and xbmcgui.getCurrentWindowDialogId() != 10140: self.chkSettings()
             if self.myMonitor.waitForAbort(5): break
             elif self.myPlayer.isPlaying(): 
-                if len(self.myPlayer.playingItem) == 0: self.myPlayer.onPlayBackStarted()
+                if xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True": self.myPlayer.playingItem = {}
+                elif len(self.myPlayer.playingItem) == 0: self.myPlayer.onPlayBackStarted()
                 self.myPlayer.playingTime = self.myPlayer.getTime()
             else: schedule.run_pending() #run scan/clean when idle
 

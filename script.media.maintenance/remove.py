@@ -1,4 +1,4 @@
-#   Copyright (C) 2019 Lunatixz
+#   Copyright (C) 2020 Lunatixz
 #
 #
 # This file is part of Media Maintenance.
@@ -17,10 +17,15 @@
 # along with Media Maintenance.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import sys
+import os, sys
 import xbmc
 import default
 
 if __name__ == '__main__':
-    selectItem = {"folder":xbmc.getInfoLabel('ListItem.Path'),"file":xbmc.getInfoLabel('ListItem.FileNameAndPath'),"type":xbmc.getInfoLabel('ListItem.DBTYPE'),"id":xbmc.getInfoLabel('ListItem.DBID'),"label":xbmc.getInfoLabel('ListItem.Label'),"showtitle":xbmc.getInfoLabel('ListItem.TVShowTitle'),"episodes":xbmc.getInfoLabel('ListItem.Property(TotalEpisodes)')}
-    default.MM().removeContent(default.MM().requestFile(xbmc.getInfoLabel('ListItem.FileNameAndPath'),fallback=selectItem),bypass=True)
+    liz   = sys.listitem
+    if liz.getLabel() == xbmc.getInfoLabel('ListItem.Label'):
+        info  = liz.getVideoInfoTag()
+        dbid  = info.getDbId() if info.getDbId() else liz.getProperty('dbid')
+        fpath = xbmc.getInfoLabel('ListItem.FileNameAndPath') #xbmc.translatePath(os.path.join(liz.getPath(),liz.getfilename()))
+        selectItem = {"folder":liz.getPath(),"file":fpath,"type":info.getMediaType(),"id":dbid,"label":liz.getLabel(),"showtitle":info.getTVShowTitle(),"episodes":liz.getProperty('TotalEpisodes)')}
+        default.MM().removeContent(default.MM().requestFile(fpath,fallback=selectItem),bypass=True)

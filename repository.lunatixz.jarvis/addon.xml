@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="repository.lunatixz.jarvis" name="Lunatixz Jarvis Beta Repository" version="1.0.2" provider-name="Lunatixz">
+<addon id="repository.lunatixz.jarvis" name="Lunatixz Beta Repository (Jarvis)" version="1.0.7" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="2.24.0"/>
+    </requires>
     <extension point="xbmc.addon.repository" name="Lunatixz Jarvis Beta Repository">
         <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml</info>
         <checksum>http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml.md5</checksum>

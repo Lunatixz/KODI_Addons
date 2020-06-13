@@ -2064,6 +2064,14 @@
     </extension>
 </addon>
 
+<addon id="script.numpy.test" version="0.0.1" name="numpy test" provider-name="Team Kodi">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <!-- <import addon="script.module.numpy" version="0.0.1"/> -->
+    </requires>
+    <extension point="xbmc.python.script" library="default.py"/>
+</addon>
+
 <addon id="script.pseudocinema.poster" version="0.0.2a" name="PseudoCinema Poster" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>

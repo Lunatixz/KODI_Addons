@@ -397,7 +397,7 @@ class PlutoTV(object):
 
                 tmpdata = {"mediatype":mtype,"label":label,"title":label,'duration':epdur,'plot':epplot,'genre':[epgenre],'season':epseason,'episode':epnumber}
                 tmpdata['starttime'] = time.mktime((start).timetuple())
-                tmpdata['url'] = self.sysARG[0]+'?mode=9&name=%s&url=%s'%(title,urls)
+                tmpdata['url'] = self.sysARG[0]+'?mode=9&name=%s&url=%s'%(title,urllib.parse.quote(urls))
                 tmpdata['art'] = {"thumb":thumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
                 guidedata.append(tmpdata)
                 

@@ -32,7 +32,8 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 
 ## GLOBALS ##
 DEBUG       = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-BASE_FEED   = 'https://twitrss.me/twitter_user_to_rss/?user=realDonaldTrump'
+BASE_FEED   = 'https://nitter.net/realDonaldTrump/rss'
+ALT_FEED    = 'https://twitrss.me/twitter_user_to_rss/?user=realDonaldTrump' #old
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -70,11 +71,9 @@ class Service(object):
             if self.myMonitor.pendingChange == True:
                 self.myMonitor.pendingChange = False
                 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
-                waitTime   = [300,600,900,1800][int(REAL_SETTINGS.getSetting('Wait_Time'))] if not DEBUG else 5
-                ignorePlay = REAL_SETTINGS.getSetting('Not_While_Playing') == 'true'
-            
+                
             # Don't run while playing.
-            if xbmc.Player().isPlayingVideo() == True and ignorePlay == True:
+            if xbmc.Player().isPlayingVideo() == True and REAL_SETTINGS.getSetting('Not_While_Playing') == True:
                 log('startService, ignore during playback')
                 continue
 
@@ -82,14 +81,13 @@ class Service(object):
             if xbmcgui.getCurrentWindowDialogId() in [10140,10103]:
                 log('startService, settings dialog opened')
                 continue
-        
+                
             self.chkFEED()
-            
-            # Sleep
-            if self.myMonitor.waitForAbort(waitTime) == True:
-                log('startService, waitForAbort/pendingChange')
-                break
     
+            # Sleep
+            waitTime = [300,600,900,1800][int(REAL_SETTINGS.getSetting('Wait_Time'))]
+            if self.myMonitor.waitForAbort(waitTime) == True: break
+                
 
     def testString(self):
         #gen. 140char mock sentence for skin test
@@ -100,7 +98,7 @@ class Service(object):
         
     def correctTime(self, tweetTime):
         log('correctTime, IN tweetTime = '+ tweetTime)
-        tweetTime  = datetime.datetime.strptime(tweetTime, '%a, %d %b %Y %H:%M:%S')
+        tweetTime  = datetime.datetime.strptime(tweetTime, '%a, %d %b %Y %H:%M:%S %Z')
         td_local   = tweetTime - datetime.timedelta(seconds=3600)
         tweetTime  = td_local.strftime('%a, %d %b %Y %I:%M:%S %p').lstrip('0')
         log('correctTime, OUT tweetTime = '+ tweetTime)
@@ -123,6 +121,6 @@ class Service(object):
             ui = gui.GUI("default.xml", ADDON_PATH, "default")
             ui.doModal()
             del ui
-        except: pass
+        except Exception as e: log("chkFEED, Failed! " + str(e), xbmc.LOGERROR)
                 
 if __name__ == '__main__': Service()

@@ -2169,7 +2169,7 @@
     <extension point="xbmc.service" library="service.py" start="startup"/>
 </addon>
 
-<addon id="script.trumptweets" name="Trump Tweets!!" version="1.0.4a" provider-name="Lunatixz">
+<addon id="script.trumptweets" name="Trump Tweets!!" version="1.0.5" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.feedparser" version="5.1.3"/>

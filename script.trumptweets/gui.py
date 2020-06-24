@@ -45,6 +45,7 @@ class GUI(xbmcgui.WindowXMLDialog):
             
             
     def onInit(self):
+        self.log('onInit')
         self.lockAction = True
         select = random.choice(ID_LIST)
         for id in ID_LIST: 

@@ -16,7 +16,7 @@
 # -*- coding: utf-8 -*-
 
 import traceback
-import xbmc, xbmcaddon, xbmcgui, xbmcvfs
+from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
 
 # Plugin Info
 ADDON_ID      = 'script.kodi.android.update'
@@ -43,7 +43,6 @@ def selectDialog(label, items, pselect=-1, uDetails=False):
 class Select(object):
     def __init__(self):
         items  = xbmcvfs.listdir('androidapp://sources/apps/')[1]
-        print(items)
         select = selectDialog(LANGUAGE(30020),items)
         if select is None: return #return on cancel.
         REAL_SETTINGS.setSetting("Custom_Manager","%s"%(items[select]))

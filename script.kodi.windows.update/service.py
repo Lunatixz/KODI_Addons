@@ -16,7 +16,7 @@
 # -*- coding: utf-8 -*-
 
 import platform, traceback, json, sys
-import xbmc, xbmcaddon, xbmcgui, xbmcvfs
+from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
 
 # Plugin Info
 ADDON_ID      = 'script.kodi.windows.update'

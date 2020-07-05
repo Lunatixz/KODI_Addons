@@ -17,11 +17,11 @@
 
 import os, time, datetime, traceback, re
 import socket, json
-import xbmc, xbmcgui, xbmcvfs, xbmcaddon
 
 from bs4 import BeautifulSoup
 from simplecache import SimpleCache
 from six.moves import urllib
+from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
 
 # Plugin Info
 ADDON_ID      = 'script.kodi.android.update'
@@ -123,7 +123,7 @@ class Installer(object):
         tmpLST = []
         for label in sorted(BUILD_OPT.keys()): tmpLST.append(xbmcgui.ListItem(label.title(),BUILD_OPT[label],ICON,path=DROID_URL%(label,PLATFORM)))
         select = selectDialog(ADDON_NAME, tmpLST)
-        if select is None: return #return on cancel.
+        if not select: return #return on cancel.
         return tmpLST[select].getPath()
         
             
@@ -136,10 +136,15 @@ class Installer(object):
                 if label == PLATFORM: label2 = LANGUAGE(30014)%PLATFORM
                 elif label.lower() == BRANCH.lower(): label2 = LANGUAGE(30022)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
                 else: label2 = '' #Don't use time-stamp for folders
-                yield (xbmcgui.ListItem(label.title(),label2,ICON,ICON,path=(url + label)))
+                liz = xbmcgui.ListItem(label.title(),label2,path=(url + label))
+                liz.setArt({'icon':ICON,'thumb':ICON})
+                yield liz
             except: #files
                 label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
-                if '.apk' in label: yield (xbmcgui.ListItem('%s.apk'%label.split('.apk')[0],'%s %s'%(label.split('.apk')[1], label2.replace('MiB','MB ').strip()),ICON,path='%s%s.apk'%(url,label.split('.apk')[0])))
+                if '.apk' in label:
+                    liz = xbmcgui.ListItem('%s.apk'%label.split('.apk')[0],'%s %s'%(label.split('.apk')[1], label2.replace('MiB','MB ').strip()),path='%s%s.apk'%(url,label.split('.apk')[0]))
+                    liz.setArt({'icon':ICON,'thumb':ICON})
+                    yield liz
 
 
     def setLastPath(self, url, path):

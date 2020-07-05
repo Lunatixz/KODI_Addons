@@ -22,6 +22,7 @@ import xbmc, xbmcgui, xbmcvfs, xbmcaddon
 from bs4 import BeautifulSoup
 from simplecache import SimpleCache
 from six.moves import urllib
+from contextlib import contextmanager
 
 # Plugin Info
 ADDON_ID      = 'script.kodi.windows.update'
@@ -58,6 +59,13 @@ def selectDialog(label, items, pselect=-1, uDetails=True):
     if select >= 0: return select
     return None
         
+@contextmanager
+def busy_dialog():
+    log('globals: busy_dialog')
+    xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+    try: yield
+    finally: xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+
 socket.setdefaulttimeout(TIMEOUT)
 class Installer(object):
     def __init__(self):
@@ -111,31 +119,36 @@ class Installer(object):
         
     def buildMain(self):
         tmpLST = []
-        for label in sorted(BUILD_OPT.keys()): tmpLST.append(xbmcgui.ListItem(label.title(),BUILD_OPT[label],ICON,path=WIND_URL%(label,PLATFORM)))
+        for label in sorted(BUILD_OPT.keys()):
+            liz = xbmcgui.ListItem(label.title(),BUILD_OPT[label],path=WIND_URL%(label,PLATFORM))
+            liz.setArt({'icon':ICON,'thumb':ICON})
+            tmpLST.append(liz)
         select = selectDialog(ADDON_NAME, tmpLST)
-        if not select: return #return on cancel.
+        if select is None: return #return on cancel.
         return tmpLST[select].getPath()
             
             
     def buildItems(self, url):
-        soup = self.openURL(url)
-        if soup is None: return
-        for item in self.getItems(soup):
-            try: #folders
-                if 'uwp' in item.lower(): continue #ignore UWP builds
-                label, label2 = re.compile("(.*?)/-(.*)").match(item).groups()
-                if label.lower() == PLATFORM.lower(): label2 = LANGUAGE(30014)%REAL_SETTINGS.getSetting("Platform")
-                elif label.lower() == BRANCH.lower(): label2 = LANGUAGE(30021)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
-                else: label2 = '' #Don't use time-stamp for folders
-                liz = (xbmcgui.ListItem(label.title(),label2,path=(url + label)))
-                liz.setArt({'icon':ICON,'thumb':ICON})
-                yield liz
-            except: #files
-                label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
-                if '.exe' in label: 
-                    liz = (xbmcgui.ListItem('%s.exe'%label.split('.exe')[0],'%s %s'%(label.split('.exe')[1], label2.replace('MiB','MB ').strip()),path='%s%s.exe'%(url,label.split('.exe')[0])))
+        with busy_dialog():
+            soup = self.openURL(url)
+            if soup is None: return
+            for item in self.getItems(soup):
+                try: #folders
+                    if 'uwp' in item.lower(): continue #ignore UWP builds
+                    label, label2 = re.compile("(.*?)/-(.*)").match(item).groups()
+                    if label.lower() == PLATFORM.lower(): label2 = LANGUAGE(30014)%REAL_SETTINGS.getSetting("Platform")
+                    elif label.lower() == BRANCH.lower(): label2 = LANGUAGE(30021)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
+                    else: label2 = '' #Don't use time-stamp for folders
+                    liz = (xbmcgui.ListItem(label.title(),label2,path=(url + label)))
                     liz.setArt({'icon':ICON,'thumb':ICON})
                     yield liz
+                except: #files
+                    label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
+                    if '.exe' in label: 
+                        liz = (xbmcgui.ListItem('%s.exe'%label.split('.exe')[0],'%s %s'%(label.split('.exe')[1], label2.replace('MiB','MB ').strip()),path='%s%s.exe'%(url,label.split('.exe')[0])))
+                        liz.setArt({'icon':ICON,'thumb':ICON})
+                        yield liz
+
 
     def setLastPath(self, url, path):
         REAL_SETTINGS.setSetting("LastURL",url)
@@ -152,9 +165,9 @@ class Installer(object):
         while not self.myMonitor.abortRequested():
             items = list(self.buildItems(url))
             if   len(items) == 0: break
-            elif len(items) == 2 and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().startswith('.exe'): select = 1 #If one folder bypass selection.
+            elif len(items) == 2  and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().startswith('.exe'): select = 1 #If one folder bypass selection.
             else: select = selectDialog(url.replace(BASE_URL,'./').replace('//','/'), items)
-            if not select: return #return on cancel.
+            if select is None: return #return on cancel.
             label  = items[select].getLabel()
             newURL = items[select].getPath()
             preURL = url.rsplit('/', 2)[0] + '/'

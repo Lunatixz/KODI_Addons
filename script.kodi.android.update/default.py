@@ -22,6 +22,7 @@ from bs4 import BeautifulSoup
 from simplecache import SimpleCache
 from six.moves import urllib
 from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
+from contextlib import contextmanager
 
 # Plugin Info
 ADDON_ID      = 'script.kodi.android.update'
@@ -66,6 +67,13 @@ def selectDialog(label, items, pselect=-1, uDetails=True):
     select = xbmcgui.Dialog().select(label, items, preselect=pselect, useDetails=uDetails)
     if select >= 0: return select
     return None
+        
+@contextmanager
+def busy_dialog():
+    log('globals: busy_dialog')
+    xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+    try: yield
+    finally: xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
 socket.setdefaulttimeout(TIMEOUT)
 class Installer(object):
@@ -121,30 +129,34 @@ class Installer(object):
         
     def buildMain(self):
         tmpLST = []
-        for label in sorted(BUILD_OPT.keys()): tmpLST.append(xbmcgui.ListItem(label.title(),BUILD_OPT[label],ICON,path=DROID_URL%(label,PLATFORM)))
+        for label in sorted(BUILD_OPT.keys()): 
+            liz = xbmcgui.ListItem(label.title(),BUILD_OPT[label],path=DROID_URL%(label,PLATFORM))
+            liz.setArt({'icon':ICON,'thumb':ICON})
+            tmpLST.append(liz)
         select = selectDialog(ADDON_NAME, tmpLST)
-        if not select: return #return on cancel.
+        if select is None: return #return on cancel.
         return tmpLST[select].getPath()
         
             
     def buildItems(self, url):
-        soup = self.openURL(url)
-        if soup is None: return
-        for item in self.getItems(soup):
-            try: #folders
-                label, label2 = re.compile("(.*?)/-(.*)").match(item).groups()
-                if label == PLATFORM: label2 = LANGUAGE(30014)%PLATFORM
-                elif label.lower() == BRANCH.lower(): label2 = LANGUAGE(30022)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
-                else: label2 = '' #Don't use time-stamp for folders
-                liz = xbmcgui.ListItem(label.title(),label2,path=(url + label))
-                liz.setArt({'icon':ICON,'thumb':ICON})
-                yield liz
-            except: #files
-                label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
-                if '.apk' in label:
-                    liz = xbmcgui.ListItem('%s.apk'%label.split('.apk')[0],'%s %s'%(label.split('.apk')[1], label2.replace('MiB','MB ').strip()),path='%s%s.apk'%(url,label.split('.apk')[0]))
+        with busy_dialog():
+            soup = self.openURL(url)
+            if soup is None: return
+            for item in self.getItems(soup):
+                try: #folders
+                    label, label2 = re.compile("(.*?)/-(.*)").match(item).groups()
+                    if label == PLATFORM: label2 = LANGUAGE(30014)%PLATFORM
+                    elif label.lower() == BRANCH.lower(): label2 = LANGUAGE(30022)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
+                    else: label2 = '' #Don't use time-stamp for folders
+                    liz = xbmcgui.ListItem(label.title(),label2,path=(url + label))
                     liz.setArt({'icon':ICON,'thumb':ICON})
                     yield liz
+                except: #files
+                    label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
+                    if '.apk' in label:
+                        liz = xbmcgui.ListItem('%s.apk'%label.split('.apk')[0],'%s %s'%(label.split('.apk')[1], label2.replace('MiB','MB ').strip()),path='%s%s.apk'%(url,label.split('.apk')[0]))
+                        liz.setArt({'icon':ICON,'thumb':ICON})
+                        yield liz
 
 
     def setLastPath(self, url, path):

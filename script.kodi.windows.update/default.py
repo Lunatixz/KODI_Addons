@@ -113,7 +113,7 @@ class Installer(object):
         tmpLST = []
         for label in sorted(BUILD_OPT.keys()): tmpLST.append(xbmcgui.ListItem(label.title(),BUILD_OPT[label],ICON,path=WIND_URL%(label,PLATFORM)))
         select = selectDialog(ADDON_NAME, tmpLST)
-        if select < 0: return #return on cancel.
+        if not select: return #return on cancel.
         return tmpLST[select].getPath()
             
             
@@ -127,11 +127,15 @@ class Installer(object):
                 if label.lower() == PLATFORM.lower(): label2 = LANGUAGE(30014)%REAL_SETTINGS.getSetting("Platform")
                 elif label.lower() == BRANCH.lower(): label2 = LANGUAGE(30021)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
                 else: label2 = '' #Don't use time-stamp for folders
-                yield (xbmcgui.ListItem(label.title(),label2,ICON,path=(url + label)))
+                liz = (xbmcgui.ListItem(label.title(),label2,path=(url + label)))
+                liz.setArt({'icon':ICON,'thumb':ICON})
+                yield liz
             except: #files
                 label, label2 = re.compile("(.*?)\s(.*)").match(item).groups()
-                if '.exe' in label: yield (xbmcgui.ListItem('%s.exe'%label.split('.exe')[0],'%s %s'%(label.split('.exe')[1], label2.replace('MiB','MB ').strip()),ICON,path='%s%s.exe'%(url,label.split('.exe')[0])))
-
+                if '.exe' in label: 
+                    liz = (xbmcgui.ListItem('%s.exe'%label.split('.exe')[0],'%s %s'%(label.split('.exe')[1], label2.replace('MiB','MB ').strip()),path='%s%s.exe'%(url,label.split('.exe')[0])))
+                    liz.setArt({'icon':ICON,'thumb':ICON})
+                    yield liz
 
     def setLastPath(self, url, path):
         REAL_SETTINGS.setSetting("LastURL",url)
@@ -150,7 +154,7 @@ class Installer(object):
             if   len(items) == 0: break
             elif len(items) == 2 and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().startswith('.exe'): select = 1 #If one folder bypass selection.
             else: select = selectDialog(url.replace(BASE_URL,'./').replace('//','/'), items)
-            if select < 0: return #return on cancel.
+            if not select: return #return on cancel.
             label  = items[select].getLabel()
             newURL = items[select].getPath()
             preURL = url.rsplit('/', 2)[0] + '/'
@@ -220,7 +224,7 @@ class Installer(object):
 
     def installEXE(self, exefile):
         if not xbmcvfs.exists(exefile): return
-        xbmc.executebuiltin('XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),0.5,true)')
+        xbmc.executebuiltin('XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),2.0,true)')
         self.killKodi.start()
         subprocess.call(exefile, shell=True)
         

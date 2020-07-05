@@ -16,7 +16,7 @@
 # -*- coding: utf-8 -*-
 
 import platform, traceback, json
-import xbmc, xbmcaddon, xbmcgui, xbmcvfs
+from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
 
 # Plugin Info
 ADDON_ID      = 'script.kodi.android.update'

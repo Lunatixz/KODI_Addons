@@ -1,17 +1,9 @@
-#     Copyright (C) 2020 Team-Kodi
+#  Copyright (C) 2020 Team-Kodi
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+#  This file is part of script.kodi.android.update
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program. If not, see <http://www.gnu.org/licenses/>.
+#  SPDX-License-Identifier: GPL-3.0-or-later
+#  See LICENSES/README.md for more information.
 #
 # -*- coding: utf-8 -*-
 
@@ -232,10 +224,10 @@ class Installer(object):
             if eta < 0: eta = divmod(0, 60)
             else: eta = divmod(eta, 60)
             total   = (float(filesize) / (1024 * 1024))
-            label   = '[B]Downloading:[/B] %s'%SETTINGS_LOC
+            label   = '%s %s'%(LANGUAGE(30023),SETTINGS_LOC)
             label2  = '%.02f MB of %.02f MB'%(currently_downloaded,total)
-            label2 += ' | [B]Speed:[/B] %.02f Kb/s'%kbps_speed
-            label2 += ' | [B]ETA:[/B] %02d:%02d'%eta
+            label2 += '%s %.02f Kb/s'%(LANGUAGE(30024),kbps_speed)
+            label2 += '%s %02d:%02d'%(LANGUAGE(30025),eta[0],eta[1])
             dia.update(int(percent), '%s\n%s\n%s'%(label,fle,label2))
         except Exception as e: 
             log("pbhook failed! %s" + str(e), xbmc.LOGERROR)

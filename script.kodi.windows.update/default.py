@@ -228,7 +228,7 @@ class Installer(object):
             label2  = '%.02f MB of %.02f MB'%(currently_downloaded,total)
             label2 += ' | [B]Speed:[/B] %.02f Kb/s'%kbps_speed
             label2 += ' | [B]ETA:[/B] %02d:%02d'%eta
-            dia.update(int(percent), label, fle, label2)
+            dia.update(int(percent), '%s\n%s\n%s'%(label,fle,label2))
         except Exception as e: 
             log("pbhook failed! %s" + str(e), xbmc.LOGERROR)
             dia.update(100)

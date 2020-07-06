@@ -16,10 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Kodi Module Auditor.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, re, traceback, json, datetime, urllib, urllib2, zlib
-import xbmc, xbmcplugin, xbmcaddon, xbmcgui
+import sys, re, traceback, json, datetime, urllib, zlib, time
 import xml.etree.ElementTree as ET
 
+from contextlib  import contextmanager
+from six.moves   import urllib
+from kodi_six    import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
 from simplecache import SimpleCache, use_cache
 
 try:
@@ -32,7 +34,7 @@ ADDON_ID      = 'service.moduleauditor'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME    = REAL_SETTINGS.getAddonInfo('name')
 SETTINGS_LOC  = REAL_SETTINGS.getAddonInfo('profile')
-ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path').decode('utf-8')
+ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path')
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 ICON          = REAL_SETTINGS.getAddonInfo('icon')
 FANART        = REAL_SETTINGS.getAddonInfo('fanart')
@@ -47,7 +49,13 @@ BUILDS        =  {19:'matrix',18:'leia',17:'krypton',16:'jarvis',15:'isengard',1
 MOD_QUERY     = '{"jsonrpc":"2.0","method":"Addons.GetAddons","params":{"type":"xbmc.python.module","enabled":true,"properties":["name","version","author","enabled"]},"id":1}'
 DISABLE_QUERY = '{"jsonrpc":"2.0","method":"Addons.SetAddonEnabled", "params":{"addonid":"%s","enabled":%s}, "id": 1}'
 VER_QUERY     = '{"jsonrpc":"2.0","method":"Application.GetProperties","params":{"properties":["version"]},"id":1}'
-
+  
+@contextmanager
+def busy_dialog():
+    log('globals: busy_dialog')
+    xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+    try: yield
+    finally: xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -65,7 +73,6 @@ def getProperty(string1):
     except Exception as e: return ''
           
 def setProperty(string1, string2):
-    print 'setProperty', string1, string2
     try: xbmcgui.Window(10000).setProperty('%s.%s'%(ADDON_ID,string1), string2)
     except Exception as e: log("setProperty, Failed! " + str(e), xbmc.LOGERROR)
 
@@ -76,11 +83,11 @@ def inputDialog(heading=ADDON_NAME, default='', key=xbmcgui.INPUT_ALPHANUM, opt=
     retval = xbmcgui.Dialog().input(heading, default, key, opt, close)
     if len(retval) > 0: return retval    
     
-def okDialog(str1, str2='', str3='', header=ADDON_NAME):
-    xbmcgui.Dialog().ok(header, str1, str2, str3)
+def okDialog(message, header=ADDON_NAME):
+    xbmcgui.Dialog().ok(header, message)
 
-def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', autoclose=0):
-    return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
+def yesnoDialog(message, header=ADDON_NAME, yes='', no='', close=0):
+    return xbmcgui.Dialog().yesno(header, message, no, yes, autoclose=close)
     
 def notificationDialog(message, header=ADDON_NAME, sound=False, time=4000, icon=ICON):
     try: xbmcgui.Dialog().notification(header, message, icon, time, sound)
@@ -98,22 +105,20 @@ def selectDialog(list, header='', autoclose=0, preselect=None, useDetails=True):
 def progressDialog(percent=0, control=None, string1='', string2='', string3='', header=ADDON_NAME):
     if percent == 0 and control is None:
         control = xbmcgui.DialogProgress()
-        control.create(header, string1, string2, string3)
-        control.update(percent, string1, string2, string3)
+        control.create(header, '%s\n%s\%s'%(string1, string2, string3))
+        control.update(percent, '%s\n%s\%s'%(string1, string2, string3))
     if control is not None:
-        if control.iscanceled(): return control.close()
-        elif percent == 100: return control.close()
-        else: control.update(percent, string1, string2, string3)
+        if percent == 100 or control.iscanceled(): return control.close()
+        else: control.update(percent, '%s\n%s\%s'%(string1, string2, string3))
     return control
     
 def busyDialog(percent=0, control=None):
     if percent == 0 and control is None:
-        control = xbmcgui.DialogBusy()
-        control.create()
+        control = xbmcgui.DialogProgressBG()
+        control.create(ADDON_NAME)
         control.update(percent)
     if control is not None:
-        if control.iscanceled: return control.close()
-        elif percent == 100: return control.close()
+        if percent == 100 or control.isFinished: return control.close()
         else: control.update(percent)
     return control
         
@@ -162,7 +167,7 @@ def setWhiteList(url):
 class SCAN(object):
     def __init__(self):
         self.cache       = SimpleCache()
-        self.silent      = False
+        self.background  = False
         self.pDialog     = None
         self.pUpdate     = 0
         self.matchCNT    = 0
@@ -199,8 +204,8 @@ class SCAN(object):
             cacheresponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
             if not cacheresponse:
                 headers = {'User-Agent':'Kodi-Auditor'}
-                req = urllib2.Request(url, None, headers)
-                page = urllib2.urlopen(req, timeout=TIMEOUT)
+                req  = urllib.request.Request(url, None, headers)
+                page = urllib.request.urlopen(req, timeout=TIMEOUT)
                 if page.headers.get('Content-Type').find('gzip') >= 0 or page.headers.get('Content-Type').find('application/octet-stream') >= 0:
                   d = zlib.decompressobj(16+zlib.MAX_WBITS)
                   cacheresponse = d.decompress(page.read())
@@ -219,8 +224,10 @@ class SCAN(object):
         
             
     def validate(self, background=False):
+        if getProperty('Running') == 'True': 
+            log('validate already running')
+            return
         log('validate')
-        if getProperty('Running') == 'True': return
         setProperty('Running','True')
         self.matchCNT  = 0
         self.errorCNT  = 0
@@ -309,7 +316,7 @@ class SCAN(object):
             summary.append({'found':found,'error':error,'label':self.label,'label2':self.label2,'kodiModule':(kodiModule),'myModule':(myModule)})
         summary = sortItems(summary)
         filler  = generateFiller(LANGUAGE(32013),'')
-        filler  = filler[:(len(filler)/2)-1]
+        filler  = filler[:(int(len(filler)/2))-1]
         summary.insert(0,{'found':False,'error':False,'label':'%s%s%s'%(filler,LANGUAGE(32013),filler),'label2':'','kodiModule':{},'myModule':{}})
         summary.insert(1,{'found':False,'error':False,'label':'\n','label2':'','kodiModule':{},'myModule':{}})
         if not background: self.pDialog = progressDialog(100, control=self.pDialog, string3=LANGUAGE(32018))
@@ -321,6 +328,7 @@ class SCAN(object):
         error = False
         whiteList  = getWhiteList()['modules']
         for kodiModule in kodiModules:
+            self.background = background
             if not background: self.pDialog = progressDialog(self.pUpdate, control=self.pDialog, string3='Checking %s ...'%((kodiModule['id'])))
             try:
                 if myModule['addonid'].lower() == kodiModule['id'].lower():
@@ -337,21 +345,23 @@ class SCAN(object):
 
         
     def buildRepo(self):
-        busy = False if self.silent else busyDialog()
         repository = BUILDS[self.sendJSON(VER_QUERY)['result']['version']['major']]
         log('buildRepo, repository = %s'%(repository))
-        self.kodiModules[repository] = list(self.buildModules(repository, busy))
+        self.kodiModules[repository] = list(self.buildModules(repository))
         return repository
         
                 
-    def buildModules(self, branch, busy=False):
+    def buildModules(self, branch):
         log('buildModules, branch = ' + (branch))
         try:
+            if self.background: busy = False 
+            else: busy = busyDialog(ADDON_NAME)
             tree = ET.fromstring(self.openURL(BASE_URL%(branch)))
             for idx, elem in enumerate(tree.iter()):
                 if busy: busy = busyDialog(idx + 1, busy)
                 if elem.tag == 'addon': addon = elem.attrib.copy()
                 if elem.tag == 'extension' and  elem.attrib.copy()['point'] == 'xbmc.python.module': yield (addon)
+            if busy: busyDialog(100)
         except Exception as e: 
             log("buildModules, Failed! " + str(e), xbmc.LOGERROR)
             if busy: busyDialog(100)
@@ -364,7 +374,7 @@ class SCAN(object):
             
 if __name__ == '__main__':
     params = SCAN().getParams()
-    try: id = urllib.unquote_plus(params["id"])
+    try: id = urllib.parse.unquote(params["id"])
     except: id = None
     try: mode = int(params["mode"])
     except: mode = None

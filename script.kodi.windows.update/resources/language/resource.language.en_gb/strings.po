@@ -100,3 +100,15 @@ msgctxt "#30021"
 msgid "Current Kodi Branch (%s.%s-%s)"
 msgstr ""
 
+msgctxt "#30023"
+msgid "[B]Downloading:[/B]"
+msgstr ""
+
+msgctxt "#30024"
+msgid " | [B]Speed:[/B]"
+msgstr ""
+
+msgctxt "#30025"
+msgid " | [B]ETA:[/B]"
+msgstr ""
+

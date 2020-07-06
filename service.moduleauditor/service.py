@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Kodi Module Auditor.  If not, see <http://www.gnu.org/licenses/>.
 
-import time
-import xbmc
 from scan import *
 
 class Monitor(xbmc.Monitor):
@@ -33,7 +31,7 @@ class Monitor(xbmc.Monitor):
         self.pendingChange = True
         REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
         self.optOut = REAL_SETTINGS.getSetting('Disable_Service') == "true"
-         
+        
         
 class Service(object):
     def __init__(self):
@@ -46,6 +44,7 @@ class Service(object):
          
          
     def startService(self):
+        setProperty('Running','False')
         self.myMonitor.pendingChange = False
         while not self.myMonitor.abortRequested():
             if self.myMonitor.waitForAbort(30)   or self.myMonitor.pendingChange: break 

@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2020 Lunatixz
 #
 #
 # This file is part of Playon Browser
@@ -16,18 +16,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Playon Browser.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, os, re, random, traceback, json, xmltodict, collections
-import urlparse, urllib, urllib2, socket, datetime
-import xbmc, xbmcplugin, xbmcaddon, xbmcgui
+import sys, os, re, random, traceback, json, xmltodict, collections, datetime
 
 from simplecache import SimpleCache
+from six.moves   import urllib
+from kodi_six    import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 
 # Plugin Info
 ADDON_ID      = 'plugin.video.playonbrowser'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME    = REAL_SETTINGS.getAddonInfo('name')
 SETTINGS_LOC  = REAL_SETTINGS.getAddonInfo('profile')
-ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path').decode('utf-8')
+ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path')
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 ICON          = REAL_SETTINGS.getAddonInfo('icon')
 FANART        = REAL_SETTINGS.getAddonInfo('fanart')
@@ -43,15 +43,15 @@ AUTO_URL       = "http://m.playon.tv/q.php"
 BASE_ID_URL    = "%s/data/data.xml?id=%s"
 BASE_UPNP      = REAL_SETTINGS.getSetting("playonUPNPid").rstrip('/')
 BASE_URL       = REAL_SETTINGS.getSetting("playonserver").rstrip('/')
-DEBUG          =  REAL_SETTINGS.getSetting("debug") == "true"
+DEBUG          = REAL_SETTINGS.getSetting("debug") == "true"
 KODILIBRARY    = False #todo strm contextMenu
 URLTYPE        = {0:'m3u8',1:'upnp',2:'ext'}[int(REAL_SETTINGS.getSetting('playonmedia'))]
 PTVL_RUNNING   = xbmcgui.Window(10000).getProperty('PseudoTVRunning') == "True"
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
-    if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg.encode("utf-8")), level)
+    if level == xbmc.LOGERROR: msg = '%s, %s'%((msg),traceback.format_exc())
+    xbmc.log('%s-%s-%s'%(ADDON_ID,ADDON_VERSION,msg), level)
 
 def getKeyboard(default='',header=ADDON_NAME):
     kb = xbmc.Keyboard(default,header)
@@ -85,32 +85,33 @@ def parseSEinfo(label):
     log("parseSEinfo, return S:" + str(season) +',E:'+ str(episode)) 
     return season, episode
 
-random.seed()
-socket.setdefaulttimeout(TIMEOUT)
 class PlayOn:
     def __init__(self, sysARG):
-        log('__init__, sysARG = ' + str(sysARG))
+        log('__init__, sysARG = %s'%(sysARG))
+        random.seed()
         self.sysARG  = sysARG
         self.cache   = SimpleCache()
         if URLTYPE == 'upnp': self.chkUPNP()
             
             
     def openURL(self, url):
-        log('openURL, url = ' + str(url))
+        log('openURL, url = %s'%(url))
         try:
-            cacheResponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
+            cacheResponse = self.cache.get('%s.%s.openURL.url=%s'%(ADDON_ID,ADDON_VERSION,url))
+            if DEBUG: cacheResponse = None
             if not cacheResponse:
-                request = urllib2.Request(url)
-                request.add_header('User-Agent','Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)')
-                cacheResponse = urllib2.urlopen(request, timeout=TIMEOUT).read()
-                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheResponse, expiration=datetime.timedelta(minutes=5))
+                req = urllib.request.Request(url)
+                with urllib.request.urlopen(req, timeout=TIMEOUT) as response:
+                    cacheResponse = response.read()
+                    if isinstance(cacheResponse, bytes): cacheResponse = cacheResponse.decode(errors='replace')
+                    self.cache.set('%s.%s.openURL.url=%s'%(ADDON_ID,ADDON_VERSION,url), cacheResponse, expiration=datetime.timedelta(minutes=5))
             return cacheResponse
         except Exception as e: log("openURL Failed! " + str(e), xbmc.LOGERROR)
         if url == BASE_URL + PLAYON_DATA: self.getIP()
         
         
     def getIP(self):
-        urls  = self.openURL(AUTO_URL).split('|')
+        urls = self.openURL(AUTO_URL).split('|')
         for url in urls:
             match = re.findall(r'[0-9]+(?:\.[0-9]+){3}:[0-9]+', url)
             log('getIP, match = ' + str(match))
@@ -203,7 +204,7 @@ class PlayOn:
             response = dict(xmltodict.parse(self.openURL(BASE_URL + uri)))
             if response and 'catalog' in response and 'group' in response['catalog']: results = response['catalog']['group']
             elif response and 'group' in response:# and response['group']['@href'] == uri:
-                results = response['group']['group']
+                results = response['group'].get('group',{})
                 genSTRM = True            
             if isinstance(results,collections.OrderedDict): results = [dict(results)]
             if not search and uri == PLAYON_DATA: self.addDir('[B][PlayOn][/B] Search','',2,ICON,genSTRM)
@@ -228,7 +229,7 @@ class PlayOn:
         item  = json.loads(uri)
         query = getKeyboard(header=LANGUAGE(30016))
         if query == False: self.buildItemMenu(search=True)
-        else: self.buildItemMenu(SEARCH_URL%(item['id']) + 'dc:description%20contains%20' + urllib.quote(query))
+        else: self.buildItemMenu(SEARCH_URL%(item['id']) + 'dc:description%20contains%20' + urllib.parse.quote(query))
         
 
     def playLater(self, name, uri):
@@ -272,21 +273,23 @@ class PlayOn:
                 aired = (dict(result.get('date','')).get('@name','') or datetime.datetime.now().strftime('%m/%d/%Y'))
                 aired = (datetime.datetime.strptime(aired, '%m/%d/%Y')).strftime('%Y-%m-%d') 
             except: aired = datetime.datetime.now().strftime('%Y-%m-%d')
-            timeData  = (dict(result.get('time','')).get('@name','') or '')
+            
             playLater = dict(result.get('media_playlater','')).get('@src','')
-            contextMenu = contextMenu + [('Add to PlayLater','XBMC.RunPlugin(%s)'%(self.sysARG[0]+"?url="+urllib.quote_plus(playLater)+"&mode="+str(8)+"&name="+urllib.quote_plus(label.encode("utf-8"))))]
+            if playLater:
+                u=self.sysARG[0]+"?url="+urllib.parse.quote(playLater)+"&mode="+str(8)+"&name="+urllib.parse.quote(label)
+                contextMenu = [(LANGUAGE(30017),'RunPlugin(%s)'%(u))]
 
+            timeData  = (dict(result.get('time','')).get('@name','') or '')
             if len(timeData) > 0:
-                timeList = timeData.split(':')
-                hours = int(timeList[0])
-                mins  = int(timeList[1])
-                secs  = int(timeList[2])
-                duration = ((hours * 60 * 60) + (mins * 60) + secs)
+                duration = (sum(x*y for x, y in zip(map(int, timeData.split(':')[::-1]), (1, 60, 3600, 86400))))
             else: duration = 0 
-                
-            if URLTYPE == 'm3u8' and 'playlaterrecordings' not in result['@href']: url = BASE_VIDEO_URL%(BASE_URL,result['@href'].split('?id=')[1])
-            elif URLTYPE == 'ext' or 'playlaterrecordings' in result['@href']: url = BASE_URL + '/' + dict(result['media'])['@src']
-            else: url = BASE_UPNP + '/' + dict(result['media'])['@src'].split('.')[0].split('/')[0] + '/'
+
+            if URLTYPE == 'm3u8' and 'playlaterrecordings' not in result['@href']: 
+                url = BASE_VIDEO_URL%(BASE_URL,result['@href'].split('?id=')[1])
+            elif URLTYPE == 'ext' or 'playlaterrecordings' in result['@href']: 
+                url = BASE_URL + '/' + dict(result['media'])['@src']
+            else: 
+                url = BASE_UPNP + '/' + dict(result['media'])['@src'].split('.')[0].split('/')[0] + '/'
                 
             log('playVideo, url = ' + url)
             liz=xbmcgui.ListItem(label, path=url)
@@ -301,25 +304,23 @@ class PlayOn:
             
             
     def addLink(self, name, u, mode, total=0):
-        name = name.encode("utf-8")
         log('addLink, name = ' + name)
-        contextMenu = [('Add to Library','XBMC.RunPlugin(%s)'%(self.sysARG[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(7)+"&name="+urllib.quote_plus(name)))]
+        # contextMenu = [('Add to Library','RunPlugin(%s)'%(self.sysARG[0]+"?url="+urllib.parse.quote(u)+"&mode="+str(7)+"&name="+urllib.parse.quote(name)))]
         liz = self.buildListitem(u) 
-        u=self.sysARG[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
+        u=self.sysARG[0]+"?url="+urllib.parse.quote(u)+"&mode="+str(mode)+"&name="+urllib.parse.quote(name)
         xbmcplugin.addDirectoryItem(handle=int(self.sysARG[1]),url=u,listitem=liz,totalItems=total)
 
 
     def addDir(self, name, u, mode, thumb=ICON, strm=False):
-        name = name.encode("utf-8")
         log('addDir, name = ' + name)
         liz=xbmcgui.ListItem(name)
         # if strm:
-            # contextMenu = [('Add to Library','XBMC.RunPlugin(%s)'%(self.sysARG[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(7)+"&name="+urllib.quote_plus(name)))]
+            # contextMenu = [('Add to Library','RunPlugin(%s)'%(self.sysARG[0]+"?url="+urllib.parse.quote(u)+"&mode="+str(7)+"&name="+urllib.parse.quote(name)))]
             # liz.addContextMenuItems(contextMenu)
         liz.setProperty('IsPlayable', 'false')
         liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
-        liz.setArt({'thumb':thumb,'fanart':FANART})
-        u=self.sysARG[0]+"?url="+urllib.quote_plus(u)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
+        liz.setArt({'thumb':thumb,'icon':thumb,'fanart':FANART})
+        u=self.sysARG[0]+"?url="+urllib.parse.quote(u)+"&mode="+str(mode)+"&name="+urllib.parse.quote(name)
         xbmcplugin.addDirectoryItem(handle=int(self.sysARG[1]),url=u,listitem=liz,isFolder=True)
   
   
@@ -329,14 +330,14 @@ class PlayOn:
        
               
     def getParams(self):
-        return dict(urlparse.parse_qsl(self.sysARG[2][1:]))
+        return dict(urllib.parse.parse_qsl(self.sysARG[2][1:]))
 
             
     def run(self):  
         params=self.getParams()
-        try: url=urllib.unquote_plus(params["url"])
+        try: url=urllib.parse.unquote(params["url"])
         except: url=None
-        try: name=urllib.unquote_plus(params["name"])
+        try: name=urllib.parse.unquote(params["name"])
         except: name=None
         try: mode=int(params["mode"])
         except: mode=None

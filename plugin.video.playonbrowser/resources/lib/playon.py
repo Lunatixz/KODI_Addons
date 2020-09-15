@@ -91,7 +91,7 @@ class PlayOn:
         random.seed()
         self.sysARG  = sysARG
         self.cache   = SimpleCache()
-        if URLTYPE == 'upnp': self.chkUPNP()
+        self.chkUPNP()
             
             
     def openURL(self, url):
@@ -245,10 +245,15 @@ class PlayOn:
     def playVideo(self, name, uri):
         log('playVideo, uri = ' + uri)
         liz = self.buildListitem(uri)
-        if 'm3u8' in uri.lower():
-            liz.setProperty('inputstreamaddon','inputstream.adaptive')
-            liz.setProperty('inputstream.adaptive.manifest_type','hls')
-        xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
+        url = liz.getPath()
+        log('playVideo, uri = %s, url = %s'%(uri,url))
+        if url.startswith('upnp://'):
+            xbmc.executebuiltin('PlayMedia(%s)'%url)
+        else:
+            if url.strip('/').endswith('.m3u8'):
+                liz.setProperty('inputstreamaddon','inputstream.adaptive')
+                liz.setProperty('inputstream.adaptive.manifest_type','hls')
+            xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
 
             
     def buildListitem(self, uri, contextMenu=[]):
@@ -289,9 +294,8 @@ class PlayOn:
             elif URLTYPE == 'ext' or 'playlaterrecordings' in result['@href']: 
                 url = BASE_URL + '/' + dict(result['media'])['@src']
             else: 
-                url = BASE_UPNP + '/' + dict(result['media'])['@src'].split('.')[0].split('/')[0] + '/'
-                
-            log('playVideo, url = ' + url)
+                url = BASE_UPNP + '/' + (result['@href'].split('?id=')[1]) + '/'
+            log('buildListitem, url = ' + url)
             liz=xbmcgui.ListItem(label, path=url)
             liz.addContextMenuItems(contextMenu)
             CONTENT_TYPE = mType

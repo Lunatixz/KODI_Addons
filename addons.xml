@@ -980,7 +980,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.playonbrowser" name="PlayOn Browser" version="2.0.6" provider-name="Lunatixz">
+<addon id="plugin.video.playonbrowser" name="PlayOn Browser" version="2.0.7" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>

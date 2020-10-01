@@ -203,6 +203,40 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.channelsdvr" version="1.0.0" name="Channels DVR" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.six" version="1.0.0"/>
+        <import addon="script.module.kodi-six" version="0.1.3.1"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
+        <import addon="pvr.iptvsimple" version="6.2.1" optional="true"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py"/>
+    <extension point="xbmc.addon.metadata">
+        <reuselanguageinvoker>true</reuselanguageinvoker>
+        <summary lang="en_GB">Live TV, everywhere</summary>
+        <description lang="en_GB">Watch your favorite programs on Kodi. Channels delivers a unified experience across all your TVs, devices, and streaming platforms.</description>
+        <platform>all</platform>
+        <license>GPL-3.0-or-later</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.channelsdvr</source>
+        <website>https://getchannels.com/</website>
+        <forum>http://forum.kodi.tv/showthread.php?tid=357406</forum>
+        <news></news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.video.cheddar" name="Cheddar" provider-name="Lunatixz" version="1.0.5">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1126,100 +1160,6 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.slingtv" version="1.0.2" name="Sling.TV" provider-name="Lunatixz, eracknaphobia, d21spike">
-    <requires>
-        <import addon="xbmc.python" version="2.26.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.pytz" version="2014.2"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-        <import addon="script.module.uepg" version="1.0.5"/>
-        <import addon="script.module.mechanize" version="0.2.6"/>
-        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
-        <import addon="script.module.requests_oauthlib" version="0.7.0"/>
-        <import addon="script.module.xmltodict" version="0.11.0"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <description lang="en_GB"></description>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/plugin.video.slingtv</source>
-        <website>https://www.sling.com</website>
-        <forum>https://forum.kodi.tv/showthread.php?tid=340715</forum>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="plugin.video.spiketv" version="1.0.2" name="Spike" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.youtube.dl" version="17.0.0"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Watch full episodes and exclusive show highlights from your favorite Spike shows.</summary>
-        <description lang="en_GB">Spike delivers original entertainment that informs, engages, inspires and above all push the boundaries of the unexpected with series like Bar Rescue, Lip Sync Battle, Ink Master, Catch a Contractor and the combat sports block Friday Night Lights Out.</description>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/plugin.video.spiketv/tree/master</source>
-        <website>http://spiketv.com</website>
-        <news>v.1.0.1[CR]-Fixed Playback order[CR]-Improved Menu</news>
-        <forum>https://forum.kodi.tv/showthread.php?tid=323852</forum>
-        <broken>Spike Network Closed</broken>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="plugin.video.teleup" name="TeleUp" provider-name="Lunatixz" version="2019.10.05">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.uepg" version="1.0.0"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">The Official plugin for the TeleUp Service.</summary>
-        <description lang="en_GB">Entirely Legal and Free! Start watching instantly or record shows for later. Signup for one of three packages today!</description>
-        <platform>all</platform>
-        <broken>Backend changed; Update Pending...</broken>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.teleup</source>
-        <website>http://teleup.com</website>
-        <forum>https://forum.kodi.tv/showthread.php?tid=331599</forum>
-        <news>2018.06.23[CR]- Misc. Maintenance</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="plugin.video.theverge" version="1.0.0" name="The Verge - YouTube" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1412,39 +1352,6 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.ustvnow" name="USTVnow" provider-name="Lunatixz" version="2020.08.26">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.uepg" version="1.0.0"/>
-        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <broken>Backend changed</broken>
-        <summary lang="en_GB">The Official plugin for the USTVnow Service.</summary>
-        <description lang="en_GB">Entirely Legal and Free! Start watching instantly or record shows for later. Signup for one of three packages today!</description>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.ustvnow</source>
-        <website>http://ustvnow.com</website>
-        <forum>http://forum.kodi.tv/showthread.php?tid=233135</forum>
-        <news>2018.09.27[CR]- Login update[CR]- Misc. Fixes[CR]2018.08.15[CR]- Fixed Free account login[CR]2018.07.25[CR]- Fixed Login Issues[CR]2018.06.23[CR]- Misc. Maintenance [CR]2018.1.5[CR]- Added HDHomerun Tuner Support[CR]- Fixed Channel Loading Errors[CR]2017.12.24[CR]- Improved Skin[CR]2017.10.16[CR]- Added OnDemand (Preview).[CR]- Added Highlights.[CR]- Added Search.[CR]- Improved UI.[CR]- Added EPG Guide w/DVR context menu.[CR]- Misc. Tweaks and Corrections.[CR]2017.8.23[CR]- Added Preferred Playback Method and Stream Quality settings.[CR]2017.8.5[CR]- Fixed encoding error.[CR]2017.8.2[CR]- Fixed paid subscription channels and dvr control.[CR]2017.7.31[CR]- Fixed login issues.[CR]- Added fallback token generation[CR]- Added initial support for uEPG module.[CR]2017.7.26[CR]- Corrected version format.[CR]- Changed "Featured" and "Guide" click behavior.[CR]- Improved Error handling.[CR]2017.4.7a[CR]- Added "Featured"[CR]- Fixed DVR support.2017.4.7[CR]-100% new code base, written from scratch for your enjoy!!, DVR Recording and Playback Untested.</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-            <screenshot>resources/images/screenshot05.png</screenshot>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="plugin.video.wired" version="1.0.1" name="Wired" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -1499,26 +1406,22 @@
     </extension>
 </addon>
 
-<addon id="repository.pseudotv" name="PseudoTV Repository" version="1.0.1" provider-name="Lunatixz">
-    <extension point="xbmc.addon.repository" name="PseudoTV Repository">
-        <dir>
-          <info compressed="false">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/addons.xml</info>
-          <checksum>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/addons.xml.md5</checksum>
-          <datadir zip="true">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/zips</datadir>
-        </dir>
-        <dir>
-          <info compressed="false">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/addons.xml</info>
-          <checksum>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/addons.xml.md5</checksum>
-          <datadir zip="true">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/zips</datadir>
-        </dir>
+<addon id="repository.lunatixz" name="Lunatixz Beta Repository (Master)" version="1.0.8" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+    </requires>
+    <extension point="xbmc.addon.repository" name="Lunatixz Leia Beta Repository">
+        <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml</info>
+        <checksum>http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml.md5</checksum>
+        <datadir zip="true">http://raw.github.com/Lunatixz/KODI_Addons/master/zips</datadir>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <description lang="en_GB">PseudoTV Live acts similar to normal broadcast or cable TV, complete with pre-defined and user-defined channels. EPG Provided by Kodi.</description>
+        <summary lang="en_GB"></summary>
+        <description lang="en_GB"></description>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/repository.pseudotv</source>
+        <source>http://raw.github.com/Lunatixz/KODI_Addons/master</source>
         <assets>
             <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
         </assets>
     </extension>
 </addon>
@@ -2070,33 +1973,6 @@
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.schedule</source>
         <assets>
             <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.module.uepg" version="1.0.6b" name="uEPG" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.pyhdhr" version="1.0.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.metadatautils" version="1.0.0" />
-    </requires>
-    <extension point="xbmc.python.module" library="/"/>
-    <extension point="xbmc.python.script" library="uepg.py"/>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Universal Electronic Programing Guide Framework</summary>
-        <description lang="en_GB">uEPG is a drop-in EPG module, developers can easily add custom electronic programing guides to any Kodi plugin with little effort; Developers can use the default interface or customize to match a specific provider.</description>
-        <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.uepg</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=321231</forum>
-        <news>v1.0.6[CR]- Improved functionally[CR]v1.0.3[CR]- Fixed listitem Parsing and Default Skin[CR]1.0.2[CR]- Added HDHomerun Tuner Support</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
     </extension>
 </addon>

@@ -44,9 +44,13 @@ BASE_ID_URL    = "%s/data/data.xml?id=%s"
 BASE_UPNP      = REAL_SETTINGS.getSetting("playonUPNPid").rstrip('/')
 BASE_URL       = REAL_SETTINGS.getSetting("playonserver").rstrip('/')
 DEBUG          = REAL_SETTINGS.getSetting("debug") == "true"
-KODILIBRARY    = False #todo strm contextMenu
-URLTYPE        = {0:'m3u8',1:'upnp',2:'ext'}[int(REAL_SETTINGS.getSetting('playonmedia'))]
-PTVL_RUNNING   = xbmcgui.Window(10000).getProperty('PseudoTVRunning') == "True"
+KODILIBRARY    = False #todo strm contextMenuc
+
+def getPTVL():
+    return xbmcgui.Window(10000).getProperty('PseudoTVRunning') == "True"
+
+def getURLTYPE():
+    return {0:'m3u8',1:'upnp',2:'ext'}[int(REAL_SETTINGS.getSetting('playonmedia'))]
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -92,8 +96,8 @@ class PlayOn:
         self.sysARG  = sysARG
         self.cache   = SimpleCache()
         self.chkUPNP()
-            
-            
+           
+           
     def openURL(self, url):
         log('openURL, url = %s'%(url))
         try:
@@ -189,7 +193,7 @@ class PlayOn:
                         xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30013), ICON, 5000)
                         BASE_UPNP = item['file']
                         REAL_SETTINGS.setSetting("playonUPNPid",BASE_UPNP.rstrip('/'))
-            elif PTVL_RUNNING == False:
+            elif getPTVL() == False:
                 BASE_UPNP = xbmcgui.Dialog().browse(0, LANGUAGE(30014), 'files', '', False, False, 'upnp://')
                 if BASE_UPNP != -1: REAL_SETTINGS.setSetting("playonUPNPid",BASE_UPNP.rstrip('/'))
             else: xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30010), ICON, 5000)
@@ -259,6 +263,7 @@ class PlayOn:
     def buildListitem(self, uri, contextMenu=[]):
         result   = {}
         infoList = {}
+        URLTYPE  = getURLTYPE()
         response = dict(xmltodict.parse(self.openURL(BASE_URL + uri)))
         if response and 'group' in response and response['group']['@href'] == uri:
             result = dict(response['group'])
@@ -362,4 +367,4 @@ class PlayOn:
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_NONE)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_TITLE)
-        xbmcplugin.endOfDirectory(int(self.sysARG[1]), cacheToDisc=True)
+        xbmcplugin.endOfDirectory(int(self.sysARG[1]), cacheToDisc=False)

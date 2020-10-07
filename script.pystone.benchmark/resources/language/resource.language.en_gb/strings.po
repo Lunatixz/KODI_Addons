@@ -1,10 +1,10 @@
 # Kodi Media Center language file
-# Addon Name: Channels DVR
-# Addon id: plugin.video.channelsdvr
+# Addon Name: CPU Benchmark
+# Addon id: script.pystone.benchmark
 # Addon Provider: Lunatixz
 msgid ""
 msgstr ""
-"Project-Id-Version: plugin.video.channelsdvr\n"
+"Project-Id-Version: script.pystone.benchmark\n"
 "Report-Msgid-Bugs-To: http://forum.kodi.tv/showthread.php?tid=315513\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -25,57 +25,29 @@ msgid "Something went wrong, Try Again..."
 msgstr ""
 
 msgctxt "#30002"
-msgid "Live"
+msgid "Top "
 msgstr ""
 
 msgctxt "#30003"
-msgid "Lineup"
+msgid "Bottom "
 msgstr ""
 
 msgctxt "#30004"
-msgid "Enable M3U/XMLTV Generator Service"
+msgid "[COLOR=%s]%s[/COLOR]"
 msgstr ""
 
 msgctxt "#30005"
-msgid "M3U/XMLTV Path"
+msgid "[I] Back [/I] or [I]Okay [/I] to exit"
 msgstr ""
 
 msgctxt "#30006"
-msgid "Use MPEG Video Streams"
+msgid "Python (v.%s) | pyStone (v.%s) benchmark [%s][CR]"
 msgstr ""
 
 msgctxt "#30007"
-msgid "M3U/XMLTV Updated"
+msgid "Platform (%s)[CR]Architecture (%s)[CR]Processor (%s) | Cores [%s][CR]"
 msgstr ""
 
 msgctxt "#30008"
-msgid "General"
-msgstr ""
-
-msgctxt "#30009"
-msgid "Enter Channels DVR Server IP"
-msgstr ""
-
-msgctxt "#30010"
-msgid "Enter Channels DVR Server Port"
-msgstr ""
-
-msgctxt "#30011"
-msgid "Allow this plugin to automatically configure IPTV Simple PVR Backend?"
-msgstr ""
-
-msgctxt "#30012"
-msgid "Coming Up Later..."
-msgstr ""
-
-msgctxt "#30013"
-msgid "Search"
-msgstr ""
-
-msgctxt "#30014"
-msgid "Enter Search Term"
-msgstr ""
-
-msgctxt "#30015"
-msgid "Recordings"
+msgid "Kodi v.%s [%s][CR]"
 msgstr ""

@@ -203,7 +203,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.channelsdvr" version="1.0.0" name="Channels DVR" provider-name="Lunatixz">
+<addon id="plugin.video.channelsdvr" version="1.0.2" name="Channels DVR" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -225,7 +225,7 @@
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.channelsdvr</source>
         <website>https://getchannels.com/</website>
         <forum>http://forum.kodi.tv/showthread.php?tid=357406</forum>
-        <news></news>
+        <news>Matrix</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -1014,7 +1014,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.playonbrowser" name="PlayOn Browser" version="2.0.7" provider-name="Lunatixz">
+<addon id="plugin.video.playonbrowser" name="PlayOn Browser" version="2.0.8" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -1035,7 +1035,7 @@
         <forum>http://forum.kodi.tv/showthread.php?tid=233136</forum>
         <website>https://www.playon.tv</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.playonbrowser</source>
-        <news>>v.2.0.6[CR]- Matrix[CR]v.2.0.4[CR]- Updated Auto-IP detection[CR]v.2.0.3[CR]- Added Search function[CR]- Added Auto-IP detection[CR]-v.2.0.2[CR]- Improved UPNPID detection[CR]- URL caching improvements[CR]v.2.0.1[CR]- Fixed PlayLater playback[CR]v.2.0.0[CR]- Refactored and optimized Code.[CR]- Added PlayLater Recording via Context Menu.</news>
+        <news>>v.2.0.8[CR]- Matrix[CR]v.2.0.4[CR]- Updated Auto-IP detection[CR]v.2.0.3[CR]- Added Search function[CR]- Added Auto-IP detection[CR]-v.2.0.2[CR]- Improved UPNPID detection[CR]- URL caching improvements[CR]v.2.0.1[CR]- Fixed PlayLater playback[CR]v.2.0.0[CR]- Refactored and optimized Code.[CR]- Added PlayLater Recording via Context Menu.</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -1047,35 +1047,37 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.plutotv" version="1.1.8" name="Pluto.TV" provider-name="Lunatixz">
+<addon id="plugin.video.plutotv" version="1.3.0" name="Pluto.TV" provider-name="Lunatixz">
     <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
+        <import addon="script.module.kodi-six" version="0.1.3.1"/>
+        <import addon="script.module.requests" version="2.7.0"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.uepg" version="1.0.6"/>
         <import addon="script.module.inputstreamhelper" version="0.3.3"/>
+        <import addon="pvr.iptvsimple" version="6.2.1" optional="true"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>
-    <extension point="xbmc.service" library="pseudotv_recommended.py" start="login"/>
+    <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
         <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV's 100+ channels of news, sports, and the Internet's best, completely free on your Kodi device.</description>
         <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <license>GPL-3.0-or-later</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.plutotv</source>
         <website>http://pluto.tv/</website>
         <forum>http://forum.kodi.tv/showthread.php?tid=315513</forum>
-        <news>v1.1.6[CR]- Moved to Pluto.TV API v2+[CR]- Added PY3 Support[CR]- Major Code Refactoring[CR]v1.1.4[CR]- Back-end updates[CR]-v1.1.2[CR]- Improved usability[CR]v1.1.0[CR]- Improved UWP check [CR]- Added automatic region detection[CR]- Improved guide load times[CR]- Improved overall performance[CR]v1.0.9[CR]- Added UWP check[CR]- Improved Playback[CR]v1.0.8[CR]- Fixed parsing errors[CR]- Added uEPG guide[CR]v1.0.7[CR]- init. uEPG support.[CR]- New menu items.[CR]- Misc. Tweaks.[CR]v1.0.7[CR]- Improved browsing speed[CR]- General tweaks and improvements.[CR]v1.0.6[CR]- Added Guest Login.[CR]- Added Geoblock warning.[CR]v1.0.5[CR]- Fixed Android Login[CR]v1.0.4[CR]- Added Region Selection and Improved Region Filter[CR]- Added Startup Wizard and Improved Login Verification.[CR]v1.0.3[CR]- Fixed Menu and Tweaked cache.[CR]v1.0.2[CR]- Fixed cookie issue on android devices.[CR]- Updated cache life.[CR]v1.0.1[CR]- Fixed login cache issue.</news>
+        <news>v1.3.60[CR]- Matrix[CR] v1.1.6[CR]- Moved to Pluto.TV API v2+[CR]- Added PY3 Support[CR]- Major Code Refactoring[CR]v1.1.4[CR]- Back-end updates[CR]-v1.1.2[CR]- Improved usability[CR]v1.1.0[CR]- Improved UWP check [CR]- Added automatic region detection[CR]- Improved guide load times[CR]- Improved overall performance[CR]v1.0.9[CR]- Added UWP check[CR]- Improved Playback[CR]v1.0.8[CR]- Fixed parsing errors[CR]- Added uEPG guide[CR]v1.0.7[CR]- init. uEPG support.[CR]- New menu items.[CR]- Misc. Tweaks.[CR]v1.0.7[CR]- Improved browsing speed[CR]- General tweaks and improvements.[CR]v1.0.6[CR]- Added Guest Login.[CR]- Added Geoblock warning.[CR]v1.0.5[CR]- Fixed Android Login[CR]v1.0.4[CR]- Added Region Selection and Improved Region Filter[CR]- Added Startup Wizard and Improved Login Verification.[CR]v1.0.3[CR]- Fixed Menu and Tweaked cache.[CR]v1.0.2[CR]- Fixed cookie issue on android devices.[CR]- Updated cache life.[CR]v1.0.1[CR]- Fixed login cache issue.</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
+            <screenshot>resources/images/screenshot01.jpg</screenshot>
+            <screenshot>resources/images/screenshot02.jpg</screenshot>
+            <screenshot>resources/images/screenshot03.jpg</screenshot>
+            <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
     </extension>
 </addon>
@@ -2023,9 +2025,10 @@
     <extension point="xbmc.service" library="service.py" start="startup"/>
 </addon>
 
-<addon id="script.pystone.benchmark" name="CPU Benchmark" version="1.1.0" provider-name="Lunatixz">
+<addon id="script.pystone.benchmark" name="CPU Benchmark" version="1.1.2" provider-name="Lunatixz">
     <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.kodi-six" version="0.1.3.1"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>executable</provides>
@@ -2033,13 +2036,15 @@
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Test your devices python performance.</summary>
         <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
-        <license>The MIT License (MIT)</license>
+        <license>MIT</license>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.pystone.benchmark</source>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/script.pystone.benchmark</source>
+        <news>v.1.1.2-Matrix</news>
+        <forum>http://forum.kodi.tv/showthread.php?tid=314081</forum>
         <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-            <screenshot>screenshot01.png</screenshot>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
         </assets>
     </extension>
 </addon>

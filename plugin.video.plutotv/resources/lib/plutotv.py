@@ -17,13 +17,14 @@
 # along with PlutoTV.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import os, sys, time, _strptime, datetime, net, re, traceback, uuid
-import socket, json, collections, inputstreamhelper
-import xbmc, xbmcgui, xbmcplugin, xbmcvfs, xbmcaddon
+import os, sys, time, _strptime, datetime, re, traceback, uuid
+import json, collections, inputstreamhelper, requests
 
-from six.moves import urllib
-from itertools import repeat
-from simplecache import SimpleCache, use_cache
+from itertools     import repeat, cycle, chain, zip_longest
+from resources.lib import xmltv
+from simplecache   import SimpleCache, use_cache
+from six.moves     import urllib
+from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 
 try:
     from multiprocessing import cpu_count 
@@ -31,7 +32,13 @@ try:
     ENABLE_POOL = True
     CORES = cpu_count()
 except: ENABLE_POOL = False
-    
+
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] == 3
+if PY3: 
+    basestring = str
+    unicode = str
+  
 # Plugin Info
 ADDON_ID      = 'plugin.video.plutotv'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
@@ -42,41 +49,54 @@ ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 ICON          = REAL_SETTINGS.getAddonInfo('icon')
 FANART        = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE      = REAL_SETTINGS.getLocalizedString
+MONITOR       = xbmc.Monitor()
 
 ## GLOBALS ##
-TIMEOUT      = 15
-CONTENT_TYPE = 'files'
-DISC_CACHE   = True
-USER_EMAIL   = REAL_SETTINGS.getSetting('User_Email')
-PASSWORD     = REAL_SETTINGS.getSetting('User_Password')
-DEBUG        = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-COOKIE_JAR   = xbmc.translatePath(os.path.join(SETTINGS_LOC, "cookiejar.lwp"))
-PTVL_RUN     = xbmcgui.Window(10000).getProperty('PseudoTVRunning') == 'True'
-BASE_API     = 'https://api.pluto.tv'
-BASE_LINEUP  = BASE_API + '/v2/channels.json'
-BASE_GUIDE   = BASE_API + '/v2/channels?start=%s&stop=%s&%s'
-LOGIN_URL    = BASE_API + '/v1/auth/local'
-BASE_CLIPS   = BASE_API + '/v2/episodes/%s/clips.json'
-BASE_VOD     = BASE_API + '/v3/vod/categories?includeItems=true&deviceType=web&%s'
-SEASON_VOD   = BASE_API + '/v3/vod/series/%s/seasons?includeItems=true&deviceType=web&%s'
-PLUTO_MENU   = [(LANGUAGE(30011), '', 0),
-                (LANGUAGE(30018), '', 1),
-                (LANGUAGE(30017), '', 2),
-                (LANGUAGE(30012), '', 3),
-                (LANGUAGE(30013), '', 20)]
+LOGO          = os.path.join('special://home/addons/%s/'%(ADDON_ID),'resources','images','logo.png')
+LANG          = 'en' #todo
+TIMEOUT       = 30
+CONTENT_TYPE  = 'episodes'
+DISC_CACHE    = False
+DTFORMAT      = '%Y%m%d%H%M%S'
+PVR_CLIENT    = 'pvr.iptvsimple'
+DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
+M3UXMLTV      = REAL_SETTINGS.getSetting('Enable_M3UXMLTV') == 'true'
+ENABLE_CONFIG = REAL_SETTINGS.getSetting('Enable_Config') == 'true'
+USER_PATH     = REAL_SETTINGS.getSetting('User_Folder') 
+M3U_FILE      = os.path.join(USER_PATH,'plutotv.m3u')
+XMLTV_FILE    = os.path.join(USER_PATH,'plutotv.xml')
+GUIDE_URL     = 'https://service-channels.clusters.pluto.tv/v1/guide?start=%s&stop=%s&%s'
+BASE_API      = 'https://api.pluto.tv'
+BASE_LINEUP   = BASE_API + '/v2/channels.json?%s'
+BASE_GUIDE    = BASE_API + '/v2/channels?start=%s&stop=%s&%s'
+LOGIN_URL     = BASE_API + '/v1/auth/local?deviceType=web&%s'
+BASE_CLIPS    = BASE_API + '/v2/episodes/%s/clips.json'
+BASE_VOD      = BASE_API + '/v3/vod/categories?includeItems=true&deviceType=web&%s'
+SEASON_VOD    = BASE_API + '/v3/vod/series/%s/seasons?includeItems=true&deviceType=web&%s'
+PLUTO_MENU    = [(LANGUAGE(30011), '', 0),
+                 (LANGUAGE(30018), '', 1),
+                 (LANGUAGE(30017), '', 2),
+                 (LANGUAGE(30012), '', 3)]
+                
+xmltv.locale      = 'UTF-8'
+xmltv.date_format = DTFORMAT
 
-def inputDialog(heading=ADDON_NAME, default='', key=xbmcgui.INPUT_ALPHANUM, opt=0, close=0):
-    retval = xbmcgui.Dialog().input(heading, default, key, opt, close)
-    if len(retval) > 0: return retval    
-        
+def getPTVL():
+    return xbmcgui.Window(10000).getProperty('PseudoTVRunning') == 'True'
+
+def setUUID():
+    if REAL_SETTINGS.getSetting("sid1_hex") and REAL_SETTINGS.getSetting("deviceId1_hex"): return
+    REAL_SETTINGS.setSetting("sid1_hex",str(uuid.uuid1().hex))
+    REAL_SETTINGS.setSetting("deviceId1_hex",str(uuid.uuid4().hex))
+
+def getUUID():
+    return REAL_SETTINGS.getSetting("sid1_hex"), REAL_SETTINGS.getSetting("deviceId1_hex")
+
 def notificationDialog(message, header=ADDON_NAME, show=True, sound=False, time=1000, icon=ICON):
-    try: xbmcgui.Dialog().notification(header, message, icon, time, sound=False)
+    try:    xbmcgui.Dialog().notification(header, message, icon, time, sound=False)
     except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
-     
-def yesnoDialog(str1, str2='', str3='', header=ADDON_NAME, yes='', no='', autoclose=0):
-    return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
-    
-def strpTime(datestring, format='%Y-%m-%d %H:%M:%S'):
+   
+def strpTime(datestring, format='%Y-%m-%dT%H:%M:%S.%fZ'):
     try: return datetime.datetime.strptime(datestring, format)
     except TypeError: return datetime.datetime.fromtimestamp(time.mktime(time.strptime(datestring, format)))
 
@@ -84,96 +104,89 @@ def timezone():
     if time.localtime(time.time()).tm_isdst and time.daylight: return time.altzone / -(60*60) * 100
     else: return time.timezone / -(60*60) * 100
     
-def setUUID():
-    if REAL_SETTINGS.getSetting("sid1"): return
-    log('setUUID, creating uuid')
-    REAL_SETTINGS.setSetting("sid1",str(uuid.uuid1()))
-    REAL_SETTINGS.setSetting("deviceId1",str(uuid.uuid4()))
-
-def getUUID():
-    return REAL_SETTINGS.getSetting("sid1"), REAL_SETTINGS.getSetting("deviceId1")
-    
-def cookieJar():
-    if not xbmcvfs.exists(COOKIE_JAR):
-        try:
-            xbmcvfs.mkdirs(SETTINGS_LOC)
-            f = xbmcvfs.File(COOKIE_JAR, 'w')
-            f.close()
-        except: log('login, Unable to create cookie folder', xbmc.LOGERROR)
-
-def log(msg, level=xbmc.LOGDEBUG):
-    if DEBUG == False and level != xbmc.LOGERROR: return
-    if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
-   
-socket.setdefaulttimeout(TIMEOUT)
-class PlutoTV(object):
-    def __init__(self, sysARG):
-        log('__init__, sysARG = ' + str(sysARG))
-        self.sysARG  = sysARG
-        self.net     = net.Net()
-        self.cache   = SimpleCache()
+def getLocalTime():
+    offset = (datetime.datetime.utcnow() - datetime.datetime.now())
+    return time.time() + offset.total_seconds()
         
+def log(msg, level=xbmc.LOGDEBUG):
+    try:   msg = str(msg)
+    except Exception as e: 'log str failed! %s'%(str(e))
+    if not DEBUG and level != xbmc.LOGERROR: return
+    try:   xbmc.log('%s-%s-%s'%(ADDON_ID,ADDON_VERSION,msg),level)
+    except Exception as e: 'log failed! %s'%(e)
+     
+def slugify(text):
+    non_url_safe = [' ','"', '#', '$', '%', '&', '+',',', '/', ':', ';', '=', '?','@', '[', '\\', ']', '^', '`','{', '|', '}', '~', "'"]
+    non_url_safe_regex = re.compile(r'[{}]'.format(''.join(re.escape(x) for x in non_url_safe)))
+    text = non_url_safe_regex.sub('', text).strip()
+    text = u'_'.join(re.split(r'\s+', text))
+    return text
+  
+class Service(object):
+    def __init__(self, sysARG=sys.argv):
+        self.running   = False
+        self.myMonitor = MONITOR
+        self.myPlutoTV = PlutoTV(sysARG)
+        
+        
+    def run(self):
+        log('Service, run')
+        while not self.myMonitor.abortRequested():
+            if self.myMonitor.waitForAbort(2): break
+            if not M3UXMLTV or self.running: continue
+            lastCheck  = float(REAL_SETTINGS.getSetting('Last_Scan') or 0)
+            conditions = [xbmcvfs.exists(M3U_FILE),xbmcvfs.exists(XMLTV_FILE)]
+            if (time.time() > (lastCheck + 3600)) or (False in conditions):
+                self.running = True
+                if self.myPlutoTV.buildService():
+                    REAL_SETTINGS.setSetting('Last_Scan',str(time.time()))
+                    notificationDialog(LANGUAGE(30031))
+                self.running = False
+                
 
-    def login(self):
-        log('login')
+class PlutoTV(object):
+    def __init__(self, sysARG=sys.argv):
+        log('__init__, sysARG = %s'%(sysARG))
         setUUID()
-        cookieJar()
-        if USER_EMAIL == LANGUAGE(30009): return #ignore, using guest login
-        if len(USER_EMAIL) > 0:
-            header_dict               = {}
-            header_dict['Accept']     = 'application/json, text/javascript, */*; q=0.01'
-            header_dict['Host']       = 'api.pluto.tv'
-            header_dict['Connection'] = 'keep-alive'
-            header_dict['Referer']    = 'http://pluto.tv/'
-            header_dict['Origin']     = 'http://pluto.tv'
-            header_dict['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.2; rv:24.0) Gecko/20100101 Firefox/24.0'
-            form_data = ({'optIn': 'true', 'password': PASSWORD,'synced': 'false', 'userIdentity': USER_EMAIL})
-            self.net.set_cookies(COOKIE_JAR)
+        self.myMonitor = MONITOR
+        self.sysARG    = sysARG
+        self.cache     = SimpleCache()
+        self.m3uList   = []
+        self.xmltvList = {'data'       : self.getData(),
+                          'channels'   : [],
+                          'programmes' : []}
+
+            
+    def getURL(self, url, param={}, header={}, life=datetime.timedelta(minutes=15)):
+        log('getURL, url = %s, header = %s'%(url, header))
+        cacheresponse = self.cache.get(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header))
+        if not cacheresponse:
             try:
-                loginlink = json.loads(self.net.http_POST(LOGIN_URL, form_data=form_data, headers=header_dict).content.encode("utf-8").rstrip())
-                if loginlink and loginlink['email'].lower() == USER_EMAIL.lower():
-                    notificationDialog(LANGUAGE(30006)%(loginlink['displayName']), time=4000)
-                    self.net.save_cookies(COOKIE_JAR)
-                else: notificationDialog(LANGUAGE(30007), time=4000)
-            except Exception as e: log('login, failed! ' + str(e), xbmc.LOGERROR)
-        else:
-            #firstrun wizard
-            if yesnoDialog(LANGUAGE(30008),no=LANGUAGE(30009), yes=LANGUAGE(30010)):
-                REAL_SETTINGS.setSetting('User_Email',inputDialog(LANGUAGE(30001)))
-                REAL_SETTINGS.setSetting('User_Password',inputDialog(LANGUAGE(30002)))
-            else: REAL_SETTINGS.setSetting('User_Email',LANGUAGE(30009))
-            
-            
-    def openURL(self, url, life=datetime.timedelta(minutes=15)):
-        log('openURL, url = ' + url)
-        try:
-            header_dict               = {}
-            header_dict['Accept']     = 'application/json, text/javascript, */*; q=0.01'
-            header_dict['Host']       = 'api.pluto.tv'
-            header_dict['Connection'] = 'keep-alive'
-            header_dict['Referer']    = 'http://pluto.tv/'
-            header_dict['Origin']     = 'http://pluto.tv'
-            header_dict['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.2; rv:24.0) Gecko/20100101 Firefox/24.0'
-            self.net.set_cookies(COOKIE_JAR)
-            trans_table   = ''.join( [chr(i) for i in range(128)] + [' '] * 128 )
-            cacheResponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-            if not cacheResponse:
-                try: cacheResponse = self.net.http_GET(url, headers=header_dict).content.encode("utf-8", 'ignore')
-                except: cacheResponse = (self.net.http_GET(url, headers=header_dict).content.translate(trans_table)).encode("utf-8")
-                self.net.save_cookies(COOKIE_JAR)
-                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheResponse, expiration=life)
-            if isinstance(cacheResponse, basestring): cacheResponse = json.loads(cacheResponse)
-            return cacheResponse
-        except Exception as e:
-            log('openURL, Unable to open url ' + str(e), xbmc.LOGERROR)
-            notificationDialog(LANGUAGE(30028), time=4000)
-            return {}
-            
+                req = requests.get(url, param, headers=header)
+                cacheresponse = req.json()
+                req.close()
+                self.cache.set(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header), json.dumps(cacheresponse), expiration=life)
+                return cacheresponse
+            except Exception as e: 
+                log("getURL, Failed! %s"%(e), xbmc.LOGERROR)
+                notificationDialog(LANGUAGE(30001))
+                return {}
+        else: return json.loads(cacheresponse)
+
+      
+    def buildHeader(self):
+        header_dict               = {}
+        header_dict['Accept']     = 'application/json, text/javascript, */*; q=0.01'
+        header_dict['Host']       = 'api.pluto.tv'
+        header_dict['Connection'] = 'keep-alive'
+        header_dict['Referer']    = 'http://pluto.tv/'
+        header_dict['Origin']     = 'http://pluto.tv'
+        header_dict['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.2; rv:24.0) Gecko/20100101 Firefox/24.0'
+        return header_dict
+
 
     def mainMenu(self):
         log('mainMenu')
-        self.login()
         for item in PLUTO_MENU: self.addDir(*item)
             
             
@@ -184,48 +197,37 @@ class PlutoTV(object):
 
 
     def getOndemand(self):
-        return self.openURL(BASE_VOD%(LANGUAGE(30022)%(getUUID())), life=datetime.timedelta(hours=1))
+        return self.getURL(BASE_VOD%(LANGUAGE(30022)%(getUUID())), header=self.buildHeader(), life=datetime.timedelta(hours=1))
 
 
     def getVOD(self, epid):
-        return self.openURL(SEASON_VOD%(epid,LANGUAGE(30022)%(getUUID())), life=datetime.timedelta(hours=1))
+        return self.getURL(SEASON_VOD%(epid,LANGUAGE(30022)%(getUUID())), header=self.buildHeader(), life=datetime.timedelta(hours=1))
         
         
     def getClips(self, epid):
-        return self.openURL(BASE_CLIPS%(epid), life=datetime.timedelta(hours=1))
+        return self.getURL(BASE_CLIPS%(epid), header=self.buildHeader(), life=datetime.timedelta(hours=1))
         
         
     def getChannels(self):
-        return sorted(self.openURL(BASE_LINEUP, life=datetime.timedelta(hours=1)), key=lambda i: i['number'])
+        return sorted(self.getURL(BASE_LINEUP%(LANGUAGE(30022)%(getUUID())), header=self.buildHeader(), life=datetime.timedelta(hours=1)), key=lambda i: i['number'])
         
+
+    def getGuidedata(self, full=False):
+        start = (datetime.datetime.fromtimestamp(getLocalTime()).strftime('%Y-%m-%dT%H:00:00Z'))
+        stop  = (datetime.datetime.fromtimestamp(getLocalTime()) + datetime.timedelta(hours=4)).strftime('%Y-%m-%dT%H:00:00Z')
+        if full: return self.getURL(GUIDE_URL %(start,stop,LANGUAGE(30022)%(getUUID())), life=datetime.timedelta(hours=1))
+        else: return sorted((self.getURL(BASE_GUIDE %(start,stop,LANGUAGE(30022)%(getUUID())), life=datetime.timedelta(hours=1))), key=lambda i: i['number'])
+
         
-    def getGuidedata(self):
-        tz    = str(timezone())
-        start = datetime.datetime.now().strftime('%Y-%m-%dT%H:00:00').replace('T','%20').replace(':00:00','%3A00%3A00.000'+tz)
-        stop  = (datetime.datetime.now() + datetime.timedelta(hours=4)).strftime('%Y-%m-%dT%H:00:00').replace('T','%20').replace(':00:00','%3A00%3A00.000'+tz)
-        return sorted((self.openURL(BASE_GUIDE %(start,stop,'sid=%s&deviceId=%s'%(getUUID())), life=datetime.timedelta(hours=1))), key=lambda i: i['number'])
-
-
     def getCategories(self):
         log('getCategories')
         collect= []
         data = self.getChannels()
         for channel in data: collect.append(channel['category'])
         counter = collections.Counter(collect)
-        for key, value in sorted(counter.iteritems()): yield (key,'categories', 0)
+        for key, value in sorted(counter.items()): yield (key,'categories', 0)
         
-        
-    def getMediaTypes(self, genre):
-        if   type == 'Movies': return 'movie'
-        elif type == 'TV': return 'episode'
-        elif type == 'Music + Radio': return 'musicvideo'
-        else: return 'video'
-            
-            
-    def pagination(self, seq, rowlen):
-        for start in xrange(0, len(seq), rowlen): yield seq[start:start+rowlen]
 
-            
     def buildGuide(self, data):
         channel, name, opt = data
         log('buildGuide, name=%s,opt=%s'%(name, opt))
@@ -365,12 +367,12 @@ class PlutoTV(object):
                     if type in ['movie','film']:
                         mtype = 'movie'
                         thumb = epposter
-                        label = '%s :[B]%s[/B]'%(label, title)
+                        label = '%s : [B]%s[/B]'%(label, title)
                     elif type in ['tv','series']:
                         mtype = 'episode'
                         thumb = epposter
-                        label = "%s :[B]%s - %s[/B]" % (label, tvtitle, epname)
-                    elif len(epname) > 0: label = '%s :[B]%s - %s[/B]'%(label, title, epname)
+                        label = "%s : [B]%s - %s[/B]" % (label, tvtitle, epname)
+                    elif len(epname) > 0: label = '%s: [B]%s - %s[/B]'%(label, title, epname)
                     epname = label
                     if type == 'music' or epgenre.lower() == 'music': mtype = 'musicvideo'
 
@@ -416,15 +418,10 @@ class PlutoTV(object):
                 newChannel['guidedata'] = guidedata
                 return newChannel
         
-        
-    def uEPG(self):
-        log('uEPG')
-        data = self.getGuidedata()
-        return urllib.parse.quote(json.dumps(list(self.poolList(self.buildGuide, zip(data,repeat('guide'),repeat(''))))))
 
-            
     def browseGuide(self, name, opt=None, data=None):
         log('browseGuide, name=%s, opt=%s'%(name,opt))
+        self.chnums = []
         if data is None: data = self.getGuidedata()
         if opt == 'categories': 
             opt  = name
@@ -480,8 +477,7 @@ class PlutoTV(object):
 
            
     def addLink(self, name, u, mode, infoList=False, infoArt=False, total=0):
-        name = name.encode("utf-8")
-        log('addLink, name = ' + name)
+        log('addLink, name = %s'%name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'true') 
         if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
@@ -493,8 +489,7 @@ class PlutoTV(object):
 
 
     def addDir(self, name, u, mode, infoList=False, infoArt=False):
-        name = name.encode("utf-8")
-        log('addDir, name = ' + name)
+        log('addDir, name = %s'%name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'false')
         if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name} )
@@ -505,17 +500,184 @@ class PlutoTV(object):
         xbmcplugin.addDirectoryItem(handle=int(self.sysARG[1]),url=u,listitem=liz,isFolder=True)
 
 
-    def poolList(self, method, items):
+    def getData(self):
+        log('getData')
+        return {'date'                : datetime.datetime.fromtimestamp(float(time.time())).strftime(xmltv.date_format),
+                'generator-info-name' : '%s Guidedata'%(ADDON_NAME),
+                'generator-info-url'  : ADDON_ID,
+                'source-info-name'    : ADDON_NAME,
+                'source-info-url'     : ADDON_ID}
+
+
+    def save(self, reset=True):
+        log('save')
+        fle = xbmcvfs.File(M3U_FILE, 'w')
+        log('save, saving m3u to %s'%(M3U_FILE))
+        fle.write('\n'.join([item for item in self.m3uList]))
+        fle.close()
+        
+        data   = self.xmltvList['data']
+        writer = xmltv.Writer(encoding=xmltv.locale, date=data['date'],
+                              source_info_url     = data['source-info-url'], 
+                              source_info_name    = data['source-info-name'],
+                              generator_info_url  = data['generator-info-url'], 
+                              generator_info_name = data['generator-info-name'])
+               
+        channels = self.sortChannels(self.xmltvList['channels'])
+        for channel in channels: writer.addChannel(channel)
+        programmes = self.sortProgrammes(self.xmltvList['programmes'])
+        for program in programmes: writer.addProgramme(program)
+        log('save, saving xmltv to %s'%(XMLTV_FILE))
+        writer.write(XMLTV_FILE, pretty_print=True)
+        return True
+        
+        
+    def sortChannels(self, channels=None):
+        channels.sort(key=lambda x:x['id'])
+        log('sortChannels, channels = %s'%(len(channels)))
+        return channels
+
+
+    def sortProgrammes(self, programmes=None):
+        programmes.sort(key=lambda x:x['channel'])
+        programmes.sort(key=lambda x:x['start'])
+        log('sortProgrammes, programmes = %s'%(len(programmes)))
+        return programmes
+
+
+    def buildService(self):
+        log('buildService')
+        channels = self.getChannels()
+        [self.buildM3U(channel) for channel in channels]
+        self.poolList(self.buildXMLTV, self.getGuidedata(full=True).get('channels',[]))
+        self.save()
+        self.chkSettings()
+        return True
+        
+        
+    def getPVR(self):
+        try: return xbmcaddon.Addon(PVR_CLIENT)
+        except: # backend disabled?
+            self.togglePVR('true')
+            xbmc.sleep(1000)
+            return xbmcaddon.Addon(PVR_CLIENT)
+            
+            
+    def chkSettings(self):
+        if ENABLE_CONFIG:
+            addon = self.getPVR()
+            check = [addon.getSetting('m3uRefreshMode')         == '1',
+                     addon.getSetting('m3uRefreshIntervalMins') == '5',
+                     addon.getSetting('logoFromEpg')            == '1',
+                     addon.getSetting('m3uPathType')            == '0',
+                     addon.getSetting('m3uPath')                == M3U_FILE,
+                     addon.getSetting('epgPathType')            == '0',
+                     addon.getSetting('epgPath')                == XMLTV_FILE]
+            if False in check: self.configurePVR()
+        
+        
+    def configurePVR(self):
+        addon = self.getPVR()
+        addon.setSetting('m3uRefreshMode'        , '1')
+        addon.setSetting('m3uRefreshIntervalMins', '5')
+        addon.setSetting('logoFromEpg'           , '1')
+        addon.setSetting('m3uPathType'           , '0')
+        addon.setSetting('m3uPath'               , M3U_FILE)
+        addon.setSetting('epgPathType'           , '0')
+        addon.setSetting('epgPath'               , XMLTV_FILE)
+        
+        
+    def buildM3U(self, channel):
+        litem = '#EXTINF:-1 tvg-chno=%s tvg-id="%s" tvg-name="%s" tvg-logo="%s" group-title="%s" radio="%s",%s\n%s'
+        logo  = (channel.get('logo',{}).get('path',LOGO) or LOGO)
+        group = [channel.get('category','')]
+        radio = False#True if "Music" in group else False
+        urls  = channel.get('stitched',{}).get('urls',[])
+        if len(urls) == 0: return False
+        if isinstance(urls, list): urls = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
+        urls = urls.split('?')[0]+LANGUAGE(30034)
+        self.m3uList.append(litem%(channel['number'],'%s@%s'%(channel['number'],slugify(ADDON_NAME)),channel['name'],logo,';'.join(group),str(radio).lower(),channel['name'],urls))
+        return True
+        
+        
+    def buildXMLTV(self, channel):
+        self.addChannel(channel)
+        [self.addProgram(channel, program) for program in  channel.get('timelines',[])]
+        return True
+        
+        
+    def addChannel(self, channel):
+        logo  = [logo.get('url',ICON) for logo in channel.get('images',[]) if logo.get('type','') == 'logo'][0]
+        citem = ({'id'           : '%s@%s'%(channel['number'],slugify(ADDON_NAME)),
+                  'display-name' : [(channel['name'], LANG)],
+                  'icon'         : [{'src':logo}]})
+        log('addChannel = %s'%(citem))
+        self.xmltvList['channels'].append(citem)
+        return True
+
+
+    def addProgram(self, channel, program):
+        episode = program.get('episode',{})
+        series  = episode.get('series',{})
+        pitem   = {'channel'     : '%s@%s'%(channel['number'],slugify(ADDON_NAME)),
+                   'category'    : [(episode.get('genre','Undefined'),LANG)],
+                   'title'       : [(program['title'], LANG)],
+                   'desc'        : [((episode['description'] or xbmc.getLocalizedString(161)), LANG)],
+                   'stop'        : (strpTime(program['stop'] ,'%Y-%m-%dT%H:%M:%S.%fZ')).strftime(xmltv.date_format),
+                   'start'       : (strpTime(program['start'],'%Y-%m-%dT%H:%M:%S.%fZ')).strftime(xmltv.date_format),
+                   'icon'        : [{'src': (episode.get('poster','') or episode.get('thumbnail','') or episode.get('featuredImage',{})).get('path',FANART)}]}
+                      
+        if episode.get('name',''):
+            pitem['sub-title'] = [(episode['name'], LANG)]
+            
+        if episode.get('clip',{}).get('originalReleaseDate',''):
+            try:
+                pitem['date'] = (strpTime(episode['clip']['originalReleaseDate'])).strftime('%Y%m%d')
+            except: pass
+
+        if episode.get('rating',''):
+            rating = program.get('rating','')
+            if rating.startswith('TV'): 
+                pitem['rating'] = [{'system': 'VCHIP', 'value': rating}]
+            else:  
+                pitem['rating'] = [{'system': 'MPAA', 'value': rating}]
+      
+         ##### TODO #####
+           # 'country'     : [('USA', LANG)],#todo
+           # 'language': (u'English', u''),
+           #  'length': {'units': u'minutes', 'length': '22'},
+           # 'orig-language': (u'English', u''),
+           # 'premiere': (u'Not really. Just testing', u'en'),
+           # 'previously-shown': {'channel': u'C12whdh.zap2it.com', 'start': u'19950921103000 ADT'},
+           # 'audio'       : {'stereo': u'stereo'},#todo                 
+           # 'subtitles'   : [{'type': u'teletext', 'language': (u'English', u'')}],#todo
+           # 'url'         : [(u'http://www.nbc.com/')],#todo
+           # 'review'      : [{'type': 'url', 'value': 'http://some.review/'}],
+           # 'video'       : {'colour': True, 'aspect': u'4:3', 'present': True, 'quality': 'standard'}},#todo
+            
+        log('addProgram = %s'%(pitem))
+        self.xmltvList['programmes'].append(pitem)
+        return True
+     
+     
+    def poolList(self, method, items=None, args=None, chunk=25):
+        log("poolList")
         results = []
-        if ENABLE_POOL and not DEBUG:
+        if ENABLE_POOL:
             pool = ThreadPool(CORES)
-            results = pool.imap_unordered(method, items, chunksize=25)
+            if args is not None: 
+                results = pool.map(method, zip(items,repeat(args)))
+            elif items: 
+                results = pool.map(method, items)#, chunksize=chunk)
             pool.close()
             pool.join()
-        else: results = [method(item) for item in items]
-        results = filter(None, results)
-        return results
-        
+        else:
+            if args is not None: 
+                results = [method((item, args)) for item in items]
+            elif items: 
+                results = [method(item) for item in items]
+        return filter(None, results)
+
         
     def getParams(self):
         return dict(urllib.parse.parse_qsl(self.sysARG[2][1:]))
@@ -541,8 +703,7 @@ class PlutoTV(object):
         elif mode == 4:  self.browseSeason(url)
         elif mode == 5:  self.browseEpisodes(name, url)
         elif mode == 9:  self.playVideo(name, url)
-        elif mode == 20: xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&skin_path=%s&refresh_path=%s&refresh_interval=%s&row_count=%s&include_hdhr=false)"%(self.uEPG(),urllib.parse.quote(ADDON_PATH),urllib.parse.quote(self.sysARG[0]+"?mode=20"),"7200","5"))
-
+        
         xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_NONE)

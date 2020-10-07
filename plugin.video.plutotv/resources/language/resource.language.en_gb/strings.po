@@ -20,42 +20,6 @@ msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr ""
 
-msgctxt "#30001"
-msgid "Enter User Email"
-msgstr ""
-
-msgctxt "#30002"
-msgid "Enter User Password"
-msgstr ""
-
-msgctxt "#30004"
-msgid "Some channels not available in your region"
-msgstr ""
-
-msgctxt "#30005"
-msgid "Select User Region"
-msgstr ""
-
-msgctxt "#30006"
-msgid "Welcome Back, %s"
-msgstr ""
-
-msgctxt "#30007"
-msgid "Invalid User Credentials"
-msgstr ""
-
-msgctxt "#30008"
-msgid "Already have a Pluto.TV account?"
-msgstr ""
-
-msgctxt "#30009"
-msgid "Guest"
-msgstr ""
-
-msgctxt "#30010"
-msgid "Sign-In"
-msgstr ""
-
 msgctxt "#30011"
 msgid "Live"
 msgstr ""
@@ -120,14 +84,26 @@ msgctxt "#30026"
 msgid "Video On Demand"
 msgstr ""
 
-msgctxt "#30027"
-msgid "Open uEPG Guide"
-msgstr ""
-
-msgctxt "#30028"
-msgid "Unable to Connect, Check User Credentials"
-msgstr ""
-
 msgctxt "#30029"
-msgid "Coming Up Next..."
+msgid "Coming Up Later..."
+msgstr ""
+
+msgctxt "#30030"
+msgid "Allow this plugin to automatically configure IPTV Simple PVR Backend?"
+msgstr ""
+
+msgctxt "#30031"
+msgid "M3U/XMLTV Updated"
+msgstr ""
+
+msgctxt "#30032"
+msgid "M3U/XMLTV Path"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Enable M3U/XMLTV Generator Service"
+msgstr ""
+
+msgctxt "#30034"
+msgid "?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&sid=246&deviceId=5331d5fb753499095a00045a&deviceVersion=DNT&appVersion=DNT&deviceDNT=0&userId=&advertisingId=&deviceLat=&deviceLon=&app_name=&appName=web&buildVersion=&appStoreUrl=&architecture=&includeExtendedEvents=false&marketingRegion=US&serverSideAds=false"
 msgstr ""

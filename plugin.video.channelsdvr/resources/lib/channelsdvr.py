@@ -169,15 +169,18 @@ class Channels(object):
         
 
     def loadM3U(self):
+        log('loadM3U')
         m3uListTMP = self.saveURL(M3U_URL,M3U_FILE).split('\n')
         return ['%s\n%s'%(line,m3uListTMP[idx+1]) for idx, line in enumerate(m3uListTMP) if line.startswith('#EXTINF:')]
 
 
     def getGuidedata(self):
+        log('getGuidedata')
         return json.loads(self.saveURL(GUIDE_URL))
 
 
     def loadXMLTV(self):
+        log('loadXMLTV')
         self.poolList(self.buildXMLTV, self.programmes)
         return self.saveXMLTV()
         
@@ -618,13 +621,9 @@ class Channels(object):
         
     def buildService(self):
         log('buildService')
-        try:
-            self.loadM3U()
-            self.loadXMLTV()
+        if self.loadM3U() and self.loadXMLTV():
             self.chkSettings()
             return True
-        except:
-            return False
         
         
     def togglePVR(self, state='true'):

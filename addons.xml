@@ -203,7 +203,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.channelsdvr" version="1.0.2" name="Channels DVR" provider-name="Lunatixz">
+<addon id="plugin.video.channelsdvr" version="1.0.3" name="Channels DVR" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>

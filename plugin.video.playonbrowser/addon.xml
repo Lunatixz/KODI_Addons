@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.playonbrowser" name="PlayOn Browser" version="2.0.8" provider-name="Lunatixz">
+<addon id="plugin.video.playonbrowser" name="PlayOn Browser" version="2.0.9" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -16,7 +16,7 @@
         <disclaimer lang="en_GB">Requires Playon Server Software</disclaimer>
         <platform>all</platform>
         <reuselanguageinvoker>true</reuselanguageinvoker>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+        <license>GPL-3.0-or-later</license>
         <forum>http://forum.kodi.tv/showthread.php?tid=233136</forum>
         <website>https://www.playon.tv</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.playonbrowser</source>

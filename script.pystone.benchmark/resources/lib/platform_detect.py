@@ -30,7 +30,10 @@ def platform_detect():
     # Handle Beaglebone Black
     # TODO: Check the Beaglebone Black /proc/cpuinfo value instead of reading
     # the platform.
-    plat = platform.platform()
+    try:
+        plat = platform.platform()
+    except:
+        plat = 'Unknown'
     if plat.lower().find('armv7l-with-debian') > -1:
         return 'Beaglebone Black'
     elif plat.lower().find('armv7l-with-ubuntu') > -1:

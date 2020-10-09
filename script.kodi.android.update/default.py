@@ -168,7 +168,8 @@ class Installer(object):
             label  = items[select].getLabel()
             newURL = items[select].getPath()
             preURL = url.rsplit('/', 2)[0] + '/'
-            if newURL.endswith('.apk'): 
+            if newURL.endswith('.apk'):
+                if not xbmcvfs.exists(SETTINGS_LOC): xbmcvfs.mkdir(SETTINGS_LOC)
                 dest = xbmc.translatePath(os.path.join(SETTINGS_LOC,label))
                 self.setLastPath(url,dest)
                 return self.downloadAPK(newURL,dest)

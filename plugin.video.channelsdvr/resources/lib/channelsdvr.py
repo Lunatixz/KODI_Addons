@@ -298,7 +298,7 @@ class Channels(object):
 
 
     def addProgram(self, program):
-        pitem = {'channel'     : program['Channel'],
+        pitem = {'channel'     : '%s@%s'%(program['Channel'],slugify(ADDON_NAME)),
                 # 'credits'     : {'director': [program.get('Directors',[])], 'cast': [program.get('Cast',[])]},
                  'category'    : [(genre,LANG) for genre in program.get('Categories',['Undefined'])],
                  'title'       : [(self.cleanString(program['Title']), LANG)],

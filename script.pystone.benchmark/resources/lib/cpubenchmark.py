@@ -83,13 +83,13 @@ class CPU(object):
         space2  = repeat_to_length(' ', avg-1)
         space3  = repeat_to_length(' ', (100 - avg) - len(msg))
         line    = '%s%s%s%s'%(LANGUAGE(30004)%('green',repeat_to_length('-',25)),LANGUAGE(30004)%('yellow',repeat_to_length('-',25)),LANGUAGE(30004)%('orange',repeat_to_length('-',25)),LANGUAGE(30004)%('red',repeat_to_length('-',25)))
-        arrow   = '%s^%s[CR]%s%s%s%s%s'%(space1,space2,space3,msg,LANGUAGE(30004)%(color,avg),LANGUAGE(30004)%(color,'%'),space2)
+        arrow   = '%s^%s\n%s%s%s%s%s'%(space1,space2,space3,msg,LANGUAGE(30004)%(color,avg),LANGUAGE(30004)%(color,'%'),space2)
         back    = LANGUAGE(30004)%('dimgrey',LANGUAGE(30005))
-        return '%s[CR]%s[CR]%s[CR]%s'%(score, line, arrow, back)
+        return '%s\n%s\n%s\n%s'%(score, line, arrow, back)
 
 
     def run(self):
         duration, stones = self.getpystone()
         info = LANGUAGE(30007)%(platform_detect.platform_detect(),platform_detect.processor_detect(),platform_detect.getcpu(),cpu_count())
-        envo = LANGUAGE(30008)%(xbmc.getInfoLabel('System.BuildVersion'),platform.system())
+        envo = LANGUAGE(30008)%(xbmc.getInfoLabel('System.BuildVersion'),(platform.system() or platform_detect.platform_detect()))
         textviewer('%s[CR]%s[CR]%s'%(envo,info,self.rank(stones)))

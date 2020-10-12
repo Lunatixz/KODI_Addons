@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<settings>
-    <setting id="Enable_Debugging" type="bool"   label="32000" default="false" />
-    <setting id="dl_folder"        type="folder" label="32001" source="auto" option="writeable" default="special://profile/addon_data/service.tvthemes/themes/"/>
-    <setting id="ffmpeg_exe"       type="file"   label="32002" source="auto" value=""/> 
-</settings>

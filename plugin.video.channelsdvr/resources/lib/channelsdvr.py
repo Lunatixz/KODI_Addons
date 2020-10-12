@@ -17,13 +17,14 @@
 # along with Channels DVR.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import os, sys, time, _strptime, datetime, re, traceback, json, inputstreamhelper, threading
+import os, sys, time, _strptime, datetime, re, traceback, json, inputstreamhelper, threading, requests
 
 from itertools     import repeat, cycle, chain, zip_longest
 from resources.lib import xmltv
 from simplecache   import SimpleCache, use_cache
 from six.moves     import urllib
 from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
+
 
 try:
     from multiprocessing import cpu_count 
@@ -154,24 +155,34 @@ class Channels(object):
         self.channels   = self.getChannels(self.getM3U(),ADDON_VERSION)
         self.programmes = self.getGuidedata(ADDON_VERSION)
         
-
-    def saveURL(self, url, file=None, life=datetime.timedelta(minutes=1)):
-        log('saveURL, url = %s, file = %s'%(url,file))
+        
+    def openURL(self, url, life=datetime.timedelta(minutes=5)):
+        log('openURL, url = %s'%(url))
         try:
-            cacheName = '%s.saveURL.%s'%(ADDON_ID,url)
+            cacheName = '%s.%s.openURL.%s'%(ADDON_ID,ADDON_VERSION,url)
             cacheResponse = self.cache.get(cacheName)
-            if cacheResponse is None:
-                response = urllib.request.urlopen(url).read()
-                cacheResponse = response.decode("utf-8")
-                self.cache.set(cacheName, cacheResponse, checksum=len(cacheResponse), expiration=life)
-                if file is not None:
-                    fle = xbmcvfs.File(file, 'w')
-                    fle.write(cacheResponse)
-                    fle.close()
+            if not cacheResponse:
+                req = requests.get(url)
+                cacheResponse = req.text
+                req.close()
+                # self.cache.set(cacheName, cacheResponse, checksum=len(cacheResponse), expiration=life)
             return cacheResponse
         except Exception as e: 
-            log("saveURL, Failed! %s"%(e), xbmc.LOGERROR)
+            log("openURL, Failed! %s"%(e), xbmc.LOGERROR)
             notificationDialog(LANGUAGE(30001))
+            return ''
+        
+
+    def saveURL(self, url, file):
+        log('saveURL, url = %s, file = %s'%(url,file))
+        try:
+            response = self.openURL(url)
+            fle = xbmcvfs.File(file, 'w')
+            fle.write(response)
+            fle.close()
+            return response
+        except Exception as e: 
+            log("saveURL, Failed! %s"%(e), xbmc.LOGERROR)
             return ''
         
 
@@ -189,6 +200,8 @@ class Channels(object):
             if line.startswith('#EXTINF:'):
                 groups = re.compile('tvg-chno=\"(.*?)\" tvg-logo=\"(.*?)\" tvg-name=\"(.*?)\" group-title=\"(.*?)\",(.*)\\n(.*)', re.IGNORECASE).search(line)
                 items.append({'number':groups.group(1),'logo':groups.group(2),'name':groups.group(3),'groups':groups.group(4),'title':groups.group(5),'url':groups.group(6)})
+        try: xbmcvfs.delete(M3U_TEMP)
+        except: pass
         return sorted(items, key=lambda k: k['number'])
         
 
@@ -210,7 +223,7 @@ class Channels(object):
     # @use_cache(1)
     def getGuidedata(self, version=ADDON_VERSION):
         log('getGuidedata')
-        return json.loads(self.saveURL(GUIDE_URL))
+        return json.loads(self.openURL(GUIDE_URL))
 
 
     def loadXMLTV(self):
@@ -276,7 +289,7 @@ class Channels(object):
 
 
     def addChannel(self, channel):
-        citem    = ({'id'           : channel['Number'],
+        citem    = ({'id'           : '%s@%s'%(channel['Number'],slugify(ADDON_NAME)),
                      'display-name' : [(channel['Name'], LANG)],
                      'icon'         : [{'src':channel.get('Image',ICON)}]})
         log('addChannel = %s'%(citem))
@@ -288,14 +301,14 @@ class Channels(object):
         pitem = {'channel'     : program['Channel'],
                 # 'credits'     : {'director': [program.get('Directors',[])], 'cast': [program.get('Cast',[])]},
                  'category'    : [(genre,LANG) for genre in program.get('Categories',['Undefined'])],
-                 'title'       : [(program['Title'], LANG)],
-                 'desc'        : [((program['Summary'] or xbmc.getLocalizedString(161)), LANG)],
+                 'title'       : [(self.cleanString(program['Title']), LANG)],
+                 'desc'        : [((self.cleanString(program.get('Summary','')) or xbmc.getLocalizedString(161)), LANG)],
                  'stop'        : (strpTime(program['Raw']['endTime']).strftime(xmltv.date_format)),
                  'start'       : (strpTime(program['Raw']['startTime']).strftime(xmltv.date_format)),
                  'icon'        : [{'src': program.get('Image',FANART)}]}
                       
         if program.get('EpisodeTitle',''):
-            pitem['sub-title'] = [(program['EpisodeTitle'], LANG)]
+            pitem['sub-title'] = [(self.cleanString(program['EpisodeTitle']), LANG)]
             
         if program.get('OriginalDate',''):
             try:
@@ -319,6 +332,10 @@ class Channels(object):
         self.xmltvList['programmes'].append(pitem)
         return True
         
+
+    def cleanString(self, text):
+        return text.encode("ascii", errors="replace").decode()
+
         
     def playVideo(self, name, url):
         log('playVideo, url = %s'%url)
@@ -334,6 +351,10 @@ class Channels(object):
             if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
                 liz.setProperty('inputstreamaddon','inputstream.adaptive')
                 liz.setProperty('inputstream.adaptive.manifest_type','hls')
+            # elif 'mpg' in url.lower():
+                # liz.setProperty('inputstreamaddon','inputstream.ffmpegdirect')
+                # liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
+                # liz.setProperty('inputstream.ffmpegdirect.is_realtime_stream','true')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), found, liz)
 
 
@@ -448,113 +469,9 @@ class Channels(object):
         item['Channel'] = {'Hidden':False,'Number':0,'Name':'','Image':''}
         self.buildPlayItem((item,'recordings'))
         
-   
-        
-    # {
-	# 'ID': '28904',
-	# 'JobID': '1599865190-ch6070',
-	# 'RuleID': '',
-	# 'GroupID': '248379',
-	# 'Path': 'TV\\Inside 9-11 War on America\\Inside 9-11 War on America 2005-08-21 2020-09-11-1859.mpg',
-	# 'Checksum': '',
-	# 'CreatedAt': 1599865190,
-	# 'Watched': False,
-	# 'Deleted': False,
-	# 'PlaybackTime': 0,
-	# 'Duration': 7234.961933,
-	# 'Commercials': [839.79, 989.84, 1413.81, 1659.18, 2137.23, 2352.71, 2686.46, 2907.73, 3437.7200000000003, 3707.59, 4401.52, 4635.47, 5091.42, 5331.6, 5810.4400000000005, 6020.59, 6351.610000000001, 6591.22],
-	# 'Delayed': False,
-	# 'Corrupted': False,
-	# 'Cancelled': False,
-	# 'Completed': True,
-	# 'Processed': True,
-	# 'Favorited': False,
-	# 'Locked': False,
-	# 'Airing': {
-		# 'Source': 'tms',
-		# 'Channel': '6070',
-		# 'OriginalDate': '2005-08-21',
-		# 'Time': 1599865200,
-		# 'Duration': 7200,
-		# 'Title': 'Inside 9/11: War on America',
-		# 'Summary': 'Investigation of the events leading up to the terrorist attacks of Sept. 11, 2001.',
-		# 'Image': 'https://tmsimg.fancybits.co/assets/p248379_b_h6_ak.jpg',
-		# 'Categories': ['Show', 'Special'],
-		# 'Genres': ['Documentary', 'Special'],
-		# 'Tags': ['CC', 'HD 1080i', 'HDTV'],
-		# 'SeriesID': '248379',
-		# 'ProgramID': 'SH007602260000-1599865200',
-		# 'TeamIDs': None,
-		# 'SeasonNumber': 0,
-		# 'EpisodeNumber': 0,
-		# 'Directors': None,
-		# 'Cast': None,
-		# 'Raw': {
-			# 'startTime': '2020-09-11T23:00Z',
-			# 'endTime': '2020-09-12T01:00Z',
-			# 'duration': 120,
-			# 'channels': ['6070'],
-			# 'stationId': '49438',
-			# 'qualifiers': ['CC', 'HD 1080i', 'HDTV'],
-			# 'ratings': [{
-				# 'body': 'USA Parental Rating',
-				# 'code': 'TVPG'
-			# }],
-			# 'program': {
-				# 'tmsId': 'SH007602260000',
-				# 'rootId': '248379',
-				# 'seriesId': '248379',
-				# 'entityType': 'Show',
-				# 'subType': 'Special',
-				# 'title': 'Inside 9/11: War on America',
-				# 'titleLang': 'en',
-				# 'releaseYear': 2005,
-				# 'releaseDate': '2005-08-21',
-				# 'origAirDate': '2005-08-21',
-				# 'descriptionLang': 'en',
-				# 'shortDescription': 'Investigation of the events leading up to the terrorist attacks of Sept. 11, 2001.',
-				# 'longDescription': 'Investigation of the events leading up to the terrorist attacks of Sept. 11, 2001.',
-				# 'topCast': None,
-				# 'genres': ['Documentary', 'Special'],
-				# 'preferredImage': {
-					# 'uri': 'https://tmsimg.fancybits.co/assets/p248379_b_h6_ak.jpg',
-					# 'height': '540',
-					# 'width': '720',
-					# 'primary': 'true',
-					# 'category': 'Banner-L2',
-					# 'text': 'yes',
-					# 'tier': ''
-				# }
-			# }
-		# }
-	# },
-	# 'ChannelNumber': '6070',
-	# 'DeviceID': 'TVE-Spectrum',
-	# 'PlayedAt': 0,
-	# 'UpdatedAt': 1599879912739,
-	# 'DeletedAt': 0,
-	# 'FavoritedAt': 0,
-	# 'DeletedReason': '',
-	# 'DeleteNow': False,
-	# 'HighestPTS': 651147881,
-	# 'SignalStats': None,
-	# 'CommercialsAligned': True,
-	# 'CommercialsEdited': False,
-	# 'CommercialsVerified': False,
-	# 'CommercialDetectSource': 'local',
-	# 'CloudComskip': {
-		# 'Successful': False
-	# },
-	# 'ImportPath': '',
-	# 'ImportQuery': '',
-	# 'ImportGroup': '',
-	# 'ImportedAt': 0,
-	# 'DeleteScheduledFor': 259200000
-# }
-    
             
     def buildRecordings(self):
-        self.poolList(self.buildRecordingItem, json.loads(self.saveURL(UPNEXT_URL)))
+        self.poolList(self.buildRecordingItem, json.loads(self.openURL(UPNEXT_URL)))
             
         
     def search(self, term=None):
@@ -562,7 +479,7 @@ class Channels(object):
         if term is None: term = getKeyboard(header=LANGUAGE(30014))
         if term:
             log('search, term = %s'%(term))
-            query = json.loads(self.saveURL(SEARCH_URL.format(query=term)))
+            query = json.loads(self.openURL(SEARCH_URL.format(query=term)))
 
 
     def buildLineup(self, chid=None):

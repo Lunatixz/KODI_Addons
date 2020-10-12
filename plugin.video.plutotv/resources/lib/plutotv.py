@@ -626,14 +626,14 @@ class PlutoTV(object):
         series  = episode.get('series',{})
         pitem   = {'channel'     : '%s@%s'%(channel['number'],slugify(ADDON_NAME)),
                    'category'    : [(episode.get('genre','Undefined'),LANG)],
-                   'title'       : [(program['title'], LANG)],
-                   'desc'        : [((episode['description'] or xbmc.getLocalizedString(161)), LANG)],
+                   'title'       : [(self.cleanString(program['title']), LANG)],
+                   'desc'        : [((self.cleanString(episode.get('description','')) or xbmc.getLocalizedString(161)), LANG)],
                    'stop'        : (strpTime(program['stop'] ,'%Y-%m-%dT%H:%M:%S.%fZ')).strftime(xmltv.date_format),
                    'start'       : (strpTime(program['start'],'%Y-%m-%dT%H:%M:%S.%fZ')).strftime(xmltv.date_format),
                    'icon'        : [{'src': (episode.get('poster','') or episode.get('thumbnail','') or episode.get('featuredImage',{})).get('path',FANART)}]}
                       
         if episode.get('name',''):
-            pitem['sub-title'] = [(episode['name'], LANG)]
+            pitem['sub-title'] = [(self.cleanString(episode['name']), LANG)]
             
         if episode.get('clip',{}).get('originalReleaseDate',''):
             try:
@@ -665,6 +665,10 @@ class PlutoTV(object):
         return True
      
      
+    def cleanString(self, text):
+        return text.encode("ascii", errors="replace").decode()
+
+        
     def poolList(self, method, items=None, args=None, chunk=25):
         log("poolList")
         results = []

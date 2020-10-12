@@ -33,7 +33,7 @@ def platform_detect():
     try:
         plat = platform.platform()
     except:
-        plat = 'Unknown'
+        plat = platform.system()
     if plat.lower().find('armv7l-with-debian') > -1:
         return 'Beaglebone Black'
     elif plat.lower().find('armv7l-with-ubuntu') > -1:
@@ -88,7 +88,7 @@ def pi_version(processor=False):
         
 def processor_detect():
     pi = pi_version(processor=True)
-    if pi is None: return platform.processor()
+    if pi is None: return (platform.processor() or platform.machine())
     
     
 def getcpu():

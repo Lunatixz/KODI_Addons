@@ -61,6 +61,7 @@ DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 M3UXMLTV      = REAL_SETTINGS.getSetting('Enable_M3UXMLTV') == 'true'
 ENABLE_TS     = REAL_SETTINGS.getSetting('Enable_TS') == 'true'
 ENABLE_CONFIG = REAL_SETTINGS.getSetting('Enable_Config') == 'true'
+BUILD_FAVS    = REAL_SETTINGS.getSetting('Build_Favorites') == 'true'
 USER_PATH     = REAL_SETTINGS.getSetting('User_Folder') 
 
 BASE_URL      = 'http://%s:%s'%(REAL_SETTINGS.getSetting('User_IP'),REAL_SETTINGS.getSetting('User_Port')) #todo dns discovery?
@@ -209,6 +210,7 @@ class Channels(object):
         litem = '#EXTINF:-1 tvg-chno="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s" group-title="%s" radio="%s",%s\n%s\n'
         logo  = (channel.get('logo','') or ICON)
         group = channel.get('groups','').split(';')
+        if BUILD_FAVS and 'Favorites' not in group: return False
         group.append(ADDON_NAME)
         radio = False
         self.m3uList.append(litem%(channel['number'],'%s@%s'%(channel['number'],slugify(ADDON_NAME)),channel['name'],logo,';'.join(group),str(radio).lower(),channel['title'],channel['url']))
@@ -235,7 +237,8 @@ class Channels(object):
     def buildXMLTV(self, content):
         channel    = content['Channel']
         programmes = content['Airings']
-        if channel['Hidden'] == True: return False
+        if channel.get('Hidden',False): return False
+        if BUILD_FAVS and not channel.get('Favorite',False): return False
         self.addChannel(channel)
         [self.addProgram(program) for program in  programmes]
         return True

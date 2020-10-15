@@ -25,7 +25,6 @@ from simplecache   import SimpleCache, use_cache
 from six.moves     import urllib
 from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 
-
 try:
     from multiprocessing import cpu_count 
     from multiprocessing.pool import ThreadPool 
@@ -57,6 +56,7 @@ CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
 DTFORMAT      = '%Y%m%d%H%M%S'
 PVR_CLIENT    = 'pvr.iptvsimple'
+DNS_CLIENT    = '_channels_app._tcp'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 M3UXMLTV      = REAL_SETTINGS.getSetting('Enable_M3UXMLTV') == 'true'
 ENABLE_TS     = REAL_SETTINGS.getSetting('Enable_TS') == 'true'
@@ -69,14 +69,20 @@ TS            = '?format=ts' if ENABLE_TS else ''
 M3U_URL       = '%s/devices/ANY/channels.m3u%s'%(BASE_URL,TS)
 GUIDE_URL     = '%s/devices/ANY/guide'%(BASE_URL)
 UPNEXT_URL    = '%s/dvr/recordings/upnext'%(BASE_URL)
-GROUPS_URL    = '%s/dvr/groups'%(BASE_URL)
 SEARCH_URL    = '%s/dvr/guide/search/groups?q={query}'%(BASE_URL)
+
 SUMMARY_URL   = '%s/dvr/recordings/summary'%(BASE_URL)
+GROUPS_URL    = '%s/dvr/groups'%(BASE_URL)
+MOVIES_URL    = '%s/dvr/groups/movies/files'%(BASE_URL)
+SOURCES_URL   = '%s/dvr/lineup'%(BASE_URL)
+PROGRAMS_URL  = '%s/dvr/programs'%(BASE_URL)
+
 M3U_TEMP      = os.path.join(SETTINGS_LOC,'channelsdvr.tmp')
 M3U_FILE      = os.path.join(USER_PATH,'channelsdvr.m3u')
 XMLTV_FILE    = os.path.join(USER_PATH,'channelsdvr.xml')
 MENU          = [(LANGUAGE(30002), '', 0),
-                (LANGUAGE(30003), '', 1)]
+                 (LANGUAGE(30017), '', 1),
+                 (LANGUAGE(30003), '', 2)]
                 # (LANGUAGE(30015), '', 2)]
                 #(LANGUAGE(30013), '', 8)]
                 
@@ -122,19 +128,19 @@ def slugify(text):
     text = non_url_safe_regex.sub('', text).strip()
     text = u'_'.join(re.split(r'\s+', text))
     return text
-
+     
 class Service(object):
     def __init__(self, sysARG=sys.argv):
         self.running    = False
         self.myMonitor  = xbmc.Monitor()
         self.myChannels = Channels(sysARG)
-        
-        
+
+
     def run(self):
         while not self.myMonitor.abortRequested():
             if self.myMonitor.waitForAbort(2): break
             elif not M3UXMLTV or self.running: continue
-            lastCheck = float(REAL_SETTINGS.getSetting('Last_Scan') or 0)
+            lastCheck  = float(REAL_SETTINGS.getSetting('Last_Scan') or 0)
             conditions = [xbmcvfs.exists(M3U_FILE),xbmcvfs.exists(XMLTV_FILE)]
             if (time.time() > (lastCheck + 3600)) or False in conditions:
                 self.running = True
@@ -166,7 +172,7 @@ class Channels(object):
                 req = requests.get(url)
                 cacheResponse = req.text
                 req.close()
-                # self.cache.set(cacheName, cacheResponse, checksum=len(cacheResponse), expiration=life)
+                self.cache.set(cacheName, cacheResponse, checksum=len(cacheResponse), expiration=life)
             return cacheResponse
         except Exception as e: 
             log("openURL, Failed! %s"%(e), xbmc.LOGERROR)
@@ -177,6 +183,7 @@ class Channels(object):
     def saveURL(self, url, file):
         log('saveURL, url = %s, file = %s'%(url,file))
         try:
+            #grab unadulterated m3u, option to preserve?
             response = self.openURL(url)
             fle = xbmcvfs.File(file, 'w')
             fle.write(response)
@@ -238,7 +245,7 @@ class Channels(object):
         channel    = content['Channel']
         programmes = content['Airings']
         if channel.get('Hidden',False): return False
-        if BUILD_FAVS and not channel.get('Favorite',False): return False
+        elif BUILD_FAVS and not channel.get('Favorite',False): return False
         self.addChannel(channel)
         [self.addProgram(program) for program in  programmes]
         return True
@@ -425,17 +432,19 @@ class Channels(object):
         return ''
         
         
-    def buildLive(self):
+    def buildLive(self, favorites=False):
         log('buildLive')
-        self.poolList(self.buildPlayItem, self.programmes, 'live')
+        self.poolList(self.buildPlayItem, self.programmes, ('live',favorites))
         
         
     def buildPlayItem(self, data):
-        content, opt = data
+        content, opt   = data
+        opt, favorites = opt
         channel    = content['Channel']
         programmes = content['Airings']
         liveMatch  = False
         if channel['Hidden'] == True: return
+        elif favorites and not channel.get('Favorite',False): return
         tz  = (timezone()//100)*60*60
         now = (datetime.datetime.fromtimestamp(float(getLocalTime()))) + datetime.timedelta(seconds=tz)
         url = self.getLiveURL(channel['Number'], self.channels)
@@ -558,8 +567,9 @@ class Channels(object):
 
         if   mode==None: self.mainMenu()
         elif mode == 0:  self.buildLive()
-        elif mode == 1:  self.buildLineup(url)
-        elif mode == 2:  self.buildRecordings()
+        elif mode == 1:  self.buildLive(favorites=True)
+        elif mode == 2:  self.buildLineup(url)
+        elif mode == 3:  self.buildRecordings()
         elif mode == 8:  self.search(name)
         elif mode == 9:  self.playVideo(name, url)
         

@@ -83,3 +83,7 @@ msgstr ""
 msgctxt "#30016"
 msgid "Build Only Favorites"
 msgstr ""
+
+msgctxt "#30017"
+msgid "Live (Favorites)"
+msgstr ""

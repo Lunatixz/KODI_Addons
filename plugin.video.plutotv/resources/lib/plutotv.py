@@ -554,9 +554,9 @@ class PlutoTV(object):
         log('buildService')
         channels = self.getChannels()
         [self.buildM3U(channel) for channel in channels]
-        self.poolList(self.buildXMLTV, self.getGuidedata(full=True).get('channels',[]))
-        self.save()
-        self.chkSettings()
+        if self.poolList(self.buildXMLTV, self.getGuidedata(full=True).get('channels',[])):
+            self.save()
+            self.chkSettings()
         return True
         
         
@@ -596,12 +596,13 @@ class PlutoTV(object):
         litem = '#EXTINF:-1 tvg-chno="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s" group-title="%s" radio="%s",%s\n%s'
         logo  = (channel.get('logo',{}).get('path',LOGO) or LOGO)
         group = [channel.get('category','')]
+        group.append('Pluto TV')
         radio = False#True if "Music" in group else False
         urls  = channel.get('stitched',{}).get('urls',[])
         if len(urls) == 0: return False
         if isinstance(urls, list): urls = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
         urls = urls.split('?')[0]+LANGUAGE(30034)
-        self.m3uList.append(litem%(channel['number'],'%s@%s'%(channel['number'],slugify(ADDON_NAME)),channel['name'],logo,';'.join(group),str(radio).lower(),channel['name'],urls))
+        self.m3uList.append(litem%(channel['number'],'%s@%s'%(channel['number'],slugify(ADDON_NAME)),channel['name'],logo,';'.join(list(set(group))),str(radio).lower(),channel['name'],urls))
         return True
         
         
@@ -614,7 +615,7 @@ class PlutoTV(object):
     def addChannel(self, channel):
         logo  = [logo.get('url',ICON) for logo in channel.get('images',[]) if logo.get('type','') == 'logo'][0]
         citem = ({'id'           : '%s@%s'%(channel['number'],slugify(ADDON_NAME)),
-                  'display-name' : [(channel['name'], LANG)],
+                  'display-name' : [(self.cleanString(channel['name']), LANG)],
                   'icon'         : [{'src':logo}]})
         log('addChannel = %s'%(citem))
         self.xmltvList['channels'].append(citem)

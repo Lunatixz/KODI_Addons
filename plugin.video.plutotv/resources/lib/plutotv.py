@@ -128,17 +128,24 @@ class Service(object):
         self.myMonitor = MONITOR
         self.myPlutoTV = PlutoTV(sysARG)
         
-        
+
+    def regPseudoTV(self):
+        log('Service, regPseudoTV')
+        asset = {'type':'iptv','icon':ICON,'m3u':M3U_FILE,'xmltv':XMLTV_FILE,'id':ADDON_ID}
+        xbmcgui.Window(10000).setProperty('PseudoTV_Recommended.%s'%(ADDON_ID), json.dumps(asset))
+
+
     def run(self):
         log('Service, run')
         while not self.myMonitor.abortRequested():
-            if self.myMonitor.waitForAbort(2): break
+            if self.myMonitor.waitForAbort(5): break
             if not M3UXMLTV or self.running: continue
             lastCheck  = float(REAL_SETTINGS.getSetting('Last_Scan') or 0)
             conditions = [xbmcvfs.exists(M3U_FILE),xbmcvfs.exists(XMLTV_FILE)]
             if (time.time() > (lastCheck + 3600)) or (False in conditions):
                 self.running = True
                 if self.myPlutoTV.buildService():
+                    self.regPseudoTV()
                     REAL_SETTINGS.setSetting('Last_Scan',str(time.time()))
                     notificationDialog(LANGUAGE(30031))
                 self.running = False
@@ -462,6 +469,24 @@ class PlutoTV(object):
         data = list(self.getCategories())
         for item in data: self.addDir(*item) 
        
+       
+    def playVOD(self, name, id):
+        log('playVOD, id = %s'%id)
+        data = self.getClips(id)[0]
+        if not data: return
+        name  = data.get('name',name)
+        epdur = (data.get('duration',0) // 1000)
+        url   = (data.get('url','') or data.get('sources',[])[0].get('file',''))
+        liz   = xbmcgui.ListItem(name)
+        liz.setPath(url)
+        liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"duration":epdur})
+        liz.setArt({'thumb':data.get('thumbnail',ICON),'fanart':data.get('thumbnail',FANART)})
+        liz.setProperty("IsPlayable","true")
+        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream() and not DEBUG:
+            liz.setProperty('inputstreamaddon','inputstream.adaptive')
+            liz.setProperty('inputstream.adaptive.manifest_type','hls')
+        xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
+        
         
     def playVideo(self, name, url, liz=None):
         if url.lower() == 'next_show': 
@@ -571,7 +596,8 @@ class PlutoTV(object):
     def chkSettings(self):
         if ENABLE_CONFIG:
             addon = self.getPVR()
-            check = [addon.getSetting('m3uRefreshMode')         == '1',
+            check = [addon.getSetting('catchupEnabled')         == 'true',
+                     addon.getSetting('m3uRefreshMode')         == '1',
                      addon.getSetting('m3uRefreshIntervalMins') == '5',
                      addon.getSetting('logoFromEpg')            == '1',
                      addon.getSetting('m3uPathType')            == '0',
@@ -583,6 +609,7 @@ class PlutoTV(object):
         
     def configurePVR(self):
         addon = self.getPVR()
+        addon.setSetting('catchupEnabled'        , 'true')
         addon.setSetting('m3uRefreshMode'        , '1')
         addon.setSetting('m3uRefreshIntervalMins', '5')
         addon.setSetting('logoFromEpg'           , '1')
@@ -593,16 +620,21 @@ class PlutoTV(object):
         
         
     def buildM3U(self, channel):
-        litem = '#EXTINF:-1 tvg-chno="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s" group-title="%s" radio="%s",%s\n%s'
+        litem = '#EXTINF:-1 tvg-chno="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s" group-title="%s" radio="%s"%s,%s\n%s'
         logo  = (channel.get('logo',{}).get('path',LOGO) or LOGO)
         group = [channel.get('category','')]
         group.append('Pluto TV')
-        radio = False#True if "Music" in group else False
+        radio   = False #True if "Music" in group else False
+        catchup = True #todo look for ondemand key that works!
+        if radio or not catchup: 
+            vod = ''
+        else:
+            vod = ' catchup="vod"'
         urls  = channel.get('stitched',{}).get('urls',[])
         if len(urls) == 0: return False
         if isinstance(urls, list): urls = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
         urls = urls.split('?')[0]+LANGUAGE(30034)
-        self.m3uList.append(litem%(channel['number'],'%s@%s'%(channel['number'],slugify(ADDON_NAME)),channel['name'],logo,';'.join(list(set(group))),str(radio).lower(),channel['name'],urls))
+        self.m3uList.append(litem%(channel['number'],'%s@%s'%(channel['number'],slugify(ADDON_NAME)),channel['name'],logo,';'.join(list(set(group))),str(radio).lower(),vod,channel['name'],urls))
         return True
         
         
@@ -625,14 +657,18 @@ class PlutoTV(object):
     def addProgram(self, channel, program):
         episode = program.get('episode',{})
         series  = episode.get('series',{})
+        uri     = episode.get('_id','')
         pitem   = {'channel'     : '%s@%s'%(channel['number'],slugify(ADDON_NAME)),
-                   'category'    : [(episode.get('genre','Undefined'),LANG)],
+                   'category'    : [(self.cleanString(episode.get('genre','Undefined')),LANG)],
                    'title'       : [(self.cleanString(program['title']), LANG)],
                    'desc'        : [((self.cleanString(episode.get('description','')) or xbmc.getLocalizedString(161)), LANG)],
                    'stop'        : (strpTime(program['stop'] ,'%Y-%m-%dT%H:%M:%S.%fZ')).strftime(xmltv.date_format),
                    'start'       : (strpTime(program['start'],'%Y-%m-%dT%H:%M:%S.%fZ')).strftime(xmltv.date_format),
                    'icon'        : [{'src': (episode.get('poster','') or episode.get('thumbnail','') or episode.get('featuredImage',{})).get('path',FANART)}]}
-                      
+                   
+        if uri:
+            pitem['catchup-id'] = 'plugin://%s/?mode=8&name=%s&url=%s'%(ADDON_ID,urllib.parse.quote(self.cleanString(program['title'])),urllib.parse.quote(uri))
+
         if episode.get('name',''):
             pitem['sub-title'] = [(self.cleanString(episode['name']), LANG)]
             
@@ -648,27 +684,15 @@ class PlutoTV(object):
             else:  
                 pitem['rating'] = [{'system': 'MPAA', 'value': rating}]
       
-         ##### TODO #####
-           # 'country'     : [('USA', LANG)],#todo
-           # 'language': (u'English', u''),
-           #  'length': {'units': u'minutes', 'length': '22'},
-           # 'orig-language': (u'English', u''),
-           # 'premiere': (u'Not really. Just testing', u'en'),
-           # 'previously-shown': {'channel': u'C12whdh.zap2it.com', 'start': u'19950921103000 ADT'},
-           # 'audio'       : {'stereo': u'stereo'},#todo                 
-           # 'subtitles'   : [{'type': u'teletext', 'language': (u'English', u'')}],#todo
-           # 'url'         : [(u'http://www.nbc.com/')],#todo
-           # 'review'      : [{'type': 'url', 'value': 'http://some.review/'}],
-           # 'video'       : {'colour': True, 'aspect': u'4:3', 'present': True, 'quality': 'standard'}},#todo
-            
         log('addProgram = %s'%(pitem))
         self.xmltvList['programmes'].append(pitem)
         return True
      
      
     def cleanString(self, text):
-        return text.encode("ascii", errors="replace").decode()
-
+        if text is None: return ''
+        return text
+        
         
     def poolList(self, method, items=None, args=None, chunk=25):
         log("poolList")
@@ -712,6 +736,7 @@ class PlutoTV(object):
         elif mode == 3:  self.browseOndemand(url)
         elif mode == 4:  self.browseSeason(url)
         elif mode == 5:  self.browseEpisodes(name, url)
+        elif mode == 8:  self.playVOD(name, url)
         elif mode == 9:  self.playVideo(name, url)
         
         xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)

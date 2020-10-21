@@ -136,15 +136,23 @@ class Service(object):
         self.myChannels = Channels(sysARG)
 
 
+    def regPseudoTV(self):
+        log('Service, regPseudoTV')
+        asset = {'type':'iptv','icon':ICON,'m3u':M3U_FILE,'xmltv':XMLTV_FILE,'id':ADDON_ID}
+        xbmcgui.Window(10000).setProperty('PseudoTV_Recommended.%s'%(ADDON_ID), json.dumps(asset))
+
+
     def run(self):
+        log('Service, run')
         while not self.myMonitor.abortRequested():
-            if self.myMonitor.waitForAbort(2): break
+            if self.myMonitor.waitForAbort(5): break
             elif not M3UXMLTV or self.running: continue
             lastCheck  = float(REAL_SETTINGS.getSetting('Last_Scan') or 0)
             conditions = [xbmcvfs.exists(M3U_FILE),xbmcvfs.exists(XMLTV_FILE)]
             if (time.time() > (lastCheck + 3600)) or False in conditions:
                 self.running = True
                 if self.myChannels.buildService(): 
+                    self.regPseudoTV()
                     REAL_SETTINGS.setSetting('Last_Scan',str(time.time()))
                     notificationDialog(LANGUAGE(30007))
                 self.running = False
@@ -300,7 +308,7 @@ class Channels(object):
 
     def addChannel(self, channel):
         citem    = ({'id'           : '%s@%s'%(channel['Number'],slugify(ADDON_NAME)),
-                     'display-name' : [(channel['Name'], LANG)],
+                     'display-name' : [(self.cleanString(channel['Name']), LANG)],
                      'icon'         : [{'src':channel.get('Image',ICON)}]})
         log('addChannel = %s'%(citem))
         self.xmltvList['channels'].append(citem)
@@ -342,9 +350,10 @@ class Channels(object):
         self.xmltvList['programmes'].append(pitem)
         return True
         
-
+        
     def cleanString(self, text):
-        return text.encode("ascii", errors="replace").decode()
+        if text is None: return ''
+        return text
 
         
     def playVideo(self, name, url):

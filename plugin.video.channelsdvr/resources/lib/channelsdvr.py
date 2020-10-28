@@ -51,12 +51,10 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 
 ## GLOBALS ##
 LANG          = 'en' #todo
-TIMEOUT       = 30
 CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
-DTFORMAT      = '%Y%m%d%H%M%S'
 PVR_CLIENT    = 'pvr.iptvsimple'
-DNS_CLIENT    = '_channels_app._tcp'
+PVR_SERVER    = '_channels_app._tcp'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 M3UXMLTV      = REAL_SETTINGS.getSetting('Enable_M3UXMLTV') == 'true'
 ENABLE_TS     = REAL_SETTINGS.getSetting('Enable_TS') == 'true'
@@ -64,6 +62,7 @@ ENABLE_CONFIG = REAL_SETTINGS.getSetting('Enable_Config') == 'true'
 BUILD_FAVS    = REAL_SETTINGS.getSetting('Build_Favorites') == 'true'
 USER_PATH     = REAL_SETTINGS.getSetting('User_Folder') 
 
+REMOTE_URL    = 'http://my.channelsdvr.net'
 BASE_URL      = 'http://%s:%s'%(REAL_SETTINGS.getSetting('User_IP'),REAL_SETTINGS.getSetting('User_Port')) #todo dns discovery?
 TS            = '?format=ts' if ENABLE_TS else ''
 M3U_URL       = '%s/devices/ANY/channels.m3u%s'%(BASE_URL,TS)
@@ -80,6 +79,7 @@ PROGRAMS_URL  = '%s/dvr/programs'%(BASE_URL)
 M3U_TEMP      = os.path.join(SETTINGS_LOC,'channelsdvr.tmp')
 M3U_FILE      = os.path.join(USER_PATH,'channelsdvr.m3u')
 XMLTV_FILE    = os.path.join(USER_PATH,'channelsdvr.xml')
+
 MENU          = [(LANGUAGE(30002), '', 0),
                  (LANGUAGE(30017), '', 1),
                  (LANGUAGE(30003), '', 2)]
@@ -87,7 +87,7 @@ MENU          = [(LANGUAGE(30002), '', 0),
                 #(LANGUAGE(30013), '', 8)]
                 
 xmltv.locale      = 'UTF-8'
-xmltv.date_format = DTFORMAT
+xmltv.date_format = '%Y%m%d%H%M%S'
 
 def getPTVL():
     return xbmcgui.Window(10000).getProperty('PseudoTVRunning') == 'True'
@@ -191,7 +191,8 @@ class Channels(object):
     def saveURL(self, url, file):
         log('saveURL, url = %s, file = %s'%(url,file))
         try:
-            #grab unadulterated m3u, option to preserve?
+            #grab unadulterated m3u, todo option to preserve?
+            #no channel list endpoint found containing streams, use m3u list.
             response = self.openURL(url)
             fle = xbmcvfs.File(file, 'w')
             fle.write(response)
@@ -227,8 +228,11 @@ class Channels(object):
         group = channel.get('groups','').split(';')
         if BUILD_FAVS and 'Favorites' not in group: return False
         group.append(ADDON_NAME)
+        url  = '#KODIPROP:inputstream=inputstream.ffmpegdirect\n#KODIPROP:inputstream.ffmpegdirect.stream_mode=timeshift\n#KODIPROP:inputstream.ffmpegdirect.is_realtime_stream=true\n%s'
+        if ENABLE_TS: url = url%('#KODIPROP:mimetype=video/mp2t\n%s'%(channel['url']))
+        else: url = url%(channel['url'])
         radio = False
-        self.m3uList.append(litem%(channel['number'],'%s@%s'%(channel['number'],slugify(ADDON_NAME)),channel['name'],logo,';'.join(group),str(radio).lower(),channel['title'],channel['url']))
+        self.m3uList.append(litem%(channel['number'],'%s@%s'%(channel['number'],slugify(ADDON_NAME)),channel['name'],logo,';'.join(group),str(radio).lower(),channel['title'],url))
         return True
         
         
@@ -370,10 +374,6 @@ class Channels(object):
             if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
                 liz.setProperty('inputstreamaddon','inputstream.adaptive')
                 liz.setProperty('inputstream.adaptive.manifest_type','hls')
-            # elif 'mpg' in url.lower():
-                # liz.setProperty('inputstreamaddon','inputstream.ffmpegdirect')
-                # liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
-                # liz.setProperty('inputstream.ffmpegdirect.is_realtime_stream','true')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), found, liz)
 
 
@@ -486,7 +486,7 @@ class Channels(object):
             
             
     def buildRecordingItem(self, item):
-        item['Airings']  = [item['Airing'].copy()]
+        item['Airings'] = [item['Airing'].copy()]
         item['Channel'] = {'Hidden':False,'Number':0,'Name':'','Image':''}
         self.buildPlayItem((item,'recordings'))
         

@@ -21,7 +21,7 @@ msgid "Enable Debugging [Log errors]"
 msgstr ""
 
 msgctxt "#30001"
-msgid "Something went wrong, Try Again..."
+msgid "Something went wrong, Please check settings and try again..."
 msgstr ""
 
 msgctxt "#30002"

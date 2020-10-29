@@ -53,6 +53,7 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 LANG          = 'en' #todo
 CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
+MY_MONITOR    = xbmc.Monitor()
 PVR_CLIENT    = 'pvr.iptvsimple'
 PVR_SERVER    = '_channels_app._tcp'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
@@ -95,7 +96,14 @@ def getPTVL():
 def notificationDialog(message, header=ADDON_NAME, show=True, sound=False, time=1000, icon=ICON):
     try:    xbmcgui.Dialog().notification(header, message, icon, time, sound=False)
     except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
-   
+    
+def notificationProgress(message, header=ADDON_NAME, time=4):
+    dia = ProgressBGDialog(message=message,header=header)
+    for i in range(time):
+        if MY_MONITOR.waitForAbort(1): break
+        dia = ProgressBGDialog((((i + 1) * 100)//time),control=dia,header=header)
+    return notificationProgress(100,control=dia)
+    
 def strpTime(datestring, format='%Y-%m-%dT%H:%MZ'):
     try: return datetime.datetime.strptime(datestring, format)
     except TypeError: return datetime.datetime.fromtimestamp(time.mktime(time.strptime(datestring, format)))
@@ -144,6 +152,7 @@ class Service(object):
 
     def run(self):
         log('Service, run')
+        self.regPseudoTV()
         while not self.myMonitor.abortRequested():
             if self.myMonitor.waitForAbort(5): break
             elif not M3UXMLTV or self.running: continue
@@ -154,7 +163,7 @@ class Service(object):
                 if self.myChannels.buildService(): 
                     self.regPseudoTV()
                     REAL_SETTINGS.setSetting('Last_Scan',str(time.time()))
-                    notificationDialog(LANGUAGE(30007))
+                    notificationProgress(LANGUAGE(30007))
                 self.running = False
 
 

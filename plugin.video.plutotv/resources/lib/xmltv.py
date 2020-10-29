@@ -157,7 +157,8 @@ def elem_to_programme(elem):
     """
     d = {'start': elem.get('start'),
          'stop': elem.get('stop'),
-         'channel': elem.get('channel')}
+         'channel': elem.get('channel'),
+         'catchup-id': elem.get('catchup-id')}
                     
     set_attrs(d, elem, ('catchup-id', 'stop', 'pdc-start', 'vps-start', 'showview',
                         'videoplus', 'clumpidx'))

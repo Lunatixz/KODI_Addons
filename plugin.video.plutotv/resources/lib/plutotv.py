@@ -74,13 +74,22 @@ LOGIN_URL     = BASE_API + '/v1/auth/local?deviceType=web&%s'
 BASE_CLIPS    = BASE_API + '/v2/episodes/%s/clips.json'
 BASE_VOD      = BASE_API + '/v3/vod/categories?includeItems=true&deviceType=web&%s'
 SEASON_VOD    = BASE_API + '/v3/vod/series/%s/seasons?includeItems=true&deviceType=web&%s'
+
 PLUTO_MENU    = [(LANGUAGE(30011), '', 0),
                  (LANGUAGE(30018), '', 1),
                  (LANGUAGE(30017), '', 2),
                  (LANGUAGE(30012), '', 3)]
                 
+INPUTSTREAM       = 'inputstream.adaptive'
+INPUTSTREAM_BETA  = 'inputstream.adaptive.testing'
 xmltv.locale      = 'UTF-8'
 xmltv.date_format = DTFORMAT
+
+def getInputStream():
+    if xbmc.getCondVisibility('System.HasAddon(%s)'%(INPUTSTREAM_BETA)):
+        return INPUTSTREAM_BETA
+    else: 
+        return INPUTSTREAM
 
 def getPTVL():
     return xbmcgui.Window(10000).getProperty('PseudoTVRunning') == 'True'
@@ -111,7 +120,7 @@ def notificationProgress(message, header=ADDON_NAME, time=4):
     for i in range(time):
         if MY_MONITOR.waitForAbort(1): break
         dia = ProgressBGDialog((((i + 1) * 100)//time),control=dia,header=header)
-    return notificationProgress(100,control=dia)
+    return ProgressBGDialog(100,control=dia)
     
 def strpTime(datestring, format='%Y-%m-%dT%H:%M:%S.%fZ'):
     try: return datetime.datetime.strptime(datestring, format)
@@ -500,9 +509,11 @@ class PlutoTV(object):
         liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"duration":epdur})
         liz.setArt({'thumb':data.get('thumbnail',ICON),'fanart':data.get('thumbnail',FANART)})
         liz.setProperty("IsPlayable","true")
-        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream() and not DEBUG:
-            liz.setProperty('inputstreamaddon','inputstream.adaptive')
-            liz.setProperty('inputstream.adaptive.manifest_type','hls')
+        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
+                liz.setProperty('inputstreamaddon',getInputStream())
+                liz.setProperty('inputstream.adaptive.manifest_type','hls')
+                liz.setMimeType('application/vnd.apple.mpegurl')
+                liz.setContentLookup(False)
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
         
         
@@ -518,9 +529,11 @@ class PlutoTV(object):
             url = url.replace('deviceType=&','deviceType=web&').replace('deviceMake=&','deviceMake=Chrome&') .replace('deviceModel=&','deviceModel=Chrome&').replace('appName=&','appName=web&')#todo replace with regex!
             log('playVideo, url = %s'%url)
             if liz is None: liz = xbmcgui.ListItem(name, path=url)
-            if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream() and not DEBUG:
-                liz.setProperty('inputstreamaddon','inputstream.adaptive')
+            if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
+                liz.setProperty('inputstreamaddon',getInputStream())
                 liz.setProperty('inputstream.adaptive.manifest_type','hls')
+                liz.setMimeType('application/vnd.apple.mpegurl')
+                liz.setContentLookup(False)
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), found, liz)
 
            

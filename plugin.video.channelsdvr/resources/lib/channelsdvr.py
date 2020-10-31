@@ -111,7 +111,7 @@ def notificationProgress(message, header=ADDON_NAME, time=4):
     for i in range(time):
         if MY_MONITOR.waitForAbort(1): break
         dia = ProgressBGDialog((((i + 1) * 100)//time),control=dia,header=header)
-    return notificationProgress(100,control=dia)
+    return ProgressBGDialog(100,control=dia)
     
 def strpTime(datestring, format='%Y-%m-%dT%H:%MZ'):
     try: return datetime.datetime.strptime(datestring, format)
@@ -392,9 +392,11 @@ class Channels(object):
             if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
                 liz.setProperty('inputstreamaddon','inputstream.adaptive')
                 liz.setProperty('inputstream.adaptive.manifest_type','hls')
+                liz.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
             liz.setProperty('inputstream','inputstream.ffmpegdirect')
             liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
             liz.setProperty('inputstream.ffmpegdirect.is_realtime_stream','true')
+
             if ENABLE_TS: liz.setProperty('mimetype','video/mp2t')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), found, liz)
 

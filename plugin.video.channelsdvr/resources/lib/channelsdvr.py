@@ -96,6 +96,15 @@ def getPTVL():
 def notificationDialog(message, header=ADDON_NAME, show=True, sound=False, time=1000, icon=ICON):
     try:    xbmcgui.Dialog().notification(header, message, icon, time, sound=False)
     except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
+
+def ProgressBGDialog(percent=0, control=None, message='', header=ADDON_NAME):
+    if percent == 0 and control is None:
+        control = xbmcgui.DialogProgressBG()
+        control.create(header, message)
+    elif control:
+        if percent == 100 or control.isFinished(): return control.close()
+        else: control.update(percent, header, message)
+    return control
     
 def notificationProgress(message, header=ADDON_NAME, time=4):
     dia = ProgressBGDialog(message=message,header=header)
@@ -383,6 +392,10 @@ class Channels(object):
             if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
                 liz.setProperty('inputstreamaddon','inputstream.adaptive')
                 liz.setProperty('inputstream.adaptive.manifest_type','hls')
+            liz.setProperty('inputstream','inputstream.ffmpegdirect')
+            liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
+            liz.setProperty('inputstream.ffmpegdirect.is_realtime_stream','true')
+            if ENABLE_TS: liz.setProperty('mimetype','video/mp2t')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), found, liz)
 
 

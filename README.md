@@ -5,7 +5,7 @@
 [![GitHub last commit](https://img.shields.io/github/last-commit/Lunatixz/KODI_Addons.svg?style=flat-square)](https://github.com/Lunatixz/KODI_Addons/commits/master)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Lunatixz/KODI_Addons.svg?color=red&style=flat-square)
 [![GitHub issues](https://img.shields.io/github/issues/Lunatixz/KODI_Addons.svg?style=flat-square)](https://github.com/Lunatixz/KODI_Addons/issues)  
-[![Kodi URL](https://img.shields.io/badge/Supports-Kodi%2017|18-blue.svg?style=flat-square)](https://kodi.tv/download)
+[![Kodi URL](https://img.shields.io/badge/Supports-Kodi%2019-blue.svg?style=flat-square)](https://kodi.tv/download)
 [![DMCA Policy](https://img.shields.io/badge/DMCA-Policy-lightgrey.svg?style=flat-square)](https://github.com/Lunatixz/KODI_Addons/raw/master/DMCA.md)
 [![Kodi Donate](https://img.shields.io/badge/Donate-Kodi-blue.svg?style=flat-square)](https://kodi.tv/contribute/donate)
 [![Paypal Donate](https://img.shields.io/badge/Donate-Lunatixz-blue.svg?style=flat-square)](https://paypal.me/Lunatixz)

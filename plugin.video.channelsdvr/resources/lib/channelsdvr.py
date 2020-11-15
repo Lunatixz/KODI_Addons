@@ -145,7 +145,7 @@ def slugify(text):
     text = non_url_safe_regex.sub('', text).strip()
     text = u'_'.join(re.split(r'\s+', text))
     return text
-     
+
 class Service(object):
     def __init__(self, sysARG=sys.argv):
         self.running    = False
@@ -155,7 +155,7 @@ class Service(object):
 
     def regPseudoTV(self):
         log('Service, regPseudoTV')
-        asset = {'type':'iptv','icon':ICON,'m3u':M3U_FILE,'xmltv':XMLTV_FILE,'id':ADDON_ID}
+        asset = {'type':'iptv','name':ADDON_NAME,'icon':ICON,'m3u':M3U_FILE,'xmltv':XMLTV_FILE,'id':ADDON_ID}
         xbmcgui.Window(10000).setProperty('PseudoTV_Recommended.%s'%(ADDON_ID), json.dumps(asset))
 
 
@@ -172,7 +172,7 @@ class Service(object):
                 if self.myChannels.buildService(): 
                     self.regPseudoTV()
                     REAL_SETTINGS.setSetting('Last_Scan',str(time.time()))
-                    notificationProgress(LANGUAGE(30007))
+                    notificationProgress(LANGUAGE(30007)%(ADDON_NAME))
                 self.running = False
 
 
@@ -181,6 +181,7 @@ class Channels(object):
         log('__init__, sysARG = %s'%(sysARG))
         self.sysARG     = sysARG
         self.cache      = SimpleCache()
+        self.m3udata    = '#EXTM3U tvg-shift="" x-tvg-url="" x-tvg-id=""\n'
         self.m3uList    = []
         self.xmltvList  = {'data'       : self.getData(),
                            'channels'   : [],
@@ -238,7 +239,7 @@ class Channels(object):
         try: xbmcvfs.delete(M3U_TEMP)
         except: pass
         return sorted(items, key=lambda k: k['number'])
-        
+
 
     def buildM3U(self, channel):
         litem = '#EXTINF:-1 tvg-chno="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s" group-title="%s" radio="%s",%s\n%s\n'
@@ -292,6 +293,7 @@ class Channels(object):
     
     def saveM3U(self, file):
         fle = xbmcvfs.File(M3U_FILE, 'w')
+        self.m3uList.insert(0,self.m3udata)
         [fle.write(m3uList) for m3uList in self.m3uList]
         fle.close()
         return True

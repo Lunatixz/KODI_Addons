@@ -93,7 +93,7 @@ msgid "Allow this plugin to automatically configure IPTV Simple PVR Backend?"
 msgstr ""
 
 msgctxt "#30031"
-msgid "M3U/XMLTV Updated"
+msgid "%s Updating..."
 msgstr ""
 
 msgctxt "#30032"
@@ -106,4 +106,28 @@ msgstr ""
 
 msgctxt "#30034"
 msgid "?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&sid=246&deviceId=5331d5fb753499095a00045a&deviceVersion=DNT&appVersion=DNT&deviceDNT=0&userId=&advertisingId=&deviceLat=&deviceLon=&app_name=&appName=web&buildVersion=&appStoreUrl=&architecture=&includeExtendedEvents=false&marketingRegion=US&serverSideAds=false"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Build Only Favorites"
+msgstr ""
+
+msgctxt "#30036"
+msgid "%s added to Favorites"
+msgstr ""
+
+msgctxt "#30037"
+msgid "%s removed from Favorites"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Add Channel to Favorites"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Remove Channel from Favorites"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Live (Favorites)"
 msgstr ""

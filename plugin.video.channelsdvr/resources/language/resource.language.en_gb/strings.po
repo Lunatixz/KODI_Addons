@@ -45,7 +45,7 @@ msgid "Use MPEG Video Streams"
 msgstr ""
 
 msgctxt "#30007"
-msgid "M3U/XMLTV Updated"
+msgid "%s Updating..."
 msgstr ""
 
 msgctxt "#30008"

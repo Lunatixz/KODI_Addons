@@ -62,6 +62,7 @@ DTFORMAT      = '%Y%m%d%H%M%S'
 PVR_CLIENT    = 'pvr.iptvsimple'
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 M3UXMLTV      = REAL_SETTINGS.getSetting('Enable_M3UXMLTV') == 'true'
+BUILD_FAVS    = REAL_SETTINGS.getSetting('Build_Favorites') == 'true'
 ENABLE_CONFIG = REAL_SETTINGS.getSetting('Enable_Config') == 'true'
 USER_PATH     = REAL_SETTINGS.getSetting('User_Folder') 
 M3U_FILE      = os.path.join(USER_PATH,'plutotv.m3u')
@@ -76,6 +77,7 @@ BASE_VOD      = BASE_API + '/v3/vod/categories?includeItems=true&deviceType=web&
 SEASON_VOD    = BASE_API + '/v3/vod/series/%s/seasons?includeItems=true&deviceType=web&%s'
 
 PLUTO_MENU    = [(LANGUAGE(30011), '', 0),
+                 (LANGUAGE(30040), '', 0),
                  (LANGUAGE(30018), '', 1),
                  (LANGUAGE(30017), '', 2),
                  (LANGUAGE(30012), '', 3)]
@@ -147,7 +149,27 @@ def slugify(text):
     text = non_url_safe_regex.sub('', text).strip()
     text = u'_'.join(re.split(r'\s+', text))
     return text
-  
+
+def getFavorites():
+    return json.loads((REAL_SETTINGS.getSetting('favorites') or '{"favorites":[]}')).get('favorites',[])
+     
+def isFavorite(chnumber):
+    return chnumber in getFavorites()
+     
+def addFavorite(chname, chnumber, silent=False):
+    favorites = getFavorites()
+    if chnumber not in favorites:
+        favorites.append(chnumber)
+        REAL_SETTINGS.setSetting('favorites',json.dumps({"favorites":favorites}))
+        if not silent: notificationDialog(LANGUAGE(30036)%(chname))
+    
+def delFavorite(chname, chnumber):
+    favorites = getFavorites()
+    if chnumber in favorites:
+        favorites.pop(favorites.index(chnumber))
+        REAL_SETTINGS.setSetting('favorites',json.dumps({"favorites":favorites}))
+        notificationDialog(LANGUAGE(30037)%(chname))
+     
 class Service(object):
     def __init__(self, sysARG=sys.argv):
         self.running   = False
@@ -157,7 +179,7 @@ class Service(object):
 
     def regPseudoTV(self):
         log('Service, regPseudoTV')
-        asset = {'type':'iptv','icon':ICON,'m3u':M3U_FILE,'xmltv':XMLTV_FILE,'id':ADDON_ID}
+        asset = {'type':'iptv','name':ADDON_NAME,'icon':ICON,'m3u':M3U_FILE,'xmltv':XMLTV_FILE,'id':ADDON_ID}
         xbmcgui.Window(10000).setProperty('PseudoTV_Recommended.%s'%(ADDON_ID), json.dumps(asset))
 
 
@@ -174,7 +196,7 @@ class Service(object):
                 if self.myPlutoTV.buildService():
                     self.regPseudoTV()
                     REAL_SETTINGS.setSetting('Last_Scan',str(time.time()))
-                    notificationProgress(LANGUAGE(30031))
+                    notificationProgress(LANGUAGE(30031)%(ADDON_NAME))
                 self.running = False
                 
 
@@ -189,23 +211,30 @@ class PlutoTV(object):
         self.xmltvList = {'data'       : self.getData(),
                           'channels'   : [],
                           'programmes' : []}
-
+                          
             
-    def getURL(self, url, param={}, header={}, life=datetime.timedelta(minutes=15)):
+    def reset(self):
+        self.__init__()
+        
+            
+    def getURL(self, url, param={}, header={'User-agent': 'Mozilla/5.0 (Windows NT 6.2; rv:24.0) Gecko/20100101 Firefox/24.0'}, life=datetime.timedelta(minutes=15)):
         log('getURL, url = %s, header = %s'%(url, header))
-        cacheresponse = self.cache.get(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header))
+        cacheresponse = self.cache.get('%s.getURL, url = %s.%s.%s'%(ADDON_NAME,url,param,header))
         if not cacheresponse:
             try:
                 req = requests.get(url, param, headers=header)
                 cacheresponse = req.json()
                 req.close()
-                self.cache.set(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header), json.dumps(cacheresponse), expiration=life)
-                return cacheresponse
             except Exception as e: 
                 log("getURL, Failed! %s"%(e), xbmc.LOGERROR)
                 notificationDialog(LANGUAGE(30001))
                 return {}
-        else: return json.loads(cacheresponse)
+            try:
+                self.cache.set('%s.getURL, url = %s.%s.%s'%(ADDON_NAME,url,param,header), json.dumps(cacheresponse), expiration=life)
+            except: pass
+            return cacheresponse
+        else: 
+            return json.loads(cacheresponse)
 
       
     def buildHeader(self):
@@ -222,12 +251,6 @@ class PlutoTV(object):
     def mainMenu(self):
         log('mainMenu')
         for item in PLUTO_MENU: self.addDir(*item)
-            
-            
-    def browseMenu(self):
-        log('browseMenu')
-        categoryMenu = self.getCategories()
-        for item in categoryMenu: self.addDir(*item)
 
 
     def getOndemand(self):
@@ -255,13 +278,24 @@ class PlutoTV(object):
         
     def getCategories(self):
         log('getCategories')
+        
+        # categories = sorted(self.getGuidedata(full=True).get('categories',[]), key=lambda k: k['order'])
+        # for category in categories: 
+            # yield (category['name'], 'categories', 0, False, {'thumb':category.get('images',[{}])[0].get('url',ICON),'fanart':category.get('images',[{},{}])[1].get('url',FANART)})
+        
         collect= []
         data = self.getChannels()
         for channel in data: collect.append(channel['category'])
         counter = collections.Counter(collect)
-        for key, value in sorted(counter.items()): yield (key,'categories', 0)
+        categories = sorted(self.getGuidedata(full=True).get('categories',[]), key=lambda k: k['order'])
+        for key, value in sorted(counter.items()): 
+            category = {}
+            for category in categories:
+                if category['name'].lower() == key.lower():
+                    break
+            yield (key,'categories', 0, False, {'thumb':category.get('images',[{}])[0].get('url',ICON),'fanart':category.get('images',[{},{}])[1].get('url',FANART)})
         
-
+        
     def buildGuide(self, data):
         channel, name, opt = data
         log('buildGuide, name=%s,opt=%s'%(name, opt))
@@ -280,14 +314,23 @@ class PlutoTV(object):
         chlogo    = channel.get('logo',{}).get('path',ICON)
         ondemand  = channel.get('onDemand','false') == 'true'
         featured  = channel.get('featured','false') == 'true'
-        favorite  = channel.get('favorite','false') == 'true'
         timelines = channel.get('timelines',[])
-
+        
+        favorite  = channel.get('favorite','false') == 'true'
+        if favorite: 
+            addFavorite(chnum, silent=True)
+        
+        if name.startswith('live'):
+            favorite = isFavorite(chnum)
+            if '(favorites)' in name and not favorite: 
+                return None
+        else:
+            favorite = None
         if   name == 'featured'   and not featured: return None
         elif name == 'favorite'   and not favorite: return None
         elif name == 'categories' and chcat != opt: return None
         elif name == 'lineup'     and chid  != opt: return None
-        elif name == 'live': DISC_CACHE = False
+        elif name.startswith('live'): DISC_CACHE = False
             
         if name in ['channels','categories','ondemand','season']:
             if name == 'season':
@@ -394,7 +437,7 @@ class PlutoTV(object):
                     epname = label
                     if type == 'music' or epgenre.lower() == 'music': mtype = 'musicvideo'
 
-                if name == 'live':
+                if name.startswith('live'):
                     if stop < now or start > now: continue
                     # epdur = (now - start).seconds
                     label = '%s| %s'%(chnum,chname)
@@ -443,7 +486,7 @@ class PlutoTV(object):
                     infoArt    = {"thumb":epthumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
                     self.addDir(label, epid, 4, infoLabels, infoArt)
                 elif name != 'guide':
-                    infoLabels = {"mediatype":mtype,"label":label,"label2":label,"tvshowtitle":tvtitle,"title":epname,"plot":epplot, "code":epid, "genre":[epgenre], "duration":epdur,'season':epseason,'episode':epnumber}
+                    infoLabels = {"favorite":favorite,"chnum":chnum,"chname":chname,"mediatype":mtype,"label":label,"label2":label,"tvshowtitle":tvtitle,"title":epname,"plot":epplot, "code":epid, "genre":[epgenre], "duration":epdur,'season':epseason,'episode':epnumber}
                     infoArt    = {"thumb":thumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
                     self.addLink(title, urls, 9, infoLabels, infoArt)
                     
@@ -460,6 +503,7 @@ class PlutoTV(object):
         if opt == 'categories': 
             opt  = name
             name = 'categories'
+            data = self.getGuidedata(full=True).get('categories',[])
         self.poolList(self.buildGuide, zip(data,repeat(name.lower()),repeat(opt)))
              
              
@@ -493,8 +537,8 @@ class PlutoTV(object):
                 
     def browseCategories(self):
         log('browseCategories')
-        data = list(self.getCategories())
-        for item in data: self.addDir(*item) 
+        categoryMenu = self.getCategories()
+        for item in categoryMenu: self.addDir(*item)
        
        
     def playVOD(self, name, id):
@@ -541,6 +585,13 @@ class PlutoTV(object):
         log('addLink, name = %s'%name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'true') 
+        
+        if infoList.get('favorite',None) is not None:
+            if infoList['favorite']:
+                liz.addContextMenuItems([(LANGUAGE(30039), 'RunScript(special://home/addons/%s/context.py, %s)'%(ADDON_ID,urllib.parse.quote(json.dumps({"chnum":infoList.pop('chnum'),"chname":infoList.pop('chname'),"mode":"del"}))))])
+            else:
+                liz.addContextMenuItems([(LANGUAGE(30038), 'RunScript(special://home/addons/%s/context.py, %s)'%(ADDON_ID,urllib.parse.quote(json.dumps({"chnum":infoList.pop('chnum'),"chname":infoList.pop('chname'),"mode":"add"}))))])
+            
         if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
         else: liz.setInfo(type="Video", infoLabels=infoList)
         if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
@@ -572,10 +623,12 @@ class PlutoTV(object):
 
     def save(self, reset=True):
         log('save')
-        fle = xbmcvfs.File(M3U_FILE, 'w')
-        log('save, saving m3u to %s'%(M3U_FILE))
-        fle.write('\n'.join([item for item in self.m3uList]))
-        fle.close()
+        if len(self.m3uList) > 0:
+            log('save, saving m3u to %s'%(M3U_FILE))
+            fle = xbmcvfs.File(M3U_FILE, 'w')
+            self.m3uList.insert(0,'#EXTM3U tvg-shift="" x-tvg-url="" x-tvg-id=""')
+            fle.write('\n'.join([item for item in self.m3uList]))
+            fle.close()
         
         data   = self.xmltvList['data']
         writer = xmltv.Writer(encoding=xmltv.locale, date=data['date'],
@@ -585,11 +638,12 @@ class PlutoTV(object):
                               generator_info_name = data['generator-info-name'])
                
         channels = self.sortChannels(self.xmltvList['channels'])
-        for channel in channels: writer.addChannel(channel)
-        programmes = self.sortProgrammes(self.xmltvList['programmes'])
-        for program in programmes: writer.addProgramme(program)
-        log('save, saving xmltv to %s'%(XMLTV_FILE))
-        writer.write(XMLTV_FILE, pretty_print=True)
+        if len(channels) > 0:
+            for channel in channels: writer.addChannel(channel)
+            programmes = self.sortProgrammes(self.xmltvList['programmes'])
+            for program in programmes: writer.addProgramme(program)
+            log('save, saving xmltv to %s'%(XMLTV_FILE))
+            writer.write(XMLTV_FILE, pretty_print=True)
         return True
         
         
@@ -608,11 +662,15 @@ class PlutoTV(object):
 
     def buildService(self):
         log('buildService')
+        self.reset()
         channels = self.getChannels()
         [self.buildM3U(channel) for channel in channels]
-        if self.poolList(self.buildXMLTV, self.getGuidedata(full=True).get('channels',[])):
-            self.save()
-            self.chkSettings()
+        guidedata = self.getGuidedata(full=True).get('channels',[])
+        # if self.poolList(self.buildXMLTV, guidedata):
+        for data in guidedata:
+            self.buildXMLTV(data)
+        self.save()
+        self.chkSettings()
         return True
         
         
@@ -652,17 +710,27 @@ class PlutoTV(object):
         
     def buildM3U(self, channel):
         litem = '#EXTINF:-1 tvg-chno="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s" group-title="%s" radio="%s"%s,%s\n%s'
+        favorite = isFavorite(channel['number'])
         logo  = (channel.get('logo',{}).get('path',LOGO) or LOGO)
+        
         group = [channel.get('category','')]
         group.append('Pluto TV')
+        if favorite:
+            group.append('Favorite')
+            
         radio   = False #True if "Music" in group else False
         catchup = True #todo look for ondemand key that works!
         if radio or not catchup: 
             vod = ''
         else:
             vod = ' catchup="vod"'
+            
         urls  = channel.get('stitched',{}).get('urls',[])
-        if len(urls) == 0: return False
+        if len(urls) == 0: 
+            return False
+        elif BUILD_FAVS and not favorite: 
+            return False
+        
         if isinstance(urls, list): urls = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
         urls = urls.split('?')[0]+LANGUAGE(30034)
         self.m3uList.append(litem%(channel['number'],'%s@%s'%(channel['number'],slugify(ADDON_NAME)),channel['name'],logo,';'.join(list(set(group))),str(radio).lower(),vod,channel['name'],urls))
@@ -671,7 +739,8 @@ class PlutoTV(object):
         
     def buildXMLTV(self, channel):
         self.addChannel(channel)
-        [self.addProgram(channel, program) for program in  channel.get('timelines',[])]
+        for program in  channel.get('timelines',[]): 
+            self.addProgram(channel, program)
         return True
         
         
@@ -761,14 +830,14 @@ class PlutoTV(object):
         log("Name: "+str(name))
 
         if   mode==None: self.mainMenu()
-        elif mode == 0:  self.browseGuide(name, url)
-        elif mode == 1:  self.browseLineup(name, url)
-        elif mode == 2:  self.browseCategories()
-        elif mode == 3:  self.browseOndemand(url)
-        elif mode == 4:  self.browseSeason(url)
-        elif mode == 5:  self.browseEpisodes(name, url)
-        elif mode == 8:  self.playVOD(name, url)
-        elif mode == 9:  self.playVideo(name, url)
+        elif mode == 0 :  self.browseGuide(name, url)
+        elif mode == 1 :  self.browseLineup(name, url)
+        elif mode == 2 :  self.browseCategories()
+        elif mode == 3 :  self.browseOndemand(url)
+        elif mode == 4 :  self.browseSeason(url)
+        elif mode == 5 :  self.browseEpisodes(name, url)
+        elif mode == 8 :  self.playVOD(name, url)
+        elif mode == 9 :  self.playVideo(name, url)
         
         xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_UNSORTED)

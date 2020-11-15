@@ -2,6 +2,7 @@
 <settings>
     <setting id="Enable_Debugging" type="bool"      label="30000" default="false"/>
     <setting id="Enable_M3UXMLTV"  type="bool"      label="30033" default="true"/>
-    <setting id="Enable_Config"    type="bool"      label="30030" default="false" visible="eq(-1,true)" enable="!System.AddonIsEnabled(plugin.video.pseudotv.live)" />
-    <setting id="User_Folder"      type="folder"    label="30032" default="special://profile/addon_data/plugin.video.plutotv/" source="files" visible="eq(-2,true)" />    
+    <setting id="Build_Favorites"  type="bool"      label="30035" default="false" visible="eq(-1,true)" subsetting="true"/>
+    <setting id="Enable_Config"    type="bool"      label="30030" default="false" visible="eq(-2,true)" enable="!System.AddonIsEnabled(plugin.video.pseudotv.live)" />
+    <setting id="User_Folder"      type="folder"    label="30032" default="special://profile/addon_data/plugin.video.plutotv/" source="files" visible="eq(-3,true)" />    
 </settings>

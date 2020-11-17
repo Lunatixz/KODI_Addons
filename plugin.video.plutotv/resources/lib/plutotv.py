@@ -179,7 +179,7 @@ class Service(object):
 
     def regPseudoTV(self):
         log('Service, regPseudoTV')
-        asset = {'type':'iptv','name':ADDON_NAME,'icon':ICON,'m3u':M3U_FILE,'xmltv':XMLTV_FILE,'id':ADDON_ID}
+        asset = {'type':'iptv','name':ADDON_NAME,'icon':ICON.replace(ADDON_PATH,'special://home/addons/%s/'%(ADDON_ID)).replace('\\','/'),'m3u':M3U_FILE,'xmltv':XMLTV_FILE,'id':ADDON_ID}
         xbmcgui.Window(10000).setProperty('PseudoTV_Recommended.%s'%(ADDON_ID), json.dumps(asset))
 
 

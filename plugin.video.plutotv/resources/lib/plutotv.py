@@ -60,10 +60,7 @@ DISC_CACHE    = False
 MY_MONITOR    = xbmc.Monitor()
 DTFORMAT      = '%Y%m%d%H%M%S'
 PVR_CLIENT    = 'pvr.iptvsimple'
-DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-M3UXMLTV      = REAL_SETTINGS.getSetting('Enable_M3UXMLTV') == 'true'
-BUILD_FAVS    = REAL_SETTINGS.getSetting('Build_Favorites') == 'true'
-ENABLE_CONFIG = REAL_SETTINGS.getSetting('Enable_Config') == 'true'
+DEBUG         = REAL_SETTINGS.getSettingBool('Enable_Debugging')
 USER_PATH     = REAL_SETTINGS.getSetting('User_Folder') 
 M3U_FILE      = os.path.join(USER_PATH,'plutotv.m3u')
 XMLTV_FILE    = os.path.join(USER_PATH,'plutotv.xml')
@@ -188,7 +185,7 @@ class Service(object):
         self.regPseudoTV()
         while not self.myMonitor.abortRequested():
             if self.myMonitor.waitForAbort(5): break
-            if not M3UXMLTV or self.running: continue
+            if not REAL_SETTINGS.getSettingBool('Enable_M3UXMLTV') or self.running: continue
             lastCheck  = float(REAL_SETTINGS.getSetting('Last_Scan') or 0)
             conditions = [xbmcvfs.exists(M3U_FILE),xbmcvfs.exists(XMLTV_FILE)]
             if (time.time() > (lastCheck + 3600)) or (False in conditions):
@@ -311,7 +308,11 @@ class PlutoTV(object):
         chcat     = (channel.get('category','')    or channel.get('genre',''))
         chfanart  = channel.get('featuredImage',{}).get('path',FANART)
         chthumb   = channel.get('thumbnail',{}).get('path',ICON)
-        chlogo    = channel.get('logo',{}).get('path',ICON)
+        
+        chlogo    = channel.get('logo',{}).get('path',ICON) 
+        if REAL_SETTINGS.getSettingBool('Use_Color_Logos'):
+            chlogo = channel.get('colorLogoPNG',{}).get('path',chlogo)
+
         ondemand  = channel.get('onDemand','false') == 'true'
         featured  = channel.get('featured','false') == 'true'
         timelines = channel.get('timelines',[])
@@ -334,13 +335,16 @@ class PlutoTV(object):
             
         if name in ['channels','categories','ondemand','season']:
             if name == 'season':
-                seasons    = (channel.get('seasons',{}))
-                vodimages  = channel.get('covers',[])
-                try: vodlogo      = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '1:1'][0]
-                except: vodlogo   = ICON
+                seasons   = (channel.get('seasons',{}))
+                vodimages = channel.get('covers',[])
+                try:    vodlogo   = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '1:1'][0]
+                except: vodlogo   = ''
                 try:    vodfanart = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '16:9'][0]
-                except: vodfanart = FANART
+                except: vodfanart = ''
+                
                 for season in seasons:
+                    vodlogo   = (vodlogo   or chlogo)
+                    vodfanart = (vodfanart or FANART)
                     mtype = 'episode'
                     label = 'Season %s'%(season['number'])
                     infoLabels = {"mediatype":mtype,"label":label,"label2":label,"title":chname,"plot":chplot, "code":chid, "genre":[chcat]}
@@ -374,7 +378,6 @@ class PlutoTV(object):
                 episode    = (item.get('episode',{})   or item)
                 series     = (episode.get('series',{}) or item)
                 epdur      = int(episode.get('duration','0') or '0') // 1000
-                
                 urls       = (item.get('stitched',{}).get('urls',[]) or urls)
                 if len(urls) == 0: continue
                 if isinstance(urls, list): urls  = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
@@ -392,7 +395,7 @@ class PlutoTV(object):
                 title      = (item.get('title',''))
                 tvplot     = (series.get('description','')                  or series.get('summary','')      or chplot)
                 tvoutline  = (series.get('summary','')                      or series.get('description','')  or chplot)
-                tvthumb    = (series.get('title',{}).get('path','')         or chthumb)
+                tvthumb    = (series.get('featuredImage',{}).get('path','') or chfanart)
                 tvfanart   = (series.get('featuredImage',{}).get('path','') or chfanart)
                 epid       = episode['_id']
                 epnumber   = episode.get('number',0)
@@ -402,9 +405,10 @@ class PlutoTV(object):
                 epgenre    = (episode.get('genre','')       or chcat)
                 eptag      = episode.get('subGenre','')
                 epmpaa     = episode.get('rating','')
-                
+                epislive   = episode.get('liveBroadcast','false') == 'true'
                 vodimages  = episode.get('covers',[])
                 vodposter  = vodfanart = vodthumb = vodlogo = ''
+                
                 if vodimages:
                     try:    vodposter = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '347:500'][0]
                     except: pass
@@ -416,10 +420,9 @@ class PlutoTV(object):
                     except: pass
 
                 chlogo     = (vodlogo or chlogo)
-                epposter   = (episode.get('poster',{}).get('path','')        or vodlogo or vodposter or vodthumb  or tvthumb)
-                epthumb    = (episode.get('thumbnail',{}).get('path','')     or vodlogo or vodthumb  or vodposter or tvthumb)
+                epposter   = (episode.get('poster',{}).get('path','')        or vodlogo   or vodposter or vodthumb  or tvthumb)
+                epthumb    = (episode.get('thumbnail',{}).get('path','')     or vodlogo   or vodthumb  or vodposter or tvthumb)
                 epfanart   = (episode.get('featuredImage',{}).get('path','') or vodfanart or tvfanart)
-                epislive   = episode.get('liveBroadcast','false') == 'true'
                 
                 label      = title
                 thumb      = chthumb
@@ -679,12 +682,15 @@ class PlutoTV(object):
         except: # backend disabled?
             self.togglePVR('true')
             xbmc.sleep(1000)
-            return xbmcaddon.Addon(PVR_CLIENT)
+            try:
+                return xbmcaddon.Addon(PVR_CLIENT)
+            except: return None
             
             
     def chkSettings(self):
-        if ENABLE_CONFIG:
+        if REAL_SETTINGS.getSettingBool'Enable_Config'):
             addon = self.getPVR()
+            if addon is None: return
             check = [addon.getSetting('catchupEnabled')         == 'true',
                      addon.getSetting('m3uRefreshMode')         == '1',
                      addon.getSetting('m3uRefreshIntervalMins') == '5',
@@ -728,11 +734,16 @@ class PlutoTV(object):
         urls  = channel.get('stitched',{}).get('urls',[])
         if len(urls) == 0: 
             return False
-        elif BUILD_FAVS and not favorite: 
+        elif REAL_SETTINGS.getSettingBool('Build_Favorites') and not favorite: 
             return False
-        
+            
         if isinstance(urls, list): urls = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
-        urls = urls.split('?')[0]+LANGUAGE(30034)
+        if REAL_SETTINGS.getSettingBool('Direct_URL'):
+            url  = '#KODIPROP:inputstream=inputstreamaddon.{inputstream}\n#KODIPROP:inputstream.adaptive.manifest_type=hls\n#KODIPROP:inputstream.ffmpegdirect.is_realtime_stream=true\n%s'.format(inputstream=getInputStream())
+            urls = url%('#KODIPROP:mimetype=application/vnd.apple.mpegurl\n%s'%(urls))
+        else:
+            urls = 'plugin://%s/?mode=9&name=%s&url=%s'%(ADDON_ID,urllib.parse.quote(self.cleanString(channel['name'])),urllib.parse.quote(urls))
+            
         self.m3uList.append(litem%(channel['number'],'%s@%s'%(channel['number'],slugify(ADDON_NAME)),channel['name'],logo,';'.join(list(set(group))),str(radio).lower(),vod,channel['name'],urls))
         return True
         
@@ -829,7 +840,10 @@ class PlutoTV(object):
         log("URL : "+str(url))
         log("Name: "+str(name))
 
-        if   mode==None: self.mainMenu()
+        if mode==None:
+            if getPTVL(): 
+                return notificationDialog(LANGUAGE(30042))
+            self.mainMenu()
         elif mode == 0 :  self.browseGuide(name, url)
         elif mode == 1 :  self.browseLineup(name, url)
         elif mode == 2 :  self.browseCategories()

@@ -87,3 +87,11 @@ msgstr ""
 msgctxt "#30017"
 msgid "Live (Favorites)"
 msgstr ""
+
+msgctxt "#30018"
+msgid "Use Direct feed"
+msgstr ""
+
+msgctxt "#30019"
+msgid "PseudoTV Live Supported through Recommended Services"
+msgstr ""

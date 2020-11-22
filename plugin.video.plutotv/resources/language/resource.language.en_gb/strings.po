@@ -131,3 +131,15 @@ msgstr ""
 msgctxt "#30040"
 msgid "Live (Favorites)"
 msgstr ""
+
+msgctxt "#30041"
+msgid "Use Direct feed"
+msgstr ""
+
+msgctxt "#30042"
+msgid "PseudoTV Live Supported through Recommended Services"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Prefer Color Channel Logos"
+msgstr ""

@@ -688,7 +688,7 @@ class PlutoTV(object):
             
             
     def chkSettings(self):
-        if REAL_SETTINGS.getSettingBool'Enable_Config'):
+        if REAL_SETTINGS.getSettingBool('Enable_Config'):
             addon = self.getPVR()
             if addon is None: return
             check = [addon.getSetting('catchupEnabled')         == 'true',

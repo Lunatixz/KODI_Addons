@@ -8,6 +8,7 @@
     <setting id="Enable_M3UXMLTV"  type="bool"      label="30004" default="true"/>
     <setting id="Build_Favorites"  type="bool"      label="30016" default="false" visible="eq(-1,true)" subsetting="true"/>
     <setting id="Enable_Config"    type="bool"      label="30011" default="false" visible="eq(-2,true)" subsetting="true" enable="!System.AddonIsEnabled(plugin.video.pseudotv.live)" />
-    <setting id="User_Folder"      type="folder"    label="30005" default="special://profile/addon_data/plugin.video.channelsdvr/" source="files" visible="eq(-3,true)" subsetting="true"/>
+    <setting id="Direct_URL"       type="bool"      label="30018" default="false" visible="eq(-3,true)" subsetting="true" />
+    <setting id="User_Folder"      type="folder"    label="30005" default="special://profile/addon_data/plugin.video.channelsdvr/" source="files" visible="eq(-4,true)" subsetting="true"/>
   </category>
 </settings>

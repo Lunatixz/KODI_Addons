@@ -50,27 +50,25 @@ FANART        = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE      = REAL_SETTINGS.getLocalizedString
 
 ## GLOBALS ##
+MY_MONITOR    = xbmc.Monitor()
+DEBUG         = REAL_SETTINGS.getSettingBool('Enable_Debugging')
+ENABLE_TS     = REAL_SETTINGS.getSettingBool('Enable_TS')
+BUILD_FAVS    = REAL_SETTINGS.getSettingBool('Build_Favorites')
+USER_PATH     = REAL_SETTINGS.getSetting('User_Folder') 
+
 LANG          = 'en' #todo
 CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
-MY_MONITOR    = xbmc.Monitor()
 PVR_CLIENT    = 'pvr.iptvsimple'
 PVR_SERVER    = '_channels_app._tcp'
-DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-M3UXMLTV      = REAL_SETTINGS.getSetting('Enable_M3UXMLTV') == 'true'
-ENABLE_TS     = REAL_SETTINGS.getSetting('Enable_TS') == 'true'
-ENABLE_CONFIG = REAL_SETTINGS.getSetting('Enable_Config') == 'true'
-BUILD_FAVS    = REAL_SETTINGS.getSetting('Build_Favorites') == 'true'
-USER_PATH     = REAL_SETTINGS.getSetting('User_Folder') 
-
 REMOTE_URL    = 'http://my.channelsdvr.net'
+
 BASE_URL      = 'http://%s:%s'%(REAL_SETTINGS.getSetting('User_IP'),REAL_SETTINGS.getSetting('User_Port')) #todo dns discovery?
 TS            = '?format=ts' if ENABLE_TS else ''
 M3U_URL       = '%s/devices/ANY/channels.m3u%s'%(BASE_URL,TS)
 GUIDE_URL     = '%s/devices/ANY/guide'%(BASE_URL)
 UPNEXT_URL    = '%s/dvr/recordings/upnext'%(BASE_URL)
 SEARCH_URL    = '%s/dvr/guide/search/groups?q={query}'%(BASE_URL)
-
 SUMMARY_URL   = '%s/dvr/recordings/summary'%(BASE_URL)
 GROUPS_URL    = '%s/dvr/groups'%(BASE_URL)
 MOVIES_URL    = '%s/dvr/groups/movies/files'%(BASE_URL)
@@ -164,7 +162,7 @@ class Service(object):
         self.regPseudoTV()
         while not self.myMonitor.abortRequested():
             if self.myMonitor.waitForAbort(5): break
-            elif not M3UXMLTV or self.running: continue
+            elif not REAL_SETTINGS.getSettingBool('Enable_M3UXMLTV') or self.running: continue
             lastCheck  = float(REAL_SETTINGS.getSetting('Last_Scan') or 0)
             conditions = [xbmcvfs.exists(M3U_FILE),xbmcvfs.exists(XMLTV_FILE)]
             if (time.time() > (lastCheck + 3600)) or False in conditions:
@@ -181,7 +179,6 @@ class Channels(object):
         log('__init__, sysARG = %s'%(sysARG))
         self.sysARG     = sysARG
         self.cache      = SimpleCache()
-        self.m3udata    = '#EXTM3U tvg-shift="" x-tvg-url="" x-tvg-id=""\n'
         self.m3uList    = []
         self.xmltvList  = {'data'       : self.getData(),
                            'channels'   : [],
@@ -242,14 +239,21 @@ class Channels(object):
 
 
     def buildM3U(self, channel):
-        litem = '#EXTINF:-1 tvg-chno="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s" group-title="%s" radio="%s",%s\n%s\n'
+        litem = '#EXTINF:-1 tvg-chno="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s" group-title="%s" radio="%s",%s\n%s'
         logo  = (channel.get('logo','') or ICON)
         group = channel.get('groups','').split(';')
         if BUILD_FAVS and 'Favorites' not in group: return False
         group.append(ADDON_NAME)
-        url  = '#KODIPROP:inputstream=inputstream.ffmpegdirect\n#KODIPROP:inputstream.ffmpegdirect.stream_mode=timeshift\n#KODIPROP:inputstream.ffmpegdirect.is_realtime_stream=true\n%s'
-        if ENABLE_TS: url = url%('#KODIPROP:mimetype=video/mp2t\n%s'%(channel['url']))
-        else: url = url%(channel['url'])
+        
+        if REAL_SETTINGS.getSettingBool('Direct_URL'):
+            url = '#KODIPROP:inputstream=inputstream.ffmpegdirect\n#KODIPROP:inputstream.ffmpegdirect.stream_mode=timeshift\n#KODIPROP:inputstream.ffmpegdirect.is_realtime_stream=true\n%s'
+            if ENABLE_TS: 
+                url = url%('#KODIPROP:mimetype=video/mp2t\n%s'%(channel['url']))
+            else: 
+                url = url%(channel['url'])
+        else:
+            url = 'plugin://%s/?mode=9&name=%s&url=%s'%(ADDON_ID,urllib.parse.quote(self.cleanString(channel['name'])),urllib.parse.quote(channel['url']))
+            
         radio = False
         self.m3uList.append(litem%(channel['number'],'%s@%s'%(channel['number'],slugify(ADDON_NAME)),channel['name'],logo,';'.join(group),str(radio).lower(),channel['title'],url))
         return True
@@ -293,8 +297,8 @@ class Channels(object):
     
     def saveM3U(self, file):
         fle = xbmcvfs.File(M3U_FILE, 'w')
-        self.m3uList.insert(0,self.m3udata)
-        [fle.write(m3uList) for m3uList in self.m3uList]
+        self.m3uList.insert(0,'#EXTM3U tvg-shift="" x-tvg-url="" x-tvg-id=""')
+        fle.write('\n'.join([item for item in self.m3uList]))
         fle.close()
         return True
         
@@ -340,40 +344,42 @@ class Channels(object):
 
 
     def addProgram(self, program):
-        pitem = {'channel'     : '%s@%s'%(program['Channel'],slugify(ADDON_NAME)),
-                # 'credits'     : {'director': [program.get('Directors',[])], 'cast': [program.get('Cast',[])]},
-                 'category'    : [(genre,LANG) for genre in program.get('Categories',['Undefined'])],
-                 'title'       : [(self.cleanString(program['Title']), LANG)],
-                 'desc'        : [((self.cleanString(program.get('Summary','')) or xbmc.getLocalizedString(161)), LANG)],
-                 'stop'        : (strpTime(program['Raw']['endTime']).strftime(xmltv.date_format)),
-                 'start'       : (strpTime(program['Raw']['startTime']).strftime(xmltv.date_format)),
-                 'icon'        : [{'src': program.get('Image',FANART)}]}
-                      
-        if program.get('EpisodeTitle',''):
-            pitem['sub-title'] = [(self.cleanString(program['EpisodeTitle']), LANG)]
-            
-        if program.get('OriginalDate',''):
-            try:
-                pitem['date'] = (strpTime(program['OriginalDate'], '%Y-%m-%d')).strftime('%Y%m%d')
-            except: pass
-            
-        if program.get('Tags',None):
-            if 'New' in program.get('Tags',[]): pitem['new'] = '' #write blank tag, tag == True
-        if program['Raw'].get('ratings',None):
-            rating = program['Raw'].get('ratings',[{}])[0].get('code','')
-            if rating.startswith('TV'): 
-                pitem['rating'] = [{'system': 'VCHIP', 'value': rating}]
-            else:  
-                pitem['rating'] = [{'system': 'MPAA', 'value': rating}]
-            
-        if program.get('EpisodeNumber',''): 
-            SElabel = 'S%sE%s'%(str(program.get("SeasonNumber",0)).zfill(2),str(program.get("EpisodeNumber",0)).zfill(2))
-            pitem['episode-num'] = [(SElabel, 'onscreen')]
+        try:
+            pitem = {'channel'     : '%s@%s'%(program['Channel'],slugify(ADDON_NAME)),
+                    # 'credits'     : {'director': [program.get('Directors',[])], 'cast': [program.get('Cast',[])]},
+                     'category'    : [(genre,LANG) for genre in (program.get('Categories',['Undefined']) or ['Undefined'])],
+                     'title'       : [(self.cleanString(program['Title']), LANG)],
+                     'desc'        : [((self.cleanString(program.get('Summary','')) or xbmc.getLocalizedString(161)), LANG)],
+                     'stop'        : (strpTime(program['Raw']['endTime']).strftime(xmltv.date_format)),
+                     'start'       : (strpTime(program['Raw']['startTime']).strftime(xmltv.date_format)),
+                     'icon'        : [{'src': program.get('Image',FANART)}]}
+                          
+            if program.get('EpisodeTitle',''):
+                pitem['sub-title'] = [(self.cleanString(program['EpisodeTitle']), LANG)]
+                
+            if program.get('OriginalDate',''):
+                try:
+                    pitem['date'] = (strpTime(program['OriginalDate'], '%Y-%m-%d')).strftime('%Y%m%d')
+                except: pass
+                
+            if program.get('Tags',None):
+                if 'New' in program.get('Tags',[]): pitem['new'] = '' #write blank tag, tag == True
+            if program['Raw'].get('ratings',None):
+                rating = program['Raw'].get('ratings',[{}])[0].get('code','')
+                if rating.startswith('TV'): 
+                    pitem['rating'] = [{'system': 'VCHIP', 'value': rating}]
+                else:  
+                    pitem['rating'] = [{'system': 'MPAA', 'value': rating}]
+                
+            if program.get('EpisodeNumber',''): 
+                SElabel = 'S%sE%s'%(str(program.get("SeasonNumber",0)).zfill(2),str(program.get("EpisodeNumber",0)).zfill(2))
+                pitem['episode-num'] = [(SElabel, 'onscreen')]
 
-        log('addProgram = %s'%(pitem))
-        self.xmltvList['programmes'].append(pitem)
-        return True
-        
+            log('addProgram = %s'%(pitem))
+            self.xmltvList['programmes'].append(pitem)
+            return True
+        except:
+            return False
         
     def cleanString(self, text):
         if text is None: return ''
@@ -484,32 +490,33 @@ class Channels(object):
         now = (datetime.datetime.fromtimestamp(float(getLocalTime()))) + datetime.timedelta(seconds=tz)
         url = self.getLiveURL(channel['Number'], self.channels)
         for program in programmes:
-            label = program.get('Title','')
-            path  = program.get('Path','')
-            stop  = (strpTime(program['Raw']['endTime']))  + datetime.timedelta(seconds=tz)
-            start = (strpTime(program['Raw']['startTime']))+ datetime.timedelta(seconds=tz)
-            if now > stop: continue
-            elif now >= start and now < stop:
-                if opt == 'live':
-                    if label:
-                        label = '%s| %s: [B]%s[/B]'%(channel['Number'],channel['Name'],program.get('Title',''))
-                    else: 
-                        label = '%s| %s'%(channel['Number'],channel['Name'])
-                    liveMatch = True
+            try:
+                label = program.get('Title','')
+                path  = program.get('Path','')
+                stop  = (strpTime(program['Raw']['endTime']))  + datetime.timedelta(seconds=tz)
+                start = (strpTime(program['Raw']['startTime']))+ datetime.timedelta(seconds=tz)
+                if now > stop: continue
+                elif now >= start and now < stop:
+                    if opt == 'live':
+                        if label:
+                            label = '%s| %s: [B]%s[/B]'%(channel['Number'],channel['Name'],program.get('Title',''))
+                        else: 
+                            label = '%s| %s'%(channel['Number'],channel['Name'])
+                        liveMatch = True
+                    elif opt == 'lineup':
+                        label = '%s - [B]%s[/B]'%(start.strftime('%I:%M %p').lstrip('0'),program.get('Title',''))
+                elif opt == 'live': continue
                 elif opt == 'lineup':
-                    label = '%s - [B]%s[/B]'%(start.strftime('%I:%M %p').lstrip('0'),program.get('Title',''))
-            elif opt == 'live': continue
-            elif opt == 'lineup':
-                url   = 'next_show'
-                label = '%s - %s'%(start.strftime('%I:%M %p').lstrip('0'),program.get('Title',''))
-                   
-            icon  = channel.get('Image',ICON)
-            thumb = program.get('Image',icon)
-            info  = {'label':label,'title':label,'duration':program.get('Duration',0),'genre':program.get('Genres',[]),'plot':program.get('Summary',xbmc.getLocalizedString(161)),'aired':program.get('OriginalDate','')}
-            art   = {'icon':icon, 'thumb':thumb}
-            self.addLink(channel['Name'], url, '9', liz=self.buildItemListItem(label, url, info, art))
-            if liveMatch: break
-            
+                    url   = 'next_show'
+                    label = '%s - %s'%(start.strftime('%I:%M %p').lstrip('0'),program.get('Title',''))
+                       
+                icon  = channel.get('Image',ICON)
+                thumb = program.get('Image',icon)
+                info  = {'label':label,'title':label,'duration':program.get('Duration',0),'genre':program.get('Genres',[]),'plot':program.get('Summary',xbmc.getLocalizedString(161)),'aired':program.get('OriginalDate','')}
+                art   = {'icon':icon, 'thumb':thumb}
+                self.addLink(channel['Name'], url, '9', liz=self.buildItemListItem(label, url, info, art))
+                if liveMatch: break
+            except: pass
             
     def buildRecordingItem(self, item):
         item['Airings'] = [item['Airing'].copy()]
@@ -559,12 +566,15 @@ class Channels(object):
         except: # backend disabled?
             self.togglePVR('true')
             xbmc.sleep(1000)
-            return xbmcaddon.Addon(PVR_CLIENT)
+            try:
+                return xbmcaddon.Addon(PVR_CLIENT)
+            except: return None
             
             
     def chkSettings(self):
-        if ENABLE_CONFIG:
+        if REAL_SETTINGS.getSettingBool('Enable_Config'):
             addon = self.getPVR()
+            if addon is None: return
             check = [addon.getSetting('m3uRefreshMode')         == '1',
                      addon.getSetting('m3uRefreshIntervalMins') == '5',
                      addon.getSetting('logoFromEpg')            == '1',
@@ -600,7 +610,10 @@ class Channels(object):
         except: mode = None
         log("Mode: %s, Name: %s, URL : %s"%(mode,name,url))
 
-        if   mode==None: self.mainMenu()
+        if mode==None:
+            if getPTVL(): 
+                return notificationDialog(LANGUAGE(30019))
+            self.mainMenu()
         elif mode == 0:  self.buildLive()
         elif mode == 1:  self.buildLive(favorites=True)
         elif mode == 2:  self.buildLineup(url)

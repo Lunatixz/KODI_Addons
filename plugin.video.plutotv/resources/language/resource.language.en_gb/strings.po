@@ -133,7 +133,7 @@ msgid "Live (Favorites)"
 msgstr ""
 
 msgctxt "#30041"
-msgid "Use Direct feed"
+msgid "Use Direct stream"
 msgstr ""
 
 msgctxt "#30042"
@@ -142,4 +142,8 @@ msgstr ""
 
 msgctxt "#30043"
 msgid "Prefer Color Channel Logos"
+msgstr ""
+
+msgctxt "#30044"
+msgid "General"
 msgstr ""

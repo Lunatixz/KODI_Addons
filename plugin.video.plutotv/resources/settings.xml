@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
+	<category label="30044">
     <setting id="Enable_Debugging" type="bool"      label="30000" default="false"/>
-    <setting id="Use_Color_Logos"  type="bool"      label="30043" default="false"/>
+    <setting                       type="lsep"      /> 
     <setting id="Enable_M3UXMLTV"  type="bool"      label="30033" default="true"/>
-    <setting id="Build_Favorites"  type="bool"      label="30035" default="false" visible="eq(-1,true)" subsetting="true"/>
-    <setting id="Enable_Config"    type="bool"      label="30030" default="false" visible="eq(-2,true)" subsetting="true" enable="!System.AddonIsEnabled(plugin.video.pseudotv.live)" />
-    <setting id="Direct_URL"       type="bool"      label="30041" default="false" visible="eq(-3,true)" subsetting="true" />
-    <setting id="User_Folder"      type="folder"    label="30032" default="special://profile/addon_data/plugin.video.plutotv/" subsetting="true" source="files" visible="eq(-4,true)" />    
+    <setting id="Use_Color_Logos"  type="bool"      label="30043" default="false" visible="eq(-1,true)" subsetting="true"/>
+    <setting id="Build_Favorites"  type="bool"      label="30035" default="false" visible="eq(-2,true)" subsetting="true"/>
+    <setting id="Direct_URL"       type="bool"      label="30041" default="false" visible="eq(-3,true)" subsetting="true"/>
+    <setting id="User_Folder"      type="folder"    label="30032" default="special://profile/addon_data/plugin.video.plutotv/" source="files" visible="eq(-4,true)" subsetting="true"/>
+    <setting id="Enable_Config"    type="bool"      label="30030" default="false" visible="eq(-5,true)" subsetting="true" enable="!System.AddonIsEnabled(plugin.video.pseudotv.live)" /> 
+  </category>
 </settings>

@@ -53,8 +53,11 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 MY_MONITOR    = xbmc.Monitor()
 DEBUG         = REAL_SETTINGS.getSettingBool('Enable_Debugging')
 ENABLE_TS     = REAL_SETTINGS.getSettingBool('Enable_TS')
+DIRECT_URL    = REAL_SETTINGS.getSettingBool('Direct_URL')
 BUILD_FAVS    = REAL_SETTINGS.getSettingBool('Build_Favorites')
-USER_PATH     = REAL_SETTINGS.getSetting('User_Folder') 
+ENABLE_CONFIG = REAL_SETTINGS.getSettingBool('Enable_Config')
+USER_PATH     = REAL_SETTINGS.getSetting('User_Folder')
+ENABLE_TSHIFT = REAL_SETTINGS.getSettingBool('Enable_Timeshift')
 
 LANG          = 'en' #todo
 CONTENT_TYPE  = 'episodes'
@@ -91,6 +94,9 @@ xmltv.date_format = '%Y%m%d%H%M%S'
 def getPTVL():
     return xbmcgui.Window(10000).getProperty('PseudoTVRunning') == 'True'
     
+def hasPTVL():
+    return bool(xbmc.getCondVisibility('System.AddonIsEnabled(plugin.video.pseudotv.live)'))
+
 def notificationDialog(message, header=ADDON_NAME, show=True, sound=False, time=1000, icon=ICON):
     try:    xbmcgui.Dialog().notification(header, message, icon, time, sound=False)
     except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
@@ -153,7 +159,9 @@ class Service(object):
 
     def regPseudoTV(self):
         log('Service, regPseudoTV')
-        asset = {'type':'iptv','name':ADDON_NAME,'icon':ICON.replace(ADDON_PATH,'special://home/addons/%s/'%(ADDON_ID)).replace('\\','/'),'m3u':M3U_FILE,'xmltv':XMLTV_FILE,'id':ADDON_ID}
+        name = ADDON_NAME
+        if REAL_SETTINGS.getSettingBool('Build_Favorites'): name = '%s (Favorites)'%(name)
+        asset = {'type':'iptv','name':name,'icon':ICON.replace(ADDON_PATH,'special://home/addons/%s/'%(ADDON_ID)).replace('\\','/'),'m3u':M3U_FILE,'xmltv':{'path':XMLTV_FILE},'id':ADDON_ID}
         xbmcgui.Window(10000).setProperty('PseudoTV_Recommended.%s'%(ADDON_ID), json.dumps(asset))
 
 
@@ -167,6 +175,8 @@ class Service(object):
             conditions = [xbmcvfs.exists(M3U_FILE),xbmcvfs.exists(XMLTV_FILE)]
             if (time.time() > (lastCheck + 3600)) or False in conditions:
                 self.running = True
+                if hasPTVL():
+                    REAL_SETTINGS.setSetting('Enable_Config','false')
                 if self.myChannels.buildService(): 
                     self.regPseudoTV()
                     REAL_SETTINGS.setSetting('Last_Scan',str(time.time()))
@@ -245,8 +255,11 @@ class Channels(object):
         if BUILD_FAVS and 'Favorites' not in group: return False
         group.append(ADDON_NAME)
         
-        if REAL_SETTINGS.getSettingBool('Direct_URL'):
-            url = '#KODIPROP:inputstream=inputstream.ffmpegdirect\n#KODIPROP:inputstream.ffmpegdirect.stream_mode=timeshift\n#KODIPROP:inputstream.ffmpegdirect.is_realtime_stream=true\n%s'
+        if DIRECT_URL:
+            if ENABLE_TSHIFT:
+                url = '#KODIPROP:inputstream=inputstream.ffmpegdirect\n#KODIPROP:inputstream.ffmpegdirect.stream_mode=timeshift\n#KODIPROP:inputstream.ffmpegdirect.is_realtime_stream=true\n%s'
+            else:
+                url = '%s'
             if ENABLE_TS: 
                 url = url%('#KODIPROP:mimetype=video/mp2t\n%s'%(channel['url']))
             else: 
@@ -297,7 +310,8 @@ class Channels(object):
     
     def saveM3U(self, file):
         fle = xbmcvfs.File(M3U_FILE, 'w')
-        self.m3uList.insert(0,'#EXTM3U tvg-shift="" x-tvg-url="" x-tvg-id=""')
+        if not self.m3uList[0].startswith('#EXTM3U'):
+            self.m3uList.insert(0,'#EXTM3U tvg-shift="" x-tvg-url="" x-tvg-id=""')
         fle.write('\n'.join([item for item in self.m3uList]))
         fle.close()
         return True
@@ -398,14 +412,17 @@ class Channels(object):
             liz.setProperty("IsPlayable","true")
             liz.setProperty("IsInternetStream","true")
             if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
-                liz.setProperty('inputstreamaddon','inputstream.adaptive')
-                liz.setProperty('inputstream.adaptive.manifest_type','hls')
-                liz.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
-            liz.setProperty('inputstream','inputstream.ffmpegdirect')
-            liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
-            liz.setProperty('inputstream.ffmpegdirect.is_realtime_stream','true')
-
-            if ENABLE_TS: liz.setProperty('mimetype','video/mp2t')
+                if ENABLE_TSHIFT:
+                    log('playVideo, timeshift enabled')
+                    liz.setProperty('inputstream','inputstream.ffmpegdirect')
+                    liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
+                    liz.setProperty('inputstream.ffmpegdirect.is_realtime_stream','true')
+                else:
+                    liz.setProperty('inputstream','inputstream.adaptive')
+                    liz.setProperty('inputstream.adaptive.manifest_type','hls')
+            if ENABLE_TS: 
+                log('playVideo, TS-MPEG enabled')
+                liz.setProperty('mimetype','video/mp2t')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), found, liz)
 
 
@@ -518,6 +535,7 @@ class Channels(object):
                 if liveMatch: break
             except: pass
             
+            
     def buildRecordingItem(self, item):
         item['Airings'] = [item['Airing'].copy()]
         item['Channel'] = {'Hidden':False,'Number':0,'Name':'','Image':''}
@@ -572,7 +590,7 @@ class Channels(object):
             
             
     def chkSettings(self):
-        if REAL_SETTINGS.getSettingBool('Enable_Config'):
+        if ENABLE_CONFIG:
             addon = self.getPVR()
             if addon is None: return
             check = [addon.getSetting('m3uRefreshMode')         == '1',

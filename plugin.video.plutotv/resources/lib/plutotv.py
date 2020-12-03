@@ -61,7 +61,10 @@ MY_MONITOR    = xbmc.Monitor()
 DTFORMAT      = '%Y%m%d%H%M%S'
 PVR_CLIENT    = 'pvr.iptvsimple'
 DEBUG         = REAL_SETTINGS.getSettingBool('Enable_Debugging')
-USER_PATH     = REAL_SETTINGS.getSetting('User_Folder') 
+USER_PATH     = REAL_SETTINGS.getSetting('User_Folder')
+DIRECT_URL    = REAL_SETTINGS.getSettingBool('Direct_URL')
+ENABLE_CONFIG = REAL_SETTINGS.getSettingBool('Enable_Config')
+USE_COLOR     = REAL_SETTINGS.getSettingBool('Use_Color_Logos')
 M3U_FILE      = os.path.join(USER_PATH,'plutotv.m3u')
 XMLTV_FILE    = os.path.join(USER_PATH,'plutotv.xml')
 GUIDE_URL     = 'https://service-channels.clusters.pluto.tv/v1/guide?start=%s&stop=%s&%s'
@@ -85,13 +88,16 @@ xmltv.locale      = 'UTF-8'
 xmltv.date_format = DTFORMAT
 
 def getInputStream():
-    if xbmc.getCondVisibility('System.HasAddon(%s)'%(INPUTSTREAM_BETA)):
+    if xbmc.getCondVisibility('System.AddonIsEnabled(%s)'%(INPUTSTREAM_BETA)):
         return INPUTSTREAM_BETA
     else: 
         return INPUTSTREAM
 
 def getPTVL():
     return xbmcgui.Window(10000).getProperty('PseudoTVRunning') == 'True'
+
+def hasPTVL():
+    return bool(xbmc.getCondVisibility('System.AddonIsEnabled(plugin.video.pseudotv.live)'))
 
 def setUUID():
     if REAL_SETTINGS.getSetting("sid1_hex") and REAL_SETTINGS.getSetting("deviceId1_hex"): return
@@ -176,7 +182,9 @@ class Service(object):
 
     def regPseudoTV(self):
         log('Service, regPseudoTV')
-        asset = {'type':'iptv','name':ADDON_NAME,'icon':ICON.replace(ADDON_PATH,'special://home/addons/%s/'%(ADDON_ID)).replace('\\','/'),'m3u':M3U_FILE,'xmltv':XMLTV_FILE,'id':ADDON_ID}
+        name = ADDON_NAME
+        if REAL_SETTINGS.getSettingBool('Build_Favorites'): name = '%s (Favorites)'%(name)
+        asset = {'type':'iptv','name':name,'path':ADDON_PATH,'icon':ICON.replace(ADDON_PATH,'special://home/addons/%s/'%(ADDON_ID)).replace('\\','/'),'m3u':M3U_FILE,'xmltv':{'path':XMLTV_FILE},'id':ADDON_ID}
         xbmcgui.Window(10000).setProperty('PseudoTV_Recommended.%s'%(ADDON_ID), json.dumps(asset))
 
 
@@ -190,6 +198,8 @@ class Service(object):
             conditions = [xbmcvfs.exists(M3U_FILE),xbmcvfs.exists(XMLTV_FILE)]
             if (time.time() > (lastCheck + 3600)) or (False in conditions):
                 self.running = True
+                if hasPTVL():
+                    REAL_SETTINGS.setSetting('Enable_Config','false')
                 if self.myPlutoTV.buildService():
                     self.regPseudoTV()
                     REAL_SETTINGS.setSetting('Last_Scan',str(time.time()))
@@ -310,7 +320,7 @@ class PlutoTV(object):
         chthumb   = channel.get('thumbnail',{}).get('path',ICON)
         
         chlogo    = channel.get('logo',{}).get('path',ICON) 
-        if REAL_SETTINGS.getSettingBool('Use_Color_Logos'):
+        if USE_COLOR:
             chlogo = channel.get('colorLogoPNG',{}).get('path',chlogo)
 
         ondemand  = channel.get('onDemand','false') == 'true'
@@ -557,10 +567,10 @@ class PlutoTV(object):
         liz.setArt({'thumb':data.get('thumbnail',ICON),'fanart':data.get('thumbnail',FANART)})
         liz.setProperty("IsPlayable","true")
         if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
-                liz.setProperty('inputstreamaddon',getInputStream())
-                liz.setProperty('inputstream.adaptive.manifest_type','hls')
-                liz.setMimeType('application/vnd.apple.mpegurl')
-                liz.setContentLookup(False)
+            inputstream = getInputStream()
+            liz.setProperty('inputstream',inputstream)
+            liz.setProperty('%s.manifest_type'%(inputstream),'hls')
+            liz.setMimeType('application/vnd.apple.mpegurl')
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
         
         
@@ -577,10 +587,10 @@ class PlutoTV(object):
             log('playVideo, url = %s'%url)
             if liz is None: liz = xbmcgui.ListItem(name, path=url)
             if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
-                liz.setProperty('inputstreamaddon',getInputStream())
-                liz.setProperty('inputstream.adaptive.manifest_type','hls')
+                inputstream = getInputStream()
+                liz.setProperty('inputstream',inputstream)
+                liz.setProperty('%s.manifest_type'%(inputstream),'hls')
                 liz.setMimeType('application/vnd.apple.mpegurl')
-                liz.setContentLookup(False)
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), found, liz)
 
            
@@ -629,7 +639,8 @@ class PlutoTV(object):
         if len(self.m3uList) > 0:
             log('save, saving m3u to %s'%(M3U_FILE))
             fle = xbmcvfs.File(M3U_FILE, 'w')
-            self.m3uList.insert(0,'#EXTM3U tvg-shift="" x-tvg-url="" x-tvg-id=""')
+            if not self.m3uList[0].startswith('#EXTM3U'):
+                self.m3uList.insert(0,'#EXTM3U tvg-shift="" x-tvg-url="" x-tvg-id=""')
             fle.write('\n'.join([item for item in self.m3uList]))
             fle.close()
         
@@ -688,7 +699,7 @@ class PlutoTV(object):
             
             
     def chkSettings(self):
-        if REAL_SETTINGS.getSettingBool('Enable_Config'):
+        if ENABLE_CONFIG:
             addon = self.getPVR()
             if addon is None: return
             check = [addon.getSetting('catchupEnabled')         == 'true',
@@ -738,9 +749,9 @@ class PlutoTV(object):
             return False
             
         if isinstance(urls, list): urls = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
-        if REAL_SETTINGS.getSettingBool('Direct_URL'):
-            url  = '#KODIPROP:inputstream=inputstreamaddon.{inputstream}\n#KODIPROP:inputstream.adaptive.manifest_type=hls\n#KODIPROP:inputstream.ffmpegdirect.is_realtime_stream=true\n%s'.format(inputstream=getInputStream())
-            urls = url%('#KODIPROP:mimetype=application/vnd.apple.mpegurl\n%s'%(urls))
+        if DIRECT_URL:
+            url  = '#KODIPROP:inputstream={inputstream}\n#KODIPROP:{inputstream}.manifest_type=hls\n#KODIPROP:mimetype=application/vnd.apple.mpegurl\n%s'.format(inputstream=getInputStream())
+            urls = url%(urls)
         else:
             urls = 'plugin://%s/?mode=9&name=%s&url=%s'%(ADDON_ID,urllib.parse.quote(self.cleanString(channel['name'])),urllib.parse.quote(urls))
             

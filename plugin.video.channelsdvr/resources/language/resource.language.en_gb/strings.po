@@ -89,9 +89,13 @@ msgid "Live (Favorites)"
 msgstr ""
 
 msgctxt "#30018"
-msgid "Use Direct feed"
+msgid "Use Direct stream"
 msgstr ""
 
 msgctxt "#30019"
 msgid "PseudoTV Live Supported through Recommended Services"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Enable Timeshift"
 msgstr ""

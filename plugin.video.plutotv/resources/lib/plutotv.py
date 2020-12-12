@@ -628,10 +628,10 @@ class PlutoTV(object):
     def getData(self):
         log('getData')
         return {'date'                : datetime.datetime.fromtimestamp(float(time.time())).strftime(xmltv.date_format),
-                'generator-info-name' : '%s Guidedata'%(ADDON_NAME),
-                'generator-info-url'  : ADDON_ID,
-                'source-info-name'    : ADDON_NAME,
-                'source-info-url'     : ADDON_ID}
+                'generator-info-name' : self.cleanString('%s Guidedata'%(ADDON_NAME)),
+                'generator-info-url'  : self.cleanString(ADDON_ID),
+                'source-info-name'    : self.cleanString(ADDON_NAME),
+                'source-info-url'     : self.cleanString(ADDON_ID)}
 
 
     def save(self, reset=True):
@@ -788,6 +788,9 @@ class PlutoTV(object):
                    'start'       : (strpTime(program['start'],'%Y-%m-%dT%H:%M:%S.%fZ')).strftime(xmltv.date_format),
                    'icon'        : [{'src': (episode.get('poster','') or episode.get('thumbnail','') or episode.get('featuredImage',{})).get('path',FANART)}]}
                    
+        if int(episode.get('duration','0') or '0') > 0:
+            pitem['length']    = {'units': 'seconds', 'length': str(int(episode['duration']) // 1000)}
+    
         if uri:
             pitem['catchup-id'] = 'plugin://%s/?mode=8&name=%s&url=%s'%(ADDON_ID,urllib.parse.quote(self.cleanString(program['title'])),urllib.parse.quote(uri))
 
@@ -813,7 +816,7 @@ class PlutoTV(object):
      
     def cleanString(self, text):
         if text is None: return ''
-        return text
+        return re.sub(u'[^\n\r\t\x20-\x7f]+',u'',text)
         
         
     def poolList(self, method, items=None, args=None, chunk=25):

@@ -302,10 +302,10 @@ class Channels(object):
     def getData(self):
         log('getData')
         return {'date'                : datetime.datetime.fromtimestamp(float(time.time())).strftime(xmltv.date_format),
-                'generator-info-name' : '%s Guidedata'%(ADDON_NAME),
-                'generator-info-url'  : ADDON_ID,
-                'source-info-name'    : ADDON_NAME,
-                'source-info-url'     : ADDON_ID}
+                'generator-info-name' : self.cleanString('%s Guidedata'%(ADDON_NAME)),
+                'generator-info-url'  : self.cleanString(ADDON_ID),
+                'source-info-name'    : self.cleanString(ADDON_NAME),
+                'source-info-url'     : self.cleanString(ADDON_ID)}
                 
     
     def saveM3U(self, file):
@@ -360,14 +360,17 @@ class Channels(object):
     def addProgram(self, program):
         try:
             pitem = {'channel'     : '%s@%s'%(program['Channel'],slugify(ADDON_NAME)),
-                    # 'credits'     : {'director': [program.get('Directors',[])], 'cast': [program.get('Cast',[])]},
-                     'category'    : [(genre,LANG) for genre in (program.get('Categories',['Undefined']) or ['Undefined'])],
+                     'category'    : [(self.cleanString(genre),LANG) for genre in (program.get('Categories',['Undefined']) or ['Undefined'])],
                      'title'       : [(self.cleanString(program['Title']), LANG)],
                      'desc'        : [((self.cleanString(program.get('Summary','')) or xbmc.getLocalizedString(161)), LANG)],
                      'stop'        : (strpTime(program['Raw']['endTime']).strftime(xmltv.date_format)),
                      'start'       : (strpTime(program['Raw']['startTime']).strftime(xmltv.date_format)),
                      'icon'        : [{'src': program.get('Image',FANART)}]}
                           
+                          
+            if int(program.get('Duration','') or  '0') > 0:
+                pitem['length']    = {'units': 'seconds', 'length': str(program['Duration'])}
+                
             if program.get('EpisodeTitle',''):
                 pitem['sub-title'] = [(self.cleanString(program['EpisodeTitle']), LANG)]
                 
@@ -395,9 +398,10 @@ class Channels(object):
         except:
             return False
         
+        
     def cleanString(self, text):
-        if text is None: return ''
-        return text
+        if text is None: return ' '
+        return re.sub(u'[^\n\r\t\x20-\x7f]+',u'',text)
 
         
     def playVideo(self, name, url):

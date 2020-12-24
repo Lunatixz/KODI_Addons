@@ -17,7 +17,7 @@
 # along with Locast.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import os, sys, time, datetime, re
+import os, sys, time, datetime, re, sched, time, threading, urllib, distutils
 import random, string, traceback
 import socket, json, inputstreamhelper, requests
 import xbmc, xbmcgui, xbmcplugin, xbmcaddon, xbmcvfs
@@ -55,6 +55,7 @@ USER_EMAIL    = REAL_SETTINGS.getSetting('User_Email')
 PASSWORD      = REAL_SETTINGS.getSetting('User_Password')
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 TOKEN         = REAL_SETTINGS.getSetting('User_Token')
+FREEREFRESH   = int(REAL_SETTINGS.getSetting('Free_RefreshRate'))
 BASE_URL      = 'https://www.locast.org'
 BASE_API      = 'https://api.locastnet.org/api'
 GEO_URL       = 'http://ip-api.com/json'
@@ -62,7 +63,8 @@ GEO_URL       = 'http://ip-api.com/json'
 MAIN_MENU     = [(LANGUAGE(30003), '' , 3),
                  (LANGUAGE(30004), '' , 4),
                  (LANGUAGE(30005), '' , 20)]
-              
+SCHEDULER = sched.scheduler(time.time, time.sleep)
+
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
@@ -83,7 +85,7 @@ def okDialog(str1, str2='', str3='', header=ADDON_NAME):
 
 def okDisable(string1):
     if yesnoDialog(string1, no=LANGUAGE(30009), yes=LANGUAGE(30015)): 
-        results = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method":"Addons.SetAddonEnabled", "params":{"addonid":"%s","enabled":false}, "id": 1}'%ADDON_ID)
+        results = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method":"Addons.SetAddonEnabled", "params":{"addonid":"%s","enabled":False}, "id": 1}'%ADDON_ID)
         if results and "OK" in results: notificationDialog(LANGUAGE(30016))
     else: sys.exit()
         
@@ -94,6 +96,21 @@ def notificationDialog(message, header=ADDON_NAME, sound=False, time=1000, icon=
     try: xbmcgui.Dialog().notification(header, message, icon, time, sound)
     except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
      
+
+def toBool(str):
+    if type(str) == str:
+        lowerStr = str.lower()
+        if lowerStr == 'true':
+            return True
+        elif lowerStr == 'false':
+            return False
+        else:
+            log('toBool failed for string %s'%(str))
+            raise ValueError
+    else:
+        return str
+
+
 socket.setdefaulttimeout(TIMEOUT) 
 class Locast(object):
     def __init__(self, sysARG):
@@ -105,6 +122,7 @@ class Locast(object):
         self.lastDMA = 0
         self.now     = datetime.datetime.now()
         self.lat, self.lon = self.setRegion()
+        self.player  = None
         if self.login(USER_EMAIL, PASSWORD) == False: sys.exit()  
 
 
@@ -374,8 +392,10 @@ class Locast(object):
 
         
     def playLive(self, name, url):
-        log('playLive')     
-        liz  = xbmcgui.ListItem(name, path=self.resolveURL(int(url))['streamUrl'])
+        log("playLive %s"%(self.sysARG[1]))     
+        self.liz_url = self.resolveURL(int(url))['streamUrl']+'?id='+url
+        log('playLive url=%s'%(self.liz_url))
+        liz  = xbmcgui.ListItem(name, path=self.liz_url)
         if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream() and not DEBUG:
             liz.setProperty('inputstreamaddon','inputstream.adaptive')
             liz.setProperty('inputstream.adaptive.manifest_type','hls')
@@ -386,7 +406,7 @@ class Locast(object):
         name = name.encode("utf-8")
         log('addLink, name = %s'%name)
         liz=xbmcgui.ListItem(name)
-        liz.setProperty('IsPlayable', 'true')
+        liz.setProperty('IsPlayable', 'True')
         if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
         else: liz.setInfo(type="Video", infoLabels=infoList)
         if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
@@ -397,11 +417,12 @@ class Locast(object):
         xbmcplugin.addDirectoryItem(handle=int(self.sysARG[1]),url=u,listitem=liz,totalItems=total)
 
 
+
     def addDir(self, name, u, mode, infoList=False, infoArt=False):
         name = name.encode("utf-8")
         log('addDir, name = %s'%name)
         liz=xbmcgui.ListItem(name)
-        liz.setProperty('IsPlayable', 'false')
+        liz.setProperty('IsPlayable', 'False')
         if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
         else: liz.setInfo(type="Video", infoLabels=infoList)
         if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
@@ -431,8 +452,25 @@ class Locast(object):
         elif mode == 3: self.getStations(name, url, 'Live')
         elif mode == 4: self.getStations(name, url, 'Lineups')
         elif mode == 5: self.getStations(name, url, 'Lineup')
-        elif mode == 9: self.playLive(name, url)
         elif mode == 20: xbmc.executebuiltin("RunScript(script.module.uepg,json=%s&refresh_path=%s&refresh_interval=%s)"%(self.uEPG(),urllib.parse.quote(self.sysARG[0]+"?mode=20"),"7200"))
+
+        elif mode == 9: 
+            self.playLive(name, url)
+            isPremiumUser = toBool(REAL_SETTINGS.getSetting('User_Donate'))
+            if not isPremiumUser:
+                log('Free Player Created, name=%s id=%s'%(name,url))
+                self.player = MyPlayer()
+                self.player.setID(int(url))
+                self._event = SCHEDULER.enter(FREEREFRESH,1, self.refreshStream, (name, int(url),))
+                t = threading.Thread( target = SCHEDULER.run )
+                t.start()
+
+                while(not xbmc.abortRequested and not self.player.isStopped()):
+                    xbmc.sleep(1000)
+
+                for event in SCHEDULER.queue:
+                    SCHEDULER.cancel(event)
+                log('Free Player Terminated, name=%s id=%s'%(name,url))
 
         xbmcplugin.setContent(int(self.sysARG[1])    , CONTENT_TYPE)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_UNSORTED)
@@ -440,3 +478,64 @@ class Locast(object):
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.addSortMethod(int(self.sysARG[1]) , xbmcplugin.SORT_METHOD_TITLE)
         xbmcplugin.endOfDirectory(int(self.sysARG[1]), cacheToDisc=self.cacheToDisc)
+        
+        
+    def refreshStream(self, name, id):
+        if self.player.isPlaying():
+            try:
+                # is it playing the same channel?
+                current_id = int(urllib.parse.parse_qs(urllib.parse.urlparse(self.player.getPlayingFile()).query)['id'][0])
+                if current_id == id:
+                    log('Refreshing Stream, name=%s id=%s'%(name,id))
+                    lizUrl = self.resolveURL(int(id))['streamUrl']+'?id='+id
+                    lizListItem  = xbmcgui.ListItem(name)
+                    lizListItem.setProperty('IsPlayable', 'True')
+                    lizListItem.setInfo(type="Video", infoLabels={"mediatype":"video","title":name})
+                    lizListItem.setArt({'thumb':ICON,'fanart':FANART})
+                    self.player.play(lizUrl, lizListItem)
+                    self._event = SCHEDULER.enter(FREEREFRESH,1, self.refreshStream, (name, id,))
+            except KeyError:
+                # playing a different url, stop refreshing
+                pass
+ 
+ 
+ 
+        
+class MyPlayer(xbmc.Player):
+    def __init__(self):
+        self._isStopped = False
+        self._id = 0
+        xbmc.Player.__init__(self)
+        
+    def onPlayBackEnded(self):
+        log('onPlayBackEnded')
+
+    def onPlayBackStarted(self):
+        log('onPlayBackStarted, id=%s'%(self._id))
+        # if playback is NOT this stream, then stop this thread
+        try:
+            current_id = int(urllib.parse.parse_qs(urllib.parse.urlparse(self.getPlayingFile()).query)['id'][0])
+            if current_id != self._id:
+                self._isStopped = True
+        except KeyError:
+            # playing a different url, stop refreshing
+            self._isStopped = True
+            
+    
+    def onPlayBackStopped(self):
+        self._isStopped = True
+        log('onPlayBackStopped, id=%s'%(self._id))
+
+    def getID(self):
+        return self._id
+
+        
+    def setID(self, id):
+        log('Player setID, id=%s'%(self._id))
+        self._id = id
+
+    def isStopped(self):
+        return self._isStopped
+    
+    
+    

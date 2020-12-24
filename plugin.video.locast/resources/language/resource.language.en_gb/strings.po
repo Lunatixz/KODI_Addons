@@ -111,3 +111,7 @@ msgstr ""
 msgctxt "#30024"
 msgid "User Information"
 msgstr ""
+
+msgctxt "#30025"
+msgid "Free Acct Refresh Rate (sec)"
+msgstr ""

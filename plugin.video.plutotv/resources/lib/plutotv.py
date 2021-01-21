@@ -578,7 +578,7 @@ class PlutoTV(object):
         if url.lower() == 'next_show': 
             found = False
             liz   = xbmcgui.ListItem(name)
-            return notificationDialog(LANGUAGE(30029), time=4000)
+            notificationDialog(LANGUAGE(30029), time=4000)
         else:
             found = True
             if url.endswith('?deviceType='): url = url.replace('deviceType=','deviceType=&deviceMake=&deviceModel=&&deviceVersion=unknown&appVersion=unknown&deviceDNT=0&userId=&advertisingId=&app_name=&appName=&buildVersion=&appStoreUrl=&architecture=&includeExtendedEvents=false')#todo lazy fix replace
@@ -598,15 +598,14 @@ class PlutoTV(object):
         log('addLink, name = %s'%name)
         liz=xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable', 'true') 
-        
-        if infoList.get('favorite',None) is not None:
-            if infoList['favorite']:
-                liz.addContextMenuItems([(LANGUAGE(30039), 'RunScript(special://home/addons/%s/context.py, %s)'%(ADDON_ID,urllib.parse.quote(json.dumps({"chnum":infoList.pop('chnum'),"chname":infoList.pop('chname'),"mode":"del"}))))])
-            else:
-                liz.addContextMenuItems([(LANGUAGE(30038), 'RunScript(special://home/addons/%s/context.py, %s)'%(ADDON_ID,urllib.parse.quote(json.dumps({"chnum":infoList.pop('chnum'),"chname":infoList.pop('chname'),"mode":"add"}))))])
-            
         if infoList == False: liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name})
-        else: liz.setInfo(type="Video", infoLabels=infoList)
+        else:     
+            if infoList.get('favorite',None) is not None:
+                if infoList['favorite']:
+                    liz.addContextMenuItems([(LANGUAGE(30039), 'RunScript(special://home/addons/%s/context.py, %s)'%(ADDON_ID,urllib.parse.quote(json.dumps({"chnum":infoList.pop('chnum'),"chname":infoList.pop('chname'),"mode":"del"}))))])
+                else:
+                    liz.addContextMenuItems([(LANGUAGE(30038), 'RunScript(special://home/addons/%s/context.py, %s)'%(ADDON_ID,urllib.parse.quote(json.dumps({"chnum":infoList.pop('chnum'),"chname":infoList.pop('chname'),"mode":"add"}))))])
+            liz.setInfo(type="Video", infoLabels=infoList)
         if infoArt == False: liz.setArt({'thumb':ICON,'fanart':FANART})
         else: liz.setArt(infoArt)
         u=self.sysARG[0]+"?url="+urllib.parse.quote(u)+"&mode="+str(mode)+"&name="+urllib.parse.quote(name)

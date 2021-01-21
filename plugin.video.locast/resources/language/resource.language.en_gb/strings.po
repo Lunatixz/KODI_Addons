@@ -38,7 +38,7 @@ msgstr ""
 
 msgctxt "#30005"
 msgid "Guide"
-msgstr "
+msgstr ""
 
 msgctxt "#30006"
 msgid "Enter User Email"
@@ -113,5 +113,77 @@ msgid "User Information"
 msgstr ""
 
 msgctxt "#30025"
-msgid "Free Acct Refresh Rate (sec)"
+msgid "Could not determine geo-location\nVerify that your internet is not blocking %s"
+msgstr ""
+
+msgctxt "#30044"
+msgid "General"
+msgstr ""
+
+msgctxt "#30029"
+msgid "Coming Up Later..."
+msgstr ""
+
+msgctxt "#30031"
+msgid "%s Updating..."
+msgstr ""
+
+msgctxt "#30041"
+msgid "Use Direct stream"
+msgstr ""
+
+msgctxt "#30042"
+msgid "PseudoTV Live Supported through Recommended Services"
+msgstr ""
+
+msgctxt "#49000"
+msgid "Integration"
+msgstr ""
+
+msgctxt "#49001"
+msgid "Install PseudoTV Live add-on"
+msgstr ""
+
+msgctxt "#49002"
+msgid "Install IPTV Manager add-on"
+msgstr ""
+
+msgctxt "#49003"
+msgid "Enable IPTV Manager integration"
+msgstr ""
+
+msgctxt "#49004"
+msgid "IPTV Manager settings…"
+msgstr ""
+
+msgctxt "#49005"
+msgid "PseudoTV Live settings…"
+msgstr ""
+
+msgctxt "#49006"
+msgid "Only add Favorites"
+msgstr ""
+
+msgctxt "#49007"
+msgid "%s added to Favorites"
+msgstr ""
+
+msgctxt "#49008"
+msgid "%s removed from Favorites"
+msgstr ""
+
+msgctxt "#49009"
+msgid "Add Channel to Favorites"
+msgstr ""
+
+msgctxt "#49010"
+msgid "Remove Channel from Favorites"
+msgstr ""
+
+msgctxt "#49011"
+msgid "Live (Favorites)"
+msgstr ""
+
+msgctxt "#49012"
+msgid "Favorites"
 msgstr ""

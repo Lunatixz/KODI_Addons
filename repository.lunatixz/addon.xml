@@ -1,15 +1,12 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="repository.lunatixz" name="Lunatixz Beta Repository (Master)" version="1.0.8" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-    </requires>
-    <extension point="xbmc.addon.repository" name="Lunatixz Leia Beta Repository">
+<addon id="repository.lunatixz" name="Lunatixz Beta Repository (Master)" version="1.0.9" provider-name="Lunatixz">
+    <extension point="xbmc.addon.repository" name="Lunatixz Master Beta Repository">
         <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml</info>
         <checksum>http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml.md5</checksum>
         <datadir zip="true">http://raw.github.com/Lunatixz/KODI_Addons/master/zips</datadir>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
+        <summary lang="en_GB">Master Repository, for older Kodi builds install Leia or Jarvis Repository</summary>
         <description lang="en_GB"></description>
         <platform>all</platform>
         <source>http://raw.github.com/Lunatixz/KODI_Addons/master</source>

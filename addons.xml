@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.channelsdvr" version="1.1.3" name="Channels DVR" provider-name="Lunatixz">
+<addon id="plugin.video.channelsdvr" version="1.1.6" name="Channels DVR" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
         <import addon="script.module.kodi-six" version="0.1.3.1"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="script.module.requests" version="2.7.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.routing" version="0.2.3"/>
         <import addon="script.module.inputstreamhelper" version="0.3.3"/>
         <import addon="inputstream.ffmpegdirect" version="1.16.0"/>
-        <import addon="pvr.iptvsimple" version="6.2.1" optional="true"/>
+        <import addon="service.iptv.manager" version="0.2.2" optional="true"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>
-    <extension point="xbmc.service" library="service.py"/>
+    <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <summary lang="en_GB">Live TV, everywhere</summary>
@@ -69,7 +70,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.locast" version="1.1.0" name="Locast" provider-name="Lunatixz">
+<addon id="plugin.video.locast" version="1.1.1" name="Locast" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -80,10 +81,10 @@
         <import addon="script.module.inputstreamhelper" version="0.3.3"/>
         <import addon="service.iptv.manager" version="0.2.2" optional="true"/>
     </requires>
-    <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>
+    <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <summary lang="en_GB">Locast is a public service to Americans, providing local broadcast signals over the Internet in select cities like New York, Philadelphia, Boston, Chicago, Houston and Dallas ...</summary>

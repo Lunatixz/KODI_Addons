@@ -17,7 +17,7 @@
 # along with Locast.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import os, sys, time, datetime, re, routing
+import os, sys, time, datetime, _strptime, re, routing
 import random, string, traceback
 import socket, json, inputstreamhelper, requests
 
@@ -34,11 +34,11 @@ try:
     CORES = cpu_count()
 except: ENABLE_POOL = False
 
-try:
-  basestring #py2
-except NameError: #py3
-  basestring = str
-  unicode = str
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] == 3
+if PY3: 
+    basestring = str
+    unicode = str
   
 # Plugin Info
 ADDON_ID      = 'plugin.video.locast'
@@ -158,7 +158,7 @@ class Locast(object):
         MAIN_MENU = [(LANGUAGE(30003),(getLive    ,self.city)),
                      (LANGUAGE(49011),(getLiveFavs,self.city)),
                      (LANGUAGE(30004),(getChannels,self.city))]
-        [self.addDir(*item) for item in MAIN_MENU]
+        for item in MAIN_MENU: self.addDir(*item)
             
 
     def getStations(self, city, name='', opt=''):
@@ -248,7 +248,7 @@ class Locast(object):
                     return self.addLink(label, (playChannel,path), infoLabels, infoArt, infoVideo, infoAudio, total=len(listings))
                 else: continue
             if opt == 'play': 
-                self.addPlaylist(label, infoLabels, infoArt, infoVideo, infoAudio)
+                self.addPlaylist(label, path, infoLabels, infoArt, infoVideo, infoAudio)
             else: 
                 self.addLink(label, (playChannel,path), infoLabels, infoArt, infoVideo, infoAudio, total=len(listings))
 
@@ -265,7 +265,7 @@ class Locast(object):
     def getURL(self, url, param={}, header={'Content-Type':'application/json'}, life=datetime.timedelta(minutes=15)):
         log('getURL, url = %s, header = %s'%(url, header))
         cacheresponse = self.cache.get(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header))
-        if cacheresponse is None:
+        if not cacheresponse:
             try:
                 req = requests.get(url, param, headers=header)
                 try:    cacheresponse = req.json()
@@ -284,7 +284,7 @@ class Locast(object):
         log('postURL, url = %s, header = %s'%(url, header))
         cacheresponse = self.cache.get(ADDON_NAME + '.postURL, url = %s.%s.%s'%(url,param,header))
         cacheresponse = None
-        if cacheresponse is None:
+        if not cacheresponse:
             try:
                 req = requests.post(url, param, headers=header)
                 cacheresponse = req.json()
@@ -462,9 +462,10 @@ class Locast(object):
         '''{u'dma': 501, u'streamUrl': u'https://acdn.locastnet.org/variant/E27GYubZwfUs.m3u8', u'name': u'WNBCDT2', u'sequence': 50, u'stationId': u'44936', u'callSign': u'4.2 COZITV', u'logo226Url': u'https://fans.tmsimg.com/assets/s78851_h3_aa.png', u'logoUrl': u'https://fans.tmsimg.com/assets/s78851_h3_aa.png', u'active': True, u'id': 1574529688491L}''' 
         data = self.getURL(BASE_API + '/watch/station/%s/%s/%s'%(id, self.lat, self.lon), header=self.buildHeader())
         liz  = xbmcgui.ListItem(data.get('name'),path=data.get('streamUrl'))
+        liz.setProperty('IsPlayable','true')
+        liz.setProperty('IsInternetStream','true')
         if opt != 'pvr':
             self.getStations(data.get('dma'), name=data.get('name'), opt='play')
-            print('resolveURL',self.listitems,len(self.listitems))
             liz = self.listitems.pop(0)
             liz.setPath(path=data.get('streamUrl'))
         return liz

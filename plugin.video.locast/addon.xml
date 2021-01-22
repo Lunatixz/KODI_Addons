@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.locast" version="1.1.0" name="Locast" provider-name="Lunatixz">
+<addon id="plugin.video.locast" version="1.1.1" name="Locast" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -10,10 +10,10 @@
         <import addon="script.module.inputstreamhelper" version="0.3.3"/>
         <import addon="service.iptv.manager" version="0.2.2" optional="true"/>
     </requires>
-    <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>
+    <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <summary lang="en_GB">Locast is a public service to Americans, providing local broadcast signals over the Internet in select cities like New York, Philadelphia, Boston, Chicago, Houston and Dallas ...</summary>

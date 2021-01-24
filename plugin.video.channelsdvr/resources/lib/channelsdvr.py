@@ -150,7 +150,7 @@ def iptv_epg():
     from resources.lib.iptvmanager import IPTVManager
     port = int(ROUTER.args.get('port')[0])
     IPTVManager(port,Channels()).send_epg()
-        
+    
 class Channels(object):
     def __init__(self, sysARG=sys.argv):
         log('__init__, sysARG = %s'%(sysARG))
@@ -210,8 +210,8 @@ class Channels(object):
     def buildLive(self, favorites=False):
         log('buildLive')
         self.poolList(self.buildPlayItem, self.getGuidedata(), ('live',favorites))
-
-
+        
+        
     def buildLineup(self, chid=None):
         log('buildLineup, chid = %s'%(chid))
         programmes = self.getGuidedata()
@@ -268,7 +268,11 @@ class Channels(object):
                 thumb = program.get('Image',icon)
                 info  = {'label':label,'title':label,'duration':program.get('Duration',0),'genre':program.get('Genres',[]),'plot':program.get('Summary',xbmc.getLocalizedString(161)),'aired':program.get('OriginalDate','')}
                 art   = {'icon':icon, 'thumb':thumb}
-                self.addLink(label, (playChannel,url), info, art, total=len(programmes))
+                if opt == 'play': 
+                    if start <= now and stop > now: info['duration'] = (now-start).seconds
+                    self.addPlaylist(label, url, info, art)
+                else: 
+                    self.addLink(label, (playChannel,url), info, art, total=len(programmes))
                 if liveMatch: break
             except: pass
 
@@ -279,10 +283,17 @@ class Channels(object):
         self.listitems = []
         self.playlist  = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         self.playlist.clear()
-        url = list(filter(lambda channel:channel['number'] == id, self.getChannels()))[0]['url']
-        liz = xbmcgui.ListItem('', path=url)
-        liz.setProperty("IsPlayable","true")
-        liz.setProperty("IsInternetStream","true")
+        programmes = self.getGuidedata()
+        data = [program for program in programmes if program['Channel']['Number'] == id]
+        channel = list(filter(lambda channel:channel['number'] == id, self.getChannels()))[0]
+        self.poolList(self.buildPlayItem, data, ('play',False))
+        liz = xbmcgui.ListItem(channel['name'],path=channel['url'])
+        liz.setProperty('IsPlayable','true')
+        liz.setProperty('IsInternetStream','true')
+        if opt != 'pvr':
+            [self.playlist.add(channel['url'],lz,idx) for idx,lz in enumerate(self.listitems)]
+            liz = self.listitems.pop(0)
+            liz.setPath(path=channel['url'])
         return liz
         
  

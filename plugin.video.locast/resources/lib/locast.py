@@ -248,6 +248,7 @@ class Locast(object):
                     return self.addLink(label, (playChannel,path), infoLabels, infoArt, infoVideo, infoAudio, total=len(listings))
                 else: continue
             if opt == 'play': 
+                if start <= now and stop > now: infoLabels['duration'] = (now-start).seconds
                 self.addPlaylist(label, path, infoLabels, infoArt, infoVideo, infoAudio)
             else: 
                 self.addLink(label, (playChannel,path), infoLabels, infoArt, infoVideo, infoAudio, total=len(listings))
@@ -466,6 +467,7 @@ class Locast(object):
         liz.setProperty('IsInternetStream','true')
         if opt != 'pvr':
             self.getStations(data.get('dma'), name=data.get('name'), opt='play')
+            [self.playlist.add(data.get('streamUrl'),lz,idx) for idx,lz in enumerate(self.listitems)]
             liz = self.listitems.pop(0)
             liz.setPath(path=data.get('streamUrl'))
         return liz

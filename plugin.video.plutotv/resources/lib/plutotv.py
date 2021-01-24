@@ -293,7 +293,6 @@ class PlutoTV(object):
             now = datetime.datetime.now()
             totstart = now
             tz = (timezone()//100)*60*60
-            
             for item in timelines:
                 episode    = (item.get('episode',{})   or item)
                 series     = (episode.get('series',{}) or item)
@@ -303,13 +302,12 @@ class PlutoTV(object):
                 if isinstance(urls, list): urls  = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
                 
                 try:
-                    start  = strpTime(item['start'],'%Y-%m-%dT%H:%M:00.000Z') + datetime.timedelta(seconds=tz)
-                    stop   = strpTime(item['stop'],'%Y-%m-%dT%H:%M:00.000Z')  + datetime.timedelta(seconds=tz)
+                    start  = strpTime(item['start'],'%Y-%m-%dT%H:%M:%S.000Z') + datetime.timedelta(seconds=tz)
+                    stop   = strpTime(item['stop'],'%Y-%m-%dT%H:%M:%S.000Z')  + datetime.timedelta(seconds=tz)
                 except:
                     start  = totstart
                     stop   = start + datetime.timedelta(seconds=epdur)
-                totstart   = stop  
-                
+                totstart   = stop                  
                 type       = series.get('type','')
                 tvtitle    = series.get('name',''                           or chname)
                 title      = (item.get('title',''))
@@ -377,7 +375,6 @@ class PlutoTV(object):
 
                 elif opt == 'lineup':
                     if now > stop: continue
-                    # elif start >= now and stop < now: epdur = (now - start).seconds
                     if type in ['movie','film']:
                         mtype = 'movie'
                         thumb = epposter
@@ -404,6 +401,7 @@ class PlutoTV(object):
                     infoLabels = {"favorite":favorite,"chnum":chnum,"chname":chname,"mediatype":mtype,"label":label,"label2":label,"tvshowtitle":tvtitle,"title":epname,"plot":epplot, "code":epid, "genre":[epgenre], "duration":epdur,'season':epseason,'episode':epnumber}
                     infoArt    = {"thumb":thumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
                     if opt == 'play': 
+                        if start <= now and stop > now: infoLabels['duration'] = (now-start).seconds
                         self.addPlaylist(label, urls, infoLabels, infoArt)
                     elif opt in ['ondemand','vod']:
                         self.addLink(label, (playOD,epid), infoLabels, infoArt)
@@ -571,7 +569,6 @@ class PlutoTV(object):
         self.listitems = []
         self.playlist  = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         self.playlist.clear()
-        
         channel = list(filter(lambda k:k.get('_id','') == id, self.getGuidedata()))[0]
         urls = channel.get('stitched',{}).get('urls',[])
         if isinstance(urls, list): urls = [url['url'] for url in urls if url['type'].lower() == 'hls'][0]
@@ -580,6 +577,7 @@ class PlutoTV(object):
         liz.setProperty('IsInternetStream','true')
         if opt != 'pvr':
             self.browseGuide(opt='play',data=[channel])
+            [self.playlist.add(urls,lz,idx) for idx,lz in enumerate(self.listitems)]
             liz = self.listitems.pop(0)
             liz.setPath(path=urls)
         return liz
@@ -640,7 +638,7 @@ class PlutoTV(object):
         if infoVideo: liz.addStreamInfo('video', infoVideo)
         if infoAudio: liz.addStreamInfo('audio', infoAudio)
         self.listitems.append(liz)
-    
+        
     
     def addLink(self, name, uri=(''), infoList={}, infoArt={}, infoVideo={}, infoAudio={}, infoType='video', total=0):
         log('addLink, name = %s'%name)

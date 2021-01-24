@@ -35,7 +35,6 @@ class IPTVManager:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect(('127.0.0.1', self.port))
             try:
-                print('via_socket',func(self))
                 sock.sendall(json.dumps(func(self)).encode())
             finally:
                 sock.close()

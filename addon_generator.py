@@ -68,9 +68,10 @@ class Generator(object):
         for root, dirnames, filenames in os.walk(GITPATH):
             for dirname in dirnames:
                 if dirname == '__pycache__':
-                    print("removing: " + dirname)
-                    os.remove(os.path.join(root, dirname))
-            
+		    try:
+                        os.remove(os.path.join(root, dirname))
+                        print("removing: " + dirname)
+                    except: pass
             for filename in filenames:
                 if filename.endswith(DELETE_EXT):
                     print("removing: " + filename)

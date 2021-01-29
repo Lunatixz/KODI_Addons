@@ -28,8 +28,8 @@ import xml.etree.ElementTree
 from zipfile import ZipFile
 from shutil import copyfile
 
-CHKPATH    = 'C:/GitHub/addon-check/'
-GITPATH    = 'C:/GitHub/KODI_Addons/'
+CHKPATH    = 'D:/GitHub/addon-check/'
+GITPATH    = 'D:/GitHub/KODI_Addons/'
 ZIPPATH    = os.path.join(GITPATH,'zips','')
 DELETE_EXT = ('.pyc', '.pyo', '.db')
 
@@ -66,6 +66,11 @@ class Generator(object):
     
     def _clean_addons(self):
         for root, dirnames, filenames in os.walk(GITPATH):
+            for dirname in dirnames:
+                if dirname == '__pycache__':
+                    print("removing: " + dirname)
+                    os.remove(os.path.join(root, dirname))
+            
             for filename in filenames:
                 if filename.endswith(DELETE_EXT):
                     print("removing: " + filename)

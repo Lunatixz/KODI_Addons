@@ -171,7 +171,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.plutotv" version="1.5.0c" name="Pluto.TV" provider-name="Lunatixz">
+<addon id="plugin.video.plutotv" version="1.5.0d" name="Pluto.TV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -647,14 +647,6 @@
             <icon>icon.png</icon>
         </assets>
     </extension>
-</addon>
-
-<addon id="script.numpy.test" version="0.0.1" name="numpy test" provider-name="Team Kodi">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-        <!-- <import addon="script.module.numpy" version="0.0.1"/> -->
-    </requires>
-    <extension point="xbmc.python.script" library="default.py"/>
 </addon>
 
 <addon id="script.pystone.benchmark" name="CPU Benchmark" version="1.1.5" provider-name="Lunatixz">

@@ -31,19 +31,19 @@ class IPTVManager:
     def via_socket(func):
         """Send the output of the wrapped function to socket"""
         def send(self):
-            """Decorator to send over a socket"""
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect(('127.0.0.1', self.port))
             try:
+                """Decorator to send over a socket"""
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.connect(('127.0.0.1', self.port))
                 sock.sendall(json.dumps(func(self)).encode())
-            finally:
                 sock.close()
+            except: pass
         return send
 
     @via_socket
     def send_channels(self):
         """Return JSON-STREAMS formatted information to IPTV Manager"""
-        return dict(version=1, streams=self.plutotv.getChannels())
+        return dict(version=1, streams=self.plutotv.getChans())
 
     @via_socket
     def send_epg(self):

@@ -106,18 +106,22 @@ def getOD():
 def getOndemand(id):
     PlutoTV().browseOndemand(id,opt='vod')
 
-@ROUTER.route('/series/<season>/<epid>')
-def getEpisodes(season,epid):
-    PlutoTV().browseGuide(epid, opt='episode', data=[PlutoTV().getVOD(epid).get('seasons',[])[int(season) - 1]])
+@ROUTER.route('/series/<season>/<sid>')
+def getEpisodes(season,sid):
+    PlutoTV().browseGuide(season, opt='episode', data=[PlutoTV().getVOD(sid)])
             
 @ROUTER.route('/season/<sid>')
 def getSeason(sid):
     PlutoTV().browseGuide(sid, opt='season', data=[PlutoTV().getVOD(sid)])
     
+@ROUTER.route('/play/vod')#unknown bug causing this route to be called during /ondemand parse. todo find issue.
+def dummy():
+    pass
+
 @ROUTER.route('/play/vod/<id>')
 def playOD(id):
     PlutoTV().playVOD(id)
-
+    
 @ROUTER.route('/play/pvr/<id>')
 def playChannel(id):
     PlutoTV().playLive(id,opt='pvr')
@@ -238,7 +242,7 @@ class PlutoTV(object):
         chcat     = (channel.get('category','')    or channel.get('genre',''))
         chfanart  = channel.get('featuredImage',{}).get('path',FANART)
         chthumb   = channel.get('thumbnail',{}).get('path',ICON)
-        chlogo    = channel.get('logo',{}).get('path',ICON) 
+        chlogo    = channel.get('logo',{}).get('path',LOGO) 
         if REAL_SETTINGS.getSettingBool('Use_Color_Logos'):
             chlogo = channel.get('colorLogoPNG',{}).get('path',chlogo)
 
@@ -286,10 +290,15 @@ class PlutoTV(object):
                     self.addDir(label, (getLineup, chid), infoLabels, infoArt)        
         else:
             urls = channel.get('stitched',{}).get('urls',[])
-            if not timelines:
+            if opt == 'episode':
+                try:    
+                    timelines = list(filter(lambda k:k.get('number') == int(name), channel.get('seasons',[])))[0].get('episodes',[])
+                except: 
+                    timelines = []
+            elif not timelines:
                 opt = 'ondemand'
                 timelines = (channel.get('items',[]) or channel.get('episodes',[]))
-                
+
             now = datetime.datetime.now()
             totstart = now
             tz = (timezone()//100)*60*60
@@ -403,7 +412,7 @@ class PlutoTV(object):
                     if opt == 'play': 
                         if start <= now and stop > now: infoLabels['duration'] = (now-start).seconds
                         self.addPlaylist(label, urls, infoLabels, infoArt)
-                    elif opt in ['ondemand','vod']:
+                    elif opt in ['ondemand','vod','episode']:
                         self.addLink(label, (playOD,epid), infoLabels, infoArt)
                     else:
                         if urls == 'NEXT_SHOW': chid = urls
@@ -420,8 +429,9 @@ class PlutoTV(object):
 
     def browseCategories(self):
         log('browseCategories')
-        categoryMenu = self.getCategories()
-        for item in categoryMenu: self.addDir(*item)
+        categoryMenu = list(self.getCategories())
+        for item in categoryMenu:
+            self.addDir(*item)
        
        
     def browseOndemand(self, id=None, opt='ondemand'):
@@ -476,7 +486,7 @@ class PlutoTV(object):
         except: return ''
         
             
-    def getChannels(self):
+    def getChans(self):
         log('getChannels')
         # https://github.com/add-ons/service.iptv.manager/wiki/JSON-STREAMS-format
         stations  = self.getGuidedata(full=True).get('channels',[])

@@ -69,7 +69,7 @@ class Generator(object):
             for dirname in dirnames:
                 if dirname == '__pycache__':
 		    try:
-                        os.remove(os.path.join(root, dirname))
+                        rmtree(os.path.join(root, dirname))
                         print("removing: " + dirname)
                     except: pass
             for filename in filenames:

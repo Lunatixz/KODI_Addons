@@ -274,7 +274,7 @@ class PlutoTV(object):
                     vodfanart = (vodfanart or FANART)
                     mtype = 'episode'
                     label = 'Season %s'%(season['number'])
-                    infoLabels = {"favorite":favorite,"chnum":chnum,"chname":chname,"mediatype":mtype,"label":label,"label2":label,"title":label,"plot":chplot, "code":chid, "genre":[chcat]}
+                    infoLabels = {"favorite":favorite,"chnum":chnum,"chname":chname,"mediatype":mtype,"label":label,"title":label,"plot":chplot, "code":chid, "genre":[chcat]}
                     infoArt    = {"thumb":vodlogo,"poster":vodlogo,"fanart":vodfanart,"icon":vodlogo,"logo":vodlogo,"clearart":chthumb}                    
                     self.addDir(label, (getEpisodes, season['number'], chid), infoLabels, infoArt)
             else:
@@ -282,7 +282,7 @@ class PlutoTV(object):
                     label = chname
                 else: 
                     label = '%s| %s'%(chnum,chname)
-                infoLabels = {"favorite":favorite,"chnum":chnum,"chname":chname,"mediatype":mtype,"label":label,"label2":label,"title":label,"plot":chplot, "code":chid, "genre":[chcat]}
+                infoLabels = {"favorite":favorite,"chnum":chnum,"chname":chname,"mediatype":mtype,"label":label,"title":label,"plot":chplot, "code":chid, "genre":[chcat]}
                 infoArt    = {"thumb":chthumb,"poster":chthumb,"fanart":chfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
                 if opt == 'ondemand': 
                     self.addDir(label, (getOndemand, chid), infoLabels, infoArt)
@@ -351,31 +351,49 @@ class PlutoTV(object):
                 epthumb    = (episode.get('thumbnail',{}).get('path','')     or vodlogo   or vodthumb  or vodposter or tvthumb)
                 epfanart   = (episode.get('featuredImage',{}).get('path','') or vodfanart or tvfanart)
                 
-                label      = title
-                thumb      = chthumb
-                if type in ['movie','film']:
-                    mtype  = 'movie'
-                    thumb  = epposter
-                elif type in ['tv','episode','series']:
-                    mtype  = 'episode'
-                    thumb  = epposter
+                if type == 'series':
+                    mtype   = 'tvshows'
+                    label   = tvtitle
+                    tvtitle = tvtitle
+                    epname  = ''
+                    thumb   = tvthumb
+                elif type in ['tv','episode']:
+                    mtype  = 'episodes'
+                    tvtitle = chname
+                    epname  = epname
+                    thumb  = epthumb
                     if epseason > 0 and epnumber > 0:
-                        label  = '%sx%s'%(epseason, epnumber)
-                        label  = '%s - %s'%(label, epname)
+                        seaep  = '%sx%s'%(epseason, epnumber)
+                        label  = '%s (%s) - %s'%(chname,seaep,epname)
+                    else:
+                        label  = '%s - %s'%(tvtitle,epname)
+                else:
+                    mtype   = 'files'
+                    label   = chname
+                    thumb   = chthumb
+                print(type, chname, tvtitle, title, epname)
+                # if type in ['movie','film']:
+                    # mtype  = 'movie'
+                    # thumb  = epposter
+                
+                # elif type == 'series':
+                    # mtype   = 'tvshow'
+                    # tvtitle = chname
                         # else: label  = '%s - %s'%(tvtitle, label)
-                    else: label = epname
-                    epname = label
-                    if type == 'music' or epgenre.lower() == 'music': mtype = 'musicvideo'
+                    # elif type != 'series': label = '%s - %s'%(chname,epname)
+                    # else: label = epname
+                if type == 'music' or epgenre.lower() == 'music': 
+                    mtype = 'musicvideo'
 
                 if opt in ['live','favorites']:
                     if stop < now or start > now: continue
                     label = '%s| %s'%(chnum,chname)
                     if type in ['movie','film']:
-                        mtype = 'movie'
+                        mtype = 'movies'
                         thumb = epposter
                         label = '%s : [B]%s[/B]'%(label, title)
                     elif type in ['tv','series']:
-                        mtype = 'episode'
+                        mtype = 'episodes'
                         thumb = epposter
                         label = "%s : [B]%s - %s[/B]" % (label, tvtitle, epname)
                     elif len(epname) > 0: label = '%s: [B]%s - %s[/B]'%(label, title, epname)
@@ -401,16 +419,16 @@ class PlutoTV(object):
                         label = '%s - %s'%(start.strftime('%I:%M %p').lstrip('0'),label)
                         urls  = 'NEXT_SHOW'
                     epname = label
-                if opt == 'ondemand' and type == "series":
+                if opt == 'ondemand' and type in ["series"]:
                     mtype = 'season'
-                    infoLabels = {"mediatype":mtype,"label":label,"label2":label,"title":label,"plot":epplot, "code":chid, "genre":[epgenre]}
-                    infoArt    = {"thumb":epthumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
+                    infoLabels = {"mediatype":mtype,"label":label,"title":epname,"plot":epplot, "code":chid, "genre":[epgenre],"tvshowtitle":tvtitle}
+                    infoArt    = {"thumb":thumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
                     self.addDir(label, (getSeason,epid), infoLabels, infoArt)
                 elif opt != 'guide':
-                    infoLabels = {"favorite":favorite,"chnum":chnum,"chname":chname,"mediatype":mtype,"label":label,"label2":label,"tvshowtitle":tvtitle,"title":epname,"plot":epplot, "code":epid, "genre":[epgenre], "duration":epdur,'season':epseason,'episode':epnumber}
+                    infoLabels = {"favorite":favorite,"chnum":chnum,"chname":chname,"mediatype":mtype,"label":label,"title":epname,"plot":epplot, "code":epid, "genre":[epgenre], "duration":epdur,'season':epseason,'episode':epnumber,"tvshowtitle":tvtitle}
                     infoArt    = {"thumb":thumb,"poster":epposter,"fanart":epfanart,"icon":chlogo,"logo":chlogo,"clearart":chthumb}
                     if opt == 'play': 
-                        if start <= now and stop > now: infoLabels['duration'] = (now-start).seconds
+                        if start <= now and stop > now: infoLabels['duration'] = ((stop) - now).seconds
                         self.addPlaylist(label, urls, infoLabels, infoArt)
                     elif opt in ['ondemand','vod','episode']:
                         self.addLink(label, (playOD,epid), infoLabels, infoArt)
@@ -610,7 +628,7 @@ class PlutoTV(object):
             liz.setProperty('inputstream',inputstream)
             liz.setProperty('%s.manifest_type'%(inputstream),'hls')
             liz.setMimeType('application/vnd.apple.mpegurl')
-        xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
+        xbmcplugin.setResolvedUrl(ROUTER.handle, True, liz)
         
         
     def playLive(self, id, opt='live'):
@@ -633,7 +651,7 @@ class PlutoTV(object):
                 liz.setProperty('inputstream',inputstream)
                 liz.setProperty('%s.manifest_type'%(inputstream),'hls')
                 liz.setMimeType('application/vnd.apple.mpegurl')
-        xbmcplugin.setResolvedUrl(int(self.sysARG[1]), found, liz)
+        xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
 
            
     def addPlaylist(self, name, path='', infoList={}, infoArt={}, infoVideo={}, infoAudio={}, infoType='video'):

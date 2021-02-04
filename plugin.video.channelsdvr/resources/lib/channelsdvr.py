@@ -209,7 +209,8 @@ class Channels(object):
 
     def buildLive(self, favorites=False):
         log('buildLive')
-        self.poolList(self.buildPlayItem, self.getGuidedata(), ('live',favorites))
+        channels = self.getGuidedata()
+        self.poolList(self.buildPlayItem, channels, ('live',favorites))
         
         
     def buildLineup(self, chid=None):
@@ -269,8 +270,8 @@ class Channels(object):
                 info  = {'label':label,'title':label,'duration':program.get('Duration',0),'genre':program.get('Genres',[]),'plot':program.get('Summary',xbmc.getLocalizedString(161)),'aired':program.get('OriginalDate','')}
                 art   = {'icon':icon, 'thumb':thumb}
                 if opt == 'play': 
-                    if start <= now and stop > now: info['duration'] = (now-start).seconds
-                    self.addPlaylist(label, url, info, art)
+                    if start <= now and stop > now: info['duration'] = ((stop) - now).seconds
+                    self.addPlaylist(label, url, info, art) 
                 else: 
                     self.addLink(label, (playChannel,url), info, art, total=len(programmes))
                 if liveMatch: break
@@ -318,7 +319,7 @@ class Channels(object):
             if REAL_SETTINGS.getSettingBool('Enable_TS'): 
                 log('playLive, TS-MPEG enabled')
                 liz.setProperty('inputstream.adaptive.mime_type','video/mp2t')
-        xbmcplugin.setResolvedUrl(int(self.sysARG[1]), found, liz)
+        xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
 
    
     def addPlaylist(self, name, path='', infoList={}, infoArt={}, infoVideo={}, infoAudio={}, infoType='video'):

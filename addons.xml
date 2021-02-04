@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.channelsdvr" version="1.1.7" name="Channels DVR" provider-name="Lunatixz">
+<addon id="plugin.video.channelsdvr" version="1.1.7a" name="Channels DVR" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -70,7 +70,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.locast" version="1.1.2" name="Locast" provider-name="Lunatixz">
+<addon id="plugin.video.locast" version="1.1.2a" name="Locast" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -171,7 +171,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.plutotv" version="1.5.1" name="Pluto.TV" provider-name="Lunatixz">
+<addon id="plugin.video.plutotv" version="1.5.1a" name="Pluto.TV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>

@@ -1,4 +1,4 @@
-#   Copyright (C) 2019 Lunatixz
+#   Copyright (C) 2021 Lunatixz
 #
 #
 # This file is part of HDHomerun Simple

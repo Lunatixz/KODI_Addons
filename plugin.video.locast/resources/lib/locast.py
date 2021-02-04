@@ -248,7 +248,7 @@ class Locast(object):
                     return self.addLink(label, (playChannel,path), infoLabels, infoArt, infoVideo, infoAudio, total=len(listings))
                 else: continue
             if opt == 'play': 
-                if start <= now and stop > now: infoLabels['duration'] = (now-start).seconds
+                if starttime <= now and endtime > now: infoLabels['duration'] = ((endtime) - now).seconds
                 self.addPlaylist(label, path, infoLabels, infoArt, infoVideo, infoAudio)
             else: 
                 self.addLink(label, (playChannel,path), infoLabels, infoArt, infoVideo, infoAudio, total=len(listings))
@@ -485,7 +485,7 @@ class Locast(object):
             if 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
                 liz.setProperty('inputstreamaddon','inputstream.adaptive')
                 liz.setProperty('inputstream.adaptive.manifest_type','hls')
-        xbmcplugin.setResolvedUrl(int(self.sysARG[1]), found, liz)
+        xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
     
     
     def addPlaylist(self, name, path='', infoList={}, infoArt={}, infoVideo={}, infoAudio={}, infoType='video'):

@@ -59,9 +59,9 @@ DISC_CACHE    = False
 DTFORMAT      = '%Y-%m-%dT%H:%M:%S' #'YYYY-MM-DDTHH:MM:SS'
 UTC_OFFSET    = datetime.datetime.utcnow() - datetime.datetime.now()
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-TRANSCODE     = REAL_SETTINGS.getSetting('Preferred_Transcoding').lower().replace('default','none')
 MTYPES        = {'EP':'episode','SH':'episode','MV':'movie'}
-    
+TRANTYPES     = ['Default','Heavy','Mobile','Internet540','Internet480','Internet360','Internet240']
+
 @ROUTER.route('/')
 def buildMenu():
     HDHR().browseTuners()
@@ -156,11 +156,12 @@ def notificationDialog(message, header=ADDON_NAME, sound=False, time=1000, icon=
 class HDHR(object):
     def __init__(self, sysARG=sys.argv):
         log('__init__, sysARG = %s'%(sysARG))
-        self.sysARG   = sysARG
-        self.cache    = SimpleCache()
-        self.pyHDHR   = PyHDHR.PyHDHR()
-        self.tuners   = self.getTuners()
-        self.hasDVR   = self.pyHDHR.hasSDDVR()
+        self.sysARG    = sysARG
+        self.cache     = SimpleCache()
+        self.pyHDHR    = PyHDHR.PyHDHR()
+        self.tuners    = self.getTuners()
+        self.hasDVR    = self.pyHDHR.hasSDDVR()
+        self.transcode = TRANTYPES[int(REAL_SETTINGS.getSetting('Preferred_Transcoding'))].lower()
         self.fillDeviceInfo()
         
         
@@ -324,12 +325,10 @@ class HDHR(object):
         video = {'codec':''}
         audio = {'codec':''}
         if tuner.getModelNumber() == "HDTC-2US":
-            if TRANSCODE == 'none': 
-                tranOPT = (tuner.getTranscodeOption() or 'none')
-            else: 
-                tranOPT = TRANSCODE
-            if tranOPT != "none": 
-                video['codec'] = 'h264'
+            if self.transcode == 'default': 
+                  tranOPT = (tuner.getTranscodeOption() or 'none')
+            else: tranOPT = self.transcode
+            if tranOPT != "none": video['codec'] = 'h264'
         else:
             if info.getVideoCodec() == "H264": 
                 video['codec'] = 'h264'
@@ -524,8 +523,8 @@ class HDHR(object):
         url   = info.getURL()
         tuner = info.getTuner()
         if tuner.getModelNumber() == "HDTC-2US":
-            if TRANSCODE == 'none': tranOPT = (tuner.getTranscodeOption() or 'none')
-            else: tranOPT = TRANSCODE
+            if self.transcode == 'none': tranOPT = (tuner.getTranscodeOption() or 'none')
+            else: tranOPT = self.transcode
             log("resolveURL, Tuner transcode option: " + tranOPT)
             if tranOPT != "none": video = {'codec': 'h264'}
             url = "%s?transcode=%s"%(url,tranOPT)
@@ -535,8 +534,7 @@ class HDHR(object):
         if opt != 'pvr':
             chan  = self.getChannelInfo(channel)
             progs = chan.getProgramInfos()
-            print(progs)
-            self.buildChannelListItem(tunerkey, channel, chan.getProgramInfos(), 'play')
+            for prog in progs: self.buildChannelListItem(tunerkey, channel, prog, 'play')
             [self.playlist.add(url,lz,idx) for idx,lz in enumerate(self.listitems)]
             liz = self.listitems.pop(0)
             liz.setPath(path=url)
@@ -554,9 +552,6 @@ class HDHR(object):
         else:            
             found = True
             liz   = self.resolveURL(tunerkey,channel,opt)
-            # if 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
-                # liz.setProperty('inputstream','inputstream.adaptive')
-                # liz.setProperty('inputstream.adaptive.manifest_type','hls')
         xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
     
     

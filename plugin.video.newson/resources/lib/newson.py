@@ -17,7 +17,7 @@
 # along with NewsOn.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import os, sys, time, datetime, traceback, feedparser, random, routing
+import os, sys, time, datetime, traceback, random, routing
 import socket, json, inputstreamhelper, requests, collections, base64
 
 from six.moves     import urllib
@@ -135,7 +135,7 @@ class NewsOn(object):
                 (LANGUAGE(30007), (buildStates,)  )]
         for item in MENU: self.addDir(*item)
         
-
+    
     def browse(self, opt='now'):
         log('browse, opt = %s'%(opt))
         items = {'now'   :self.getLiveNow,
@@ -147,8 +147,9 @@ class NewsOn(object):
                 if self.poolList(self.buildStates, items.get('states',[])):
                     for state in self.states.keys(): 
                         self.addDir(state,(buildCities,state),infoArt={"thumb":FAN_URL%(state),"poster":LOGO_URL%(state),"fanart":FANART,"icon":ICON,"logo":ICON})
-        else: self.poolList(self.buildChannel, items, opt)
-        
+        else: 
+            if not (list(set(self.poolList(self.buildChannel, items, opt)))): 
+                self.addDir(LANGUAGE(30008), (buildMenu,))
         
     def browseCities(self, state):
         log('browseCities, state = %s'%(state))
@@ -226,9 +227,11 @@ class NewsOn(object):
 
         if opt == 'channels':
             self.addDir(chname,(buildStation,chid),infoArt={"thumb":chlogo,"poster":chlogo,"fanart":FANART,"icon":ICON,"logo":ICON})
+            return True
         else:
             self.addLink(label, (playURL,encodeString(url)), infoList=infoLabel, infoArt=infoArt)
-
+            return True
+        
 
     @use_cache(1)
     def getCoordinates(self):

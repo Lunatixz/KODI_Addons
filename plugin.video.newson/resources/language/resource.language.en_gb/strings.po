@@ -47,3 +47,7 @@ msgstr ""
 msgctxt "#30007"
 msgid "Browse by State"
 msgstr ""
+
+msgctxt "#30008"
+msgid "There are no live stations right now!"
+msgstr ""

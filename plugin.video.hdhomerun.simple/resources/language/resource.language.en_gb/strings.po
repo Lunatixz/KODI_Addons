@@ -32,6 +32,10 @@ msgctxt "#30101"
 msgid "Available Devices"
 msgstr ""
 
+msgctxt "#30102"
+msgid "General"
+msgstr ""
+
 msgctxt "#30103"
 msgid "Tuner Details"
 msgstr ""
@@ -154,8 +158,4 @@ msgstr ""
 
 msgctxt "#49012"
 msgid "Favorites"
-msgstr ""
-
-msgctxt "#30101"
-msgid "General"
 msgstr ""

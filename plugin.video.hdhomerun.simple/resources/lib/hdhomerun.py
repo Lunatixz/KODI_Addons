@@ -523,7 +523,7 @@ class HDHR(object):
         url   = info.getURL()
         tuner = info.getTuner()
         if tuner.getModelNumber() == "HDTC-2US":
-            if self.transcode == 'none': tranOPT = (tuner.getTranscodeOption() or 'none')
+            if self.transcode == 'default': tranOPT = (tuner.getTranscodeOption() or 'none')
             else: tranOPT = self.transcode
             log("resolveURL, Tuner transcode option: " + tranOPT)
             if tranOPT != "none": video = {'codec': 'h264'}

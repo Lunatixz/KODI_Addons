@@ -583,10 +583,10 @@ class Tuner(BaseDevice):
         if self.ModelNumber == "HDTC-2US":
             try:
                 response = urllib.request.urlopen(self.BaseURL+"/transcode.html",None,5)
-                regx = Regex('transcodeChanged\(\)">((.|\n)+?)</select>').search(response.read())
+                regx = re.compile('transcodeChanged\(\)">((.|\n)+?)</select>', re.IGNORECASE).search(response.read())
                 selecttags = regx.group(1)
                 
-                regx = Regex('.+"(.*)".+selected=').search(selecttags)
+                regx = re.compile('.+"(.*)".+selected=', re.IGNORECASE).search(selecttags)
                 self.TranscodeOption = regx.group(1)
             except Exception as e:
                 pass

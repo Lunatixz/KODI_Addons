@@ -263,13 +263,13 @@ class Locast(object):
         return float('{0:.7f}'.format(geo_data['lat'])), float('{0:.7f}'.format(geo_data['lon']))
 
 
-    def getURL(self, url, param={}, header={'Content-Type':'application/json'}, life=datetime.timedelta(minutes=15)):
+    def getURL(self, url, param={}, header={'Content-Type':'application/json'}, life=datetime.timedelta(minutes=5)):
         log('getURL, url = %s, header = %s'%(url, header))
         cacheresponse = self.cache.get(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header))
         if not cacheresponse:
             try:
                 req = requests.get(url, param, headers=header)
-                try:    cacheresponse = req.json()
+                try: cacheresponse = req.json()
                 except: return {}
                 req.close()
                 self.cache.set(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header), json.dumps(cacheresponse), expiration=life)
@@ -281,7 +281,7 @@ class Locast(object):
         else: return json.loads(cacheresponse)
 
 
-    def postURL(self, url, param={}, header={'Content-Type':'application/json'}, life=datetime.timedelta(minutes=15)):
+    def postURL(self, url, param={}, header={'Content-Type':'application/json'}, life=datetime.timedelta(minutes=5)):
         log('postURL, url = %s, header = %s'%(url, header))
         cacheresponse = self.cache.get(ADDON_NAME + '.postURL, url = %s.%s.%s'%(url,param,header))
         cacheresponse = None
@@ -330,10 +330,12 @@ class Locast(object):
                 self.token = data['token']
                 if REAL_SETTINGS.getSetting('User_Token') != self.token: REAL_SETTINGS.setSetting('User_Token',self.token)
                 if self.chkUser(user): 
-                    REAL_SETTINGS.setSetting('User_totalDonations',str(self.userdata.get('totalDonations','0')))
-                    REAL_SETTINGS.setSetting('User_DonateExpire',datetime.datetime.fromtimestamp(float(str(self.userdata.get('donationExpire','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
-                    REAL_SETTINGS.setSetting('User_Donate',str(self.userdata.get('didDonate','False')))
-                    REAL_SETTINGS.setSetting('User_LastLogin',datetime.datetime.fromtimestamp(float(str(self.userdata.get('lastlogin','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
+                    try:
+                        REAL_SETTINGS.setSetting('User_Donate',str(self.userdata.get('didDonate','False')))
+                        REAL_SETTINGS.setSetting('User_totalDonations',str(self.userdata.get('totalDonations','0')))
+                        REAL_SETTINGS.setSetting('User_LastLogin',datetime.datetime.fromtimestamp(float(str(self.userdata.get('lastlogin','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
+                        REAL_SETTINGS.setSetting('User_DonateExpire',datetime.datetime.fromtimestamp(float(str(self.userdata.get('donationExpire','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
+                    except: pass
                     self.lastDMA = self.userdata.get('lastDmaUsed','')
                     notificationDialog(LANGUAGE(30021)%(self.userdata.get('name','')))
                     return True
@@ -364,6 +366,10 @@ class Locast(object):
         return self.getURL(BASE_API + '/watch/epg/%s'%(city), param={'start_time':urllib.parse.quote(now)}, header=self.buildHeader(), life=datetime.timedelta(minutes=45))
         
         
+    def getAll(self):
+        return self.getURL(BASE_API + '/dma',header=self.buildHeader())
+              
+
     def getCity(self):
         log("getCity")
         '''{u'active': True, u'DMA': u'501', u'small_url': u'https://s3.us-east-2.amazonaws.com/static.locastnet.org/cities/new-york.jpg', u'large_url': u'https://s3.us-east-2.amazonaws.com/static.locastnet.org/cities/background/new-york.jpg', u'name': u'New York'}'''
@@ -422,13 +428,17 @@ class Locast(object):
         stnum    = re.sub('[^\d\.]+','', label)
         stname   = re.compile('[^a-zA-Z]').sub('', label)
         favorite = isFavorite(stnum)
-        channel  = {"name"  :stname,
-                    "stream":"plugin://%s/play/pvr/%s"%(ADDON_ID,station['id']), 
-                    "id"    :"%s.%s@%s"%(stnum,slugify(stname),slugify(ADDON_NAME)), 
-                    "logo"  :(station.get('logoUrl','') or station.get('logo226Url','') or ICON), 
-                    "preset":stnum,
-                    "group" :ADDON_NAME,
-                    "radio" :False}
+        channel  = {"name"     :stname,
+                    "stream"   :"plugin://%s/play/pvr/%s"%(ADDON_ID,station['id']), 
+                    "id"       :"%s.%s@%s"%(stnum,slugify(stname),slugify(ADDON_NAME)), 
+                    "logo"     :(station.get('logoUrl','') or station.get('logo226Url','') or ICON), 
+                    "preset"   :stnum,
+                    "group"    :ADDON_NAME,
+                    "radio"    :False}#,
+                    # "kodiprops":{"inputstream":"inputstream.adaptive",
+                                 # "inputstream.adaptive.manifest_type":"hls",
+                                 # "inputstream.adaptive.media_renewal_url":"plugin://%s/play/pvr/%s"%(ADDON_ID,station['id']),
+                                 # "inputstream.adaptive.media_renewal_time":"900"}}
         if favorite: channel['group'] = ';'.join([LANGUAGE(49012),ADDON_NAME])
         if REAL_SETTINGS.getSettingBool('Build_Favorites') and not favorite: return None
         elif opt == 'channel': return channel
@@ -461,15 +471,16 @@ class Locast(object):
         self.playlist  = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         self.playlist.clear()
         '''{u'dma': 501, u'streamUrl': u'https://acdn.locastnet.org/variant/E27GYubZwfUs.m3u8', u'name': u'WNBCDT2', u'sequence': 50, u'stationId': u'44936', u'callSign': u'4.2 COZITV', u'logo226Url': u'https://fans.tmsimg.com/assets/s78851_h3_aa.png', u'logoUrl': u'https://fans.tmsimg.com/assets/s78851_h3_aa.png', u'active': True, u'id': 1574529688491L}''' 
-        data = self.getURL(BASE_API + '/watch/station/%s/%s/%s'%(id, self.lat, self.lon), header=self.buildHeader())
-        liz  = xbmcgui.ListItem(data.get('name'),path=data.get('streamUrl'))
+        data = self.getURL(BASE_API + '/watch/station/%s/%s/%s'%(id, self.lat, self.lon), header=self.buildHeader(), life=datetime.timedelta(seconds=5))
+        url  = data.get('streamUrl')
+        liz  = xbmcgui.ListItem(data.get('name'),path=url)
         liz.setProperty('IsPlayable','true')
         liz.setProperty('IsInternetStream','true')
         if opt != 'pvr':
             self.getStations(data.get('dma'), name=data.get('name'), opt='play')
-            [self.playlist.add(data.get('streamUrl'),lz,idx) for idx,lz in enumerate(self.listitems)]
+            [self.playlist.add(url,lz,idx) for idx,lz in enumerate(self.listitems)]
             liz = self.listitems.pop(0)
-            liz.setPath(path=data.get('streamUrl'))
+            liz.setPath(path=url)
         return liz
         
         
@@ -482,9 +493,12 @@ class Locast(object):
         else:            
             found = True
             liz   = self.resolveURL(id,opt)
-            if 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
-                liz.setProperty('inputstreamaddon','inputstream.adaptive')
+            if opt != 'pvr' and 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
+                liz.setProperty('inputstream','inputstream.adaptive')
                 liz.setProperty('inputstream.adaptive.manifest_type','hls')
+                # liz.setProperty('inputstream.adaptive.media_renewal_url', 'plugin://%s/play/%s/%s'%(ADDON_ID,opt,id))
+                # liz.setProperty('inputstream.adaptive.media_renewal_time', '900')
+                #todo debug pvr (IPTV Simple) not playing with inputstream! temp. use kodiprops in m3u?
         xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
     
     

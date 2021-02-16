@@ -371,7 +371,7 @@ class PlutoTV(object):
                     mtype   = 'files'
                     label   = chname
                     thumb   = chthumb
-                print(type, chname, tvtitle, title, epname)
+                    
                 # if type in ['movie','film']:
                     # mtype  = 'movie'
                     # thumb  = epposter

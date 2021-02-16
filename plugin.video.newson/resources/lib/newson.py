@@ -1,4 +1,4 @@
-#   Copyright (C) 2019 Lunatixz
+#   Copyright (C) 2021 Lunatixz
 #
 #
 # This file is part of NewsOn.
@@ -18,7 +18,7 @@
 
 # -*- coding: utf-8 -*-
 import os, sys, time, datetime, traceback, random, routing
-import socket, json, inputstreamhelper, requests, collections, base64
+import socket, json, requests, collections, base64
 
 from six.moves     import urllib
 from itertools     import repeat, cycle, chain, zip_longest
@@ -201,7 +201,7 @@ class NewsOn(object):
     
     def buildChannel(self, data):
         item, opt = data
-        # if not item.get('live',False) and opt in ['now','new']: return None
+        if not item.get('live',False) and opt in ['now']: return None
         chid        = item['id']
         chname      = item['name']
         chdesc      = (item.get('description','') or xbmc.getLocalizedString(161))
@@ -299,9 +299,6 @@ class NewsOn(object):
         liz = xbmcgui.ListItem(path=url)
         liz.setProperty('IsPlayable','true')
         liz.setProperty('IsInternetStream','true')
-        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
-            liz.setProperty('inputstreamaddon','inputstream.adaptive')
-            liz.setProperty('inputstream.adaptive.manifest_type','hls')
         xbmcplugin.setResolvedUrl(ROUTER.handle, True, liz)
 
 

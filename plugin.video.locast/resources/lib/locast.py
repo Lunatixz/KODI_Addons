@@ -269,7 +269,7 @@ class Locast(object):
         if not cacheresponse:
             try:
                 req = requests.get(url, param, headers=header)
-                try:    cacheresponse = req.json()
+                try: cacheresponse = req.json()
                 except: return {}
                 req.close()
                 self.cache.set(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header), json.dumps(cacheresponse), expiration=life)
@@ -364,6 +364,10 @@ class Locast(object):
         return self.getURL(BASE_API + '/watch/epg/%s'%(city), param={'start_time':urllib.parse.quote(now)}, header=self.buildHeader(), life=datetime.timedelta(minutes=45))
         
         
+    def getAll(self):
+        return self.getURL(BASE_API + '/dma',header=self.buildHeader())
+              
+
     def getCity(self):
         log("getCity")
         '''{u'active': True, u'DMA': u'501', u'small_url': u'https://s3.us-east-2.amazonaws.com/static.locastnet.org/cities/new-york.jpg', u'large_url': u'https://s3.us-east-2.amazonaws.com/static.locastnet.org/cities/background/new-york.jpg', u'name': u'New York'}'''
@@ -483,7 +487,7 @@ class Locast(object):
             found = True
             liz   = self.resolveURL(id,opt)
             if 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
-                liz.setProperty('inputstreamaddon','inputstream.adaptive')
+                liz.setProperty('inputstream','inputstream.adaptive')
                 liz.setProperty('inputstream.adaptive.manifest_type','hls')
         xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
     

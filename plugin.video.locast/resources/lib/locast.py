@@ -61,6 +61,10 @@ CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
 DTFORMAT      = '%Y-%m-%dT%H:%M:%S' #'YYYY-MM-DDTHH:MM:SS'
 UTC_OFFSET    = datetime.datetime.utcnow() - datetime.datetime.now()
+MONITOR       = xbmc.Monitor()
+PLAYER        = xbmc.Player()
+WINDOW        = xbmcgui.Window(10000)
+
 
 @ROUTER.route('/')
 def buildMenu():
@@ -89,6 +93,14 @@ def playChannel(id):
 @ROUTER.route('/play/live/<id>')
 def playChannel(id):
     Locast().playLive(id,opt='live')
+    
+@ROUTER.route('/refresh/pvr/<id>/<rnd>')
+def refreshChannel(id,rnd):
+    Locast().playLive(id,opt='pvr',refresh=True)
+
+@ROUTER.route('/refresh/live/<id>/<rnd>')
+def refreshChannel(id,rnd):
+    Locast().playLive(id,opt='live',refresh=True)
 
 @ROUTER.route('/iptv/channels')
 def iptv_channels():
@@ -265,7 +277,11 @@ class Locast(object):
 
     def getURL(self, url, param={}, header={'Content-Type':'application/json'}, life=datetime.timedelta(minutes=15)):
         log('getURL, url = %s, header = %s'%(url, header))
-        cacheresponse = self.cache.get(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header))
+        if REAL_SETTINGS.getSetting('User_Donate').lower() == 'false' and ('/watch/station/' in url):
+            # Do not used cached play URLs for non donating users because they may be close to expiry
+            cacheresponse = None
+        else:
+            cacheresponse = self.cache.get(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header))
         if not cacheresponse:
             try:
                 req = requests.get(url, param, headers=header)
@@ -316,6 +332,7 @@ class Locast(object):
         try:    self.userdata = self.getURL(BASE_API + '/user/me',header=self.buildHeader())
         except: self.userdata = {}
         if self.userdata.get('email','').lower() == user.lower(): state = True
+        else: REAL_SETTINGS.setSetting('User_Donate','unknown') # force a re-login after email changed
         log('chkUser = %s'%(state))
         return state
 
@@ -323,7 +340,7 @@ class Locast(object):
     def login(self, user, password):
         log('login')
         if len(user) > 0:
-            if self.chkUser(user): return True
+            if self.chkUser(user) and REAL_SETTINGS.getSetting('User_Donate').lower() != 'unknown': return True
             data = self.postURL(BASE_API + '/user/login',param='{"username":"' + user + '","password":"' + password + '"}')
             '''{u'token': u''}'''
             if data and 'token' in data: 
@@ -331,7 +348,8 @@ class Locast(object):
                 if REAL_SETTINGS.getSetting('User_Token') != self.token: REAL_SETTINGS.setSetting('User_Token',self.token)
                 if self.chkUser(user): 
                     REAL_SETTINGS.setSetting('User_totalDonations',str(self.userdata.get('totalDonations','0')))
-                    REAL_SETTINGS.setSetting('User_DonateExpire',datetime.datetime.fromtimestamp(float(str(self.userdata.get('donationExpire','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
+                    if str(self.userdata.get('donationExpire','')) != str(None):
+                        REAL_SETTINGS.setSetting('User_DonateExpire',datetime.datetime.fromtimestamp(float(str(self.userdata.get('donationExpire','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
                     REAL_SETTINGS.setSetting('User_Donate',str(self.userdata.get('didDonate','False')))
                     REAL_SETTINGS.setSetting('User_LastLogin',datetime.datetime.fromtimestamp(float(str(self.userdata.get('lastlogin','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
                     self.lastDMA = self.userdata.get('lastDmaUsed','')
@@ -459,7 +477,7 @@ class Locast(object):
             return programmes
                        
 
-    def resolveURL(self, id, opt):
+    def resolveURL(self, id, opt, refresh=False):
         log('resolveURL, id = %s, opt = %s'%(id,opt))  
         self.listitems = []
         self.playlist  = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
@@ -469,7 +487,7 @@ class Locast(object):
         liz  = xbmcgui.ListItem(data.get('name'),path=data.get('streamUrl'))
         liz.setProperty('IsPlayable','true')
         liz.setProperty('IsInternetStream','true')
-        if opt != 'pvr':
+        if refresh or opt != 'pvr':
             self.getStations(data.get('dma'), name=data.get('name'), opt='play')
             [self.playlist.add(data.get('streamUrl'),lz,idx) for idx,lz in enumerate(self.listitems)]
             liz = self.listitems.pop(0)
@@ -477,19 +495,42 @@ class Locast(object):
         return liz
         
         
-    def playLive(self, id, opt='live'):
-        log('playLive, id = %s, opt = %s'%(id,opt))             
+    def playLive(self, id, opt='live', refresh=False):
+        log('playLive, id = %s, opt = %s, refresh=%s'%(id,opt,refresh))             
         if id == 'NEXT_SHOW': 
             found = False
             liz   = xbmcgui.ListItem(LANGUAGE(30029))
             notificationDialog(LANGUAGE(30029), time=4000)
         else:            
             found = True
-            liz   = self.resolveURL(id,opt)
+            liz   = self.resolveURL(id,opt,refresh)
             if 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
-                liz.setProperty('inputstream','inputstream.adaptive')
+                # using inputstream.adaptive did not work on CoreELEC v19. 
+                #   workaround: allow user to select adaptive or ffmpegdirect in configuration
+                liz.setProperty('inputstream',REAL_SETTINGS.getSetting('Inputstream_Clnt'))
                 liz.setProperty('inputstream.adaptive.manifest_type','hls')
+        path = liz.getPath()
+        WINDOW.setProperty("locast-last-opt-played",opt)
+        WINDOW.setProperty("locast-last-startime",str(int(time.time())))
+        WINDOW.setProperty("locast-last-netloc",urllib.parse.urlparse(path).netloc)
+        WINDOW.setProperty("locast-last-id-played",id)       
         xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
+        if refresh:
+            # reset the playlist because when current stream refreshed/restarted kodi erases the new playlist
+            # when current playing item stops.
+            # Unfortunately I have not figured out how to recover the playlist created by the IPTV PVR
+            # so instead I put in the playlist generated by self.resolveURL via self.getStations
+            log('playLive, path=%s, num_listitems=%s'%(path,len(self.listitems))) 
+            loop_count = 0
+            while (not MONITOR.abortRequested()) and (not PLAYER.isPlaying() or path != PLAYER.getPlayingFile()): 
+                loop_count += 1
+                xbmc.sleep(100) 
+                if loop_count == 50: break  # quit loop if loop goes on for too long
+            self.playlist  = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+            self.playlist.clear()
+            self.playlist.add(path,liz,0)
+            [self.playlist.add(path,lz,idx+1) for idx,lz in enumerate(self.listitems)]
+        
     
     
     def addPlaylist(self, name, path='', infoList={}, infoArt={}, infoVideo={}, infoAudio={}, infoType='video'):

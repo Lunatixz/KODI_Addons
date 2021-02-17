@@ -116,6 +116,14 @@ msgctxt "#30025"
 msgid "Could not determine geo-location\nVerify that your internet is not blocking %s"
 msgstr ""
 
+msgctxt "#30026"
+msgid "Inputstream Client"
+msgstr "switch to ffmpegdirect if you are having playback issues"
+
+msgctxt "#30027"
+msgid "Free Acct Refresh Rate (sec)"
+msgstr "reduce this if Locast times out and asks for donations before refresh happens"
+
 msgctxt "#30044"
 msgid "General"
 msgstr ""

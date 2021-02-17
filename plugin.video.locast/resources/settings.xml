@@ -6,7 +6,7 @@
     <setting id="User_Password"     type="text"      label="30007" default=""  option="hidden"/>
     <setting id="User_Token"        type="text"      label="30002" default=""  visible="false"/>
     <setting id="Inputstream_Clnt"  type="labelenum" label="30026" default="inputstream.adaptive" values="inputstream.adaptive|inputstream.ffmpegdirect"/>
-    <setting id="Free_RefreshRate"  type="slider"    label="30027" default="900" range="60,1,1200" option="int" visible="eq(4,false)|eq(4,False)" />
+    <setting id="Free_RefreshRate"  type="slider"    label="30027" default="824" range="60,1,1200" option="int" visible="eq(4,false)|eq(4,False)" />
     <setting id=""                  type="lsep"      label="30024" default="" />
     <setting id="User_City"         type="text"      label="30020" default="Unknown"  enable="false" />
     <setting id="User_LastLogin"    type="text"      label="30022" default="Unknown"  enable="false" />

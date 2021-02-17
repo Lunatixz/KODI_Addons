@@ -525,7 +525,7 @@ class Locast(object):
             while (not MONITOR.abortRequested()) and (not PLAYER.isPlaying() or path != PLAYER.getPlayingFile()): 
                 loop_count += 1
                 xbmc.sleep(100) 
-                if loop_count == 50: break  # quit loop if loop goes on for too long
+                if loop_count == 10: break  # quit loop if loop goes on for too long
             self.playlist  = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
             self.playlist.clear()
             self.playlist.add(path,liz,0)

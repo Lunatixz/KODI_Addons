@@ -11,16 +11,15 @@
         <control type="image">
             <posx>0</posx>
             <posy>0</posy>
-            <width>1920</width> 
-            <height>1080</height>
+            <width>auto</width> 
+            <height>auto</height>
             <texture>black.png</texture>
-            <aspectratio scalediffuse="false">stretch</aspectratio>
         </control>
         <control type="image" id="30000">
             <posx>0</posx> 
             <posy>0</posy> 
-            <width>1920</width> 
-            <height>1080</height> 
+            <width>auto</width> 
+            <height>auto</height> 
             <aspectratio scalediffuse="false">scale</aspectratio>
             <animation effect="fade" time="1000">VisibleChange</animation>
             <animation effect="zoom" start="110" end="130" center="auto" time="25000" tween="cubic" easing="inout" condition="String.isEqual(Window.Property(earth_animation),okay)" pulse="true">Conditional</animation>
@@ -29,8 +28,8 @@
         <control type="image" id="30100">
             <posx>0</posx> 
             <posy>0</posy> 
-            <width>1920</width> 
-            <height>1080</height> 
+            <width>auto</width> 
+            <height>auto</height> 
             <aspectratio scalediffuse="false">scale</aspectratio>
             <animation effect="fade" time="1000">VisibleChange</animation>
             <animation effect="zoom" start="110" end="130" center="auto" time="25000" tween="cubic" easing="inout" condition="String.isEqual(Window.Property(earth_animation),okay)" pulse="true">Conditional</animation>
@@ -39,15 +38,16 @@
         <control type="image" id="30003">
             <posx>0</posx>
             <posy>250</posy>
-            <width>1920</width> 
-            <height>1080</height> 
+            <width>auto</width> 
+            <height>auto</height> 
             <texture>overlayfade.png</texture>
+            <animation effect="fade" end="95" condition="True">Conditional</animation>
             <visible>String.isEqual(Window.Property(earth_overlay),okay) + [Control.IsVisible(30000)|Control.IsVisible(30100)]</visible>
         </control>
         <control type="image">
-            <posx>-800</posx>
+            <posx>105</posx>
             <posy>950</posy>
-            <width>1920</width> 
+            <width>150</width> 
             <height>50</height> 
             <align>left</align>
             <texture>logo.png</texture>
@@ -58,9 +58,9 @@
         <control type="label" id="30001">
             <posx>105</posx>
             <posy>1000</posy>
-            <align>left</align>
             <width>auto</width>
             <height>25</height>
+            <align>left</align>
             <font>font10</font>
             <textcolor>ffffffff</textcolor>
             <shadowcolor>ff000000</shadowcolor>

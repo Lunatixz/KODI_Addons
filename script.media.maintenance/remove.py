@@ -26,6 +26,6 @@ if __name__ == '__main__':
     if liz.getLabel() == xbmc.getInfoLabel('ListItem.Label'):
         info  = liz.getVideoInfoTag()
         dbid  = info.getDbId() if info.getDbId() else liz.getProperty('dbid')
-        fpath = xbmc.getInfoLabel('ListItem.FileNameAndPath') #xbmc.translatePath(os.path.join(liz.getPath(),liz.getfilename()))
+        fpath = xbmc.getInfoLabel('ListItem.FileNameAndPath') #xbmcvfs.translatePath(os.path.join(liz.getPath(),liz.getfilename()))
         selectItem = {"folder":liz.getPath(),"file":fpath,"type":info.getMediaType(),"id":dbid,"label":liz.getLabel(),"showtitle":info.getTVShowTitle(),"episodes":liz.getProperty('TotalEpisodes)')}
         default.MM().removeContent(default.MM().requestFile(fpath,fallback=selectItem),bypass=True)

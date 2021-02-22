@@ -17,45 +17,31 @@
 # along with Media Maintenance.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import os, sys, time, datetime, re, traceback,json, schedule
-import xbmc, xbmcgui, xbmcplugin, xbmcaddon, default
-from simplecache import SimpleCache, use_cache
-
-# Plugin Info
-ADDON_ID      = 'script.media.maintenance'
-REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
-ADDON_NAME    = REAL_SETTINGS.getAddonInfo('name')
-SETTINGS_LOC  = REAL_SETTINGS.getAddonInfo('profile')
-ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path').decode('utf-8')
-ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
-ICON          = REAL_SETTINGS.getAddonInfo('icon')
-FANART        = REAL_SETTINGS.getAddonInfo('fanart')
-LANGUAGE      = REAL_SETTINGS.getLocalizedString
-DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-
-def log(msg, level=xbmc.LOGDEBUG):
-    if DEBUG == False and level != xbmc.LOGERROR: return
-    if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
+from default import *
 
 class Player(xbmc.Player):
     def __init__(self):
         xbmc.Player.__init__(self)
-        self.resetMeta()
-        
-        
-    def resetMeta(self):
         self.playingTime = 0
         self.playingItem = {}
         
         
+    def reset(self):
+        log('reset')
+        self.__init__()
+        
+        
+    def getPlayerTime(self):
+        try:    return self.getTotalTime()
+        except: return 0
+        
+        
     def onPlayBackStarted(self):
-        xbmc.sleep(5000)
-        if not self.isPlaying(): return
-        self.playingItem = self.myService.myUtils.requestItem()
-        self.playingItem['TotalTime'] = self.getTotalTime()
-        log('onPlayBackStarted, playingItem = ' + json.dumps(self.playingItem))
-        #todo add wait for playlist option, save playing playlist, monitor position and watched status; on stop prompt to delete watched items if match.
+        if self.isPlayingVideo():
+            self.playingItem = self.myService.myUtils.requestItem()
+            self.playingItem['TotalTime'] = self.getPlayerTime()
+            log('onPlayBackStarted, playingItem = %s'%(self.playingItem))
+            #todo add wait for playlist option, save playing playlist, monitor position and watched status; on stop prompt to delete watched items if match.
         
          
     def onPlayBackEnded(self):
@@ -70,12 +56,17 @@ class Player(xbmc.Player):
 
     def chkContent(self, playingItem={}):
         log('chkContent, playingItem = %s'%(json.dumps(self.playingItem)))
-        if xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True" or self.playingItem.get('TotalTime',0) <= 0: return
-        elif self.playingItem.get("file","").startswith(('plugin://','upnp://')): return
+        conditions = [xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True",
+                      not self.playingItem,
+                      self.playingItem.get('TotalTime',-1) <= 0,
+                      self.playingItem.get("file","").startswith(('plugin://','upnp://','pvr://'))]
+        if True in conditions: return
         elif (self.playingTime * 100 / self.playingItem['TotalTime']) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
-            if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": self.myService.myUtils.removeSeason(self.playingItem)
-            else:self.myService.myUtils.removeContent(self.playingItem)
-        self.resetMeta()
+            if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": 
+                self.myService.myUtils.chkSeason(self.playingItem)
+            else:
+                self.myService.myUtils.removeContent(self.playingItem)
+        self.reset()
         
         
 class Monitor(xbmc.Monitor):
@@ -105,7 +96,8 @@ class Monitor(xbmc.Monitor):
         
     def onChange(self):
         log('onChange')
-        if self.myService.loadMySchedule(): self.pendingChange = False
+        if self.myService.loadMySchedule(): 
+            self.pendingChange = False
                 
         
     def onNotification(self, sender, method, data):
@@ -115,7 +107,7 @@ class Monitor(xbmc.Monitor):
 class Service(object):
     def __init__(self):
         self.running   = False
-        self.myUtils   = default.MM()
+        self.myUtils   = MM()
         self.myMonitor = Monitor()
         self.myMonitor.myService = self
         self.myPlayer  = Player()

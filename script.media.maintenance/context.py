@@ -1,4 +1,4 @@
-#   Copyright (C) 2019 Lunatixz
+#   Copyright (C) 2021 Lunatixz
 #
 #
 # This file is part of Media Maintenance.
@@ -17,15 +17,17 @@
 # along with Media Maintenance.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import sys
-import xbmc
-import default
+from default import *
 
 if __name__ == '__main__':
-    selectItem = {"type":xbmc.getInfoLabel('ListItem.DBTYPE'),"id":xbmc.getInfoLabel('ListItem.DBID'),"label":xbmc.getInfoLabel('ListItem.Label'),"showtitle":xbmc.getInfoLabel('ListItem.TVShowTitle')}
-    tvshow = selectItem['showtitle']
-    if selectItem['type'] in ['tvshow','season','episode'] and len(tvshow) > 0:
-        TVShowList = default.MM().getUserList()
-        TVShowList.append(tvshow)
-        default.MM().setUserList(TVShowList)
-        default.MM().notificationDialog(default.LANGUAGE(30043)%(tvshow))
+    liz = sys.listitem
+    print(liz.getVideoInfoTag().getProperty('type'))
+    if liz.getProperty('type') in ['tvshow','season','episode'] and len(liz.getProperty('showtitle')) > 0:
+        with busy_dialog():
+            mediaMaint = MM()
+            TVShowList = mediaMaint.getUserList()
+            if (liz.getProperty('year') or 0) > 0: label = '%s (%d)'%(liz.getProperty('showtitle'),liz.getProperty('year'))
+            else: label = liz.getProperty('showtitle')
+            TVShowList.append({'type':'series','label':label,'title':liz.getProperty('showtitle'),'year':liz.getProperty('year'),'dbid':liz.getProperty('tvshowid')})
+            mediaMaint.setUserList(TVShowList)
+        notificationDialog(default.LANGUAGE(30043)%(liz.getProperty('showtitle')))

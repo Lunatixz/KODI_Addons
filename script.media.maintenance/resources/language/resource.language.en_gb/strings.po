@@ -41,7 +41,7 @@ msgid "Monitored TV Shows"
 msgstr ""
 
 msgctxt "#30006"
-msgid "Scan Sonnar for Monitored TV Shows"
+msgid "Add Sonarr Monitored TV Shows"
 msgstr ""
 
 msgctxt "#30007"
@@ -53,7 +53,7 @@ msgid "API-Key"
 msgstr ""
 
 msgctxt "#30009"
-msgid "Scanning Sonnarr"
+msgid "Scanning Sonarrr"
 msgstr ""
 
 msgctxt "#30010"
@@ -197,7 +197,7 @@ msgid "Select All"
 msgstr ""
 
 msgctxt "#30045"
-msgid "Monitor all TV Shows"
+msgid "Monitor all shows"
 msgstr ""
 
 msgctxt "#30046"
@@ -206,4 +206,16 @@ msgstr ""
 
 msgctxt "#30047"
 msgid "Monitor PVR Recordings"
+msgstr ""
+
+msgctxt "#30048"
+msgid "Unselect All"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Remove all show monitors"
+msgstr ""
+
+msgctxt "#30050"
+msgid "Scanning Movies for duplicates..."
 msgstr ""

@@ -1,4 +1,4 @@
-#   Copyright (C) 2018 Lunatixz
+#   Copyright (C) 2021 Lunatixz
 #
 #
 # This file is part of Media Maintenance.
@@ -17,169 +17,293 @@
 # along with Media Maintenance.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import os, sys, time, datetime, re, traceback
-import urlparse, urllib, urllib2, socket, json, collections
-import xbmc, xbmcgui, xbmcplugin, xbmcaddon, xbmcvfs
-from simplecache import SimpleCache, use_cache
+import os, sys, time, datetime, re, traceback, json, collections, requests, schedule
 
+from six.moves   import urllib
+from contextlib  import contextmanager
+from simplecache import SimpleCache, use_cache
+from itertools   import repeat, cycle, chain, zip_longest
+from kodi_six    import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
+   
+try:
+    from multiprocessing      import cpu_count 
+    from multiprocessing.pool import ThreadPool 
+    ENABLE_POOL = True
+    CORES = cpu_count()
+except: ENABLE_POOL = False
+
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] == 3
+if PY3: 
+    basestring = str
+    unicode = str
+    
 # Plugin Info
 ADDON_ID       = 'script.media.maintenance'
 REAL_SETTINGS  = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME     = REAL_SETTINGS.getAddonInfo('name')
 SETTINGS_LOC   = REAL_SETTINGS.getAddonInfo('profile')
-ADDON_PATH     = REAL_SETTINGS.getAddonInfo('path').decode('utf-8')
+ADDON_PATH     = REAL_SETTINGS.getAddonInfo('path')
 ADDON_VERSION  = REAL_SETTINGS.getAddonInfo('version')
 ICON           = REAL_SETTINGS.getAddonInfo('icon')
 FANART         = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE       = REAL_SETTINGS.getLocalizedString
 
 # Globals
-TIMEOUT        = 15
 NOTIFY         = True
 DEBUG          = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 DUPMATCH       = int(REAL_SETTINGS.getSetting('Duplicate_Match'))
 SONARR_URL     = '%s/api/series?apikey=%s'%(REAL_SETTINGS.getSetting('Sonarr_IP'),REAL_SETTINGS.getSetting('Sonarr_API'))
 RADARR_URL     = '%s/api/movie?apikey=%s'%(REAL_SETTINGS.getSetting('Radarr_IP'),REAL_SETTINGS.getSetting('Radarr_API'))
-JSON_TV_ENUMS  = '["title", "genre", "year", "rating", "plot", "studio", "mpaa", "cast", "playcount", "episode", "imdbnumber", "premiered", "votes", "lastplayed", "fanart", "thumbnail", "file", "originaltitle", "sorttitle", "episodeguide", "season", "watchedepisodes", "dateadded", "tag", "art", "userrating", "ratings", "runtime", "uniqueid" ]'
-JSON_MV_ENUMS  = '["title", "genre", "year", "rating", "director", "trailer", "tagline", "plot", "plotoutline", "originaltitle", "lastplayed", "playcount", "writer", "studio", "mpaa", "cast", "country", "imdbnumber", "runtime", "set", "showlink", "streamdetails", "top250", "votes", "fanart", "thumbnail", "file", "sorttitle", "resume", "setid", "dateadded", "tag", "art", "userrating", "ratings", "premiered", "uniqueid"]'
+JSON_TV_ENUMS  = '["title", "genre", "year", "rating", "playcount", "episode", "file", "season", "watchedepisodes", "art", "uniqueid"]'
+JSON_MV_ENUMS  = '["title", "genre", "year", "rating", "playcount", "streamdetails", "file", "art", "uniqueid"]'
 JSON_IT_ENUMS  = '["title","artist","albumartist","genre","year","rating","album","track","duration","comment","lyrics","musicbrainztrackid","musicbrainzartistid","musicbrainzalbumid","musicbrainzalbumartistid","playcount","fanart","director","trailer","tagline","plot","plotoutline","originaltitle","lastplayed","writer","studio","mpaa","cast","country","imdbnumber","premiered","productioncode","runtime","set","showlink","streamdetails","top250","votes","firstaired","season","episode","showtitle","thumbnail","file","resume","artistid","albumid","tvshowid","setid","watchedepisodes","disc","tag","art","genreid","displayartist","albumartistid","description","theme","mood","style","albumlabel","sorttitle","episodeguide","uniqueid","dateadded","channel","channeltype","hidden","locked","channelnumber","starttime","endtime","specialsortseason","specialsortepisode","compilation","releasetype","albumreleasetype","contributors","displaycomposer","displayconductor","displayorchestra","displaylyricist","userrating"]'
 JSON_FL_ENUMS  = '["title","artist","albumartist","genre","year","rating","album","track","duration","comment","lyrics","musicbrainztrackid","musicbrainzartistid","musicbrainzalbumid","musicbrainzalbumartistid","playcount","fanart","director","trailer","tagline","plot","plotoutline","originaltitle","lastplayed","writer","studio","mpaa","cast","country","imdbnumber","premiered","productioncode","runtime","set","showlink","streamdetails","top250","votes","firstaired","season","episode","showtitle","thumbnail","file","resume","artistid","albumid","tvshowid","setid","watchedepisodes","disc","tag","art","genreid","displayartist","albumartistid","description","theme","mood","style","albumlabel","sorttitle","episodeguide","uniqueid","dateadded","size","lastmodified","mimetype","specialsortseason","specialsortepisode"]'
 
-def log(msg, level=xbmc.LOGDEBUG):
-    if DEBUG == False and level != xbmc.LOGERROR: return
-    if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
-    
-def uni(string, encoding = 'utf-8'):
-    if isinstance(string, basestring):
-        if not isinstance(string, unicode): string = unicode(string, encoding, errors='ignore')
-        elif isinstance(string, unicode): string = string.encode('ascii', 'replace')
-    return string
+@contextmanager
+def busy_dialog(escape=False):
+    if not escape:
+        log('globals: busy_dialog')
+        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+        try: yield
+        finally: xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+    else: yield
 
+def log(msg, level=xbmc.LOGDEBUG):
+    if not DEBUG and level != xbmc.LOGERROR: return
+    if   level == xbmc.LOGERROR: msg = '%s, %s'%((msg),traceback.format_exc())
+    try: xbmc.log('%s-%s-%s'%(ADDON_ID,ADDON_VERSION,msg),level)
+    except Exception as e: 'log failed! %s'%(e)
+
+def dumpJSON(dict1, idnt=None, sortkey=True):
+    if not dict1 or isinstance(dict1,basestring): return dict1
+    elif isinstance(dict1, basestring): return dict1
+    return (json.dumps(dict1, indent=idnt, sort_keys=sortkey))
+    
+def loadJSON(string1):
+    if not string1: return []
+    elif isinstance(string1,dict): return string1
+    elif isinstance(string1,basestring): 
+        string1 = (string1.strip('\n').strip('\t').strip('\r'))
+        try: return json.loads(string1, strict=False)
+        except Exception as e: log("loadJSON failed! %s \n %s"%(e,string1), xbmc.LOGERROR)
+    return {}
+           
+def sendJSON(command, cache=False):
+    response = loadJSON(xbmc.executeJSONRPC(command))
+    log('sendJSON, command = %s, response = %s'%(command, response))
+    return response
+    
+def findItemIDX(list1, list2):
+    return [idx for idx, lst1 in enumerate(list1) for lst2 in list2 if lst1.getLabel() == lst2['label']]
+   
+def notificationDialog(message, header=ADDON_NAME, sound=False, time=4000, icon=ICON):
+    try:    xbmcgui.Dialog().notification(header, message, icon, time, sound=False)
+    except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
+    return True
+
+def selectDialog(list, header=ADDON_NAME, autoclose=0, preselect=None, multi=True, useDetails=True):
+    if preselect is None: preselect = {True:[],False:-1}[multi]
+    if multi: return xbmcgui.Dialog().multiselect(header, list, autoclose, preselect, useDetails)
+    else: return xbmcgui.Dialog().select(header, list, autoclose, preselect, useDetails)
+        
+def progressDialogBG(percent=0, control=None, message='', header=ADDON_NAME):
+    if control is None and percent == 0:
+        control = xbmcgui.DialogProgressBG()
+        control.create(header, message)
+    elif control:
+        if percent == 100 or control.isFinished(): return control.close()
+        else: control.update(percent, header, message)
+    return control
+
+def yesnoDialog(message, heading=ADDON_NAME, nolabel='', yeslabel='', customlabel='', autoclose=0):
+    try:    
+        if customlabel:
+            return xbmcgui.Dialog().yesnocustom(heading, message, customlabel, nolabel, yeslabel, autoclose)
+        else: raise Exception()
+    except: return xbmcgui.Dialog().yesno(heading, message, nolabel, yeslabel, autoclose)
+          
 class MM(object):
-    def __init__(self):
-        self.cache = SimpleCache()
+    def __init__(self, cache=None):
+        if cache is None:
+            self.cache = SimpleCache()
+        else:
+            self.cache = cache
         
         
-    def sendJSON(self, command, cache=False, life=datetime.timedelta(hours=12)):
-        log('sendJSON, command = ' + str(command))
-        cacheresponse = self.cache.get(ADDON_NAME + '.sendJSON, command = %s'%json.dumps(command))
-        if DEBUG or not cache: cacheresponse = None
-        if not cacheresponse:
-            cacheresponse = uni(xbmc.executeJSONRPC(command))
-            self.cache.set(ADDON_NAME + '.sendJSON, command = %s'%json.dumps(command), cacheresponse, expiration=life)
-        return json.loads(cacheresponse)
+    def log(self, msg, level=xbmc.LOGDEBUG):
+        return log('%s: %s'%(self.__class__.__name__,msg),level)
     
-    
+
+    def cacheJSON(self, command, life=datetime.timedelta(minutes=15)):
+        cacheName = '%s.cacheJSON.%s'%(ADDON_ID,command)
+        cacheResponse = self.cache.get(cacheName)
+        if not cacheResponse:
+            cacheResponse = dumpJSON(sendJSON(command))
+            self.cache.set(cacheName, cacheResponse, checksum=len(cacheResponse), expiration=life)
+        return loadJSON(cacheResponse)
+        
+        
     def openURL(self, url, life=datetime.timedelta(minutes=15)):
         try:
-            log('openURL, url = ' + str(url))
+            self.log('openURL, url = %s'%(url))
             cacheresponse = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
-            if DEBUG: cacheresponse = None
             if not cacheresponse:
-                request = urllib2.Request(url)
-                request.add_header('User-Agent','Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)')
-                cacheresponse = urllib2.urlopen(request, timeout=TIMEOUT).read()
-                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheresponse, expiration=life)
-            return json.loads(cacheresponse)
+                cacheresponse = requests.get(url).json()
+                self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, dumpJSON(cacheresponse), expiration=life)
+                return cacheresponse
+            return loadJSON(cacheresponse)
         except Exception as e:
-            log("openURL Failed! " + str(e), xbmc.LOGERROR)
-            self.notificationDialog(LANGUAGE(30001))
-            return ''
-            
-            
-    def getMonitored(self, type='series'):
-        log('getMonitored, type = ' + type)
-        if type == 'series': 
-            mediaList = self.getTVShows()
-            url = SONARR_URL
-            setSetting = 'ScanSonarr'
-        else: 
-            mediaList = self.getMovies()
-            url = RADARR_URL
-            setSetting = 'ScanRadarr'
-        results  = self.openURL(url)
-        if not results: return
-        userList = self.getUserList(type)
-        for idx, item in enumerate(results):
-            updateDialogProgress = (idx) * 100 // len(results)
-            REAL_SETTINGS.setSetting(setSetting,'Scanning... (%d'%(updateDialogProgress)+'%)')
-            match = False
-            show  = item["title"]
-            for kodititle in userList:
-                if kodititle.lower() == show.lower():
-                    log('getMonitored, monitor match: show = ' + show + ', kodititle = ' + kodititle)
-                    match = True
-                    break
-            if match: continue
-            if item["monitored"]: 
-                for title in mediaList:
-                    title = title['title']
-                    if title.lower() == show.lower(): 
-                        log('getMonitored, kodi match: show = ' + show + ', title = ' + title)
-                        userList.append(title)
-                        break
-        REAL_SETTINGS.setSetting(setSetting,LANGUAGE(30011)%(datetime.datetime.now().strftime('%Y-%m-%d')))
-        if len(userList) > 0: self.setUserList(userList, type)
+            self.log("openURL Failed! %s"%(e), xbmc.LOGERROR)
+            notificationDialog(LANGUAGE(30001))
+            return {}
         
            
     def getUserList(self, type='series'):
-        REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
-        if type == 'series': 
-            try: return (REAL_SETTINGS.getSetting('TVShowList').split(',') or [])
-            except: return []
-        else:
-            try: return (REAL_SETTINGS.getSetting('MoviesList').split(',') or [])
-            except: return []
+        setSetting1 = {'series':'TVShowList','movie':'MoviesList'}[type]
+        try:    return loadJSON(REAL_SETTINGS.getSetting(setSetting1))
+        except: return []
         
         
     def setUserList(self, userList, type='series'):
-        msg = ""
-        if type == 'series': 
-            setSetting0 = 'ScanSonarr'
-            setSetting1 = 'TVShowList'
-            setSetting2 = 'ViewTVShows'
-        else: 
-            setSetting0 = 'ScanRadarr'
-            setSetting1 = 'MoviesList'
-            setSetting2 = 'ViewMovies'
-            
-        plural = 's' if len(userList) > 1 else '' 
-        if len(userList) > 0: msg = LANGUAGE(30010)%(len(userList),plural)
-        else: 
-            self.notificationDialog(LANGUAGE(30017))
-            REAL_SETTINGS.setSetting(setSetting0,'')
-        userList = ','.join(list(set(userList)))
-        log('setUserList, UserList = ' + userList + ', type = ' + type)
-        REAL_SETTINGS.setSetting(setSetting1,userList)
-        REAL_SETTINGS.setSetting(setSetting2,msg)
-        if len(userList) == 0: REAL_SETTINGS.openSettings()
-            
+        log('setUserList, UserList = %s, type = %s'%(userList,type))
+        dataSet = {'series':{'setSetting0':'ScanSonarr', 'setSetting1':'TVShowList', 'setSetting2':'ViewTVShows'},
+                   'movie' :{'setSetting0':'ScanRadarr', 'setSetting1':'MoviesList', 'setSetting2':'ViewMovies'}}[type]
         
-    def hasMovie(self):
-        return bool(xbmc.getCondVisibility('Library.HasContent(Movies)'))
+        if len(userList) > 0: 
+            userList = [dict(t) for t in {tuple(d.items()) for d in userList}]
+            msg = LANGUAGE(30010)%(len(userList),'s' if len(userList) > 1 else '')
+            REAL_SETTINGS.setSetting(dataSet['setSetting1'],dumpJSON(userList))
+            REAL_SETTINGS.setSetting(dataSet['setSetting2'],msg)
+        else:
+            msg = ''
+            notificationDialog(LANGUAGE(30017))
+            REAL_SETTINGS.setSetting(dataSet['setSetting0'],'')
+            REAL_SETTINGS.setSetting(dataSet['setSetting1'],'')
+            REAL_SETTINGS.setSetting(dataSet['setSetting2'],'')
+        return True
         
-        
-    def hasTV(self):
-        return bool(xbmc.getCondVisibility('Library.HasContent(TVShows)'))
 
+    def buildListitems(self, items, type='series'): #todo move from selectdialog to window UI and control panel
+        mediaLST = list(self.poolList(self.buildListitem, items, type))
+        log("buildListitems, found %s"%(len(mediaLST)))
+        return mediaLST
+        
+        
+    def buildListitem(self, data):
+        item, type = data
+        path = item['file']
+        if item.get('year',0) > 0: label = '%s (%d)'%(item['label'],item['year'])
+        else: label = item['label']
+        label2 = path
+        id     = {'type':type,'label':label,'title':item['title'],'year':item['year']} 
+        for k,v in item.get('uniqueid',{}).items(): id[k] = str(v)  
+        if type != 'series':
+            id['dbid'] = item['movieid']
+            video = item['streamdetails']['video']
+            audio = item['streamdetails']['audio']
+            if path.startswith('stack://'): label = ' %s [[B]STACK[/B]]'%label
+            if len(video) > 0: label = '%s - Video [Codec: [B]%s[/B]|Height: [B]%s[/B]|Runtime: [B]%s[/B]]'%(label,video[0]['codec'].upper(),video[0]['height'],video[0]['duration'])
+            if len(audio) > 0: label = '%s - Audio [Codec: [B]%s[/B]|Channels: [B]%s[/B]|Language: [B]%s[/B]]'%(label,audio[0]['codec'].upper(),audio[0]['channels'],audio[0]['language'].title())
+        else: id['dbid'] = item['tvshowid']
+        thumb = (item['art'].get('poster','') or item.get('thumbnail','') or ICON)
+        art = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON}
+        return self.getListitem(label, label2, path=path, infoArt=art, infoProp=id)
+        
+        
+    def viewTVShows(self):
+        with busy_dialog():
+            TVShowList = self.buildListitems(self.getTVShows())
+            TVShowList.insert(0, self.getListitem(LANGUAGE(30044),LANGUAGE(30045))) #Select All
+            TVShowList.insert(1, self.getListitem(LANGUAGE(30048),LANGUAGE(30049))) #Unselect All
+        select = selectDialog(TVShowList, LANGUAGE(30037), preselect=findItemIDX(TVShowList,self.getUserList()))
+        if select is None or len(select) == 0: return
+        elif 0 in select: self.setUserList([loadJSON(TVShowList[idx].getProperty('id')) for idx in range(2,len(TVShowList))])
+        elif 1 in select: self.setUserList([])
+        else: self.setUserList([loadJSON(TVShowList[idx].getProperty('id')) for idx in select])
+        return
+
+
+    def getMonitored(self, mtype='series'):
+        self.log('getMonitored, type = %s'%type)
+        dataSet = {'series':{'setSetting':'ScanSonarr', 'mediaList':self.getTVShows, 'url':SONARR_URL},
+                   'movie' :{'setSetting':'ScanRadarr', 'mediaList':self.getMovies , 'url':RADARR_URL}}[mtype]
+        with busy_dialog():
+            results = self.openURL(dataSet['url'])
+            if not results: return
+            userList = self.getUserList(mtype)
+            userList.extend(self.poolList(self.findMonitored, results, (mtype, dataSet, userList)))
+        self.setUserList(userList, mtype)
+        REAL_SETTINGS.setSetting(dataSet['setSetting'],LANGUAGE(30011)%(datetime.datetime.now().strftime('%Y-%m-%d')))
+        return
+            
+        
+    def findMonitored(self, data):
+        item, meta = data
+        type, dataSet, userList = meta
+        if not item["monitored"]: return None
+        mediaList = dataSet['mediaList']()
+        for kodiItem in mediaList:
+            conditions = [item["title"] == kodiItem["title"] and item["year"] == kodiItem["year"],
+                          item[{"series":"tvdbId"}[type]] == kodiItem.get("uniqueid",{}).get({"series":"tvdb","movie":"tmdb"}[type],0),
+                          kodiItem.get('year',0) == 0 and item["title"] == kodiItem["title"]]
+            if True in conditions:
+                if kodiItem.get('year',0) > 0: label = '%s (%d)'%(kodiItem['title'],kodiItem['year'])
+                else: label = kodiItem['title']
+                id = {'type':type,'label':label,'title':kodiItem['title'],'year':kodiItem['year'],'dbid':kodiItem['tvshowid']} 
+                if id not in userList: return id
+        return None
+            
+            
+    def scanDuplicates(self):
+        dupLST = []
+        delLST = []
+        with busy_dialog(): 
+            MoviesList = self.getMovies(cache=False)
+        if len(MoviesList) > 0:
+            busy = progressDialogBG(0, message=LANGUAGE(30050))
+            duplicates = [item for item, count in collections.Counter([{0:'%s (%d)'%(movie['label'],movie['year']),1:movie['label']}[DUPMATCH] for movie in MoviesList]).items() if count > 1]
+            for idx, item in enumerate(duplicates):
+                updateDialogProgress = (idx) * 100 // len(duplicates)
+                busy = progressDialogBG(updateDialogProgress, busy)
+                for movie in MoviesList:
+                    title = {0:'%s (%d)'%(movie['label'],movie['year']),1:movie['label']}[DUPMATCH]
+                    if item.lower() == title.lower(): dupLST.append(movie)
+        if len(dupLST) > 0:
+            dupLST.sort(key=lambda x:x['label'])
+            listitem = self.buildListitems(dupLST,type='movie')
+        else: return notificationDialog(LANGUAGE(30033))
+        busy = progressDialogBG(100, busy)
+        selects = selectDialog(listitem,LANGUAGE(30036))
+        if selects:
+            busy = progressDialogBG(0, message=LANGUAGE(30040))
+            delLST = [self.requestFile(listitem[select].getLabel2()) for select in selects if not listitem[select].getLabel2().startswith('stack://')]
+            # delLST = [self.requestFile(dupLST[item].getLabel2()) for item in items]
+            for idx, movie in enumerate(delLST):
+                updateDialogProgress = (idx+1) * 100 // len(delLST)
+                busy = progressDialogBG(updateDialogProgress, busy)
+                self.removeContent(movie)
+        
+        
+    def chkSeason(self, playingItem):
+        log('chkSeason')
+        notificationDialog('Coming Soon')
+        
         
     def removeSeason(self, playingItem):
         log('removeSeason')
-        print json.dumps(playingItem)
+        print(json.dumps(playingItem))
         type = playingItem["type"]
         dbid = playingItem["id"]
         if type == 'tvshow': seasons = self.getSeasons(dbid)
         paths = self.getDirectory(playingItem["folder"])['files']
-        print paths, seasons
+        print(paths, seasons)
         for season in seasons:
             for path in paths:
-                print path['filetype'], season['label'].lower(), path['label'].lower(),path["file"]
-                print re.match('(?:s|season)\W?(\d{1,2})', season['label'].lower(), re.I | re.M).group()
+                print(path['filetype'], season['label'].lower(), path['label'].lower(),path["file"])
+                print(re.match('(?:s|season)\W?(\d{1,2})', season['label'].lower(), re.I | re.M).group())
                 # if path['filetype'] == 'directory' and season['label'].lower() == path['label'].lower(): print self.getDirectory(path["file"])
-            
-            
-            
+
             # self.removeLibrary(type, epid)
         # if type == 'tvshow': self.removeLibrary(type, dbid)
         
@@ -187,10 +311,11 @@ class MM(object):
         #fetch tvshowid from seasonid, check season episode total to sonarr, if playcount > 0 on all remove.
         # {"jsonrpc":"2.0","method":"VideoLibrary.GetSeasonDetails","params":{"seasonid":2075,"properties":["episode","tvshowid"]},"id":6}
     
+    
     def getDirectory(self, path):
         log('getDirectory')
         json_query = ('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","media":"video","properties":["season","episode"]},"id":1}'%(path))
-        json_response = self.sendJSON(json_query)
+        json_response = self.cacheJSON(json_query)
         if 'result' not in json_response: return {}
         return json_response['result']
     
@@ -198,14 +323,11 @@ class MM(object):
     def getSeasons(self, id):
         log('getSeasons, id = %s'%id)
         json_query = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetSeasons","params":{"tvshowid":%s},"id":1}'%(id))
-        json_response = self.sendJSON(json_query)
+        json_response = self.cacheJSON(json_query)
         if 'result' not in json_response: return {}
         return json_response['result'].get('seasons',{})
     
-    
-    
-    
-    
+
     def splitStack(self, file):
         path = file.replace(',,',',').split(' , ')
         return '|'.join(path).replace('stack://','').split(', media = video')[0].split('|')
@@ -217,7 +339,7 @@ class MM(object):
         #todo mark watched in kodi b4 delete.
         #todo allow option to ignore tvshow delete if watch flag count > 1.
         #todo add "select all" option in tvshow monitor list. or move option to settings bypassing monitor list
-        print playingItem
+        print(playingItem)
         try:
             type = playingItem["type"]
             dbid = playingItem["id"]
@@ -234,9 +356,9 @@ class MM(object):
                 userList = self.getUserList()
                 if tvshow not in userList and not bypass: return
                 mediaInfo = '%s - %sx%s - %s'%(tvshow,playingItem["season"],playingItem["episode"],mediaInfo)
-            else: return self.notificationDialog(LANGUAGE('NA'))
+            else: return notificationDialog(LANGUAGE('NA'))
             if silent == False:
-                if not self.yesnoDialog(mediaInfo, file, header='%s - %s'%(ADDON_NAME,LANGUAGE(30021)%(type)), yes='Remove', no='Keep', autoclose=15000): return
+                if not yesnoDialog('%s/n%s'%(mediaInfo, file), heading='%s - %s'%(ADDON_NAME,LANGUAGE(30021)%(type)), yeslabel='Remove', nolabel='Keep', autoclose=15000): return
             if REAL_SETTINGS.getSetting('Enable_Removal') == 'true':
                 if not file.startswith('pvr://recordings/'): self.removeLibrary(type, dbid)
                         # if path.startswith('stack://'):
@@ -244,21 +366,12 @@ class MM(object):
                             # for file in files: MoviesList.append({'label':label,'label2':file,'thumb':(item['art'].get('poster','') or item['thumbnail'])})
                         # else:
                 if self.deleteFile(file):
-                    self.notificationDialog(LANGUAGE(30023)%mediaInfo)
+                    notificationDialog(LANGUAGE(30023)%mediaInfo)
                     return
-            self.notificationDialog(LANGUAGE(30022))
+            notificationDialog(LANGUAGE(30022))
         except Exception as e:
             log("removeContent Failed! " + str(e), xbmc.LOGERROR)
             log('removeContent, playingItem = ' + json.dumps(playingItem))
-        
-        
-    def removeLibrary(self, type, id):
-        log("removeLibrary, type = %s, id = %s"%(type,id))
-        param  = {'episode':'episodeid','movie':'movieid','movie':'movieid','tvshow':'tvshowid','season':'seasonid','channel':''}[type]
-        method = {'episodeid':'RemoveEpisode','movieid':'RemoveMovie','tvshowid':'RemoveTVShow','seasonid':''}[param]
-        json_query = '{"jsonrpc":"2.0","method":"VideoLibrary.%s","params":{"%s":%s},"id":1}'%(method, param, str(id))
-        self.sendJSON(json_query)
-        return True
         
         
     def deleteFile(self, file):
@@ -267,19 +380,28 @@ class MM(object):
             try: 
                 if xbmcvfs.delete(file): return True
             except: pass
+            if self.myMonitor.waitForAbort(1): break
         if xbmcvfs.exists(file): return False
         return True
+        
+        
+    def removeLibrary(self, type, id):
+        log("removeLibrary, type = %s, id = %s"%(type,id))
+        param  = {'episode':'episodeid','movie':'movieid','movie':'movieid','tvshow':'tvshowid','season':'seasonid','channel':''}[type]
+        method = {'episodeid':'RemoveEpisode','movieid':'RemoveMovie','tvshowid':'RemoveTVShow','seasonid':''}[param]
+        json_query = '{"jsonrpc":"2.0","method":"VideoLibrary.%s","params":{"%s":%s},"id":1}'%(method, param, str(id))
+        return sendJSON(json_query)
         
         
     def cleanLibrary(self, type="video"):
         type = {'video':'video','episode':'tvshows','movie':'movies'}[type]
         json_query = '{"jsonrpc":"2.0","method":"VideoLibrary.Clean","params":{"showdialogs":false,"content":"5s"},"id":1}'%type
-        self.sendJSON(json_query)
+        return sendJSON(json_query)
         
         
     def getActivePlayer(self):
         json_query = ('{"jsonrpc":"2.0","method":"Player.GetActivePlayers","params":{},"id":1}')
-        json_response = self.sendJSON(json_query)
+        json_response = sendJSON(json_query)
         try: id = json_response['result'][0]['playerid']
         except: id = 1
         log("getActivePlayer, id = " + str(id)) 
@@ -287,8 +409,8 @@ class MM(object):
         
         
     def requestItem(self):
-        json_query = ('{"jsonrpc":"2.0","method":"Player.GetItem","params":{"playerid":%d,"properties":%s}, "id": 1}'%(self.getActivePlayer(), JSON_IT_ENUMS))
-        json_response = self.sendJSON(json_query)
+        json_query    = ('{"jsonrpc":"2.0","method":"Player.GetItem","params":{"playerid":%d,"properties":%s}, "id": 1}'%(self.getActivePlayer(), JSON_IT_ENUMS))
+        json_response = sendJSON(json_query)
         if 'result' not in json_response: return {}
         return json_response['result'].get('item',{})
         
@@ -296,7 +418,7 @@ class MM(object):
     def requestFile(self, file, media='video', fallback={}):
         log("requestFile, file = " + file + ", media = " + media) 
         json_query = ('{"jsonrpc":"2.0","method":"Files.GetFileDetails","params":{"file":"%s","media":"%s","properties":%s},"id":1}' % (self.escapeDirJSON(file), media, JSON_FL_ENUMS))
-        json_response = self.sendJSON(json_query)
+        json_response = self.cacheJSON(json_query)
         if 'result' not in json_response: return fallback
         return json_response['result'].get('filedetails',fallback)
         
@@ -306,130 +428,71 @@ class MM(object):
         return mydir
         
         
-    def getTVShows(self):
+    def getTVShows(self, cache=True):
         if not self.hasTV(): return []
-        busy = self.progressDialogBG(0, string1=LANGUAGE(30038))
         json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetTVShows","params":{"properties":%s}, "id": 1}'%(JSON_TV_ENUMS))
-        json_response = self.sendJSON(json_query, cache=True)
+        if cache: json_response = self.cacheJSON(json_query)
+        else: json_response = sendJSON(json_query)
         if not 'result' in json_response: return []
-        self.progressDialogBG(100, busy)
-        return sorted(json_response['result']['tvshows'], key=lambda x:x['label']) 
+        return sorted(filter(lambda k:k['label'] != '', json_response['result'].get('tvshows',[])), key=lambda x:x['label'])
         
         
-    def getMovies(self):
+    def getMovies(self, cache=True):
         if not self.hasMovie(): return []
-        busy = self.progressDialogBG(0, string1=LANGUAGE(30039))
         json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetMovies","params":{"properties":%s}, "id": 1}'%(JSON_MV_ENUMS))
-        json_response = self.sendJSON(json_query)
-        self.progressDialogBG(100, busy)
+        if cache: json_response = self.cacheJSON(json_query)
+        else: json_response = sendJSON(json_query)
         if not 'result' in json_response: return []
-        return sorted(json_response['result']['movies'], key=lambda x:x['label']) 
-        
-        
-    def buildListitems(self, list, TV=False): #todo move to window UI and control panel
-        mediaLST = []
-        msg = LANGUAGE(30039)
-        if TV: msg = LANGUAGE(30038)
-        busy = self.progressDialogBG(0, string1=msg)
-        for idx, item in enumerate(list):
-            try:
-                if TV: label = item['label']
-                else: label = '%s (%d)'%(item['label'],item['year'])
-                path  = item['file']
-                updateDialogProgress = (idx) * 100 // len(list)
-                busy = self.progressDialogBG(updateDialogProgress, busy, string1=label)
-                if not TV:
-                    video = item['streamdetails']['video']
-                    audio = item['streamdetails']['audio']
-                    if path.startswith('stack://'): label = ' %s [[B]STACK[/B]]'%label
-                    if len(video) > 0: label = '%s - Video [Codec: [B]%s[/B]|Height: [B]%s[/B]|Runtime: [B]%s[/B]]'%(label,video[0]['codec'].upper(),video[0]['height'],video[0]['duration'])
-                    if len(audio) > 0: label = '%s - Audio [Codec: [B]%s[/B]|Channels: [B]%s[/B]|Language: [B]%s[/B]]'%(label,audio[0]['codec'].upper(),audio[0]['channels'],audio[0]['language'].title())
-                mediaLST.append(self.getListitem(label, path, (item['art'].get('poster','') or item['thumbnail'])))
-            except Exception as e: log("buildListitems Failed! %s , item = %s"%(str(e),item), xbmc.LOGERROR)
-        self.progressDialogBG(100, busy)
-        log("buildListitems, found "  + str(len(mediaLST)))
-        return mediaLST
-
-    
-    def viewTVShows(self):
-        TVShowList = self.buildListitems(self.getTVShows(),TV=True)
-        TVShowList.insert(0, self.getListitem(LANGUAGE(30044),LANGUAGE(30045),ICON, ICON))
-        select = self.selectDialog(TVShowList, LANGUAGE(30037), preselect=self.findItemIDX(TVShowList,self.getUserList()))
-        if select is None or select < 0: return
-        elif 0 in select: self.setUserList([TVShowList[idx].getLabel() for idx in range(1,len(TVShowList))])
-        elif select is not None: self.setUserList([TVShowList[idx].getLabel() for idx in select])
-
-        
-    def getListitem(self, label1="", label2="", iconImage="", thumbnailImage="", path="", offscreen=False):
-        try: return xbmcgui.ListItem(label1, label2, iconImage, thumbnailImage, path, offscreen)
-        except: return xbmcgui.ListItem(label1, label2, iconImage, thumbnailImage, path)
-    
-   
-    def findItemIDX(self, tvlist, userlist):
-        return [idx for idx, tvshow in enumerate(tvlist) for usershow in userlist if tvshow.getLabel() == usershow]
-    
-    
-    def selectDialog(self, list, header=ADDON_NAME, autoclose=0, preselect=None, multi=True, useDetails=True):
-        if preselect is None: preselect = {True:[],False:-1}[multi]
-        if multi: return xbmcgui.Dialog().multiselect(header, list, autoclose, preselect, useDetails)
-        else: return xbmcgui.Dialog().select(header, list, autoclose, preselect, useDetails)
+        return sorted(filter(lambda k:k['label'] != '', json_response['result'].get('movies',[])), key=lambda x:x['label']) 
         
 
-    def scanDuplicates(self):
-        dupLST = []
-        delLST = []
-        MoviesList = self.getMovies()
-        if len(MoviesList) > 0:
-            duplicates = [item for item, count in collections.Counter([{0:'%s (%d)'%(movie['label'],movie['year']),1:movie['label']}[DUPMATCH] for movie in MoviesList]).items() if count > 1]
-            for item in duplicates:
-                for movie in MoviesList:
-                    title = {0:'%s (%d)'%(movie['label'],movie['year']),1:movie['label']}[DUPMATCH]
-                    if item.lower() == title.lower(): dupLST.append(movie)
-        if len(dupLST) > 0:
-            dupLST.sort(key=lambda x:x['label'])
-            listitem = self.buildListitems(dupLST)
-            selects = self.selectDialog(listitem,LANGUAGE(30036))
-            if selects:
-                busy = self.progressDialogBG(0, string1=LANGUAGE(30040))
-                delLST = [self.requestFile(listitem[select].getLabel2()) for select in selects if not listitem[select].getLabel2().startswith('stack://')]
-                # delLST = [self.requestFile(dupLST[item].getLabel2()) for item in items]
-                for idx, movie in enumerate(delLST):
-                    updateDialogProgress = (idx) * 100 // len(delLST)
-                    busy = self.progressDialogBG(updateDialogProgress, busy)
-                    self.removeContent(movie)
-                self.progressDialogBG(100, busy)
-        else: self.notificationDialog(LANGUAGE(30033))
+    def hasMovie(self):
+        return (xbmc.getCondVisibility('Library.HasContent(Movies)'))
         
         
+    def hasTV(self):
+        return (xbmc.getCondVisibility('Library.HasContent(TVShows)'))
+
+
+    def getListitem(self, label="", label2="", path="", infoList=None, infoArt=None, infoProp=None, offscreen=False):
+        liz = xbmcgui.ListItem(label, label2, path, offscreen)
+        if not infoList is None: liz.setInfo(type='video', infoLabels=infoList)
+        else: liz.setInfo(type='video', infoLabels={"mediatype":'video',"label":label,"title":label})
+        if not infoArt  is None: liz.setArt(infoArt)
+        else: liz.setArt({"thumb":ICON,"poster":ICON,"fanart":FANART,"icon":ICON,"logo":ICON})
+        if not infoProp is None: liz.setProperty('id', dumpJSON(infoProp))
+        # if not infoProp is None: [liz.setProperty(key, str(pvalue)) for key, pvalue in infoProp.items()]
+        return liz
+
+
     def buildMenu(self):
         items  = [LANGUAGE(30002),LANGUAGE(30034),LANGUAGE(30035)]
         {None:sys.exit,
         -1:sys.exit,
-        0:self.viewTVShows,
-        1:self.scanDuplicates,
-        2:REAL_SETTINGS.openSettings}[self.selectDialog(items,multi=False,useDetails=False)]()
+         0:self.viewTVShows,
+         1:self.scanDuplicates,
+         2:REAL_SETTINGS.openSettings}[selectDialog(items,multi=False,useDetails=False)]()
+        return self.buildMenu()
         
-        
-    def progressDialogBG(self, percent=0, control=None, string1='', header=ADDON_NAME):
-        if percent == 0 and control is None:
-            control = xbmcgui.DialogProgressBG()
-            control.create(header, ADDON_NAME)
-            control.update(percent, string1)
-        if percent == 100 and control is not None: return control.close()
-        elif control is not None: control.update(percent, string1)
-        return control
-        
-        
-    def notificationDialog(self, message, header=ADDON_NAME, show=NOTIFY, sound=False, time=1000, icon=ICON):
-        log('notificationDialog: ' + message)
-        if not show: return
-        try: xbmcgui.Dialog().notification(header, message, icon, time, sound=False)
-        except : xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
-      
-      
-    def yesnoDialog(self, str1, str2='', str3='', header=ADDON_NAME, yes='', no='', autoclose=0):
-        return xbmcgui.Dialog().yesno(header, str1, str2, str3, no, yes, autoclose)
-        
+   
+    def poolList(self, method, items=None, args=None, chunk=1):
+        log("poolList")
+        results = []
+        if ENABLE_POOL:
+            pool = ThreadPool(CORES)
+            if args is not None: 
+                results = pool.map(method, zip(items,repeat(args)), chunksize=chunk)
+            elif items: 
+                results = pool.map(method, items, chunksize=chunk)
+            pool.close()
+            pool.join()
+        else:
+            if args is not None: 
+                results = [method((item, args)) for item in items]
+            elif items: 
+                results = [method(item) for item in items]
+        return filter(None, results)
+
 
 if __name__ == '__main__':
     try: arg = sys.argv[1]
@@ -440,3 +503,4 @@ if __name__ == '__main__':
     elif arg == '-clearTVShows': MM().setUserList([])
     elif arg == '-scanRadarr':   MM().getMonitored('movie')
     elif arg == '-clearMovies':  MM().setUserList([], 'movie')
+    REAL_SETTINGS.openSettings()

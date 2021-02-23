@@ -1,4 +1,4 @@
-#   Copyright (C) 2020 Lunatixz
+#   Copyright (C) 2021 Lunatixz
 #
 #
 # This file is part of Video ScreenSaver.
@@ -16,9 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Video ScreenSaver.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib, json, os, traceback, datetime
-import xbmc, xbmcaddon, xbmcvfs, xbmcgui
-from simplecache import SimpleCache, use_cache
+import json, os, random, datetime, itertools, traceback
+
+from contextlib    import contextmanager
+from simplecache   import use_cache, SimpleCache
+from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 
 # Plugin Info
 ADDON_ID       = 'screensaver.videosaver'
@@ -26,28 +28,26 @@ REAL_SETTINGS  = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME     = REAL_SETTINGS.getAddonInfo('name')
 ADDON_VERSION  = REAL_SETTINGS.getAddonInfo('version')
 ICON           = REAL_SETTINGS.getAddonInfo('icon')
-ADDON_PATH     = (REAL_SETTINGS.getAddonInfo('path').decode('utf-8'))
-SETTINGS_LOC   = REAL_SETTINGS.getAddonInfo('profile').decode('utf-8')
-XSP_CACHE_LOC  = os.path.join(SETTINGS_LOC, 'cache','')
-MEDIA_EXTS     = (xbmc.getSupportedMedia('video')).split('|')
-ACTION_STOP    = 13
+ADDON_PATH     = REAL_SETTINGS.getAddonInfo('path')
+SETTINGS_LOC   = REAL_SETTINGS.getAddonInfo('profile')
 LANGUAGE       = REAL_SETTINGS.getLocalizedString
-VOLUME         = int(REAL_SETTINGS.getSetting('Set_Volume'))
-DEBUG          = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
+
+ACTION_STOP    = 13
+MEDIA_EXTS     = (xbmc.getSupportedMedia('video')).split('|')
+VIDEO_LIMIT    = int(REAL_SETTINGS.getSetting("VideoLimit"))
 SINGLE_FLE     = int(REAL_SETTINGS.getSetting("VideoSource")) == 0
-PLAYLIST_FLE     = REAL_SETTINGS.getSetting("VideoFile")[-3:] == 'xsp' 
-RANDOM_PLAY       = REAL_SETTINGS.getSetting("VideoRandom") == "true"
+DEBUG          = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
+PLAYLIST_FLE   = REAL_SETTINGS.getSetting("VideoFile").endswith(('.xsp','.xml'))
+RANDOM_PLAY    = REAL_SETTINGS.getSetting("VideoRandom") == "true"
 KEYLOCK        = REAL_SETTINGS.getSetting("LockAction") == 'true'
 DISABLE_TRAKT  = REAL_SETTINGS.getSetting("TraktDisable") == 'true'
-VIDEO_LIMIT    = int(REAL_SETTINGS.getSetting("VideoLimit"))
 VIDEO_FILE     = REAL_SETTINGS.getSetting("VideoFile")
 VIDEO_PATH     = REAL_SETTINGS.getSetting("VideoFolder")
-DEFAULT_REPEAT = REAL_SETTINGS.getSetting('RepeatState').lower()
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
-    if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg.encode("utf-8")), level)
+    if level == xbmc.LOGERROR: '%s, %s'%(msg,traceback.format_exc())
+    xbmc.log('%s-%s-%s'%(ADDON_ID,ADDON_VERSION,msg),level)
     
 def sendJSON(command):
     log('sendJSON, command = %s'%(command))
@@ -97,7 +97,13 @@ def getActivePlayer():
     except: id = 1
     log("getActivePlayer, id = " + str(id)) 
     return id
-    
+
+def getFileDetails(path):
+    log('getFileDetails')
+    json_query    = ('{"jsonrpc":"2.0","method":"Files.GetFileDetails","params":{"file":"%s","media":"video","properties":["file"]},"id":1}' % (path))
+    json_response = sendJSON(json_query)
+    return (json_response)
+               
 def progressDialog(percent=0, control=None, string1='', header=ADDON_NAME):
     if percent == 0 and control is None:
         control = xbmcgui.DialogProgress()
@@ -108,42 +114,24 @@ def progressDialog(percent=0, control=None, string1='', header=ADDON_NAME):
         else: control.update(percent, string1)
     return control
 
-class BackgroundWindow(xbmcgui.WindowXMLDialog):
-    def __init__(self, *args, **kwargs):
-        xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
-        if DISABLE_TRAKT: xbmcgui.Window(10000).setProperty('script.trakt.paused','true')
-        xbmcgui.Window(10000).setProperty("PseudoTVRunning", "True")
-        self.myPlayer = Player()
-        setRepeat('all')
-        saveVolume()
-        setVolume(VOLUME)
-        
-        
-    def onAction(self, act):
-        log('onAction')
-        if KEYLOCK and act.getId() != ACTION_STOP: return
-        self.onClose()
-            
-            
-    def onClose(self):
-        log('onClose')
-        setRepeat(DEFAULT_REPEAT)
-        xbmcgui.Window(10000).clearProperty('script.trakt.paused')
-        xbmcgui.Window(10000).setProperty("PseudoTVRunning", "False")
-        xbmcgui.Window(10000).setProperty("%s.Running"%(ADDON_ID), "False")
-        setVolume(int(xbmcgui.Window(10000).getProperty('%s.RESTORE'%ADDON_ID)))
-        self.myPlayer.stop()
-        self.close()
-        
+@contextmanager
+def busy_dialog(escape=False):
+    if not escape:
+        log('globals: busy_dialog')
+        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+        try: yield
+        finally: xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+    else: yield
+
 
 class Player(xbmc.Player):
     def __init__(self):
         xbmc.Player.__init__(self, xbmc.Player()) 
-
+        
 
     def onPlayBackError(self):
         log('onPlayBackError')
-        exeAction('stop')
+        # exeAction('stop')
 
 
     def onPlayBackEnded(self):
@@ -154,69 +142,84 @@ class Player(xbmc.Player):
         
     def onPlayBackStopped(self):
         log('onPlayBackStopped')
-        self.stop()
+        self.myBackground.onClose()
         
         
-class Start():
-    def __init__(self):
-        self.fileCount     = 0
-        self.dirCount      = 0
-        self.busy          = None
-        self.myPlayer      = Player()
-        self.cache         = SimpleCache()
-        self.background    = BackgroundWindow('%s.background.xml'%ADDON_ID, ADDON_PATH, "Default")
-        self.buildPlaylist()
+class BackgroundWindow(xbmcgui.WindowXMLDialog):
+    def __init__(self, *args, **kwargs):
+        xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
+        if DISABLE_TRAKT: xbmcgui.Window(10000).setProperty('script.trakt.paused','true')
+        self.playList  = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)        
+        self.fileCount = 0
+        self.cache     = SimpleCache()
+        self.myPlayer  = Player()
+        self.myPlayer.myBackground = self
         
-      
-    def getFileDetails(self, path):
-        log('getFileDetails')
-        json_query    = ('{"jsonrpc":"2.0","method":"Files.GetFileDetails","params":{"file":"%s","media":"video","properties":["file"]},"id":1}' % (self.escapeDirJSON(path)))
-        json_response = sendJSON(json_query)
-        return (json_response)
-          
-          
-    def getDirectory(self, path, media='video', ignore='false', method='random', order='ascending', end=0, start=0, filter={}):
+        if saveVolume(): 
+            setVolume(int(REAL_SETTINGS.getSetting('SetVolume')))
+        setRepeat('all')
+        
+        
+    def onInit(self):
+        self.winid = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
+        self.winid.setProperty('ss_time', 'okay' if REAL_SETTINGS.getSetting("Time") == 'true' else 'nope')
+        self.myPlayer.play(self.buildPlaylist())
+        
+        
+    def onAction(self, act):
+        log('onAction')
+        if KEYLOCK and act.getId() != ACTION_STOP: return
+        self.onClose()
+            
+            
+    def onClose(self):
+        log('onClose')
+        setRepeat(REAL_SETTINGS.getSetting('RepeatState').lower())
+        xbmcgui.Window(10000).clearProperty('script.trakt.paused')
+        xbmcgui.Window(10000).clearProperty('%s.Running'%(ADDON_ID))
+        setVolume(int(xbmcgui.Window(10000).getProperty('%s.RESTORE'%ADDON_ID)))
+        self.myPlayer.stop()
+        self.playList.clear()
+        self.close()
+        
+        
+    def getDirectory(self, path, media='video', ignore='false', method='episode', order='ascending', end=0, start=0, filter={}):
         log('getDirectory, path = %s'%(path))
-        cacheresponse = self.cache.get(ADDON_NAME + '.getDirectory, path = %s'%path)
-        if DEBUG: cacheresponse = None
+        cacheresponse = self.cache.get('%s.getDirectory, path = %s'%(ADDON_NAME,path))
         if not cacheresponse:
-            json_query    = ('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","media":"%s","sort":{"ignorearticle":%s,"method":"%s","order":"%s"},"limits":{"end":%s,"start":%s}},"id":1}' % (self.escapeDirJSON(path), media, ignore, method, order, end, start))
+            if RANDOM_PLAY: method = 'random'
+            json_query    = ('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","media":"%s","sort":{"ignorearticle":%s,"method":"%s","order":"%s"},"limits":{"end":%s,"start":%s}},"id":1}' % (path, media, ignore, method, order, end, start))
             cacheresponse = (sendJSON(json_query))
             if 'result' in cacheresponse: 
-                self.cache.set(ADDON_NAME + '.getDirectory, path = %s'%path, json.dumps(cacheresponse), expiration=datetime.timedelta(hours=6))
+                self.cache.set('%s.getDirectory, path = %s'%(ADDON_NAME,path), json.dumps(cacheresponse), expiration=datetime.timedelta(minutes=15))
                 return cacheresponse
-        return json.loads(cacheresponse)
+        else: return json.loads(cacheresponse)
 
 
-    def buildDirectory(self, path, limit, busy=None):
+    def buildDirectory(self, path, limit):
         log('buildDirectory, path = %s'%(path))
-        itemLST = []
-        dirLST  = []
-        # if busy is None: busy = progressDialog(0, string1=LANGUAGE(32013))
-        json_response = self.getDirectory(path, end=limit)
-        if 'result' in json_response and json_response['result'] != None and 'files' in json_response['result']:
-            response = json_response['result']['files']
+        itemLST   = []
+        dirLST    = []
+        with busy_dialog():
+            response = self.getDirectory(path, end=limit).get('result',{}).get('files',[])
             for idx, item in enumerate(response):
-                if self.fileCount >= limit: break
+                if self.fileCount > limit: break
                 file     = item.get('file','')
                 fileType = item.get('filetype','')
                 if fileType == 'file':
                     self.fileCount += 1
                     itemLST.append(file)
-                    # busy = progressDialog(idx*100//limit, busy, string1=item['label'])
                 elif fileType == 'directory': 
-                    self.dirCount += 1
                     dirLST.append(file)  
             if self.fileCount < limit:
                 for dir in dirLST:
-                    if self.fileCount >= limit: break
-                    itemLST.extend(self.buildDirectory(file, limit, busy))  
-        # if busy is not None: progressDialog(100, busy, string1=LANGUAGE(32013))  
-        return itemLST
-        
+                    if self.fileCount > limit: break 
+                    itemLST.extend(self.buildDirectory(dir, limit))
+            return itemLST
+            
 
-    def buildItems(self, responce):
-        log('buildItems')
+    def buildItem(self, responce):
+        log('buildItem')
         if 'result' in responce and 'filedetails' in responce['result']: key = 'filedetails'
         elif 'result' in responce and 'files' in responce['result']: key = 'files'
         else: xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
@@ -224,36 +227,34 @@ class Start():
             if key == 'files' and item.get('filetype','') == 'directory': continue
             yield responce['result'][key]['file']
 
-                
-    def escapeDirJSON(self, dir_name):
-        mydir = dir_name
-        if (mydir.find(":")): mydir = mydir.replace("\\", "\\\\")
-        return mydir
-        
 
-    def getSmartPlaylist(self, path):
-        log('getSmartPlaylist')
-        if not xbmcvfs.exists(XSP_CACHE_LOC): xbmcvfs.mkdirs(XSP_CACHE_LOC)
-        if xbmcvfs.copy(path, os.path.join(XSP_CACHE_LOC,os.path.split(path)[1])):
-            if xbmcvfs.exists(os.path.join(XSP_CACHE_LOC,os.path.split(path)[1])): return os.path.join(XSP_CACHE_LOC,os.path.split(path)[1])
-        return path
-        
-        
     def buildPlaylist(self):
         log('buildPlaylist')
-        self.playList = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         self.playList.clear()
-        xbmc.sleep(1000)
-        if not SINGLE_FLE: playListItem = self.buildDirectory(VIDEO_PATH, VIDEO_LIMIT)
-        elif PLAYLIST_FLE: playListItem = self.buildDirectory(self.getSmartPlaylist(VIDEO_FILE), VIDEO_LIMIT)
-        elif not VIDEO_FILE.startswith(('plugin','upnp','pvr')): playListItem = list(self.buildItems(self.getFileDetails(VIDEO_FILE)))
-        else: playListItem = [VIDEO_FILE]
-        [self.playList.add(playItem, index=idx) for idx, playItem in enumerate(playListItem)]
-        if RANDOM_PLAY: self.playList.shuffle()
-        else: self.playList.unshuffle()
-        self.myPlayer.play(self.playList)
-        exeAction('fullscreen')
-        self.background.doModal()
-        self.playList.clear()
+        xbmc.sleep(100)
+        
+        if not SINGLE_FLE: 
+            playListItem = self.buildDirectory(VIDEO_PATH, VIDEO_LIMIT)
+        elif PLAYLIST_FLE: 
+            playListItem = self.buildDirectory(VIDEO_FILE, VIDEO_LIMIT)
+        elif not VIDEO_FILE.startswith(('plugin://','upnp://','pvr://')): 
+            playListItem = list(self.buildItem(getFileDetails(VIDEO_FILE)))
+        else: return VIDEO_FILE
+            
+        for idx, playItem in enumerate(playListItem): 
+            self.playList.add(playItem, index=idx)
+            
+        if RANDOM_PLAY: 
+            self.playList.shuffle()
+        else: 
+            self.playList.unshuffle()
+        return self.playList
+        
+        
+class Start():
+    def __init__(self):
+        self.myBackground = BackgroundWindow('%s.background.xml'%ADDON_ID, ADDON_PATH, "Default")
+        self.myBackground.doModal()
+        del self.myBackground
         
 if __name__ == '__main__': Start()

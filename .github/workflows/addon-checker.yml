@@ -3,10 +3,10 @@ name: Kodi Addon-Check
 on:
   push:
     branches:
-      - 'matrix'
+      - 'master'
   pull_request:
     branches:
-      - 'matrix'
+      - 'master'
 
 jobs:
   kodi-addon-checker:
@@ -19,8 +19,6 @@ jobs:
 
     - name: Extract official repo target
       shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch
 
     - name: Kodi addon checker validation
       # id: kodi-addon-checker

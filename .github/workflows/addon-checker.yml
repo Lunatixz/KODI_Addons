@@ -17,13 +17,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
-    - name: Extract official repo target
-      shell: bash
-
     - name: Kodi addon checker validation
-      # id: kodi-addon-checker
-      # uses: xbmc/action-kodi-addon-checker@v1.2
       with:
-        kodi-version: ${{ steps.extract_branch.outputs.branch }}
+        kodi-version: matrix
         addon-id: ${{ github.event.repository.name }}
         is-pr: false

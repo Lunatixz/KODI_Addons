@@ -9,6 +9,7 @@
 [![DMCA Policy](https://img.shields.io/badge/DMCA-Policy-lightgrey.svg?style=flat-square)](https://github.com/Lunatixz/KODI_Addons/raw/master/DMCA.md)
 [![Kodi Donate](https://img.shields.io/badge/Donate-Kodi-blue.svg?style=flat-square)](https://kodi.tv/contribute/donate)
 [![Paypal Donate](https://img.shields.io/badge/Donate-Lunatixz-blue.svg?style=flat-square)](https://paypal.me/Lunatixz)
+[![Buy Me Coffee](https://img.shields.io/badge/Coffee-Lunatixz-blue.svg?style=flat-square)](https://www.buymeacoffee.com/Lunatixz)
 [![Twitter URL](https://img.shields.io/twitter/follow/PseudoTV_Live.svg?color=blue&label=%40PseudoTV_Live&style=flat-square)](https://twitter.com/PseudoTV_Live) 
 
 

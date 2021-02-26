@@ -130,8 +130,8 @@ class Service(object):
         schedule.clear()
         scanTime  = [0,1,6,24][int(REAL_SETTINGS.getSetting('Enable_Scan'))]
         cleanTime = [0,1,6,24,168][int(REAL_SETTINGS.getSetting('Enable_Clean'))]
-        if scanTime  > 0: schedule.every(scanTime).hour.do(self.scanLibrary)
-        if cleanTime > 0: schedule.every(cleanTime).hour.do(self.cleanLibrary)
+        if scanTime  > 0: schedule.every(scanTime).hours.do(self.scanLibrary)
+        if cleanTime > 0: schedule.every(cleanTime).hours.do(self.cleanLibrary)
         return True
         
         

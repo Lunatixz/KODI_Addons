@@ -584,7 +584,7 @@
     </extension>
 </addon>
 
-<addon id="script.media.maintenance" version="1.1.2" name="Media Maintenance" provider-name="Lunatixz">
+<addon id="script.media.maintenance" version="1.1.2a" name="Media Maintenance" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.7.0"/>

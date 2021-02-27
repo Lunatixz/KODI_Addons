@@ -1,4 +1,4 @@
-#   Copyright (C) 2020 Lunatixz
+#   Copyright (C) 2021 Lunatixz
 #
 #
 # This file is part of OnMute
@@ -20,10 +20,9 @@ import sys, os, re, traceback, json
 import xbmc, xbmcplugin, xbmcaddon, xbmcgui
 
 # Plugin Info
-ADDON_ID = 'service.onmute'
+ADDON_ID      = 'service.onmute'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
-DEBUG = REAL_SETTINGS.getSetting('enableDebug') == "true"
     
 try:
   basestring #py2
@@ -32,25 +31,14 @@ except NameError: #py3
   unicode = str
   
 def log(msg, level = xbmc.LOGDEBUG):
-    if DEBUG == False and level != xbmc.LOGERROR:
-        return
-    elif level == xbmc.LOGERROR:
-        msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + str(msg), level)
+    if not REAL_SETTINGS.getSetting('enableDebug') == "true" and level != xbmc.LOGERROR: return
+    if   level == xbmc.LOGERROR: msg = '%s, %s'%((msg),traceback.format_exc())
+    try: xbmc.log('%s-%s-%s'%(ADDON_ID,ADDON_VERSION,msg),level)
+    except Exception as e: xbmc.log('log failed! %s'%(e),level)
 
-def uni(string, encoding='utf-8'):
-    if isinstance(string, basestring):
-        if not isinstance(string, unicode):
-           string = unicode(string, encoding)
-        else: 
-            string = string.encode('ascii', 'ignore')
-    return string
-    
 def loadJSON(string):
-    try: 
-        return json.loads(string, strict=False)
-    except Exception as e: 
-        log("loadJSON failed! " + str(e), xbmc.LOGERROR)
+    try: return json.loads(string, strict=False)
+    except Exception as e: log("loadJSON failed! %s\n%s"%(e,string), xbmc.LOGERROR)
     return {}
         
 def dumpJSON(mydict, sortkey=True):
@@ -84,19 +72,19 @@ class Monitor(xbmc.Monitor):
     def __init__(self):
         xbmc.Monitor.__init__(self, xbmc.Monitor())
         self.searchSub = REAL_SETTINGS.getSetting('searchSub') == "true"
-        self.enableCC =  REAL_SETTINGS.getSetting('enableCC') == "true"
+        self.enableCC  = REAL_SETTINGS.getSetting('enableCC') == "true"
         
         
     def onSettingsChanged(self):
         log("onSettingsChanged")
         self.searchSub = REAL_SETTINGS.getSetting('searchSub') == "true"
-        self.enableCC =  REAL_SETTINGS.getSetting('enableCC') == "true"
+        self.enableCC  = REAL_SETTINGS.getSetting('enableCC') == "true"
         
         
 class Service():
     def __init__(self):
-        self.userCC = self.getCC()
-        self.Player = Player()
+        self.userCC  = self.getCC()
+        self.Player  = Player()
         self.Monitor = Monitor()
         self.autoSub = False
         self.Player.subFound = False
@@ -195,4 +183,5 @@ class Service():
         # restore users closed caption preference .
         if self.userCC == False and self.getCC() == True:
             self.setCC(self.userCC)
-Service()
+            
+if __name__ == '__main__': Service()

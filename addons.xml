@@ -801,23 +801,23 @@
     </extension>
 </addon>
 
-<addon id="service.onmute" version="0.0.3" name="OnMute" provider-name="Lunatixz">
+<addon id="service.onmute" version="1.0.0" name="OnMute" provider-name="Lunatixz">
     <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="xbmc.python" version="3.0.0"/>
     </requires>
     <extension point="xbmc.python.script" library="settings.py"/>
-    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Enable closed captioning and subtitles "OnMute".</summary>
         <description lang="en_GB">Let "OnMute" toggle closed captioning and subtitles while Kodi is muted.</description>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.onmute</source>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.onmute</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=334361</forum>
-        <news>v.0.0.3[CR]-PY3</news>
+        <news>v1.1.0[CR]- Matrix</news>
+        <license>GPL-3.0-or-later</license>
         <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
         </assets>
     </extension>
 </addon>

@@ -22,7 +22,6 @@ from default import *
 class Player(xbmc.Player):
     def __init__(self):
         xbmc.Player.__init__(self)
-        self.playingTime = 0
         self.playingItem = {}
         
         
@@ -31,19 +30,24 @@ class Player(xbmc.Player):
         self.__init__()
         
         
-    def getPlayerTime(self):
+    def getPlayerTotalTime(self):
         try:    return self.getTotalTime()
+        except: return 0
+        
+        
+    def getPlayerTime(self):
+        try:    return self.getTime()
         except: return 0
         
         
     def onPlayBackStarted(self):
         if self.isPlayingVideo():
             self.playingItem = self.myService.myUtils.requestItem()
-            self.playingItem['TotalTime'] = self.getPlayerTime()
+            self.playingItem['TotalTime'] = self.getPlayerTotalTime()
             log('onPlayBackStarted, playingItem = %s'%(self.playingItem))
             #todo add wait for playlist option, save playing playlist, monitor position and watched status; on stop prompt to delete watched items if match.
         
-         
+
     def onPlayBackEnded(self):
         log('onPlayBackEnded')
         self.chkContent(self.playingItem)
@@ -61,7 +65,7 @@ class Player(xbmc.Player):
                       self.playingItem.get('TotalTime',-1) <= 0,
                       self.playingItem.get("file","").startswith(('plugin://','upnp://','pvr://'))]
         if True in conditions: return
-        elif (self.playingTime * 100 / self.playingItem['TotalTime']) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
+        elif (self.playingItem['Time'] * 100 / self.playingItem['TotalTime']) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
             if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": 
                 self.myService.myUtils.chkSeason(self.playingItem)
             else:
@@ -135,21 +139,18 @@ class Service(object):
         return True
         
         
-    # def chkSettings(self):
-        # self.myMonitor.pendingChange = False
-        
-        
     def startService(self):
         log('startService')
         self.myMonitor.waitForAbort(5)
         self.loadMySchedule()
         while not self.myMonitor.abortRequested():
-            # if self.myMonitor.pendingChange and xbmcgui.getCurrentWindowDialogId() != 10140: self.chkSettings()
+            # if xbmcgui.getCurrentWindowDialogId() == 10140 and not self.myMonitor.pendingChange: self.myMonitor.pendingChange = True
             if self.myMonitor.waitForAbort(5): break
-            elif self.myPlayer.isPlaying(): 
+            if self.myPlayer.isPlaying(): 
                 if xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True": self.myPlayer.playingItem = {}
-                elif len(self.myPlayer.playingItem) == 0: self.myPlayer.onPlayBackStarted()
-                self.myPlayer.playingTime = self.myPlayer.getTime()
+                if self.myPlayer.playingItem:
+                    self.myPlayer.playingItem['Time'] = self.myPlayer.getPlayerTime()
+                else: self.myPlayer.onPlayBackStarted()
             else: schedule.run_pending() #run scan/clean when idle
 
 if __name__ == '__main__': Service()

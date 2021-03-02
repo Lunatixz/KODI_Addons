@@ -99,7 +99,11 @@ def buildStation(chid):
 @ROUTER.route('/station/<chid>/<opt>')
 def browseDetails(chid,opt):
     NewsOn().browseStation(chid,opt)
-  
+    
+@ROUTER.route('/play/live')#unknown bug causing this route to be called during /ondemand parse. todo find issue.
+def dummy():
+    pass
+    
 @ROUTER.route('/play/live/<url>')
 def playURL(url):
     NewsOn().playVideo(url,opt='live')
@@ -224,7 +228,8 @@ class NewsOn(object):
             duration = 0
         infoLabel   = {"mediatype":"video","label":label,"title":label,"plot":plot,"duration":duration,"genre":['News']}
         infoArt     = {"thumb":thumb,"poster":thumb,"fanart":self.getMAP((configValue.get('latitude','undefined'),configValue.get('longitude','undefined'))),"icon":chlogo,"logo":chlogo} 
-
+        if opt == 'local':infoArt['fanart'] = thumb
+        
         if opt == 'channels':
             self.addDir(chname,(buildStation,chid),infoArt={"thumb":chlogo,"poster":chlogo,"fanart":FANART,"icon":ICON,"logo":ICON})
             return True

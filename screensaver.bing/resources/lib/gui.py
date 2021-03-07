@@ -60,7 +60,7 @@ class GUI(xbmcgui.WindowXMLDialog):
          
     def onInit( self ):
         self.winid = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
-        self.winid.setProperty('bing_time'     , 'okay' if REAL_SETTINGS.getSetting("Time") == 'true' else 'nope')
+        self.winid.setProperty('bing_time'     , 'okay' if REAL_SETTINGS.getSetting("Time") == 'true'    else 'nope')
         self.winid.setProperty('bing_animation', 'okay' if REAL_SETTINGS.getSetting("Animate") == 'true' else 'nope')
         self.winid.setProperty('bing_overlay'  , 'okay' if REAL_SETTINGS.getSetting("Overlay") == 'true' else 'nope')
         self.PanelItems = self.getControl(101)

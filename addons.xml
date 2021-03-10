@@ -180,7 +180,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.plutotv" version="1.5.4" name="Pluto.TV" provider-name="Lunatixz">
+<addon id="plugin.video.plutotv" version="1.5.5a" name="Pluto.TV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -441,7 +441,7 @@
     </extension>
 </addon>
 
-<addon id="screensaver.google.earth" name="Google Earth" version="1.0.8" provider-name="Lunatixz">
+<addon id="screensaver.google.earth" name="Google Earth" version="1.0.9" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>

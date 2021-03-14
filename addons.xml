@@ -702,6 +702,21 @@
     </extension>
 </addon>
 
+<addon id="script.module.pySSD" version="1.0.0" name="pySSD" provider-name="Lunatixz, vuolter">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0" />
+    </requires>
+    <extension library="lib" point="xbmc.python.module" />
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_US">Module for Kodi.</summary>
+        <description lang="en_US">packed for kodi from pySSD</description>
+        <website>https://pypi.org/project/ssd/</website>
+        <license>MIT</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pySSD</source>
+    </extension>
+</addon>
+
 <addon id="script.module.schedule" version="1.0.0" name="schedule" provider-name="Lunatixz, dbader">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />

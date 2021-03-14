@@ -260,6 +260,7 @@ class MM(object):
         delLST = []
         with busy_dialog(): 
             MoviesList = self.getMovies(cache=False)
+            
         if len(MoviesList) > 0:
             busy = progressDialogBG(0, message=LANGUAGE(30050))
             duplicates = [item for item, count in collections.Counter([{0:'%s (%d)'%(movie['label'],movie['year']),1:movie['label']}[DUPMATCH] for movie in MoviesList]).items() if count > 1]
@@ -269,6 +270,7 @@ class MM(object):
                 for movie in MoviesList:
                     title = {0:'%s (%d)'%(movie['label'],movie['year']),1:movie['label']}[DUPMATCH]
                     if item.lower() == title.lower(): dupLST.append(movie)
+
         if len(dupLST) > 0:
             dupLST.sort(key=lambda x:x['label'])
             listitem = self.buildListitems(dupLST,type='movie')
@@ -359,19 +361,29 @@ class MM(object):
             else: return notificationDialog(LANGUAGE('NA'))
             if silent == False:
                 if not yesnoDialog('%s/n%s'%(mediaInfo, file), heading='%s - %s'%(ADDON_NAME,LANGUAGE(30021)%(type)), yeslabel='Remove', nolabel='Keep', autoclose=15000): return
-            if REAL_SETTINGS.getSetting('Enable_Removal') == 'true':
-                if not file.startswith('pvr://recordings/'): self.removeLibrary(type, dbid)
-                        # if path.startswith('stack://'):
-                            # files = self.splitStack(path)
-                            # for file in files: MoviesList.append({'label':label,'label2':file,'thumb':(item['art'].get('poster','') or item['thumbnail'])})
-                        # else:
-                if self.deleteFile(file):
+            
+            if not file.startswith('pvr://recordings/'): 
+                if self.removeLibrary(type, dbid):
                     notificationDialog(LANGUAGE(30023)%mediaInfo)
-                    return
-            notificationDialog(LANGUAGE(30022))
+
+            ##DANGER ZONE##
+            if REAL_SETTINGS.getSetting('Enable_Removal') == 'true':
+                if self.deleteFile(file): 
+                    notificationDialog(LANGUAGE(30051)%mediaInfo)
+                else: 
+                    notificationDialog(LANGUAGE(30022))
+            ### TEMP####
+            else: #todo clean nfos if not removing media
+                file = os.path.join(os.path.dirname(file),'movie.nfo')
+                if self.deleteFile(file): 
+                    notificationDialog(LANGUAGE(30051)%mediaInfo)
+                else: 
+                    notificationDialog(LANGUAGE(30022))
+                
+            ###############
         except Exception as e:
-            log("removeContent Failed! " + str(e), xbmc.LOGERROR)
-            log('removeContent, playingItem = ' + json.dumps(playingItem))
+            log("removeContent Failed! %s"%(e), xbmc.LOGERROR)
+            log('removeContent, playingItem = %s'%(playingItem))
         
         
     def deleteFile(self, file):

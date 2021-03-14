@@ -109,7 +109,7 @@ msgid "Permission required, Check file access."
 msgstr ""
 
 msgctxt "#30023"
-msgid ""%s" Removed"
+msgid ""%s" Removed!"
 msgstr ""
 
 msgctxt "#30024"
@@ -218,4 +218,8 @@ msgstr ""
 
 msgctxt "#30050"
 msgid "Scanning Movies for duplicates..."
+msgstr ""
+
+msgctxt "#30051"
+msgid ""%s" Deleted!"
 msgstr ""

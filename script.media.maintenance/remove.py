@@ -1,4 +1,4 @@
-#   Copyright (C) 2020 Lunatixz
+#   Copyright (C) 2021 Lunatixz
 #
 #
 # This file is part of Media Maintenance.
@@ -22,7 +22,7 @@ import xbmc
 import default
 
 if __name__ == '__main__':
-    liz   = sys.listitem
+    liz = sys.listitem
     if liz.getLabel() == xbmc.getInfoLabel('ListItem.Label'):
         info  = liz.getVideoInfoTag()
         dbid  = info.getDbId() if info.getDbId() else liz.getProperty('dbid')

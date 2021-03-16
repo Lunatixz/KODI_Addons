@@ -561,9 +561,9 @@ class PlutoTV(object):
                 except: aired = starttime
                 program = {"start"      :starttime.strftime(DTFORMAT),
                            "stop"       :(starttime + datetime.timedelta(seconds=(int(episode['duration']) // 1000))).strftime(DTFORMAT),
-                           "title"      :listing.get('title',channel['name']),
-                           "description":(episode.get('description','') or xbmc.getLocalizedString(161)),
-                           "subtitle"   :episode.get('name',''),
+                           "title"      :self.cleanString(listing.get('title',channel['name'])),
+                           "description":self.cleanString(episode.get('description','') or xbmc.getLocalizedString(161)),
+                           "subtitle"   :self.cleanString(episode.get('name','')),
                            "genre"      :episode.get('genres',""),
                            "image"      :(episode.get('poster','') or episode.get('thumbnail','') or episode.get('featuredImage',{})).get('path',chfanart),
                            "date"       :aired.strftime('%Y-%m-%d'),
@@ -571,7 +571,11 @@ class PlutoTV(object):
                            "stream"     :'plugin://%s/play/vod/%s'%(ADDON_ID,uri)}
                 programmes[channel['id']].append(program)
             return programmes
-                       
+             
+    
+    def cleanString(self, text):
+        return text.replace(' (Embed)','')
+             
              
     def poolList(self, method, items=None, args=None, chunk=25):
         log("poolList")

@@ -1,5 +1,5 @@
 # Kodi Media Center language file
-# Addon Name: Pluto.TV
+# Addon Name: Pluto TV
 # Addon id: plugin.video.plutotv
 # Addon Provider: Lunatixz
 msgid ""

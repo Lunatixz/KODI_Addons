@@ -180,7 +180,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.plutotv" version="1.5.5a" name="Pluto.TV" provider-name="Lunatixz">
+<addon id="plugin.video.plutotv" version="1.5.5b" name="Pluto TV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -309,17 +309,29 @@
     </extension>
 </addon>
 
-<addon id="repository.lunatixz" name="Lunatixz Beta Repository (Master)" version="1.0.9" provider-name="Lunatixz">
-    <extension point="xbmc.addon.repository" name="Lunatixz Master Beta Repository">
-        <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml</info>
-        <checksum>http://raw.github.com/Lunatixz/KODI_Addons/master/addons.xml.md5</checksum>
-        <datadir zip="true">http://raw.github.com/Lunatixz/KODI_Addons/master/zips</datadir>
+<addon id="repository.lunatixz" name="Lunatixz Beta Repository (Matrix)" version="1.1.0" provider-name="Lunatixz">
+    <extension point="xbmc.addon.repository" name="Lunatixz Matrix Beta Repository">
+        <dir>
+          <info compressed="false">https://raw.githubusercontent.com/Lunatixz/KODI_Addons/master/addons.xml</info>
+          <checksum>https://raw.githubusercontent.com/Lunatixz/KODI_Addons/master/addons.xml.md5</checksum>
+          <datadir zip="true">https://raw.githubusercontent.com/Lunatixz/KODI_Addons/master/zips</datadir>
+        </dir>
+        <dir>
+          <info compressed="false">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/addons.xml</info>
+          <checksum>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/addons.xml.md5</checksum>
+          <datadir zip="true">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/zips</datadir>
+        </dir>
+        <dir>
+          <info compressed="false">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/addons.xml</info>
+          <checksum>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/addons.xml.md5</checksum>
+          <datadir zip="true">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/zips</datadir>
+        </dir>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Master Repository, for older Kodi builds install Leia or Jarvis Repository</summary>
-        <description lang="en_GB"></description>
+        <summary lang="en_GB">Matrix Repository</summary>
+        <description lang="en_GB">Matrix Repository, for older Kodi builds install Leia or Jarvis Repository</description>
         <platform>all</platform>
-        <source>http://raw.github.com/Lunatixz/KODI_Addons/master</source>
+        <source>https://github.com/Lunatixz/KODI_Addons</source>
         <assets>
             <icon>icon.png</icon>
         </assets>

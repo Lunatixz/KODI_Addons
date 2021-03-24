@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.channelsdvr" version="1.1.7a" name="Channels DVR" provider-name="Lunatixz">
+<addon id="plugin.video.channelsdvr" version="1.1.8" name="Channels DVR" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>

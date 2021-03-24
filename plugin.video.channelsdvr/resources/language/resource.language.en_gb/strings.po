@@ -112,6 +112,10 @@ msgctxt "#30023"
 msgid "%s not found, Please Install"
 msgstr ""
 
+msgctxt "#30024"
+msgid "Devices"
+msgstr ""
+
 msgctxt "#49000"
 msgid "Integration"
 msgstr ""
@@ -163,4 +167,3 @@ msgstr ""
 msgctxt "#49012"
 msgid "Favorites"
 msgstr ""
-

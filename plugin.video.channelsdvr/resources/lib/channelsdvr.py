@@ -54,15 +54,26 @@ ROUTER        = routing.Plugin()
 ## GLOBALS ##
 TIMEOUT       = 30
 DEBUG         = REAL_SETTINGS.getSettingBool('Enable_Debugging')
-PVR_SERVER    = '_channels_app._tcp'
+PVR_SERVER    = '_channels_app._tcp' #todo bonjour
 REMOTE_URL    = 'http://my.channelsdvr.net'
+
 BASE_URL      = 'http://%s:%s'%(REAL_SETTINGS.getSetting('User_IP'),REAL_SETTINGS.getSetting('User_Port')) #todo dns discovery?
-TS            = '?format=ts' if REAL_SETTINGS.getSettingBool('Enable_TS') else ''
-M3U_URL       = '%s/devices/ANY/channels.m3u%s'%(BASE_URL,TS)
+
+BONJOUR_URL   = '%s/bonjour'%(BASE_URL)
+NAT_URL       = '%s/remote/nat'%(BASE_URL)
+DEV_URL       = '%s/devices'%(BASE_URL)
+M3U_URL       = '%s/devices/ANY/channels.m3u%s'%(BASE_URL,'?format=ts' if REAL_SETTINGS.getSettingBool('Enable_TS') else '')
 GUIDE_URL     = '%s/devices/ANY/guide'%(BASE_URL)
-UPNEXT_URL    = '%s/dvr/recordings/upnext'%(BASE_URL)
+PLAY_URL      = '%s/devices/ANY/channels/{chid}/hls/stream.m3u8'%(BASE_URL)
+
+DVR_URL       = '%s/dvr'%(BASE_URL)
+RECORDING_URL = '%s/dvr/files?all=true'%(BASE_URL)
+PROGS_URL     = '%s/dvr/programs'%(BASE_URL)
+PATHS_URL     = '%s/dvr/scanner/paths'%(BASE_URL)
+CHANNELS_URL  = '%s/dvr/guide/channels'%(BASE_URL)
 SEARCH_URL    = '%s/dvr/guide/search/groups?q={query}'%(BASE_URL)
 SUMMARY_URL   = '%s/dvr/recordings/summary'%(BASE_URL)
+UPNEXT_URL    = '%s/dvr/recordings/upnext'%(BASE_URL)
 GROUPS_URL    = '%s/dvr/groups'%(BASE_URL)
 MOVIES_URL    = '%s/dvr/groups/movies/files'%(BASE_URL)
 SOURCES_URL   = '%s/dvr/lineup'%(BASE_URL)
@@ -121,6 +132,14 @@ def getLive():
 def getLiveFavs():
     Channels().buildLive(favorites=True)
     
+@ROUTER.route('/devices')
+def getDevices():
+    Channels().buildDevices(id=None)
+    
+@ROUTER.route('/device/<id>')
+def getDevice(id):
+    Channels().buildDevices(id)
+    
 @ROUTER.route('/lineup')
 def getLineup():
     Channels().buildLineup(chid=None)
@@ -165,10 +184,14 @@ class Channels(object):
             cacheResponse = self.cache.get(cacheName)
             if not cacheResponse:
                 req = requests.get(url, timeout=TIMEOUT)
-                cacheResponse = req.text
+                if url == M3U_URL: 
+                    cacheResponse = req.text
+                else:
+                    cacheResponse = req.json()
                 req.close()
-                self.cache.set(cacheName, cacheResponse, checksum=len(cacheResponse), expiration=life)
-            return cacheResponse
+                self.cache.set(cacheName, json.dumps(cacheResponse), checksum=len(json.dumps(cacheResponse)), expiration=life)
+                return cacheResponse
+            else: return json.loads(cacheResponse)
         except Exception as e: 
             log("openURL, Failed! %s"%(e), xbmc.LOGERROR)
             notificationDialog(LANGUAGE(30001))
@@ -179,14 +202,29 @@ class Channels(object):
         log('buildMenu')
         MENU = [(LANGUAGE(30002),(getLive,)),
                 (LANGUAGE(30017),(getLiveFavs,)),
-                (LANGUAGE(30003),(getLineup,))]
+                (LANGUAGE(30003),(getLineup,)),
+                (LANGUAGE(30024),(getDevices,))]
                #(LANGUAGE(30015), '', 2)]
                #(LANGUAGE(30013), '', 8)]
         for item in MENU: self.addDir(*item)
 
 
-    def getChannels(self):
-        log('getChannels')
+    def buildDevices(self, id=None):
+        log('buildDevices, id=%s'%(id))
+        devices = self.openURL(DEV_URL)
+        for device in devices: 
+            if id is None:
+                self.addDir(device['FriendlyName'], (getDevice,device['DeviceID']))
+            elif id == device['DeviceID']:
+                items = []
+                channels = device.get('Channels',[]) 
+                for channel in channels: 
+                    self.addDir(channel.get('GuideName'),(getChannel,channel.get('GuideNumber')), infoArt={"thumb":channel.get('Logo'),"poster":channel.get('Logo'),"fanart":channel.get('Logo'),"icon":channel.get('Logo'),"logo":channel.get('Logo')})
+                break
+
+
+    def getChannelsM3U(self):
+        log('getChannelsM3U')
         m3uListTMP = self.openURL(M3U_URL).split('\n')
         lines = ['%s\n%s'%(line,m3uListTMP[idx+1]) for idx, line in enumerate(m3uListTMP) if line.startswith('#EXTINF:')]
         items = []
@@ -200,11 +238,28 @@ class Channels(object):
                               'title' :groups.group(5),
                               'url'   :groups.group(6)})
         return sorted(items, key=lambda k: k['number'])
+        
+        
+    def getChannels(self):
+        log('getChannels') #todo rewrite to remove parse and dict() rebuild? no longer needed since we moved away from m3u parsing.
+        items    = []
+        channels = self.openURL(CHANNELS_URL)
+        for key in channels.keys():
+            channel = channels[key]
+            if channel.get('Hidden',False): continue
+            items.append({'number'  :channel.get('Number'),
+                          'logo'    :channel.get('Image'),
+                          'name'    :channel.get('CallSign'),
+                          'groups'  :[],
+                          'Favorite':channel.get('Favorite'),
+                          'title'   :channel.get('Name'),
+                          'url'     :PLAY_URL.format(chid=channel.get('Number'))})
+        return sorted(items, key=lambda k: k['number'])
 
 
     def getGuidedata(self, version=ADDON_VERSION):
         log('getGuidedata')
-        return json.loads(self.openURL(GUIDE_URL))
+        return self.openURL(GUIDE_URL)
 
 
     def buildLive(self, favorites=False):
@@ -268,7 +323,7 @@ class Channels(object):
                 icon  = channel.get('Image',ICON)
                 thumb = program.get('Image',icon)
                 info  = {'label':label,'title':label,'duration':program.get('Duration',0),'genre':program.get('Genres',[]),'plot':program.get('Summary',xbmc.getLocalizedString(161)),'aired':program.get('OriginalDate','')}
-                art   = {'icon':icon, 'thumb':thumb}
+                art   = {"thumb":thumb,"poster":thumb,"fanart":thumb,"icon":icon,"logo":icon}
                 if opt == 'play': 
                     if start <= now and stop > now: info['duration'] = ((stop) - now).seconds
                     self.addPlaylist(label, url, info, art) 
@@ -290,7 +345,6 @@ class Channels(object):
         self.poolList(self.buildPlayItem, data, ('play',False))
         liz = xbmcgui.ListItem(channel['name'],path=channel['url'])
         liz.setProperty('IsPlayable','true')
-        liz.setProperty('IsInternetStream','true')
         if opt != 'pvr':
             [self.playlist.add(channel['url'],lz,idx) for idx,lz in enumerate(self.listitems)]
             liz = self.listitems.pop(0)
@@ -310,15 +364,16 @@ class Channels(object):
             if 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
                 if REAL_SETTINGS.getSettingBool('Enable_Timeshift'):
                     log('playLive, timeshift enabled')
-                    liz.setProperty('inputstream','inputstream.ffmpegdirect')
-                    liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
+                    # liz.setProperty('inputstream','inputstream.ffmpegdirect')
+                    # liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
                 else:
                     liz.setProperty('inputstream','inputstream.adaptive')
-                    liz.setProperty('inputstream.adaptive.manifest_type','hls')
-                    liz.setProperty('inputstream.adaptive.mime_type','application/vnd.apple.mpegurl')
-            if REAL_SETTINGS.getSettingBool('Enable_TS'): 
-                log('playLive, TS-MPEG enabled')
-                liz.setProperty('inputstream.adaptive.mime_type','video/mp2t')
+                    liz.setMimeType('application/xml+dash')
+                    liz.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+                    # liz.setProperty('inputstream.adaptive.manifest_type', 'hls')
+            # if REAL_SETTINGS.getSettingBool('Enable_TS'): 
+                # log('playLive, TS-MPEG enabled')
+                # liz.setProperty('inputstream.adaptive.mime_type','video/mp2t')
         xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
 
    
@@ -326,11 +381,10 @@ class Channels(object):
         log('addPlaylist, name = %s'%name)
         liz = xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable','true')
-        liz.setProperty('IsInternetStream','true')
         if infoList:  liz.setInfo(type=infoType, infoLabels=infoList)
         else:         liz.setInfo(type=infoType, infoLabels={"mediatype":infoType,"label":name,"title":name})
         if infoArt:   liz.setArt(infoArt)
-        else:         liz.setArt({'thumb':ICON,'fanart':FANART})
+        else:         liz.setArt({"thumb":ICON,"poster":ICON,"fanart":FANART,"icon":ICON,"logo":ICON})
         if infoVideo: liz.addStreamInfo('video', infoVideo)
         if infoAudio: liz.addStreamInfo('audio', infoAudio)
         self.listitems.append(liz)
@@ -340,11 +394,10 @@ class Channels(object):
         log('addLink, name = %s'%name)
         liz = xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable','true')
-        liz.setProperty('IsInternetStream','true')
         if infoList:  liz.setInfo(type=infoType, infoLabels=infoList)
         else:         liz.setInfo(type=infoType, infoLabels={"mediatype":infoType,"label":name,"title":name})
         if infoArt:   liz.setArt(infoArt)
-        else:         liz.setArt({'thumb':ICON,'fanart':FANART})
+        else:         liz.setArt({"thumb":ICON,"poster":ICON,"fanart":FANART,"icon":ICON,"logo":ICON})
         if infoVideo: liz.addStreamInfo('video', infoVideo)
         if infoAudio: liz.addStreamInfo('audio', infoAudio)
         if infoList.get('favorite',None) is not None: liz = self.addContextMenu(liz, infoList)
@@ -358,7 +411,7 @@ class Channels(object):
         if infoList: liz.setInfo(type=infoType, infoLabels=infoList)
         else:        liz.setInfo(type=infoType, infoLabels={"mediatype":infoType,"label":name,"title":name})
         if infoArt:  liz.setArt(infoArt)
-        else:        liz.setArt({'thumb':ICON,'fanart':FANART})
+        else:        liz.setArt({"thumb":ICON,"poster":ICON,"fanart":FANART,"icon":ICON,"logo":ICON})
         if infoList.get('favorite',None) is not None: liz = self.addContextMenu(liz, infoList)
         xbmcplugin.addDirectoryItem(ROUTER.handle, ROUTER.url_for(*uri), liz, isFolder=True)
         
@@ -449,7 +502,7 @@ class Channels(object):
         
             
     # def buildRecordings(self):
-        # self.poolList(self.buildRecordingItem, json.loads(self.openURL(UPNEXT_URL)))
+        # self.poolList(self.buildRecordingItem, self.openURL(UPNEXT_URL))
             
         
     # def search(self, term=None):
@@ -457,7 +510,7 @@ class Channels(object):
         # if term is None: term = getKeyboard(header=LANGUAGE(30014))
         # if term:
             # log('search, term = %s'%(term))
-            # query = json.loads(self.openURL(SEARCH_URL.format(query=term)))
+            # query = self.openURL(SEARCH_URL.format(query=term))
 
 
     def run(self): 

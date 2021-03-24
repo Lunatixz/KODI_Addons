@@ -308,7 +308,8 @@ class PlutoTV(object):
                 epdur      = int(episode.get('duration','0') or '0') // 1000
                 urls       = (item.get('stitched',{}).get('urls',[]) or urls)
                 if len(urls) == 0: continue
-                if isinstance(urls, list): urls  = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
+                if isinstance(urls, list): 
+                    urls  = [url['url'] for url in urls if url['type'].lower() == 'hls'][0] # todo select quality
                 
                 try:
                     start  = strpTime(item['start'],'%Y-%m-%dT%H:%M:%S.000Z') + datetime.timedelta(seconds=tz)
@@ -316,6 +317,7 @@ class PlutoTV(object):
                 except:
                     start  = totstart
                     stop   = start + datetime.timedelta(seconds=epdur)
+                    
                 totstart   = stop                  
                 type       = series.get('type','')
                 tvtitle    = series.get('name',''                           or chname)
@@ -346,20 +348,18 @@ class PlutoTV(object):
                     try:    vodlogo   = [image.get('url',[]) for image in vodimages if image.get('aspectRatio','') == '1:1'][0]
                     except: pass
 
-                chlogo     = (vodlogo or chlogo)
-                epposter   = (episode.get('poster',{}).get('path','')        or vodlogo   or vodposter or vodthumb  or tvthumb)
-                epthumb    = (episode.get('thumbnail',{}).get('path','')     or vodlogo   or vodthumb  or vodposter or tvthumb)
-                epfanart   = (episode.get('featuredImage',{}).get('path','') or vodfanart or tvfanart)
+                chlogo   = (vodlogo or chlogo)
+                epposter = (episode.get('poster',{}).get('path','')        or vodlogo   or vodposter or vodthumb  or tvthumb)
+                epthumb  = (episode.get('thumbnail',{}).get('path','')     or vodlogo   or vodthumb  or vodposter or tvthumb)
+                epfanart = (episode.get('featuredImage',{}).get('path','') or vodfanart or tvfanart)
                 
                 if type == 'series':
                     mtype   = 'tvshows'
                     label   = tvtitle
-                    tvtitle = tvtitle
                     epname  = ''
                     thumb   = tvthumb
                 elif type in ['tv','episode']:
                     mtype  = 'episodes'
-                    tvtitle = chname
                     epname  = epname
                     thumb  = epthumb
                     if epseason > 0 and epnumber > 0:
@@ -378,7 +378,6 @@ class PlutoTV(object):
                 
                 # elif type == 'series':
                     # mtype   = 'tvshow'
-                    # tvtitle = chname
                         # else: label  = '%s - %s'%(tvtitle, label)
                     # elif type != 'series': label = '%s - %s'%(chname,epname)
                     # else: label = epname
@@ -395,7 +394,10 @@ class PlutoTV(object):
                     elif type in ['tv','series']:
                         mtype = 'episodes'
                         thumb = epposter
-                        label = "%s : [B]%s - %s[/B]" % (label, tvtitle, epname)
+                        if label == tvtitle:
+                            label = "%s : [B]%s[/B]" % (label, epname)
+                        else:
+                            label = "%s : [B]%s - %s[/B]" % (label, tvtitle, epname)
                     elif len(epname) > 0: label = '%s: [B]%s - %s[/B]'%(label, title, epname)
                     epname = label
                     if type == 'music' or epgenre.lower() == 'music': mtype = 'musicvideo'
@@ -454,7 +456,7 @@ class PlutoTV(object):
        
     def browseOndemand(self, id=None, opt='ondemand'):
         log('browseOndemand, opt = %s'%(opt))
-        self.browseGuide(id, opt, data=self.getOndemand()['categories'])
+        self.browseGuide(id, opt, data=self.getOndemand().get('categories',[]))
         
        
     def getOndemand(self):

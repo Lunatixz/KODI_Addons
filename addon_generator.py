@@ -32,6 +32,7 @@ CHKPATH    = 'D:/GitHub/addon-check/'
 GITPATH    = 'D:/GitHub/KODI_Addons/'
 ZIPPATH    = os.path.join(GITPATH,'zips','')
 DELETE_EXT = ('.pyc', '.pyo', '.db')
+DELETE_FOLDERS = ['__pycache__','Corel Auto-Preserve']
 
 # Compatibility with 3.0, 3.1 and 3.2 not supporting u"" literals
 if sys.version < '3':
@@ -67,8 +68,9 @@ class Generator(object):
     def _clean_addons(self):
         for root, dirnames, filenames in os.walk(GITPATH):
             for dirname in dirnames:
-                if dirname == '__pycache__':
-		    try:
+                if dirname in DELETE_FOLDERS:
+                    try:
+                        print("found: " + dirname)
                         rmtree(os.path.join(root, dirname))
                         print("removing: " + dirname)
                     except: pass

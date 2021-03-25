@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.video.airytv" version="0.1.0" name="AiryTV" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.six" version="1.0.0"/>
+        <import addon="script.module.kodi-six" version="0.1.3.1"/>
+        <import addon="script.module.requests" version="2.7.0"/> 
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.routing" version="0.2.3"/>
+        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
+        <import addon="plugin.video.tubed" version="0.0.1"/>
+        <import addon="service.iptv.manager" version="0.2.2" optional="true"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.service" library="pseudotv_recommended.py"/>
+    <extension point="xbmc.addon.metadata">
+        <reuselanguageinvoker>true</reuselanguageinvoker>
+        <summary lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV.</summary>
+        <description lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp; Comedy. Stream Anime &amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you.</description>
+        <platform>all</platform>
+        <license>GPL-3.0-or-later</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.airytv</source>
+        <website>https://airy.tv/</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=361486&amp;pid=3023875</forum>
+        <news>v1.0.0[CR]- Matrix Support[CR]</news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.jpg</screenshot>
+            <screenshot>resources/images/screenshot02.jpg</screenshot>
+            <screenshot>resources/images/screenshot03.jpg</screenshot>
+            <screenshot>resources/images/screenshot04.jpg</screenshot>
+        </assets>
+    </extension>
+</addon>

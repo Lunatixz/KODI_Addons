@@ -391,15 +391,34 @@ class AIRYTV(object):
 
     
     def resolveYoutube(self, url, seek=0):
-        patterns = [r'(?P<video_id>[\w-]{11})',
-                    r'(?:http)*s*:*[/]{0,2}(?:w{3}\.|m\.)*youtu(?:\.be/|be\.com/'
-                    r'(?:embed/|watch/|v/|.*?[?&/]v=))(?P<video_id>[\w-]{11}).*']
+        log('resolveYoutube, url = %s, seek = %s'%(url,seek))
+        """Returns Video_ID extracting from the given url of Youtube
+        Examples of URLs:
+          Valid:
+            'http://youtu.be/_lOT2p_FCvA',
+            'www.youtube.com/watch?v=_lOT2p_FCvA&feature=feedu',
+            'http://www.youtube.com/embed/_lOT2p_FCvA',
+            'http://www.youtube.com/v/_lOT2p_FCvA?version=3&amp;hl=en_US',
+            'https://www.youtube.com/watch?v=rTHlyTphWP0&index=6&list=PLjeDyYvG6-40qawYNR4juzvSOg-ezZ2a6',
+            'youtube.com/watch?v=_lOT2p_FCvA',
+          Invalid:
+            'youtu.be/watch?v=_lOT2p_FCvA',
+        """
 
-        for pattern in patterns:
-            vid = re.search(pattern, url)
-            if vid:
-                match = vid.group('video_id')
-                return 'plugin://plugin.video.tubed/?mode=play&video_id={}&start_offset={}".format(match, float(seek))'
+        if url.startswith(('youtu', 'www')):
+            url = 'http://%s'%url
+        query = urllib.parse.urlparse(url)
+        if 'youtube' in query.hostname:
+            if query.path == '/watch':
+                match = urllib.parse.parse_qs(query.query)['v'][0]
+            elif query.path.startswith(('/embed/', '/v/')):
+                match = query.path.split('/')[2]
+        elif 'youtu.be' in query.hostname:
+            match = query.path[1:]
+        else:
+            match = None
+        if match:
+            return 'plugin://plugin.video.tubed/?mode=play&video_id={vid}&start_offset={offset}'.format(vid=match, offset=float(seek))
         return url
     
 
@@ -421,7 +440,10 @@ class AIRYTV(object):
         for url in urls:
             name = (broadcast.get('title'))
             liz  = xbmcgui.ListItem(name)
-            liz.setPath(self.resolveYoutube(url,broadcast.get('view_duration',0)))
+            if xbmcgui.Window(10000).getProperty('PseudoTVRunning') == "True":
+                liz.setPath(self.resolveYoutube(url))
+            else: #apply channel offset when not using PseudoTV
+                liz.setPath(self.resolveYoutube(url,broadcast.get('view_duration',0)))
             liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"duration":runtime,"plot":(broadcast.get('description',''))})
             liz.setArt({'thumb':ICON,'fanart':FANART,"icon":LOGO,"logo":LOGO,"clearart":LOGO})
             liz.setProperty("IsPlayable","true")

@@ -100,12 +100,16 @@ def playOD(id,epid):
     AIRYTV().playVOD(id,epid)
     
 @ROUTER.route('/play/pvr/<id>')
-def playChannel(id):
+def playPVR(id):
     AIRYTV().playLive(id,opt='pvr')
 
-@ROUTER.route('/play/live/<id>')
-def playChannel(id):
-    AIRYTV().playLive(id,opt='live')
+@ROUTER.route('/play/hls/<id>')
+def playLive(id):
+    AIRYTV().playLive(id,None,'live')
+    
+@ROUTER.route('/play/live/<id>/<epid>')
+def playVOD(id,epid):
+    AIRYTV().playLive(id,epid,'vod')
 
 @ROUTER.route('/iptv/channels')
 def iptv_channels():
@@ -245,7 +249,7 @@ class AIRYTV(object):
         for channel in self.getChannels():
             if id  and channel.get('id') != int(id): continue 
             if cat and channel.get('category') != cat: continue 
-            self.addDir(channel.get('name'), uri=(getLineup,channel.get('id')), infoArt={'thumb':LOGO_URL%(channel.get('name')),'fanart':FANART})
+            self.addDir('%s| %s'%(channel.get('number'),channel.get('name')), uri=(getLineup,channel.get('id')), infoArt={'thumb':LOGO_URL%(channel.get('name')),'fanart':FANART})
             
         
     def buildChannels(self, opt='live'):
@@ -327,8 +331,8 @@ class AIRYTV(object):
                 stream  = (part.get('source_url'))
                 start   = strpTime(part.get('start_at_iso'))
                 
-            if hls: uri=(playChannel,id)
-            else:   uri=(playOD,id,epid)
+            if hls: uri=(playLive,id)
+            else:   uri=(playVOD,id,epid)
                 
             if opt == 'iptv_broadcasts':
                 program = {"start"      :starttime.strftime(DTFORMAT),
@@ -341,7 +345,7 @@ class AIRYTV(object):
                            "image"      :FANART,
                            "date"       :starttime.strftime('%Y-%m-%d'),
                            "credits"    :"",
-                           "stream"     :"plugin://%s/play/vod/%s"%(ADDON_ID,epid)}
+                           "stream"     :"plugin://%s/play/vod/%s/%s"%(ADDON_ID,id,epid)}
                 programmes[id].append(program)
             
             elif opt in ['live','favorites','broadcast']:
@@ -360,7 +364,7 @@ class AIRYTV(object):
                 else: 
                     label  = '%s - %s'%(starttime.strftime('%I:%M %p').lstrip('0'),title)
                     uri    = list(uri)
-                    uri[1] = 'NEXT_SHOW'
+                    if hls: uri[1] = 'NEXT_SHOW'
                     uri    = tuple(uri)
                 self.addLink(label, uri, infoList={"favorite":favorite,"chnum":number,"chname":name,"mediatype":"video","label":label,"title":label}, infoArt={'thumb':LOGO_URL%(name),'fanart':FANART})
 
@@ -422,8 +426,8 @@ class AIRYTV(object):
         return url
     
 
-    def resolveURL(self, id, opt, epid=None ):
-        log('resolveURL, id = %s, opt = %s, epid = %s'%(id,opt,epid))
+    def resolveURL(self, id, epid=None, opt='live'):
+        log('resolveURL, id = %s, epid = %s, opt = %s'%(id,epid,opt))
         lizs = []
         urls = []
         if opt == 'live':
@@ -437,6 +441,7 @@ class AIRYTV(object):
             runtime = (broadcast.get('stream_duration',0))
             for part in  parts: urls.append(part.get('source_url'))
         if not urls: urls = [channel.get('source_url')]
+        print('channel',channel,'broadcast',broadcast)
         for url in urls:
             name = (broadcast.get('title'))
             liz  = xbmcgui.ListItem(name)
@@ -474,20 +479,19 @@ class AIRYTV(object):
 
     def playVOD(self, id, epid):
         log('playVOD, id = %s, epid = %s'%(id,epid))
-        liz = self.resolveURL(id,'vod',epid)
-        log('playVOD, url = %s'%(liz.getPath()))   
-        xbmcplugin.setResolvedUrl(ROUTER.handle, True, liz)
+        xbmcplugin.setResolvedUrl(ROUTER.handle, True, self.resolveURL(id,epid,'vod'))
         
         
-    def playLive(self, id, opt='live'):
-        log('playLive, id = %s, opt = %s'%(id,opt))
+    def playLive(self, id, epid=None, opt='live'):
+        log('playLive, id = %s, epid = %s, opt = %s'%(id,epid,opt))
+        #if opt == 'pvr', find epid.
         if id == 'NEXT_SHOW': 
             found = False
             liz   = xbmcgui.ListItem()
             notificationDialog(LANGUAGE(30029), time=4000)
         else:
             found = True
-            liz   = self.resolveURL(id, opt)
+            liz   = self.resolveURL(id,epid,opt)
             log('playLive, url = %s'%(liz.getPath()))  
         xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
 

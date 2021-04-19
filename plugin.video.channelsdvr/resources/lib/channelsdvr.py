@@ -58,13 +58,13 @@ PVR_SERVER    = '_channels_app._tcp' #todo bonjour
 REMOTE_URL    = 'http://my.channelsdvr.net'
 
 BASE_URL      = 'http://%s:%s'%(REAL_SETTINGS.getSetting('User_IP'),REAL_SETTINGS.getSetting('User_Port')) #todo dns discovery?
-
 BONJOUR_URL   = '%s/bonjour'%(BASE_URL)
 NAT_URL       = '%s/remote/nat'%(BASE_URL)
 DEV_URL       = '%s/devices'%(BASE_URL)
-M3U_URL       = '%s/devices/ANY/channels.m3u%s'%(BASE_URL,'?format=ts' if REAL_SETTINGS.getSettingBool('Enable_TS') else '')
+M3U_URL       = '%s/devices/ANY/channels.m3u{TS}'%(BASE_URL)
 GUIDE_URL     = '%s/devices/ANY/guide'%(BASE_URL)
-PLAY_URL      = '%s/devices/ANY/channels/{chid}/hls/stream.m3u8'%(BASE_URL)
+PLAY_URL      = '%s/devices/ANY/channels/{chid}/hls/stream.m3u8{CODEC}'%(BASE_URL)
+PLAY_MPG      = '%s/devices/ANY/channels/{chid}/stream.mpg{TS}'%(BASE_URL)
 
 DVR_URL       = '%s/dvr'%(BASE_URL)
 RECORDING_URL = '%s/dvr/files?all=true'%(BASE_URL)
@@ -170,28 +170,32 @@ def iptv_epg():
     port = int(ROUTER.args.get('port')[0])
     IPTVManager(port,Channels()).send_epg()
     
-class Channels(object):
+class Channels(object):    
     def __init__(self, sysARG=sys.argv):
         log('__init__, sysARG = %s'%(sysARG))
-        self.sysARG     = sysARG
-        self.cache      = SimpleCache()
+        self.sysARG = sysARG
+        self.cache  = SimpleCache()
         
         
-    def openURL(self, url, life=datetime.timedelta(minutes=15)):
-        log('openURL, url = %s'%(url))
+    def openURL(self, url, life=datetime.timedelta(minutes=15),serialized=True):
         try:
-            cacheName = '%s.%s.openURL.%s'%(ADDON_ID,ADDON_VERSION,url)
-            cacheResponse = self.cache.get(cacheName)
+            if url == M3U_URL: 
+                serialized = False
+                val = '?format=ts' if REAL_SETTINGS.getSettingBool('Enable_TS') else ''
+                url = M3U_URL.format(TS=val)
+            log('openURL, url = %s'%(url))
+            
+            cacheName  = '%s.openURL.%s'%(ADDON_ID,url)
+            cacheResponse = self.cache.get(cacheName, checksum=ADDON_VERSION, json_data=serialized)
             if not cacheResponse:
                 req = requests.get(url, timeout=TIMEOUT)
-                if url == M3U_URL: 
+                if url.startswith(M3U_URL): 
                     cacheResponse = req.text
                 else:
                     cacheResponse = req.json()
                 req.close()
-                self.cache.set(cacheName, json.dumps(cacheResponse), checksum=len(json.dumps(cacheResponse)), expiration=life)
-                return cacheResponse
-            else: return json.loads(cacheResponse)
+                self.cache.set(cacheName, cacheResponse, checksum=ADDON_VERSION, expiration=life, json_data=serialized)
+            return cacheResponse
         except Exception as e: 
             log("openURL, Failed! %s"%(e), xbmc.LOGERROR)
             notificationDialog(LANGUAGE(30001))
@@ -239,11 +243,19 @@ class Channels(object):
                               'url'   :groups.group(6)})
         return sorted(items, key=lambda k: k['number'])
         
-        
     def getChannels(self):
-        log('getChannels') #todo rewrite to remove parse and dict() rebuild? no longer needed since we moved away from m3u parsing.
+        #todo rewrite to remove parse and dict() rebuild? no longer needed since we moved away from m3u parsing.
         items    = []
         channels = self.openURL(CHANNELS_URL)
+        
+        if REAL_SETTINGS.getSettingBool('Enable_TS'):
+            playURL = PLAY_MPG
+        else: 
+            playURL = PLAY_URL
+        TS_VAL = '?format=ts'   if REAL_SETTINGS.getSettingBool('Enable_TS')            else ''
+        CO_VAL = '?vcodec=copy' if not REAL_SETTINGS.getSettingBool('Enable_Timeshift') else ''
+        log('getChannels, playURL = %s, TS_VAL = %s, CO_VAL = %s'%(playURL,TS_VAL,CO_VAL))
+        
         for key in channels.keys():
             channel = channels[key]
             if channel.get('Hidden',False): continue
@@ -253,7 +265,7 @@ class Channels(object):
                           'groups'  :[],
                           'Favorite':channel.get('Favorite'),
                           'title'   :channel.get('Name'),
-                          'url'     :PLAY_URL.format(chid=channel.get('Number'))})
+                          'url'     :playURL.format(chid=channel.get('Number'),TS=TS_VAL,CODEC=CO_VAL)})
         return sorted(items, key=lambda k: k['number'])
 
 
@@ -361,19 +373,19 @@ class Channels(object):
         else:
             found = True
             liz   = self.resolveURL(id, opt)
-            if 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
+            url   = liz.getPath()
+            log('playLive, url = %s'%(url))
+            if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
                 if REAL_SETTINGS.getSettingBool('Enable_Timeshift'):
                     log('playLive, timeshift enabled')
-                    # liz.setProperty('inputstream','inputstream.ffmpegdirect')
-                    # liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
+                    liz.setProperty('inputstream','inputstream.ffmpegdirect')
+                    liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
                 else:
                     liz.setProperty('inputstream','inputstream.adaptive')
-                    liz.setMimeType('application/xml+dash')
-                    liz.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-                    # liz.setProperty('inputstream.adaptive.manifest_type', 'hls')
-            # if REAL_SETTINGS.getSettingBool('Enable_TS'): 
-                # log('playLive, TS-MPEG enabled')
-                # liz.setProperty('inputstream.adaptive.mime_type','video/mp2t')
+                    liz.setProperty('inputstream.adaptive.manifest_type','hls')
+            elif url.endswith('?format=ts'): 
+                log('playLive, TS-MPEG enabled')
+                liz.setProperty('inputstream.adaptive.mime_type','vnd.apple.mpegurl')
         xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
 
    

@@ -32,24 +32,24 @@ def notificationDialog(message, header=ADDON_NAME, sound=False, time=1000, icon=
     try:    return xbmcgui.Dialog().notification(header, message, icon, time, sound)
     except: return xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
 
-def getFavorites():
-    return json.loads((REAL_SETTINGS.getSetting('favorites') or '{"favorites":[]}')).get('favorites',[])
+def getFavorites(dma):
+    return json.loads((REAL_SETTINGS.getSetting('favorites.%s'%(dma)) or '{"favorites":[]}')).get('favorites',[])
      
-def isFavorite(chnumber):
-    return str(chnumber) in getFavorites()
+def isFavorite(dma,chnumber):
+    return str(chnumber) in getFavorites(dma)
      
-def addFavorite(chname, chnumber, silent=False):
-    favorites = getFavorites()
+def addFavorite(dma, chname, chnumber, silent=False):
+    favorites = getFavorites(dma)
     if chnumber not in favorites:
         favorites.append(chnumber)
-        REAL_SETTINGS.setSetting('favorites',json.dumps({"favorites":favorites}))
+        REAL_SETTINGS.setSetting('favorites.%s'%(dma),json.dumps({"favorites":favorites}))
         if not silent: notificationDialog(LANGUAGE(49007)%(chname))
     
-def delFavorite(chname, chnumber):
-    favorites = getFavorites()
+def delFavorite(dma, chname, chnumber):
+    favorites = getFavorites(dma)
     if chnumber in favorites:
         favorites.pop(favorites.index(chnumber))
-        REAL_SETTINGS.setSetting('favorites',json.dumps({"favorites":favorites}))
+        REAL_SETTINGS.setSetting('favorites.%s'%(dma),json.dumps({"favorites":favorites}))
         notificationDialog(LANGUAGE(49008)%(chname))
   
 class Favorites:    
@@ -61,8 +61,9 @@ class Favorites:
         mode   = (params.get("mode",'')     or None)
         chname = (params.get("chname",'')   or '')
         chnum  = (params.get("chnum",'')    or '-1')
+        dma    = (params.get("dma",'')      or '0')
         if mode == None : return 
-        if mode == 'add': addFavorite(chname,chnum)
-        if mode == 'del': delFavorite(chname,chnum)
+        if mode == 'add': addFavorite(dma,chname,chnum)
+        if mode == 'del': delFavorite(dma,chname,chnum)
         
 if __name__ == '__main__': Favorites(sys.argv).run()

@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
 	<category label="30044">
-    <setting id="Enable_Debugging"  type="bool"      label="30000" default="false" />
     <setting id="User_Email"        type="text"      label="30006" default="" />
     <setting id="User_Password"     type="text"      label="30007" default=""  option="hidden"/>
     <setting id="User_Token"        type="text"      label="30002" default=""  visible="false"/>
+    <setting id="Enable_Debugging"  type="bool"      label="30000" default="false" />
     <setting id=""                  type="lsep"      label="30024" default="" />
-    <setting id="User_City"         type="text"      label="30020" default="Unknown"  enable="false" />
+    <setting id="User_City"         type="text"      label="30020" default="Unknown"  enable="false"                                                 visible="eq(-2,false)"/>
+    <setting id="User_City"         type="action"    label="30020" default="Unknown"  enable="!String.Contains(Window.Property(User_City),Unknown)"  visible="eq(-3,true)" action="RunScript($CWD/region.py)" option="close" />
     <setting id="User_LastLogin"    type="text"      label="30022" default="Unknown"  enable="false" />
     <setting id="User_Donate"       type="text"      label="30019" default="Unknown"  enable="false" />
     <setting id="User_DonateExpire" type="text"      label="30023" default="Unknown"  enable="false" />
+    <setting id="User_DMA"          type="text"      label="30023" default="0"        enable="false" visible="false"/>
   </category>
   <category label="49000">
     <setting label="49001"          type="action" action="InstallAddon(plugin.video.pseudotv.live)" option="close" visible="!System.HasAddon(plugin.video.pseudotv.live)"/>

@@ -18,14 +18,14 @@
 
 # -*- coding: utf-8 -*-
 import os, sys, time, datetime, _strptime, re, routing
-import random, string, traceback
-import socket, json, inputstreamhelper, requests
+import random, string, traceback, tzlocal, pytz
+import json, inputstreamhelper, requests
 
-from six.moves     import urllib
-from simplecache   import SimpleCache, use_cache
-from itertools     import repeat, cycle, chain, zip_longest
-from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
-from favorites     import *
+from six.moves                import urllib
+from simplecache              import SimpleCache, use_cache
+from itertools                import repeat, cycle, chain, zip_longest
+from kodi_six                 import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
+from favorites                import *
 
 try:
     from multiprocessing      import cpu_count
@@ -57,10 +57,12 @@ DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 BASE_URL      = 'https://www.locast.org'
 BASE_API      = 'https://api.locastnet.org/api'
 GEO_URL       = 'http://ip-api.com/json'
+GEO_URL_2     = 'https://api.bigdatacloud.net/data/reverse-geocode-client'
+GEO_JSON      = 'https://geocode.xyz/{city},US?json=1'
+TZ_API        = 'https://timezonedb.com/ajax.get-time-zone?coordinate={lat}%2C{lon}'
 CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
 DTFORMAT      = '%Y-%m-%dT%H:%M:%S' #'YYYY-MM-DDTHH:MM:SS'
-UTC_OFFSET    = datetime.datetime.utcnow() - datetime.datetime.now()
 
 @ROUTER.route('/')
 def buildMenu():
@@ -131,24 +133,24 @@ def okDisable(msg):
 def yesnoDialog(message, heading=ADDON_NAME, yeslabel='', nolabel='', autoclose=0):
     return xbmcgui.Dialog().yesno(heading, message, nolabel, yeslabel, autoclose)
     
-def notificationDialog(message, header=ADDON_NAME, sound=False, time=1000, icon=ICON):
+def notificationDialog(message, header=ADDON_NAME, sound=False, time=4000, icon=ICON):
     try:    return xbmcgui.Dialog().notification(header, message, icon, time, sound)
     except: return xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
-
+             
 class Locast(object):
     def __init__(self, sysARG=sys.argv):
         log('__init__, sysARG = %s'%(sysARG))
         self.sysARG        = sysARG
         self.cache         = SimpleCache()
-        self.token         = (REAL_SETTINGS.getSetting('User_Token') or None)
-        self.lastDMA       = 0
-        self.now           = datetime.datetime.now()
-        self.lat, self.lon = self.setRegion()
+        self.token         = (REAL_SETTINGS.getSetting('User_Token')  or None)
+        self.dma           = int(REAL_SETTINGS.getSetting('User_DMA') or '0')
+        self.lat, self.lon, self.zone = self.setRegion()
+        
         if self.login(REAL_SETTINGS.getSetting('User_Email'), REAL_SETTINGS.getSetting('User_Password')) == False: 
             sys.exit()
         else:
-            self.city = self.getRegion()
-
+            self.city, self.now = self.getRegion()
+            
 
     def reset(self):
         self.__init__()
@@ -164,6 +166,8 @@ class Locast(object):
     def getStations(self, city, name='', opt=''):
         log("getStations, city = %s, opt = %s, name = %s"%(city,opt,name))
         stations = self.getEPG(city)
+        if not isinstance(stations,list):
+            return notificationDialog(LANGUAGE(30017))
         for station in stations:
             if station['active'] == False: continue
             path     = str(station['id'])
@@ -176,7 +180,7 @@ class Locast(object):
             if stnum:
                 stname    = re.compile('[^a-zA-Z]').sub('', label)
                 stlabel   = '%s| %s'%(stnum,stname)
-                favorite  = isFavorite(stnum)
+                favorite  = isFavorite(self.dma,stnum)
             else: stlabel = label
             if opt in ['live','favorites']:
                 self.buildListings(listings, label, thumb, path, opt)
@@ -193,12 +197,16 @@ class Locast(object):
                 self.addDir(label, (getLineup, city,urllib.parse.quote(label)), infoList={"favorite":favorite,"chnum":stnum,"chname":stname,"mediatype":"video","label":label,"title":label}, infoArt={"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":ICON,"logo":ICON})
             else: continue  
 
+
+    def getDateTime(self,timestamp):
+        return datetime.datetime.fromtimestamp(timestamp, tz=pytz.timezone(self.zone))
+        
         
     def buildListings(self, listings, chname, chlogo, path, opt=''):
         log('buildListings, chname = %s, opt = %s'%(chname,opt))
-        now = datetime.datetime.now()
+        now = self.now
         for listing in listings:
-            try: starttime  = datetime.datetime.fromtimestamp(int(str(listing['startTime'])[:-3]))
+            try: starttime  = self.getDateTime(int(str(listing['startTime'])[:-3]))
             except: continue
             duration   = listing.get('duration',0)
             endtime    = starttime + datetime.timedelta(seconds=duration)
@@ -206,7 +214,7 @@ class Locast(object):
             favorite   = None
             chnum      = -1            
             # if listing['isNew']: label = '*%s'%label
-            try: aired = datetime.datetime.fromtimestamp(int(str(listing['airdate'])[:-3]))
+            try: aired = self.getDateTime(int(str(listing['airdate'])[:-3]))
             except: aired = starttime
             try: type  = {'Series':'episode'}[listing.get('showType','Series')]
             except: type = 'video'
@@ -215,7 +223,7 @@ class Locast(object):
             elif opt in ['live','favorites','play']: 
                 chnum  = re.sub('[^\d\.]+','', chname)
                 if chnum:
-                    favorite = isFavorite(chnum)
+                    favorite = isFavorite(self.dma,chnum)
                     chname   = re.compile('[^a-zA-Z]').sub('', chname)
                     chname   = '%s| %s'%(chnum,chname)
                     label    = '%s : [B] %s[/B]'%(chname, label)
@@ -254,25 +262,92 @@ class Locast(object):
                 self.addLink(label, (playChannel,path), infoLabels, infoArt, infoVideo, infoAudio, total=len(listings))
 
 
+    @use_cache(1)
+    def getREG(self,url):
+        log('getREG, url = %s'%(url))
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'})
+            return json.load(urllib.request.urlopen(req))
+        except Exception as e: 
+            log("getREG, %s, Failed! %s"%(url, e), xbmc.LOGERROR)
+            return {}
+        
+        
+    @use_cache(28)
+    def getGEO(self,url):
+        log('getGEO, url = %s'%(url))
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'})
+            return json.load(urllib.request.urlopen(req))
+        except Exception as e: 
+            log("getGEO, %s, Failed! %s"%(url, e), xbmc.LOGERROR)
+            return {}
+        
+        
+    @use_cache(28)
+    def getTZ(self,url):
+        log('getTZ, url = %s'%(url))
+        try:
+            match = re.compile('Zone Name</td>(.*?)<td>(.*?)\</td>',re.IGNORECASE).search(str(urllib.request.urlopen(url).read()))
+            return match.group(2)
+        except Exception as e:
+            log("getTZ, %s, Failed! %s"%(url, e), xbmc.LOGERROR)
+            notificationDialog(LANGUAGE(49014))
+            return None
+
+
+    def getGEOdata(self):
+        log('getGEOdata')
+        geo_data = {'lat':0.0,'lon':0.0}
+        for url in [GEO_URL,GEO_URL_2]:
+            response = self.getREG(url)
+            if   'lat'      in response: geo_data = {'lat':self.formatGEO(response.get('lat','0.0')),'lon':self.formatGEO(response.get('lon','0.0'))}
+            elif 'latitude' in response: geo_data = {'lat':self.formatGEO(response.get('latitude','0.0')),'lon':self.formatGEO(response.get('longitude','0.0'))}
+            if geo_data.get('lat') != 0.0: return geo_data
+        
+                
+    def formatGEO(self, loc):
+        return float('{0:.7f}'.format(float(loc)))
+
+
     def setRegion(self):
+        log('setRegion, dma = %s'%(self.dma))
         try: 
-            geo_data = json.load(urllib.request.urlopen(GEO_URL))
+            geo_tz   = tzlocal.get_localzone().zone
+            geo_data = self.getGEOdata()
+            
+            if geo_data.get('lat') == 0.0: 
+                okDialog(LANGUAGE(30025)%('%s\n%s'%(GEO_URL,GEO_URL_2)))
+                raise Exception(LANGUAGE(30025)%('%s\n%s'%(GEO_URL,GEO_URL_2)))
+                
+            elif DEBUG and self.dma > 0:
+                try:
+                    if not self.getURL(BASE_API + '/watch/dma/%s/%s'%(geo_data['lat'],geo_data['lon']),header=self.buildHeader()).get('DMA'):
+                        raise Exception(LANGUAGE(30013))
+                    response = self.getGEO(GEO_JSON.format(city=urllib.parse.quote(REAL_SETTINGS.getSetting('User_City'))))
+                    reg_data = {'lat':self.formatGEO(response.get('latt','0.0')),'lon':self.formatGEO(response.get('longt','0.0'))}
+                    geo_tz   = (self.getTZ(TZ_API.format(lat=reg_data.get('lat'),lon=reg_data.get('lon'))) or geo_tz)
+                    geo_data = reg_data
+                except:
+                    self.dma = 0
+                    
+            log('setRegion, geo_data = %s, geo_tz = %s'%(geo_data,geo_tz))
         except: 
             geo_data = {'lat':0.0,'lon':0.0}
-            okDialog(LANGUAGE(30025)%(GEO_URL))
-        return float('{0:.7f}'.format(geo_data['lat'])), float('{0:.7f}'.format(geo_data['lon']))
+        return geo_data['lat'],geo_data['lon'],geo_tz
 
 
     def getURL(self, url, param={}, header={'Content-Type':'application/json'}, life=datetime.timedelta(minutes=5)):
         log('getURL, url = %s, header = %s'%(url, header))
-        cacheresponse = self.cache.get(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header))
+        cachename     = '%s.getURL.url.%s.%s.%s'%(ADDON_NAME,url,param,header)
+        cacheresponse = self.cache.get(cachename)
         if not cacheresponse:
             try:
                 req = requests.get(url, param, headers=header)
                 try: cacheresponse = req.json()
                 except: return {}
                 req.close()
-                self.cache.set(ADDON_NAME + '.getURL, url = %s.%s.%s'%(url,param,header), json.dumps(cacheresponse), expiration=life)
+                self.cache.set(cachename, json.dumps(cacheresponse), expiration=life)
                 return cacheresponse
             except Exception as e: 
                 log("getURL, Failed! %s"%(e), xbmc.LOGERROR)
@@ -283,8 +358,8 @@ class Locast(object):
 
     def postURL(self, url, param={}, header={'Content-Type':'application/json'}, life=datetime.timedelta(minutes=5)):
         log('postURL, url = %s, header = %s'%(url, header))
-        cacheresponse = self.cache.get(ADDON_NAME + '.postURL, url = %s.%s.%s'%(url,param,header))
-        cacheresponse = None
+        cachename     = '%s.postURL.url.%s.%s.%s'%(ADDON_NAME,url,param,header)
+        cacheresponse = self.cache.get(cachename)
         if not cacheresponse:
             try:
                 req = requests.post(url, param, headers=header)
@@ -333,10 +408,10 @@ class Locast(object):
                     try:
                         REAL_SETTINGS.setSetting('User_Donate',str(self.userdata.get('didDonate','False')))
                         REAL_SETTINGS.setSetting('User_totalDonations',str(self.userdata.get('totalDonations','0')))
-                        REAL_SETTINGS.setSetting('User_LastLogin',datetime.datetime.fromtimestamp(float(str(self.userdata.get('lastlogin','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
-                        REAL_SETTINGS.setSetting('User_DonateExpire',datetime.datetime.fromtimestamp(float(str(self.userdata.get('donationExpire','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
+                        REAL_SETTINGS.setSetting('User_LastLogin',self.getDateTime(float(str(self.userdata.get('lastlogin','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
+                        REAL_SETTINGS.setSetting('User_DonateExpire',self.getDateTime(float(str(self.userdata.get('donationExpire','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
                     except: pass
-                    self.lastDMA = self.userdata.get('lastDmaUsed','')
+                    if self.dma == 0: self.dma = self.userdata.get('lastDmaUsed','')
                     notificationDialog(LANGUAGE(30021)%(self.userdata.get('name','')))
                     return True
             elif data.get('message'): notificationDialog(data.get('message'))
@@ -362,7 +437,7 @@ class Locast(object):
         log("getEPG, city = %s"%city)
         '''[{"id":104,"dma":501,"name":"WCBSDT (WCBS-DT)","callSign":"WCBS","logoUrl":"https://fans.tmsimg.com/h5/NowShowing/28711/s28711_h5_aa.png","active":true,"affiliate":"CBS","affiliateName":"CBS",
              "listings":[{"stationId":104,"startTime":1535410800000,"duration":1800,"isNew":true,"audioProperties":"CC, HD 1080i, HDTV, New, Stereo","videoProperties":"CC, HD 1080i, HDTV, New, Stereo","programId":"EP000191906491","title":"Inside Edition","description":"Primary stories and alternative news.","entityType":"Episode","airdate":1535328000000,"genres":"Newsmagazine","showType":"Series"}]}'''
-        now = ('{0:.23s}{1:s}'.format(datetime.datetime.now().strftime('%Y-%m-%dT00:00:00'),'-05:00'))
+        now = ('{0:.23s}{1:s}'.format(self.now.strftime('%Y-%m-%dT00:00:00'),'-05:00'))
         return self.getURL(BASE_API + '/watch/epg/%s'%(city), param={'start_time':urllib.parse.quote(now)}, header=self.buildHeader(), life=datetime.timedelta(minutes=45))
         
         
@@ -375,17 +450,25 @@ class Locast(object):
         '''{u'active': True, u'DMA': u'501', u'small_url': u'https://s3.us-east-2.amazonaws.com/static.locastnet.org/cities/new-york.jpg', u'large_url': u'https://s3.us-east-2.amazonaws.com/static.locastnet.org/cities/background/new-york.jpg', u'name': u'New York'}'''
         try:
             city = self.getURL(BASE_API + '/watch/dma/%s/%s'%(self.lat,self.lon),header=self.buildHeader())
-            if city and 'DMA' not in city: okDisable(city.get('message'))
+            if city and 'DMA' not in city: 
+                xbmcgui.Window(10000).setProperty('User_City','Unknown')
+                okDisable(city.get('message'))
             else:
                 REAL_SETTINGS.setSetting('User_City',str(city['name']))
+                xbmcgui.Window(10000).setProperty('User_City',str(city['name']))
                 return city
+                
         except: okDisable(LANGUAGE(30013))
+
+
+    def getTime(self):
+        return datetime.datetime.now(pytz.timezone(self.zone))#.astimezone(pytz.utc)
 
 
     def getRegion(self):
         log("getRegion")
-        try: return self.getCity()['DMA']
-        except: return self.lastDMA if self.lastDMA > 0 else sys.exit()
+        try:    return self.getCity()['DMA'],self.getTime()
+        except: return self.dma if self.dma > 0 else sys.exit()
 
 
     def poolList(self, method, items=None, args=None, chunk=25):
@@ -427,7 +510,7 @@ class Locast(object):
         label    = (station.get('affiliateName','') or station.get('affiliate','') or station.get('callSign','') or station.get('name',''))
         stnum    = re.sub('[^\d\.]+','', label)
         stname   = re.compile('[^a-zA-Z]').sub('', label)
-        favorite = isFavorite(stnum)
+        favorite = isFavorite(self.dma,stnum)
         channel  = {"name"     :stname,
                     "stream"   :"plugin://%s/play/pvr/%s"%(ADDON_ID,station['id']), 
                     "id"       :"%s.%s@%s"%(stnum,slugify(stname),slugify(ADDON_NAME)), 
@@ -446,21 +529,24 @@ class Locast(object):
             programmes = {channel['id']:[]}
             listings   = station.get('listings',[])
             for listing in listings:
-                try: starttime  = datetime.datetime.fromtimestamp(int(str(listing['startTime'])[:-3])) + UTC_OFFSET
+                try: starttime  = self.getDateTime(int(str(listing['startTime'])[:-3]))
                 except: continue
-                try:    aired = datetime.datetime.fromtimestamp(int(str(listing['airdate'])[:-3]))
+                try:    aired = self.getDateTime(int(str(listing['airdate'])[:-3]))
                 except: aired = starttime
                 program = {"start"      :starttime.strftime(DTFORMAT),
                            "stop"       :(starttime + datetime.timedelta(seconds=listing.get('duration',0))).strftime(DTFORMAT),
                            "title"      :listing.get('title',channel['name']),
                            "description":(listing.get('description','') or listing.get('shortDescription','') or xbmc.getLocalizedString(161)),
                            "subtitle"   :listing.get('episodeTitle',''),
-                           "episode"    :"S%sE%s"%(str(listing.get('seasonNumber',0)).zfill(2),str(listing.get('episodeNumber',0)).zfill(2)),
                            "genre"      :listing.get('genres',""),
                            "image"      :(listing.get('preferredImage','') or channel['logo']),
                            "date"       :aired.strftime('%Y-%m-%d'),
                            "credits"    :"",
                            "stream"     :""}
+                           
+                if listing.get('seasonNumber',0) > 0 and listing.get('episodeNumber',0) > 0:
+                    program["episode"] = "S%sE%s"%(str(listing.get('seasonNumber',0)).zfill(2),str(listing.get('episodeNumber',0)).zfill(2))
+                    
                 programmes[channel['id']].append(program)
             return programmes
                        
@@ -489,13 +575,13 @@ class Locast(object):
         if id == 'NEXT_SHOW': 
             found = False
             liz   = xbmcgui.ListItem(LANGUAGE(30029))
-            notificationDialog(LANGUAGE(30029), time=4000)
+            notificationDialog(LANGUAGE(30029))
         else:            
             found = True
             liz   = self.resolveURL(id,opt)
-            if opt != 'pvr' and 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
-                liz.setProperty('inputstream','inputstream.adaptive')
-                liz.setProperty('inputstream.adaptive.manifest_type','hls')
+            # if opt != 'pvr' and 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
+                # liz.setProperty('inputstream','inputstream.adaptive')
+                # liz.setProperty('inputstream.adaptive.manifest_type','hls')
                 # liz.setProperty('inputstream.adaptive.media_renewal_url', 'plugin://%s/play/%s/%s'%(ADDON_ID,opt,id))
                 # liz.setProperty('inputstream.adaptive.media_renewal_time', '900')
                 #todo debug pvr (IPTV Simple) not playing with inputstream! temp. use kodiprops in m3u?
@@ -546,9 +632,9 @@ class Locast(object):
     def addContextMenu(self, liz, infoList={}):
         log('addContextMenu')
         if infoList['favorite']:
-            liz.addContextMenuItems([(LANGUAGE(49010), 'RunScript(special://home/addons/%s/favorites.py, %s)'%(ADDON_ID,urllib.parse.quote(json.dumps({"chnum":infoList.pop('chnum'),"chname":infoList.pop('chname'),"mode":"del"}))))])
+            liz.addContextMenuItems([(LANGUAGE(49010), 'RunScript(special://home/addons/%s/favorites.py, %s)'%(ADDON_ID,urllib.parse.quote(json.dumps({"dma":self.dma,"chnum":infoList.pop('chnum'),"chname":infoList.pop('chname'),"mode":"del"}))))])
         else:
-            liz.addContextMenuItems([(LANGUAGE(49009), 'RunScript(special://home/addons/%s/favorites.py, %s)'%(ADDON_ID,urllib.parse.quote(json.dumps({"chnum":infoList.pop('chnum'),"chname":infoList.pop('chname'),"mode":"add"}))))])
+            liz.addContextMenuItems([(LANGUAGE(49009), 'RunScript(special://home/addons/%s/favorites.py, %s)'%(ADDON_ID,urllib.parse.quote(json.dumps({"dma":self.dma,"chnum":infoList.pop('chnum'),"chname":infoList.pop('chname'),"mode":"add"}))))])
         return liz
         
         

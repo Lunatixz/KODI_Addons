@@ -187,3 +187,11 @@ msgstr ""
 msgctxt "#49012"
 msgid "Favorites"
 msgstr ""
+
+msgctxt "#49013"
+msgid "Select Region"
+msgstr ""
+
+msgctxt "#49014"
+msgid "Too many region changes detected!! You have exceed your daily usage. Restoring default region..."
+msgstr ""

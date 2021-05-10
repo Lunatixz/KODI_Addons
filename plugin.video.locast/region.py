@@ -98,10 +98,11 @@ class Region(object):
                 listitem = xbmcgui.ListItem(k.get('name'),path=str(k.get('id')))
                 listitem.setArt({'thumb':k.get('imageLargeUrl')})
                 yield listitem
+                
         listItems = list(getListItem())
-        pselect = ([idx for idx, dma in enumerate(listItems) if dma.getPath() == REAL_SETTINGS.getSetting('User_DMA')] or [-1])[0]
+        pselect = ([idx for idx, dma in enumerate(listItems) if dma.getPath() == (REAL_SETTINGS.getSetting('User_Select_DMA') or REAL_SETTINGS.getSetting('User_DMA'))] or [-1])[0]
         select  = selectDialog(listItems,header='%s %s'%(ADDON_NAME,LANGUAGE(49013)),preselect=pselect)
-        REAL_SETTINGS.setSetting('User_City',listItems[select].getLabel())
-        REAL_SETTINGS.setSetting('User_DMA',listItems[select].getPath())
+        REAL_SETTINGS.setSetting('User_Select_DMA' ,listItems[select].getPath())
+        REAL_SETTINGS.setSetting('User_Select_City',listItems[select].getLabel())
         REAL_SETTINGS.openSettings()
 if __name__ == '__main__': Region(sys.argv).listRegions()

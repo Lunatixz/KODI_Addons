@@ -40,6 +40,7 @@ def slugify(text):
 
 def regPseudoTV():
     while not MONITOR.abortRequested():
+        WAIT_TIME = 300
         if (xbmc.getCondVisibility('System.HasAddon(service.iptv.manager)') and xbmc.getCondVisibility('System.HasAddon(plugin.video.pseudotv.live)')):
             if REAL_SETTINGS.getSettingBool('iptv.enabled'):
                 try:
@@ -48,16 +49,15 @@ def regPseudoTV():
                     IPTV_PATH    = IPTV_MANAGER.getAddonInfo('profile')
                     IPTV_M3U     = os.path.join(IPTV_PATH,'playlist.m3u8')
                     IPTV_XMLTV   = os.path.join(IPTV_PATH,'epg.xml')
+            
+                    asset = {'iptv':{'type':'iptv','name':ADDON_NAME,'icon':ICON.replace(ADDON_PATH,'special://home/addons/%s/'%(ADDON_ID)).replace('\\','/'),'m3u':{'path':IPTV_M3U,'slug':'@%s'%(slugify(ADDON_NAME))},'xmltv':{'path':IPTV_XMLTV},'id':ADDON_ID}}
+                    xbmcgui.Window(10000).setProperty(PROP_KEY, json.dumps(asset))
+                    WAIT_TIME = 900
                 except Exception as e:
                     xbmc.log('%s-%s-regPseudoTV failed! %s'%(ADDON_ID,ADDON_VERSION,e),xbmc.LOGERROR)
                     break
-            
-                asset = {'iptv':{'type':'iptv','name':ADDON_NAME,'icon':ICON.replace(ADDON_PATH,'special://home/addons/%s/'%(ADDON_ID)).replace('\\','/'),'m3u':{'path':IPTV_M3U,'slug':'@%s'%(slugify(ADDON_NAME))},'xmltv':{'path':IPTV_XMLTV},'id':ADDON_ID}}
-                xbmcgui.Window(10000).setProperty(PROP_KEY, json.dumps(asset))
-                WAIT_TIME = 900
             else:
                 xbmcgui.Window(10000).clearProperty(PROP_KEY)
-                WAIT_TIME = 300
         if MONITOR.waitForAbort(WAIT_TIME): break
         
 if __name__ == '__main__': regPseudoTV()

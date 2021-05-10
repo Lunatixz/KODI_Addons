@@ -136,30 +136,34 @@ def yesnoDialog(message, heading=ADDON_NAME, yeslabel='', nolabel='', autoclose=
 def notificationDialog(message, header=ADDON_NAME, sound=False, time=4000, icon=ICON):
     try:    return xbmcgui.Dialog().notification(header, message, icon, time, sound)
     except: return xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
-             
+
+def getLastDMA():
+    return int(REAL_SETTINGS.getSetting('User_LastDMA') or '0')
+
 class Locast(object):
-    def __init__(self, sysARG=sys.argv):
+    def __init__(self, sysARG=sys.argv, dma=getLastDMA()):
         log('__init__, sysARG = %s'%(sysARG))
         self.sysARG        = sysARG
         self.cache         = SimpleCache()
         self.token         = (REAL_SETTINGS.getSetting('User_Token')  or None)
-        self.dma           = int(REAL_SETTINGS.getSetting('User_DMA') or '0')
-        self.lat, self.lon, self.zone = self.setRegion()
         
-        if self.login(REAL_SETTINGS.getSetting('User_Email'), REAL_SETTINGS.getSetting('User_Password')) == False: 
+        if not self.login(): 
             sys.exit()
         else:
-            self.city, self.now = self.getRegion()
+            self.lat, self.lon, self.zone, self.dma, self.now = self.getRegion()
             
+        if self.dma != getLastDMA(): 
+            REAL_SETTINGS.setSetting('User_LastDMA',str(self.dma))
+        
 
     def reset(self):
         self.__init__()
         
            
     def buildMenu(self):
-        MAIN_MENU = [(LANGUAGE(30003),(getLive    ,self.city)),
-                     (LANGUAGE(49011),(getLiveFavs,self.city)),
-                     (LANGUAGE(30004),(getChannels,self.city))]
+        MAIN_MENU = [(LANGUAGE(30003),(getLive    ,self.dma)),
+                     (LANGUAGE(49011),(getLiveFavs,self.dma)),
+                     (LANGUAGE(30004),(getChannels,self.dma))]
         for item in MAIN_MENU: self.addDir(*item)
             
 
@@ -198,7 +202,7 @@ class Locast(object):
             else: continue  
 
 
-    def getDateTime(self,timestamp):
+    def getDateTime(self, timestamp):
         return datetime.datetime.fromtimestamp(timestamp, tz=pytz.timezone(self.zone))
         
         
@@ -263,7 +267,7 @@ class Locast(object):
 
 
     @use_cache(1)
-    def getREG(self,url):
+    def getREG(self, url):
         log('getREG, url = %s'%(url))
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'})
@@ -274,7 +278,7 @@ class Locast(object):
         
         
     @use_cache(28)
-    def getGEO(self,url):
+    def getGEO(self, url):
         log('getGEO, url = %s'%(url))
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'})
@@ -296,8 +300,8 @@ class Locast(object):
             return None
 
 
-    def getGEOdata(self):
-        log('getGEOdata')
+    def getIPGEO(self):
+        log('getIPGEO')
         geo_data = {'lat':0.0,'lon':0.0}
         for url in [GEO_URL,GEO_URL_2]:
             response = self.getREG(url)
@@ -308,33 +312,6 @@ class Locast(object):
                 
     def formatGEO(self, loc):
         return float('{0:.7f}'.format(float(loc)))
-
-
-    def setRegion(self):
-        log('setRegion, dma = %s'%(self.dma))
-        try: 
-            geo_tz   = tzlocal.get_localzone().zone
-            geo_data = self.getGEOdata()
-            
-            if geo_data.get('lat') == 0.0: 
-                okDialog(LANGUAGE(30025)%('%s\n%s'%(GEO_URL,GEO_URL_2)))
-                raise Exception(LANGUAGE(30025)%('%s\n%s'%(GEO_URL,GEO_URL_2)))
-                
-            elif DEBUG and self.dma > 0:
-                try:
-                    if not self.getURL(BASE_API + '/watch/dma/%s/%s'%(geo_data['lat'],geo_data['lon']),header=self.buildHeader()).get('DMA'):
-                        raise Exception(LANGUAGE(30013))
-                    response = self.getGEO(GEO_JSON.format(city=urllib.parse.quote(REAL_SETTINGS.getSetting('User_City'))))
-                    reg_data = {'lat':self.formatGEO(response.get('latt','0.0')),'lon':self.formatGEO(response.get('longt','0.0'))}
-                    geo_tz   = (self.getTZ(TZ_API.format(lat=reg_data.get('lat'),lon=reg_data.get('lon'))) or geo_tz)
-                    geo_data = reg_data
-                except:
-                    self.dma = 0
-                    
-            log('setRegion, geo_data = %s, geo_tz = %s'%(geo_data,geo_tz))
-        except: 
-            geo_data = {'lat':0.0,'lon':0.0}
-        return geo_data['lat'],geo_data['lon'],geo_tz
 
 
     def getURL(self, url, param={}, header={'Content-Type':'application/json'}, life=datetime.timedelta(minutes=5)):
@@ -395,8 +372,11 @@ class Locast(object):
         return state
 
 
-    def login(self, user, password):
+    def login(self):
         log('login')
+        user     = REAL_SETTINGS.getSetting('User_Email')
+        password = REAL_SETTINGS.getSetting('User_Password')
+        
         if len(user) > 0:
             if self.chkUser(user): return True
             data = self.postURL(BASE_API + '/user/login',param='{"username":"' + user + '","password":"' + password + '"}')
@@ -411,7 +391,8 @@ class Locast(object):
                         REAL_SETTINGS.setSetting('User_LastLogin',self.getDateTime(float(str(self.userdata.get('lastlogin','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
                         REAL_SETTINGS.setSetting('User_DonateExpire',self.getDateTime(float(str(self.userdata.get('donationExpire','')).rstrip('L'))/1000).strftime("%Y-%m-%d %I:%M %p"))
                     except: pass
-                    if self.dma == 0: self.dma = self.userdata.get('lastDmaUsed','')
+                    REAL_SETTINGS.setSetting('User_DMA',str(self.userdata.get('lastDmaUsed','0')))
+                    # self.dma = 
                     notificationDialog(LANGUAGE(30021)%(self.userdata.get('name','')))
                     return True
             elif data.get('message'): notificationDialog(data.get('message'))
@@ -445,31 +426,57 @@ class Locast(object):
         return self.getURL(BASE_API + '/dma',header=self.buildHeader())
               
 
-    def getCity(self):
-        log("getCity")
+    def getCity(self, lat, lon):
+        log("getCity, lat = %s, lon = %s"%(lat, lon))
         '''{u'active': True, u'DMA': u'501', u'small_url': u'https://s3.us-east-2.amazonaws.com/static.locastnet.org/cities/new-york.jpg', u'large_url': u'https://s3.us-east-2.amazonaws.com/static.locastnet.org/cities/background/new-york.jpg', u'name': u'New York'}'''
         try:
-            city = self.getURL(BASE_API + '/watch/dma/%s/%s'%(self.lat,self.lon),header=self.buildHeader())
+            city = self.getURL(BASE_API + '/watch/dma/%s/%s'%(lat,lon),header=self.buildHeader())
             if city and 'DMA' not in city: 
+                REAL_SETTINGS.setSetting('User_DMA','0')
+                REAL_SETTINGS.setSetting('User_City','Unknown')
                 xbmcgui.Window(10000).setProperty('User_City','Unknown')
                 okDisable(city.get('message'))
-            else:
-                REAL_SETTINGS.setSetting('User_City',str(city['name']))
+                return 'Unknown', 0
+            else: 
+                REAL_SETTINGS.setSetting('User_DMA',str(city['DMA']))
+                REAL_SETTINGS.setSetting('User_City',city['name'])
                 xbmcgui.Window(10000).setProperty('User_City',str(city['name']))
-                return city
-                
         except: okDisable(LANGUAGE(30013))
 
 
-    def getTime(self):
-        return datetime.datetime.now(pytz.timezone(self.zone))#.astimezone(pytz.utc)
+    def getTime(self, zone):
+        log("getCity, zone = %s"%(zone))
+        return datetime.datetime.now(pytz.timezone(zone))#.astimezone(pytz.utc)
 
 
     def getRegion(self):
         log("getRegion")
-        try:    return self.getCity()['DMA'],self.getTime()
-        except: return self.dma if self.dma > 0 else sys.exit()
+        try:
+            geo_data = self.getIPGEO()
+            geo_tz   = tzlocal.get_localzone().zone
+            
+            self.getCity(geo_data.get('lat'), geo_data.get('lon'))
+            geo_city = REAL_SETTINGS.getSetting('User_City')
+            geo_dma  = int(REAL_SETTINGS.getSetting('User_DMA'))
 
+            if geo_data.get('lat') == 0.0: 
+                okDialog(LANGUAGE(30025)%('%s\n%s'%(GEO_URL,GEO_URL_2)))
+                raise Exception(LANGUAGE(30025)%('%s\n%s'%(GEO_URL,GEO_URL_2)))
+                
+            elif DEBUG and int(REAL_SETTINGS.getSetting('User_Select_DMA') or '0') > 0:
+                geo_city = REAL_SETTINGS.getSetting('User_Select_City')
+                geo_dma  = int(REAL_SETTINGS.getSetting('User_Select_DMA'))
+                response = self.getGEO(GEO_JSON.format(city=urllib.parse.quote(geo_city)))
+                geo_data = {'lat':self.formatGEO(response.get('latt','0.0')),'lon':self.formatGEO(response.get('longt','0.0'))}
+                geo_tz   = self.getTZ(TZ_API.format(lat=geo_data.get('lat'),lon=geo_data.get('lon'))) 
+                
+            log('setRegion, geo_city = %s, geo_dma = %s, geo_data = %s, geo_tz = %s'%(geo_city,geo_dma,geo_data,geo_tz))
+            return geo_data['lat'], geo_data['lon'], geo_tz, geo_dma, self.getTime(geo_tz)
+        except Exception as e:
+            log("getRegion, Failed! %s"%(e), xbmc.LOGERROR) 
+            notificationDialog(LANGUAGE(30001))
+            sys.exit()
+            
 
     def poolList(self, method, items=None, args=None, chunk=25):
         log("poolList")

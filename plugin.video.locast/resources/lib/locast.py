@@ -139,7 +139,10 @@ def notificationDialog(message, header=ADDON_NAME, sound=False, time=4000, icon=
 
 def getLastDMA():
     return int(REAL_SETTINGS.getSetting('User_LastDMA') or '0')
-
+    
+def isPlaylistRandom():
+    return xbmc.getInfoLabel('Playlist.Random').lower() == 'on' # Disable auto playlist shuffling if it's on
+    
 class Locast(object):
     def __init__(self, sysARG=sys.argv, dma=getLastDMA()):
         log('__init__, sysARG = %s'%(sysARG))
@@ -464,11 +467,14 @@ class Locast(object):
                 raise Exception(LANGUAGE(30025)%('%s\n%s'%(GEO_URL,GEO_URL_2)))
                 
             elif DEBUG and int(REAL_SETTINGS.getSetting('User_Select_DMA') or '0') > 0:
-                geo_city = REAL_SETTINGS.getSetting('User_Select_City')
-                geo_dma  = int(REAL_SETTINGS.getSetting('User_Select_DMA'))
-                response = self.getGEO(GEO_JSON.format(city=urllib.parse.quote(geo_city)))
-                geo_data = {'lat':self.formatGEO(response.get('latt','0.0')),'lon':self.formatGEO(response.get('longt','0.0'))}
-                geo_tz   = self.getTZ(TZ_API.format(lat=geo_data.get('lat'),lon=geo_data.get('lon'))) 
+                response = self.getGEO(GEO_JSON.format(city=urllib.parse.quote( REAL_SETTINGS.getSetting('User_Select_City'))))
+                reg_data = {'lat':self.formatGEO(response.get('latt','0.0')),'lon':self.formatGEO(response.get('longt','0.0'))}
+                if reg_data.get('lat') != 0.0:
+                    geo_data = reg_data
+                    geo_tz   = self.getTZ(TZ_API.format(lat=geo_data.get('lat'),lon=geo_data.get('lon'))) 
+                    geo_city = REAL_SETTINGS.getSetting('User_Select_City')
+                    geo_dma  = int(REAL_SETTINGS.getSetting('User_Select_DMA'))
+                else: log('setRegion, reg_data = %s error'%(reg_data))
                 
             log('setRegion, geo_city = %s, geo_dma = %s, geo_data = %s, geo_tz = %s'%(geo_city,geo_dma,geo_data,geo_tz))
             return geo_data['lat'], geo_data['lon'], geo_tz, geo_dma, self.getTime(geo_tz)
@@ -572,7 +578,9 @@ class Locast(object):
         if opt != 'pvr':
             self.getStations(data.get('dma'), name=data.get('name'), opt='play')
             [self.playlist.add(url,lz,idx) for idx,lz in enumerate(self.listitems)]
-            liz = self.listitems.pop(0)
+            if isPlaylistRandom(): self.channelPlaylist.unshuffle()
+            if isinstance(self.listitems,list): 
+                liz = self.listitems.pop(0)
             liz.setPath(path=url)
         return liz
         

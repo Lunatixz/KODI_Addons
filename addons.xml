@@ -114,7 +114,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.locast" version="1.1.4c" name="Locast" provider-name="Lunatixz">
+<addon id="plugin.video.locast" version="1.1.4d" name="Locast" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>

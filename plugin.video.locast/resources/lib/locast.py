@@ -212,57 +212,66 @@ class Locast(object):
     def buildListings(self, listings, chname, chlogo, path, opt=''):
         log('buildListings, chname = %s, opt = %s'%(chname,opt))
         now = self.now
+        listings = sorted(listings, key=lambda k: k['startTime'])
         for listing in listings:
             try: starttime  = self.getDateTime(int(str(listing['startTime'])[:-3]))
             except: continue
             duration   = listing.get('duration',0)
             endtime    = starttime + datetime.timedelta(seconds=duration)
-            label      = listing['title']
+            title      = listing['title']
             favorite   = None
             chnum      = -1            
             # if listing['isNew']: label = '*%s'%label
-            try: aired = self.getDateTime(int(str(listing['airdate'])[:-3]))
+            try:    aired = self.getDateTime(int(str(listing['airdate'])[:-3]))
             except: aired = starttime
-            try: type  = {'Series':'episode'}[listing.get('showType','Series')]
+                
+            try:    type = {'Series':'episode'}[listing.get('showType','Series')]
             except: type = 'video'
-            plot = (listing.get('description','') or listing.get('shortDescription','') or label)
+                
+            plot = (listing.get('description','') or listing.get('shortDescription','') or xbmc.getLocalizedString(161))
             if now > endtime: continue
-            elif opt in ['live','favorites','play']: 
-                chnum  = re.sub('[^\d\.]+','', chname)
-                if chnum:
-                    favorite = isFavorite(self.dma,chnum)
-                    chname   = re.compile('[^a-zA-Z]').sub('', chname)
-                    chname   = '%s| %s'%(chnum,chname)
-                    label    = '%s : [B] %s[/B]'%(chname, label)
-                else: label = chname
-                if opt == 'favorites' and not favorite: continue
-            elif opt == 'lineup':
+                
+            chlabel = chname
+            chnum   = re.compile('[^\d\.]+').sub('',chname)
+            if chnum:
+                favorite = isFavorite(self.dma,chnum)
+                chname   = re.compile('[^a-zA-Z]').sub('', chname)
+                chlabel  = '%s| %s'%(chnum,chname)
+
+            if   opt == 'favorites' and not favorite: continue
+            elif opt in ['live','favorites']: 
+                label = '%s : [B] %s[/B]'%(chlabel, title)
+            elif opt in ['lineup','play']:
                 if now >= starttime and now < endtime: 
-                    label = '%s - [B]%s[/B]'%(starttime.strftime('%I:%M %p').lstrip('0'),label)
+                    label = '%s - [B]%s[/B]'%(starttime.strftime('%I:%M %p').lstrip('0'),title)
                 else: 
-                    label = '%s - %s'%(starttime.strftime('%I:%M %p').lstrip('0'),label)
+                    label = '%s - %s'%(starttime.strftime('%I:%M %p').lstrip('0'),title)
                     path  = 'NEXT_SHOW'
-                    
+            else: label = chlabel
+
             thumb      = (listing.get('preferredImage','') or chlogo)  
             infoLabels = {"favorite":favorite,"chnum":chnum,"chname":chname,"mediatype":type,"label":label,"title":label,'duration':duration,'plot':plot,'genre':listing.get('genres',[]),"aired":aired.strftime('%Y-%m-%d')}
             infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":chlogo,"logo":chlogo}
             infoVideo  = {} #todo added more meta from listings, ie mpaa, isNew, video/audio codec
-            infoAudio  = {} #todo added more meta from listings, ie mpaa, isNew, video/audio codec
-            if type == 'episode':
-                infoLabels['tvshowtitle'] = listing.get('title',label)
+            infoAudio  = {} #todo added more meta from listings, ie mpaa, isNew, video/audio codec    
+                               
+            if type == 'episode' and opt != 'play':
+                infoLabels['tvshowtitle'] = listing.get('title','')
                 if listing.get('seasonNumber',None):
                     infoLabels['season']  = listing.get('seasonNumber',0)
                     infoLabels['episode'] = listing.get('episodeNumber',0)
                     seaep = '%sx%s'%(str(listing.get('seasonNumber','')).zfill(2),str(listing.get('episodeNumber','')).zfill(2))
                     label = '%s - %s %s'%(label,seaep,listing.get('episodeTitle',''))
-                else: label = '%s %s'%(label,listing.get('episodeTitle',''))
+                else: 
+                    label = '%s %s'%(label,listing.get('episodeTitle',''))
                 infoLabels['title'] = label
                 infoLabels['label'] = label
+                           
             if opt in ['live','favorites']:
                 if now >= starttime and now < endtime:
                     return self.addLink(label, (playChannel,path), infoLabels, infoArt, infoVideo, infoAudio, total=len(listings))
                 else: continue
-            if opt == 'play': 
+            elif opt == 'play': 
                 if starttime <= now and endtime > now: infoLabels['duration'] = ((endtime) - now).seconds
                 self.addPlaylist(label, path, infoLabels, infoArt, infoVideo, infoAudio)
             else: 

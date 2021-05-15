@@ -63,7 +63,6 @@ TZ_API        = 'https://timezonedb.com/ajax.get-time-zone?coordinate={lat}%2C{l
 CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
 DTFORMAT      = '%Y-%m-%dT%H:%M:%S' #'YYYY-MM-DDTHH:MM:SS'
-UTC_OFFSET    = datetime.datetime.utcnow() - datetime.datetime.now()
 
 @ROUTER.route('/')
 def buildMenu():
@@ -206,10 +205,6 @@ class Locast(object):
             else: continue  
 
 
-    def getDateTime(self, timestamp):
-        return (datetime.datetime.fromtimestamp(timestamp, tz=pytz.timezone(self.zone)) + UTC_OFFSET) - datetime.timedelta(hours=1)
-        
-        
     def buildListings(self, listings, chname, chlogo, path, opt=''):
         log('buildListings, chname = %s, opt = %s'%(chname,opt))
         now = self.now
@@ -327,6 +322,15 @@ class Locast(object):
         return float('{0:.7f}'.format(float(loc)))
 
 
+    def getTime(self, zone):
+        log("getCity, zone = %s"%(zone))
+        return datetime.datetime.now(pytz.timezone(zone))#.astimezone(pytz.utc) 
+
+
+    def getDateTime(self, timestamp):
+        return datetime.datetime.fromtimestamp(timestamp, tz=pytz.timezone(self.zone))
+        
+
     def getURL(self, url, param={}, header={'Content-Type':'application/json'}, life=datetime.timedelta(minutes=5)):
         log('getURL, url = %s, header = %s'%(url, header))
         cachename     = '%s.getURL.url.%s.%s.%s'%(ADDON_NAME,url,param,header)
@@ -432,7 +436,7 @@ class Locast(object):
         '''[{"id":104,"dma":501,"name":"WCBSDT (WCBS-DT)","callSign":"WCBS","logoUrl":"https://fans.tmsimg.com/h5/NowShowing/28711/s28711_h5_aa.png","active":true,"affiliate":"CBS","affiliateName":"CBS",
              "listings":[{"stationId":104,"startTime":1535410800000,"duration":1800,"isNew":true,"audioProperties":"CC, HD 1080i, HDTV, New, Stereo","videoProperties":"CC, HD 1080i, HDTV, New, Stereo","programId":"EP000191906491","title":"Inside Edition","description":"Primary stories and alternative news.","entityType":"Episode","airdate":1535328000000,"genres":"Newsmagazine","showType":"Series"}]}'''
         now = ('{0:.23s}{1:s}'.format(self.now.strftime('%Y-%m-%dT00:00:00'),'-05:00'))
-        return self.getURL(BASE_API + '/watch/epg/%s'%(city), param={'start_time':urllib.parse.quote(now)}, header=self.buildHeader(), life=datetime.timedelta(minutes=45))
+        return self.getURL(BASE_API + '/watch/epg/%s'%(city), param={'start_time':urllib.parse.quote(now)}, header=self.buildHeader(), life=datetime.timedelta(minutes=5))
         
         
     def getAll(self):
@@ -457,11 +461,6 @@ class Locast(object):
         except: okDisable(LANGUAGE(30013))
 
 
-    def getTime(self, zone):
-        log("getCity, zone = %s"%(zone))
-        return datetime.datetime.now(pytz.timezone(zone))#.astimezone(pytz.utc)
-
-
     def getRegion(self):
         log("getRegion")
         try:
@@ -484,9 +483,9 @@ class Locast(object):
                     geo_tz   = self.getTZ(TZ_API.format(lat=geo_data.get('lat'),lon=geo_data.get('lon'))) 
                     geo_city = REAL_SETTINGS.getSetting('User_Select_City')
                     geo_dma  = int(REAL_SETTINGS.getSetting('User_Select_DMA'))
-                else: log('setRegion, reg_data = %s error'%(reg_data))
+                else: log('getRegion, reg_data = %s error'%(reg_data))
                 
-            log('setRegion, geo_city = %s, geo_dma = %s, geo_data = %s, geo_tz = %s'%(geo_city,geo_dma,geo_data,geo_tz))
+            log('getRegion, geo_city = %s, geo_dma = %s, geo_data = %s, geo_tz = %s'%(geo_city,geo_dma,geo_data,geo_tz))
             return geo_data['lat'], geo_data['lon'], geo_tz, geo_dma, self.getTime(geo_tz)
         except Exception as e:
             log("getRegion, Failed! %s"%(e), xbmc.LOGERROR) 
@@ -516,14 +515,14 @@ class Locast(object):
     def getChannels(self):
         log('getChannels')
         # https://github.com/add-ons/service.iptv.manager/wiki/JSON-STREAMS-format
-        stations = self.getEPG(self.getRegion())
+        stations = self.getEPG(self.dma)
         return list(self.poolList(self.buildStation, stations,'channel'))
 
 
     def getGuide(self):
         log('getGuide')
         # https://github.com/add-ons/service.iptv.manager/wiki/JSON-EPG-format
-        stations  = self.getEPG(self.getRegion())
+        stations  = self.getEPG(self.dma)
         return {k:v for x in self.poolList(self.buildStation, stations,'programmes') for k,v in x.items()}
         
 

@@ -60,7 +60,7 @@ DTFORMAT      = '%Y-%m-%dT%H:%M:%S' #'YYYY-MM-DDTHH:MM:SS'
 UTC_OFFSET    = datetime.datetime.utcnow() - datetime.datetime.now()
 DEBUG         = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 MTYPES        = {'EP':'episode','SH':'episode','MV':'movie'}
-TRANTYPES     = ['Default','Heavy','Mobile','Internet540','Internet480','Internet360','Internet240']
+TRANTYPES     = ['None','Heavy','Mobile','Internet540','Internet480','Internet360','Internet240']
 
 @ROUTER.route('/')
 def buildMenu():
@@ -325,7 +325,7 @@ class HDHR(object):
         video = {'codec':''}
         audio = {'codec':''}
         if tuner.getModelNumber() == "HDTC-2US":
-            if self.transcode == 'default': 
+            if self.transcode == 'none': 
                   tranOPT = (tuner.getTranscodeOption() or 'none')
             else: tranOPT = self.transcode
             if tranOPT != "none": video['codec'] = 'h264'
@@ -512,7 +512,7 @@ class HDHR(object):
         xbmcplugin.setResolvedUrl(int(self.sysARG[1]), True, liz)
         
 
-    def resolveURL(self, tunerkey, channel, opt=None):
+    def resolveURL(self, tunerkey, channel, opt='pvr'):
         log('resolveURL, channel = %s, opt = %s'%(channel,opt)) 
         self.listitems = []
         self.playlist  = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
@@ -520,10 +520,11 @@ class HDHR(object):
         liz = xbmcgui.ListItem('')
         self.setDevice(tunerkey)
         info  = self.pyHDHR.getLiveTVChannelInfo(channel)
+        if not info: return liz
         url   = info.getURL()
         tuner = info.getTuner()
         if tuner.getModelNumber() == "HDTC-2US":
-            if self.transcode == 'default': tranOPT = (tuner.getTranscodeOption() or 'none')
+            if self.transcode == 'none': tranOPT = (tuner.getTranscodeOption() or 'none')
             else: tranOPT = self.transcode
             log("resolveURL, Tuner transcode option: " + tranOPT)
             if tranOPT != "none": video = {'codec': 'h264'}

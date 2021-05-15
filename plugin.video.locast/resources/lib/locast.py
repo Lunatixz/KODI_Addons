@@ -63,6 +63,7 @@ TZ_API        = 'https://timezonedb.com/ajax.get-time-zone?coordinate={lat}%2C{l
 CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
 DTFORMAT      = '%Y-%m-%dT%H:%M:%S' #'YYYY-MM-DDTHH:MM:SS'
+UTC_OFFSET    = datetime.datetime.utcnow() - datetime.datetime.now()
 
 @ROUTER.route('/')
 def buildMenu():
@@ -206,7 +207,7 @@ class Locast(object):
 
 
     def getDateTime(self, timestamp):
-        return datetime.datetime.fromtimestamp(timestamp, tz=pytz.timezone(self.zone))
+        return (datetime.datetime.fromtimestamp(timestamp, tz=pytz.timezone(self.zone)) + UTC_OFFSET) - datetime.timedelta(hours=1)
         
         
     def buildListings(self, listings, chname, chlogo, path, opt=''):

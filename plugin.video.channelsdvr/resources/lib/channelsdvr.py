@@ -496,12 +496,15 @@ class Channels(object):
                            "title"      :listing.get('Title',channel['name']),
                            "description":(listing.get('Summary','') or xbmc.getLocalizedString(161)),
                            "subtitle"   :listing.get('EpisodeTitle',''),
-                           "episode"    :"S%sE%s"%(str(listing.get('SeasonNumber',0)).zfill(2),str(listing.get('EpisodeNumber',0)).zfill(2)),
                            "genre"      :listing.get('Categories',[]),
                            "image"      :(listing.get('Image','') or channel['logo']),
                            "date"       :aired.strftime('%Y-%m-%d'),
                            "credits"    :"",
                            "stream"     :""}
+                           
+                if listing.get('SeasonNumber',0) > 0 and listing.get('EpisodeNumber',0) > 0:
+                    program["episode"] = "S%sE%s"%(str(listing.get('SeasonNumber',0)).zfill(2),str(listing.get('EpisodeNumber',0)).zfill(2))
+                    
                 programmes[channel['id']].append(program)
             return programmes
 

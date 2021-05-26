@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="30800"> <!-- Sources -->
+        <setting id="last_refreshed" visible="false"/>
+        <setting label="30801" type="lsep"/> <!-- Refreshing -->
+        <setting label="30803" type="action" action="RunScript(service.iptv.manager,refresh)"/> <!-- Force refresh now -->
+    </category>
+    <category label="30820"> <!-- IPTV Simple -->
+        <setting label="30821" type="lsep"/> <!-- Configuration -->
+        <setting label="30822" type="action" option="close" action="RunScript(service.iptv.manager,setup-iptv-simple)"/> <!-- Configure IPTV Simple automatically -->
+        <setting label="30823" type="action" option="close" action="Addon.OpenSettings(pvr.iptvsimple)" enable="System.HasAddon(pvr.iptvsimple)"/> <!-- Open IPTV Simple settings -->
+        <setting label="30824" type="bool" id="iptv_simple_restart" default="true" enable="System.HasAddon(pvr.iptvsimple)"/> <!-- Automatically restart IPTV Simple -->
+    </category>
+    <category label="30880"> <!-- Expert -->
+        <setting label="30881" type="lsep"/> <!-- Logging -->
+        <setting label="30882" type="bool" id="debug_logging" default="false"/>
+        <setting label="30883" type="action" action="InstallAddon(script.kodi.loguploader)" option="close" visible="!System.HasAddon(script.kodi.loguploader)"/> <!-- Install Kodi Logfile Uploader -->
+        <setting label="30884" type="action" action="RunAddon(script.kodi.loguploader)" visible="String.StartsWith(System.BuildVersion,18) + System.HasAddon(script.kodi.loguploader) | System.AddonIsEnabled(script.kodi.loguploader)" /> <!-- Open Kodi Logfile Uploader -->
+    </category>
+</settings>

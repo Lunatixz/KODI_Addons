@@ -1,0 +1,100 @@
+# Kodi Media Center language file
+# Addon Name: IPTV Manager
+# Addon id: service.iptv.manager
+msgid ""
+msgstr ""
+"Language: ro\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# CONTEXT MENU
+msgctxt "#30600"
+msgid "Play with IPTV Manager"
+msgstr "Redă cu IPTV Manager"
+
+# MESSAGES
+msgctxt "#30700"
+msgid "Are you sure you want to setup IPTV Simple for the use with IPTV Manager? Any existing configuration of IPTV Simple will be overwritten."
+msgstr "Sunteți sigur/(ă) că vreți să configurați IPTV Simple pentru a fi utilizat cu IPTV Manager? Dacă există vreo configurație a IPTV Simple, aceasta va fi suprascrisă."
+
+msgctxt "#30701"
+msgid "IPTV Simple is configured for use with IPTV Manager!"
+msgstr "IPTV Simple este configurat să fie folosit cu IPTV Manager!"
+
+msgctxt "#30702"
+msgid "The configuration of IPTV Simple has failed. Please check the log files for more information."
+msgstr "Configurarea IPTV Manager a eșuat. Vă rugăm să verificați logurile pentru mai multe informații."
+
+msgctxt "#30703"
+msgid "Detecting IPTV add-ons..."
+msgstr "Se detectează add-on-uri IPTV..."
+
+msgctxt "#30704"
+msgid "Fetching channels and guide of {addon}..."
+msgstr "Se descarcă canalele și ghidul pentru {addon}..."
+
+msgctxt "#30705"
+msgid "Updating channels and guide..."
+msgstr "Se actualizează canalele și ghidul..."
+
+msgctxt "#30706"
+msgid "This program isn't available to play."
+msgstr "Acest program nu este disponibil pentru redare."
+
+# SETTINGS
+msgctxt "#30800"
+msgid "Channels"
+msgstr "Canale"
+
+msgctxt "#30801"
+msgid "Refreshing"
+msgstr "Se actualizează"
+
+msgctxt "#30802"
+msgid "Refresh interval [I](in hours)[/I]"
+msgstr "Interval de actualizare [I](în ore)[/I]"
+
+msgctxt "#30803"
+msgid "Refresh channels and guide now…"
+msgstr "Actualizează canalele și ghidul acum..."
+
+msgctxt "#30820"
+msgid "IPTV Simple"
+msgstr "IPTV Simple"
+
+msgctxt "#30821"
+msgid "Configuration"
+msgstr "Configurare"
+
+msgctxt "#30822"
+msgid "Configure IPTV Simple automatically…"
+msgstr "Configurează IPTV Simple în mod automat..."
+
+msgctxt "#30823"
+msgid "Open IPTV Simple settings…"
+msgstr "Deschide setările IPTV Simple..."
+
+msgctxt "#30824"
+msgid "Automatically restart IPTV Simple to refresh the data"
+msgstr "Repornește automat IPTV Simple pentru a actualiza datele"
+
+msgctxt "#30880"
+msgid "Expert"
+msgstr ""
+
+msgctxt "#30881"
+msgid "Logging"
+msgstr ""
+
+msgctxt "#30882"
+msgid "Enable debug logging"
+msgstr ""
+
+msgctxt "#30883"
+msgid "Install Kodi Logfile Uploader…"
+msgstr ""
+
+msgctxt "#30884"
+msgid "Open Kodi Logfile Uploader…"
+msgstr ""

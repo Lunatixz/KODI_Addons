@@ -104,5 +104,7 @@ class Region(object):
         select  = selectDialog(listItems,header='%s %s'%(ADDON_NAME,LANGUAGE(49013)),preselect=pselect)
         REAL_SETTINGS.setSetting('User_Select_DMA' ,listItems[select].getPath())
         REAL_SETTINGS.setSetting('User_Select_City',listItems[select].getLabel())
+        xbmc.executebuiltin("RunScript(service.iptv.manager,reload)")
         REAL_SETTINGS.openSettings()
+        # xbmc.executebuiltin("AlarmClock(Update IPTV-Manager,RunScript(service.iptv.manager,update),00:05)")
 if __name__ == '__main__': Region(sys.argv).listRegions()

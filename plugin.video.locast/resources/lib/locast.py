@@ -64,6 +64,9 @@ CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
 DTFORMAT      = '%Y-%m-%dT%H:%M:%S' #'YYYY-MM-DDTHH:MM:SS'
 
+INPUTSTREAM       = 'inputstream.adaptive'
+INPUTSTREAM_BETA  = 'inputstream.adaptive.testing'
+
 @ROUTER.route('/')
 def buildMenu():
     Locast().buildMenu()
@@ -142,7 +145,12 @@ def getLastDMA():
     
 def isPlaylistRandom():
     return xbmc.getInfoLabel('Playlist.Random').lower() == 'on' # Disable auto playlist shuffling if it's on
-    
+
+def getInputStream():
+    if xbmc.getCondVisibility('System.AddonIsEnabled(%s)'%(INPUTSTREAM_BETA)):
+        return INPUTSTREAM_BETA
+    else: return INPUTSTREAM
+        
 class Locast(object):
     def __init__(self, sysARG=sys.argv, dma=getLastDMA()):
         log('__init__, sysARG = %s'%(sysARG))
@@ -239,12 +247,12 @@ class Locast(object):
                 label = '%s : [B] %s[/B]'%(chlabel, title)
             elif opt in ['lineup','play']:
                 if now >= starttime and now < endtime: 
-                    label = '%s - [B]%s[/B]'%(starttime.strftime('%I:%M %p').lstrip('0'),title)
+                    label = '%s - [B]%s[/B]'%(self.getDateTimeUTC(int(str(listing['startTime'])[:-3])).strftime('%I:%M %p').lstrip('0'),title)
                 else: 
-                    label = '%s - %s'%(starttime.strftime('%I:%M %p').lstrip('0'),title)
+                    label = '%s - %s'%(self.getDateTimeUTC(int(str(listing['startTime'])[:-3])).strftime('%I:%M %p').lstrip('0'),title)
                     path  = 'NEXT_SHOW'
             else: label = chlabel
-
+                
             thumb      = (listing.get('preferredImage','') or chlogo)  
             infoLabels = {"favorite":favorite,"chnum":chnum,"chname":chname,"mediatype":type,"label":label,"title":label,'duration':duration,'plot':plot,'genre':listing.get('genres',[]),"aired":aired.strftime('%Y-%m-%d')}
             infoArt    = {"thumb":thumb,"poster":thumb,"fanart":FANART,"icon":chlogo,"logo":chlogo}
@@ -300,7 +308,12 @@ class Locast(object):
     def getTZ(self,url):
         log('getTZ, url = %s'%(url))
         try:
-            match = re.compile('Zone Name</td>(.*?)<td>(.*?)\</td>',re.IGNORECASE).search(str(urllib.request.urlopen(url).read()))
+            heading  = self.buildHeader()
+            heading['Origin']  = 'https://timezonedb.com/'
+            heading['Referer'] = 'https://timezonedb.com/'
+            del heading['Authorization']
+            req   = urllib.request.Request(url,headers=heading)
+            match = re.compile('Zone Name</td>(.*?)<td>(.*?)\</td>',re.IGNORECASE).search(str((urllib.request.urlopen(req).read())))
             return match.group(2)
         except Exception as e:
             log("getTZ, %s, Failed! %s"%(url, e), xbmc.LOGERROR)
@@ -327,8 +340,17 @@ class Locast(object):
         return datetime.datetime.now(pytz.timezone(zone))#.astimezone(pytz.utc) 
 
 
-    def getDateTime(self, timestamp):
+    def getDateTime(self, timestamp): #convert timestamp to datetime obj with tz info
         return datetime.datetime.fromtimestamp(timestamp, tz=pytz.timezone(self.zone))
+        
+        
+    def getLocalTime(self):
+        offset = (datetime.datetime.utcnow() - datetime.datetime.now())
+        return time.time() + offset.total_seconds() #returns time epoch
+        
+        
+    def getDateTimeUTC(self, timestamp):
+        return datetime.datetime.fromtimestamp(timestamp).replace(tzinfo=pytz.utc)
         
 
     def getURL(self, url, param={}, header={'Content-Type':'application/json'}, life=datetime.timedelta(minutes=5)):
@@ -535,7 +557,7 @@ class Locast(object):
         favorite = isFavorite(self.dma,stnum)
         channel  = {"name"     :stname,
                     "stream"   :"plugin://%s/play/pvr/%s"%(ADDON_ID,station['id']), 
-                    "id"       :"%s.%s@%s"%(stnum,slugify(stname),slugify(ADDON_NAME)), 
+                    "id"       :"%s.%s.%s@%s"%(stnum,self.dma,slugify(stname),slugify(ADDON_NAME)), 
                     "logo"     :(station.get('logoUrl','') or station.get('logo226Url','') or ICON), 
                     "preset"   :stnum,
                     "group"    :ADDON_NAME,
@@ -551,9 +573,9 @@ class Locast(object):
             programmes = {channel['id']:[]}
             listings   = station.get('listings',[])
             for listing in listings:
-                try: starttime  = self.getDateTime(int(str(listing['startTime'])[:-3]))
+                try: starttime  = self.getDateTime(int(str(listing['startTime'])[:-3])).astimezone(pytz.utc) 
                 except: continue
-                try:    aired = self.getDateTime(int(str(listing['airdate'])[:-3]))
+                try:    aired = self.getDateTime(int(str(listing['airdate'])[:-3])).astimezone(pytz.utc) 
                 except: aired = starttime
                 program = {"start"      :starttime.strftime(DTFORMAT),
                            "stop"       :(starttime + datetime.timedelta(seconds=listing.get('duration',0))).strftime(DTFORMAT),
@@ -584,6 +606,12 @@ class Locast(object):
         liz  = xbmcgui.ListItem(data.get('name'),path=url)
         liz.setProperty('IsPlayable','true')
         liz.setProperty('IsInternetStream','true')
+        
+        if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
+            inputstream = getInputStream()
+            liz.setProperty('inputstream',inputstream)
+            liz.setProperty('%s.manifest_type'%(inputstream),'hls')
+            
         if opt != 'pvr':
             self.getStations(data.get('dma'), name=data.get('name'), opt='play')
             [self.playlist.add(url,lz,idx) for idx,lz in enumerate(self.listitems)]

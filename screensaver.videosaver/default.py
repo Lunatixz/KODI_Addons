@@ -64,9 +64,11 @@ def isMute():
 def saveVolume():
     json_query = '{"jsonrpc":"2.0","method":"Application.GetProperties","params":{"properties":["volume"]},"id":1}'
     json_response = (sendJSON(json_query))
-    xbmcgui.Window(10000).setProperty('%s.RESTORE'%ADDON_ID,str(json_response.get('result',{}).get('volume',0)))
-    if 'OK' in json_response: return True
-    return False
+    if not json_response: return False
+    restoreVolume = json_response.get('result',{}).get('volume',0)
+    log('saveVolume, state = ' + str(restoreVolume))
+    xbmcgui.Window(10000).setProperty('%s.RESTORE'%ADDON_ID,str(restoreVolume))
+    return True
     
 def setVolume(state):
     log('setVolume, state = ' + str(state))
@@ -144,6 +146,7 @@ class Player(xbmc.Player):
         log('onPlayBackStopped')
         self.myBackground.onClose()
         
+
         
 class BackgroundWindow(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
@@ -155,15 +158,15 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
         self.myPlayer  = Player()
         self.myPlayer.myBackground = self
         
-        if saveVolume(): 
-            setVolume(int(REAL_SETTINGS.getSetting('SetVolume')))
-        setRepeat('all')
-        
         
     def onInit(self):
         self.winid = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
         self.winid.setProperty('ss_time', 'okay' if REAL_SETTINGS.getSetting("Time") == 'true' else 'nope')
         self.myPlayer.play(self.buildPlaylist())
+
+        if saveVolume(): 
+            setVolume(int(REAL_SETTINGS.getSetting('SetVolume')))
+        setRepeat('all')
         
         
     def onAction(self, act):

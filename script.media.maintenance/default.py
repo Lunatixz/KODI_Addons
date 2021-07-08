@@ -17,27 +17,24 @@
 # along with Media Maintenance.  If not, see <http://www.gnu.org/licenses/>.
 
 # -*- coding: utf-8 -*-
-import os, sys, time, datetime, re, traceback, json, collections, requests, schedule
+import os, sys, time, datetime, re, traceback, json, collections, requests, schedule, subprocess
 
 from six.moves   import urllib
 from contextlib  import contextmanager
 from simplecache import SimpleCache, use_cache
 from itertools   import repeat, cycle, chain, zip_longest
 from kodi_six    import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
-   
-try:
-    from multiprocessing      import cpu_count 
-    from multiprocessing.pool import ThreadPool 
-    ENABLE_POOL = True
-    CORES = cpu_count()
-except: ENABLE_POOL = False
+from functools   import partial, wraps
 
-PY2 = sys.version_info[0] == 2
-PY3 = sys.version_info[0] == 3
-if PY3: 
-    basestring = str
-    unicode = str
-    
+try:
+    CORES = 2
+    USING_THREAD = (CORES == 1 or xbmc.getCondVisibility('System.Platform.Windows')) #multiprocessing takes foreground focus from windows, bug in python?
+    if USING_THREAD:    from multiprocessing.dummy import Pool as ThreadPool
+    else:               from multiprocessing.pool  import ThreadPool
+except Exception as e:
+    USING_THREAD = True
+    from _threadpool import ThreadPool
+
 # Plugin Info
 ADDON_ID       = 'script.media.maintenance'
 REAL_SETTINGS  = xbmcaddon.Addon(id=ADDON_ID)
@@ -57,17 +54,12 @@ SONARR_URL     = '%s/api/series?apikey=%s'%(REAL_SETTINGS.getSetting('Sonarr_IP'
 RADARR_URL     = '%s/api/movie?apikey=%s'%(REAL_SETTINGS.getSetting('Radarr_IP'),REAL_SETTINGS.getSetting('Radarr_API'))
 JSON_TV_ENUMS  = '["title", "genre", "year", "rating", "playcount", "episode", "file", "season", "watchedepisodes", "art", "uniqueid"]'
 JSON_MV_ENUMS  = '["title", "genre", "year", "rating", "playcount", "streamdetails", "file", "art", "uniqueid"]'
-JSON_IT_ENUMS  = '["title","artist","albumartist","genre","year","rating","album","track","duration","comment","lyrics","musicbrainztrackid","musicbrainzartistid","musicbrainzalbumid","musicbrainzalbumartistid","playcount","fanart","director","trailer","tagline","plot","plotoutline","originaltitle","lastplayed","writer","studio","mpaa","cast","country","imdbnumber","premiered","productioncode","runtime","set","showlink","streamdetails","top250","votes","firstaired","season","episode","showtitle","thumbnail","file","resume","artistid","albumid","tvshowid","setid","watchedepisodes","disc","tag","art","genreid","displayartist","albumartistid","description","theme","mood","style","albumlabel","sorttitle","episodeguide","uniqueid","dateadded","channel","channeltype","hidden","locked","channelnumber","starttime","endtime","specialsortseason","specialsortepisode","compilation","releasetype","albumreleasetype","contributors","displaycomposer","displayconductor","displayorchestra","displaylyricist","userrating"]'
-JSON_FL_ENUMS  = '["title","artist","albumartist","genre","year","rating","album","track","duration","comment","lyrics","musicbrainztrackid","musicbrainzartistid","musicbrainzalbumid","musicbrainzalbumartistid","playcount","fanart","director","trailer","tagline","plot","plotoutline","originaltitle","lastplayed","writer","studio","mpaa","cast","country","imdbnumber","premiered","productioncode","runtime","set","showlink","streamdetails","top250","votes","firstaired","season","episode","showtitle","thumbnail","file","resume","artistid","albumid","tvshowid","setid","watchedepisodes","disc","tag","art","genreid","displayartist","albumartistid","description","theme","mood","style","albumlabel","sorttitle","episodeguide","uniqueid","dateadded","size","lastmodified","mimetype","specialsortseason","specialsortepisode"]'
 
 @contextmanager
-def busy_dialog(escape=False):
-    if not escape:
-        log('globals: busy_dialog')
-        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
-        try: yield
-        finally: xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
-    else: yield
+def busy_dialog():
+    xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+    try: yield
+    finally: xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
 def log(msg, level=xbmc.LOGDEBUG):
     if not DEBUG and level != xbmc.LOGERROR: return
@@ -76,14 +68,14 @@ def log(msg, level=xbmc.LOGDEBUG):
     except Exception as e: 'log failed! %s'%(e)
 
 def dumpJSON(dict1, idnt=None, sortkey=True):
-    if not dict1 or isinstance(dict1,basestring): return dict1
-    elif isinstance(dict1, basestring): return dict1
+    if not dict1 or isinstance(dict1,str): return dict1
+    elif isinstance(dict1, str): return dict1
     return (json.dumps(dict1, indent=idnt, sort_keys=sortkey))
     
 def loadJSON(string1):
     if not string1: return []
     elif isinstance(string1,dict): return string1
-    elif isinstance(string1,basestring): 
+    elif isinstance(string1,str): 
         string1 = (string1.strip('\n').strip('\t').strip('\r'))
         try: return json.loads(string1, strict=False)
         except Exception as e: log("loadJSON failed! %s \n %s"%(e,string1), xbmc.LOGERROR)
@@ -122,7 +114,15 @@ def yesnoDialog(message, heading=ADDON_NAME, nolabel='', yeslabel='', customlabe
             return xbmcgui.Dialog().yesnocustom(heading, message, customlabel, nolabel, yeslabel, autoclose)
         else: raise Exception()
     except: return xbmcgui.Dialog().yesno(heading, message, nolabel, yeslabel, autoclose)
-          
+        
+def roundupDIV(p, q):
+    try:
+        d, r = divmod(p, q)
+        if r: d += 1
+        return d
+    except ZeroDivisionError: 
+        return 1
+    
 class MM(object):
     def __init__(self, cache=None):
         if cache is None:
@@ -410,26 +410,28 @@ class MM(object):
         json_query = '{"jsonrpc":"2.0","method":"VideoLibrary.Clean","params":{"showdialogs":false,"content":"5s"},"id":1}'%type
         return sendJSON(json_query)
         
-        
-    def getActivePlayer(self):
+
+    def getActivePlayer(self, return_item=False):
         json_query = ('{"jsonrpc":"2.0","method":"Player.GetActivePlayers","params":{},"id":1}')
         json_response = sendJSON(json_query)
-        try: id = json_response['result'][0]['playerid']
+        try:    id = json_response.get('result',[{'playerid':1}])[0].get('playerid',1)
         except: id = 1
-        log("getActivePlayer, id = " + str(id)) 
+        self.log("getActivePlayer, id = %s" % (id))
+        if return_item: return item
         return id
-        
-        
-    def requestItem(self):
-        json_query    = ('{"jsonrpc":"2.0","method":"Player.GetItem","params":{"playerid":%d,"properties":%s}, "id": 1}'%(self.getActivePlayer(), JSON_IT_ENUMS))
-        json_response = sendJSON(json_query)
-        if 'result' not in json_response: return {}
-        return json_response['result'].get('item',{})
-        
-        
+
+
+    def getPlayerItem(self, playlist=False):
+        self.log('getPlayerItem, playlist = %s' % (playlist))
+        if playlist: json_query = '{"jsonrpc":"2.0","method":"Playlist.GetItems","params":{"playlistid":%s,"properties":["runtime","title","plot","genre","year","studio","mpaa","season","episode","showtitle","thumbnail","uniqueid","file","customproperties"]},"id":1}'%(self.getActivePlaylist())
+        else:        json_query = '{"jsonrpc":"2.0","method":"Player.GetItem","params":{"playerid":%s,"properties":["file","writer","channel","channels","channeltype","mediapath","uniqueid","customproperties"]}, "id": 1}'%(self.getActivePlayer())
+        result = self.cacheJSON(json_query).get('result', {})
+        return (result.get('item', {}) or result.get('items', []))
+
+
     def requestFile(self, file, media='video', fallback={}):
         log("requestFile, file = " + file + ", media = " + media) 
-        json_query = ('{"jsonrpc":"2.0","method":"Files.GetFileDetails","params":{"file":"%s","media":"%s","properties":%s},"id":1}' % (self.escapeDirJSON(file), media, JSON_FL_ENUMS))
+        json_query = ('{"jsonrpc":"2.0","method":"Files.GetFileDetails","params":{"file":"%s","media":"%s","properties":%s},"id":1}' % (self.escapeDirJSON(file), media, self.getEnums(id="List.Fields.Files", type='items')))
         json_response = self.cacheJSON(json_query)
         if 'result' not in json_response: return fallback
         return json_response['result'].get('filedetails',fallback)
@@ -440,6 +442,13 @@ class MM(object):
         return mydir
         
         
+    def getEnums(self, id, type=''):
+        self.log('getEnums id = %s, type = %s' % (id, type))
+        json_query = ('{"jsonrpc":"2.0","method":"JSONRPC.Introspect","params": {"getmetadata": true, "filterbytransport": true,"filter": {"getreferences": false, "id":"%s","type":"type"}},"id":1}'%(id))
+        json_response = self.cacheJSON(json_query).get('result',{}).get('types',{}).get(id,{})
+        return (json_response.get(type,{}).get('enums',[]) or json_response.get('enums',[]))
+
+
     def getTVShows(self, cache=True):
         if not self.hasTV(): return []
         json_query    = ('{"jsonrpc":"2.0","method":"VideoLibrary.GetTVShows","params":{"properties":%s}, "id": 1}'%(JSON_TV_ENUMS))
@@ -487,23 +496,45 @@ class MM(object):
         return self.buildMenu()
         
    
-    def poolList(self, method, items=None, args=None, chunk=1):
-        log("poolList")
+    def poolList(self, func, items=[], args=None, kwargs=None, chunksize=None):
         results = []
-        if ENABLE_POOL:
-            pool = ThreadPool(CORES)
-            if args is not None: 
-                results = pool.map(method, zip(items,repeat(args)), chunksize=chunk)
-            elif items: 
-                results = pool.map(method, items, chunksize=chunk)
+        if len(items) == 0: return results
+        try:
+            if chunksize is None: chunksize = roundupDIV(len(items), self.cpuCount)
+            if len(items) == 0 or chunksize < 1: chunksize = 1 #set min. size
+            self.log("poolList, chunksize = %s, items = %s"%(chunksize,len(items)))
+            
+            pool = ThreadPool(self.cpuCount)
+            if kwargs and isinstance(kwargs,dict):
+                results = pool.imap(partial(func, **kwargs), items, chunksize)
+            else:
+                if args: items = zip(items,repeat(args))
+                results = pool.imap(func, items, chunksize)
             pool.close()
             pool.join()
-        else:
-            if args is not None: 
-                results = [method((item, args)) for item in items]
-            elif items: 
-                results = [method(item) for item in items]
-        return filter(None, results)
+        except Exception as e: 
+            self.log("poolList, threadPool Failed! %s"%(e), xbmc.LOGERROR)
+            results = self.genList(func, items, args, kwargs)
+        
+        if results: 
+            try:    results = list(filter(None, results)) #catch pickle error if/when using processing
+            except: results = list(results)
+        return results
+        
+        
+    def genList(self, func, items=[], args=None, kwargs=None):
+        self.log("genList, %s"%(func.__name__))
+        try:
+            if kwargs and isinstance(kwargs,dict):
+                results = (partial(func, **kwargs)(item) for item in items)
+            elif args:
+                results = (func((item, args)) for item in items)
+            else:
+                results = (func(item) for item in items)
+            return list(filter(None, results))
+        except Exception as e: 
+            self.log("genList, Failed! %s"%(e), xbmc.LOGERROR)
+            return []
 
 
 if __name__ == '__main__':

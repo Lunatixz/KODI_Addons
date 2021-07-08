@@ -19,14 +19,34 @@
 # -*- coding: utf-8 -*-
 from default import *
 
+def isPseudoTV():
+    return xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True"
+    
 class Player(xbmc.Player):
     def __init__(self):
         xbmc.Player.__init__(self)
         self.playingItem = {}
         
         
-    def reset(self):
+    def resetPlayingItem(self):
         self.playingItem = {}
+        
+        
+    def assertPlaying(self):
+        if isPseudoTV(): return False
+        elif self.isPlayingVideo(): return True
+        return False
+        
+        
+    def updatePlayingItem(self):
+        if self.playingItem: self.playingItem['Time'] = self.getPlayerTime()
+        else:  self.onPlayBackStarted()
+        
+
+    def getPlayerItem(self):
+        log('getPlayerItem')
+        try:    return self.getPlayingItem() #Kodi v20. todo
+        except: return self.myService.myUtils.getPlayerItem()
         
         
     def getPlayerTotalTime(self):
@@ -41,19 +61,19 @@ class Player(xbmc.Player):
         
     def onAVStarted(self):
         log('onAVStarted')
-        self.reset()
+        self.resetPlayingItem()
         
 
     def onPlayBackStarted(self):
         if self.isPlayingVideo():
-            self.playingItem = self.myService.myUtils.requestItem()
+            self.playingItem = self.getPlayerItem()
             self.playingItem['TotalTime'] = self.getPlayerTotalTime()
             log('onPlayBackStarted, playingItem = %s'%(self.playingItem))
         
 
     def onPlayBackError(self):
         log('onPlayBackError')
-        self.reset()
+        self.resetPlayingItem()
         
         
     def onPlayBackEnded(self):
@@ -68,18 +88,18 @@ class Player(xbmc.Player):
 
     def chkContent(self, playingItem={}):
         log('chkContent, playingItem = %s'%(self.playingItem))
-        conditions = [xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True",
+        conditions = [isPseudoTV(),
                       not self.playingItem,
                       self.playingItem.get('TotalTime',-1) <= 0,
                       self.playingItem.get("file","").startswith(('plugin://','upnp://','pvr://'))]
                       
-        if not True in conditions:
-            if ((self.playingItem['Time'] * 100) / self.playingItem['TotalTime']) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
-                if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": 
-                    self.myService.myUtils.chkSeason(self.playingItem)
-                else:
-                    self.myService.myUtils.removeContent(self.playingItem)
-        self.reset()
+        if True in conditions: return
+        if ((self.playingItem['Time'] * 100) / self.playingItem['TotalTime']) >= float(REAL_SETTINGS.getSetting('Play_Percentage')):
+            if self.playingItem["type"] == "episode" and REAL_SETTINGS.getSetting('Wait_4_Season') == "true": 
+                self.myService.myUtils.chkSeason(self.playingItem)
+            else:
+                self.myService.myUtils.removeContent(self.playingItem)
+        self.resetPlayingItem()
         
         
 class Monitor(xbmc.Monitor):
@@ -119,13 +139,11 @@ class Monitor(xbmc.Monitor):
  
 class Service(object):
     def __init__(self):
-        self.running   = False
         self.myUtils   = MM()
         self.myMonitor = Monitor()
-        self.myMonitor.myService = self
         self.myPlayer  = Player()
-        self.myPlayer.myService = self
-        self.startService()
+        self.myPlayer.myService  = self
+        self.myMonitor.myService = self
     
     
     def scanLibrary(self):
@@ -149,7 +167,7 @@ class Service(object):
         
         
     def getIdleTime(self):
-        try: return (int(xbmc.getGlobalIdleTime()) or 0)
+        try:    return (int(xbmc.getGlobalIdleTime()) or 0)
         except: return 0 #Kodi raises error after sleep.
         
             
@@ -158,15 +176,9 @@ class Service(object):
         self.myMonitor.waitForAbort(5)
         self.loadMySchedule()
         while not self.myMonitor.abortRequested():
-            # if xbmcgui.getCurrentWindowDialogId() == 10140 and not self.myMonitor.pendingChange: self.myMonitor.pendingChange = True
-            if self.myMonitor.waitForAbort(5): break
-            if self.myPlayer.isPlaying():
-                if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
-                    if self.myPlayer.playingItem:
-                        self.myPlayer.playingItem['Time'] = self.myPlayer.getPlayerTime()
-                    else: 
-                        self.myPlayer.onPlayBackStarted()
-            elif self.getIdleTime() > 900:
-                schedule.run_pending()  #run scan/clean when 15mins idle
+            if   self.myMonitor.waitForAbort(2): break
+            elif self.myPlayer.assertPlaying():  self.myPlayer.updatePlayingItem() #update playingItem
+            elif self.getIdleTime() > 900:       schedule.run_pending()            #run scan/clean when 15mins idle
 
-if __name__ == '__main__': Service()
+
+if __name__ == '__main__': Service().startService()

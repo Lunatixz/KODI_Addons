@@ -28,10 +28,9 @@ from kodi_six                 import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcv
 from favorites                import *
 
 try:
-    from multiprocessing      import cpu_count
-    from multiprocessing.pool import ThreadPool 
+    from multiprocessing.dummy import Pool as ThreadPool
     ENABLE_POOL = True
-    CORES = cpu_count()
+    CORES       = 4
 except: ENABLE_POOL = False
 
 PY2 = sys.version_info[0] == 2
@@ -418,7 +417,7 @@ class Locast(object):
         
         if len(user) > 0:
             if self.chkUser(user): return True
-            data = self.postURL(BASE_API + '/user/login',param='{"username":"' + user + '","password":"' + password + '"}')
+            data = self.postURL(BASE_API + '/user/login?client_id=CqhAMsBw%2BnxTXSJMLGqyOw%3D%3D',param=json.dumps({"username":user,"password":password,"captcha":"kodi"}))
             '''{u'token': u''}'''
             if data and 'token' in data: 
                 self.token = data['token']
@@ -549,6 +548,7 @@ class Locast(object):
         
 
     def buildStation(self, data):
+        inputstream = getInputStream()
         station, opt = data
         if station['active'] == False: return None
         label    = (station.get('affiliateName','') or station.get('affiliate','') or station.get('callSign','') or station.get('name',''))
@@ -562,10 +562,10 @@ class Locast(object):
                     "preset"   :stnum,
                     "group"    :ADDON_NAME,
                     "radio"    :False}#,
-                    # "kodiprops":{"inputstream":"inputstream.adaptive",
-                                 # "inputstream.adaptive.manifest_type":"hls",
-                                 # "inputstream.adaptive.media_renewal_url":"plugin://%s/play/pvr/%s"%(ADDON_ID,station['id']),
-                                 # "inputstream.adaptive.media_renewal_time":"900"}}
+                    #"kodiprops":{"inputstream":inputstream,
+                    #             "%s.manifest_type":"hls"%(inputstream),
+                    #             "http-reconnect":"true"}
+                                 
         if favorite: channel['group'] = ';'.join([LANGUAGE(49012),ADDON_NAME])
         if REAL_SETTINGS.getSettingBool('Build_Favorites') and not favorite: return None
         elif opt == 'channel': return channel
@@ -609,6 +609,7 @@ class Locast(object):
         
         if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
             inputstream = getInputStream()
+            liz.setProperty('http-reconnect','true')
             liz.setProperty('inputstream',inputstream)
             liz.setProperty('%s.manifest_type'%(inputstream),'hls')
             
@@ -631,12 +632,6 @@ class Locast(object):
         else:            
             found = True
             liz   = self.resolveURL(id,opt)
-            # if opt != 'pvr' and 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
-                # liz.setProperty('inputstream','inputstream.adaptive')
-                # liz.setProperty('inputstream.adaptive.manifest_type','hls')
-                # liz.setProperty('inputstream.adaptive.media_renewal_url', 'plugin://%s/play/%s/%s'%(ADDON_ID,opt,id))
-                # liz.setProperty('inputstream.adaptive.media_renewal_time', '900')
-                #todo debug pvr (IPTV Simple) not playing with inputstream! temp. use kodiprops in m3u?
         xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
     
     

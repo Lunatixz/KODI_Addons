@@ -46,8 +46,8 @@ msgstr ""
 
 msgctxt "#30007"
 msgid "All Channels"
-msgstr "
+msgstr ""
 
 msgctxt "#30008"
 msgid ">> Next"
-msgstr "
+msgstr ""

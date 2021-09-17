@@ -4,7 +4,7 @@
 # Addon Provider: Lunatixz
 msgid ""
 msgstr ""
-"Project-Id-Version: \\script.twittertweets\n"
+"Project-Id-Version: script.twittertweets\n"
 "Report-Msgid-Bugs-To: https://forum.kodi.tv/showthread.php?tid=317791\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: 2017-10-17 22:03+0200\n"

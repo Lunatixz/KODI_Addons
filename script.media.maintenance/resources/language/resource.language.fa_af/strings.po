@@ -1,0 +1,225 @@
+# Kodi Media Center language file
+# Addon Name: "Media Maintenance"
+# Addon id: script.media.maintenance
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: plugin.video.cbr\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: fa_af\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+
+msgctxt "#30000"
+msgid "Enable Debugging [Log errors]"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Something went wrong, Try again..."
+msgstr ""
+
+msgctxt "#30002"
+msgid "Select TV Shows to Monitor"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Scanning..."
+msgstr ""
+
+msgctxt "#30004"
+msgid "Scan Complete"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Monitored TV Shows"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Add Sonarr Monitored TV Shows"
+msgstr ""
+
+msgctxt "#30007"
+msgid "IP:Port"
+msgstr ""
+
+msgctxt "#30008"
+msgid "API-Key"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Scanning Sonarrr"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Monitoring [B](%s)[/B] TV Show%s"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Last Scanned (%s)"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Clear Monitored TV Shows"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Enable add-on to [B]DELETE[/B] your media"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Warning!! Selecting "Remove" will [B]PERMANENTLY DELETE[/B] media"
+msgstr ""
+
+msgctxt "#30015"
+msgid "TV Shows"
+msgstr ""
+
+msgctxt "#30016"
+msgid "Sonarr"
+msgstr ""
+
+msgctxt "#30017"
+msgid "Cleared Monitored TV Shows"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Movies"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Radarr"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Watched after"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Remove (%s)"
+msgstr ""
+
+msgctxt "#30022"
+msgid "Permission required, Check file access."
+msgstr ""
+
+msgctxt "#30023"
+msgid ""%s" Removed!"
+msgstr ""
+
+msgctxt "#30024"
+msgid "Monitor Movies"
+msgstr ""
+
+msgctxt "#30025"
+msgid "Clear Monitored Movies"
+msgstr ""
+
+msgctxt "#30026"
+msgid "Scan Radarr for Monitored Movies"
+msgstr ""
+
+msgctxt "#30027"
+msgid ""
+msgstr ""
+
+msgctxt "#30028"
+msgid "Monitors"
+msgstr ""
+
+msgctxt "#30029"
+msgid "Only Remove TV episodes after completing the season"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Scheduling"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Scan Library"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Clean Library"
+msgstr ""
+
+msgctxt "#30033"
+msgid "No Duplicates Found"
+msgstr ""
+
+msgctxt "#30034"
+msgid "Scan Library for duplicate Movies"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Open Settings"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Select duplicates to remove"
+msgstr ""
+
+msgctxt "#30037"
+msgid "Select one or multiple TV Shows"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Scanning TV Shows..."
+msgstr ""
+
+msgctxt "#30039"
+msgid "Scanning Movies..."
+msgstr ""
+
+msgctxt "#30040"
+msgid "Removing duplicate Movies..."
+msgstr ""
+
+msgctxt "#30041"
+msgid "Match duplicate Movies by"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Add to Monitor List"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Add "%s" to Monitored TV Shows"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Select All"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Monitor all shows"
+msgstr ""
+
+msgctxt "#30046"
+msgid "General"
+msgstr ""
+
+msgctxt "#30047"
+msgid "Monitor PVR Recordings"
+msgstr ""
+
+msgctxt "#30048"
+msgid "Unselect All"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Remove all show monitors"
+msgstr ""
+
+msgctxt "#30050"
+msgid "Scanning Movies for duplicates..."
+msgstr ""
+
+msgctxt "#30051"
+msgid ""%s" Deleted!"
+msgstr ""

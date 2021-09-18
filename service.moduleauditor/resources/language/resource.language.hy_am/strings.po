@@ -1,0 +1,124 @@
+# XBMC Media Center language file
+# Addon Name: Kodi Module Auditor
+# Addon id: service.moduleauditor
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: hy_am\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+
+msgctxt "#32000"
+msgid "Enable Debugging"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Something went wrong, Try again..."
+msgstr ""
+
+msgctxt "#32002"
+msgid "[COLOR=green]Verified[/COLOR]"
+msgstr ""
+
+msgctxt "#32003"
+msgid "[COLOR=orange]Unknown Origin[/COLOR]"
+msgstr ""
+
+msgctxt "#32004"
+msgid "[COLOR=red]Unknown Version[/COLOR]"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Silently run scan every x days"
+msgstr ""
+
+msgctxt "#32006"
+msgid "found [B]%d[/B] issue%s, Manually run for more details ..."
+msgstr ""
+
+msgctxt "#32007"
+msgid "Summary"
+msgstr ""
+
+msgctxt "#32008"
+msgid "Details"
+msgstr ""
+
+msgctxt "#32009"
+msgid "View Summary or Details?"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Module Disabled"
+msgstr ""
+
+msgctxt "#32011"
+msgid "Disable %s?"
+msgstr ""
+
+msgctxt "#32012"
+msgid "Select Module to disable"
+msgstr ""
+
+msgctxt "#32013"
+msgid "[COLOR=white][B]Risk Assessment[/B][/COLOR] - [COLOR=red][B]Severe[/B][/COLOR] | [COLOR=orange][B]Moderate[/B][/COLOR] | [COLOR=green][B]Low[/B][/COLOR]"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Building Kodi Repositories ..."
+msgstr ""
+
+msgctxt "#32015"
+msgid "reviewing %s"
+msgstr ""
+
+msgctxt "#32016"
+msgid "Auditing Modules ..."
+msgstr ""
+
+msgctxt "#32017"
+msgid "Verifying %s"
+msgstr ""
+
+msgctxt "#32018"
+msgid "Audit Complete"
+msgstr ""
+
+msgctxt "#32019"
+msgid "Added to White List"
+msgstr ""
+
+msgctxt "#32020"
+msgid "View Options for Module?"
+msgstr ""
+
+msgctxt "#32021"
+msgid "Disable Module?"
+msgstr ""
+
+msgctxt "#32022"
+msgid "Ignore Module?"
+msgstr ""
+
+msgctxt "#32023"
+msgid "More Information ..."
+msgstr ""
+
+msgctxt "#32024"
+msgid "Back to Details ..."
+msgstr ""
+
+msgctxt "#32025"
+msgid "Select Action for %s"
+msgstr ""
+
+msgctxt "#32026"
+msgid "Disable Auto Scan"
+msgstr ""

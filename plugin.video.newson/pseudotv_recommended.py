@@ -42,11 +42,15 @@ def slugify(text):
 
 def regPseudoTV():
     while not MONITOR.abortRequested():
-        WAIT_TIME = 60
+        WAIT_TIME = 300
+        
         if xbmc.getCondVisibility('System.HasAddon(plugin.video.pseudotv.live)'):
             WAIT_TIME = 900
             asset = {'vod':[{'type':'vod','name':'%s (%s)'%(LANGUAGE(30006),ADDON_NAME),'description':LANGUAGE(30002),'icon':LOGO,'path':'plugin://plugin.video.newson/local','id':ADDON_ID}]}
             xbmcgui.Window(10000).setProperty(PROP_KEY, json.dumps(asset))
+        else:
+            xbmcgui.Window(10000).clearProperty(PROP_KEY)
+            
         if MONITOR.waitForAbort(WAIT_TIME): break
         
 if __name__ == '__main__': regPseudoTV()

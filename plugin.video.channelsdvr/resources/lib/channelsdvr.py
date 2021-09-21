@@ -27,17 +27,12 @@ from itertools     import repeat, cycle, chain, zip_longest
 from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 
 try:
-    from multiprocessing      import cpu_count 
-    from multiprocessing.pool import ThreadPool 
-    ENABLE_POOL = True
+    from multiprocessing.dummy import Pool as ThreadPool     
+    from multiprocessing       import cpu_count
     CORES = cpu_count()
+    ENABLE_POOL = True
 except: ENABLE_POOL = False
 
-PY3 = sys.version_info[0] == 3
-if PY3: 
-    basestring = str
-    unicode = str
-  
 # Plugin Info
 ADDON_ID      = 'plugin.video.channelsdvr'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
@@ -46,6 +41,7 @@ SETTINGS_LOC  = REAL_SETTINGS.getAddonInfo('profile')
 ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path')
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 ICON          = REAL_SETTINGS.getAddonInfo('icon')
+LOGO          = os.path.join('special://home/addons/%s/'%(ADDON_ID),'resources','images','logo.png')
 FANART        = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE      = REAL_SETTINGS.getLocalizedString
 ROUTER        = routing.Plugin()
@@ -176,7 +172,7 @@ class Channels(object):
         self.cache  = SimpleCache()
         
         
-    def openURL(self, url, life=datetime.timedelta(minutes=15),serialized=True):
+    def openURL(self, url, life=datetime.timedelta(minutes=5),serialized=True):
         try:
             if url == M3U_URL: 
                 serialized = False
@@ -260,10 +256,14 @@ class Channels(object):
             if channel.get('Hidden',False): continue
             items.append({'number'  :channel.get('Number'),
                           'logo'    :channel.get('Image'),
-                          'name'    :channel.get('CallSign'),
+                          'name'    :channel.get('Name',channel.get('CallSign')),
+                          'HD'      :channel.get('HD',False),
+                          'id'      :channel.get('ID'),
+                          'DRM'     :channel.get('DRM'),
+                          'station' :channel.get('Station'),
                           'groups'  :[],
                           'Favorite':channel.get('Favorite'),
-                          'title'   :channel.get('Name'),
+                          'title'   :channel.get('Name',channel.get('CallSign')),
                           'url'     :playURL.format(chid=channel.get('Number'),TS=TS_VAL,CODEC=CO_VAL)})
         return sorted(items, key=lambda k: k['number'])
 
@@ -291,12 +291,12 @@ class Channels(object):
   
     def buildLineupItem(self, content):
         channel = content['Channel']
-        label   = '%s| %s'%(channel['Number'],channel['Name'])
+        label   = '%s| %s'%(channel['Number'],channel.get('Name',channel.get('CallSign')))
         art     = {"thumb" :channel.get('Image',ICON),
                    "poster":channel.get('Image',ICON),
                    "fanart":channel.get('Image',ICON),
-                   "icon"  :channel.get('Image',ICON),
-                   "logo"  :channel.get('Image',ICON)} 
+                   "icon"  :channel.get('Image',LOGO),
+                   "logo"  :channel.get('Image',LOGO)} 
         self.addDir(label, (getChannel,channel['Number']), infoArt=art)
         
 
@@ -306,12 +306,44 @@ class Channels(object):
         channel    = content['Channel']
         programmes = content['Airings']
         liveMatch  = False
-        if channel['Hidden'] == True: return
+        if channel.get('Hidden',False) == True: return
         elif favorites and not channel.get('Favorite',False): return
         tz  = (timezone()//100)*60*60
         now = (datetime.datetime.fromtimestamp(float(getLocalTime()))) + datetime.timedelta(seconds=tz)
         url = channel['Number']
-        for program in programmes:
+        for program in programmes: #todo add support for custom and virtual channels, no starttimes create on the fly
+            # [{
+                # 'Airings': [{
+                    # 'Source': 'virtual/file/16870',
+                    # 'Channel': '10001',
+                    # 'OriginalDate': '2009-11-13',
+                    # 'Time': 1627070757,
+                    # 'Duration': 2556,
+                    # 'Title': 'Monk',
+                    # 'EpisodeTitle': 'Mr. Monk Is the Best Man',
+                    # 'Summary': 'Monk attempts to save the wedding of someone close to him by learning who is trying to sabotage it.',
+                    # 'FullSummary': 'Monk attempts to save the wedding of someone close to him by finding out who is trying to sabotage it and why.',
+                    # 'Image': 'http://tmsimg.fancybits.co/assets/p184807_b_h6_ag.jpg',
+                    # 'Categories': ['Episode', 'Series'],
+                    # 'Genres': ['Crime drama', 'Comedy'],
+                    # 'Tags': ['Stereo'],
+                    # 'SeriesID': '184807',
+                    # 'ProgramID': 'EP005116510129',
+                    # 'SeasonNumber': 8,
+                    # 'EpisodeNumber': 13,
+                    # 'Directors': ['Michael Zinberg'],
+                    # 'Cast': ['Tony Shalhoub', 'Ted Levine', 'Traylor Howard'],
+                    # 'ReleaseYear': 2009,
+                    # 'Raw': None
+                # }],
+                # 'Channel': {
+                    # 'HD': True,
+                    # 'Hidden': False,
+                    # 'Image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Logo_Monk.svg/1200px-Logo_Monk.svg.png',
+                    # 'Name': 'Monk 24/7',
+                    # 'Number': '10001'
+                # }
+            # }]
             try:
                 label = program.get('Title','')
                 path  = program.get('Path','')
@@ -321,9 +353,9 @@ class Channels(object):
                 elif now >= start and now < stop:
                     if opt == 'live':
                         if label:
-                            label = '%s| %s: [B]%s[/B]'%(channel['Number'],channel['Name'],program.get('Title',''))
+                            label = '%s| %s: [B]%s[/B]'%(channel['Number'],channel.get('Name',channel.get('CallSign')),program.get('Title',''))
                         else: 
-                            label = '%s| %s'%(channel['Number'],channel['Name'])
+                            label = '%s| %s'%(channel['Number'],channel.get('Name',channel.get('CallSign')))
                         liveMatch = True
                     elif opt == 'lineup':
                         label = '%s - [B]%s[/B]'%(start.strftime('%I:%M %p').lstrip('0'),program.get('Title',''))
@@ -331,7 +363,7 @@ class Channels(object):
                 elif opt == 'lineup':
                     url   = 'NEXT_SHOW'
                     label = '%s - %s'%(start.strftime('%I:%M %p').lstrip('0'),program.get('Title',''))
-                icon  = channel.get('Image',ICON)
+                icon  = channel.get('Image',LOGO)
                 thumb = program.get('Image',icon)
                 info  = {'label':label,'title':label,'duration':program.get('Duration',0),'genre':program.get('Genres',[]),'plot':program.get('Summary',xbmc.getLocalizedString(161)),'aired':program.get('OriginalDate','')}
                 art   = {"thumb":thumb,"poster":thumb,"fanart":thumb,"icon":icon,"logo":icon}
@@ -395,7 +427,7 @@ class Channels(object):
         if infoList:  liz.setInfo(type=infoType, infoLabels=infoList)
         else:         liz.setInfo(type=infoType, infoLabels={"mediatype":infoType,"label":name,"title":name})
         if infoArt:   liz.setArt(infoArt)
-        else:         liz.setArt({"thumb":ICON,"poster":ICON,"fanart":FANART,"icon":ICON,"logo":ICON})
+        else:         liz.setArt({"thumb":LOGO,"poster":LOGO,"fanart":FANART,"icon":LOGO,"logo":LOGO})
         if infoVideo: liz.addStreamInfo('video', infoVideo)
         if infoAudio: liz.addStreamInfo('audio', infoAudio)
         self.listitems.append(liz)
@@ -408,7 +440,7 @@ class Channels(object):
         if infoList:  liz.setInfo(type=infoType, infoLabels=infoList)
         else:         liz.setInfo(type=infoType, infoLabels={"mediatype":infoType,"label":name,"title":name})
         if infoArt:   liz.setArt(infoArt)
-        else:         liz.setArt({"thumb":ICON,"poster":ICON,"fanart":FANART,"icon":ICON,"logo":ICON})
+        else:         liz.setArt({"thumb":LOGO,"poster":LOGO,"fanart":FANART,"icon":LOGO,"logo":LOGO})
         if infoVideo: liz.addStreamInfo('video', infoVideo)
         if infoAudio: liz.addStreamInfo('audio', infoAudio)
         if infoList.get('favorite',None) is not None: liz = self.addContextMenu(liz, infoList)
@@ -422,7 +454,7 @@ class Channels(object):
         if infoList: liz.setInfo(type=infoType, infoLabels=infoList)
         else:        liz.setInfo(type=infoType, infoLabels={"mediatype":infoType,"label":name,"title":name})
         if infoArt:  liz.setArt(infoArt)
-        else:        liz.setArt({"thumb":ICON,"poster":ICON,"fanart":FANART,"icon":ICON,"logo":ICON})
+        else:        liz.setArt({"thumb":ICON,"poster":ICON,"fanart":FANART,"icon":LOGO,"logo":LOGO})
         if infoList.get('favorite',None) is not None: liz = self.addContextMenu(liz, infoList)
         xbmcplugin.addDirectoryItem(ROUTER.handle, ROUTER.url_for(*uri), liz, isFolder=True)
         
@@ -464,7 +496,7 @@ class Channels(object):
         # https://github.com/add-ons/service.iptv.manager/wiki/JSON-EPG-format
         channels  = self.getChannels()
         guidedata = self.getGuidedata()
-        return {k:v for x in self.poolList(self.buildStation, guidedata,(channels,'programmes')) for k,v in x.items()}
+        return {k:v for x in self.poolList(self.buildStation, guidedata, (channels,'programmes')) for k,v in x.items()}
         
 
     def buildStation(self, data):
@@ -477,7 +509,7 @@ class Channels(object):
         channel  = {"name"  :station['Name'],
                     "stream":"plugin://%s/play/pvr/%s"%(ADDON_ID,station['Number']), 
                     "id"    :"%s.%s@%s"%(station['Number'],slugify(station['Name']),slugify(ADDON_NAME)), 
-                    "logo"  :(station.get('Image','') or ICON), 
+                    "logo"  :(station.get('Image','') or LOGO), 
                     "preset":station['Number'],
                     "group" :';'.join(cdata['groups']),
                     "radio" :False}

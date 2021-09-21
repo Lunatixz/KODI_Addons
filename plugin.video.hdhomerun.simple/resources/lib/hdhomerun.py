@@ -28,10 +28,9 @@ from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_enc
 from pyhdhr        import PyHDHR
 
 try:
-    from multiprocessing      import cpu_count
-    from multiprocessing.pool import ThreadPool 
+    from multiprocessing.dummy import Pool as ThreadPool
     ENABLE_POOL = True
-    CORES = cpu_count()
+    CORES       = 4
 except: ENABLE_POOL = False
 
 PY2 = sys.version_info[0] == 2

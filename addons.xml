@@ -105,7 +105,7 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.hdhomerun.simple" name="HDHomerun Simple" provider-name="Lunatixz" version="1.0.6a">
+<addon id="plugin.video.hdhomerun.simple" name="HDHomerun Simple" provider-name="Lunatixz" version="1.0.7">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -144,7 +144,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.locast" version="1.1.8" name="Locast" provider-name="Lunatixz">
+<addon id="plugin.video.locast" version="1.1.9" name="Locast" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -165,6 +165,7 @@
     <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
+        <lifecyclestate type="broken" lang="en_GB">Locast is suspending operations, effective immediately.\nVisit www.locast.org for details...</lifecyclestate>
         <summary lang="en_GB">Locast is a public service to Americans, providing local broadcast signals over the Internet in select cities like New York, Philadelphia, Boston, Chicago, Houston and Dallas ...</summary>
         <description lang="en_GB">All you have to do is sign up online, provide your name and email address, and certify that you live in, and are logging on from, one of the select US cities (“Designated Market Area”). Then, you can select among local broadcasters and stream your favorite local station. Locast.org is a “digital translator,” meaning that Locast.org operates just like a traditional broadcast translator service, except instead of using an over-the-air signal to boost a broadcaster’s reach, we stream the signal over the Internet to consumers located within select US cities. Ever since the dawn of TV broadcasting in the mid-20th Century, non-profit organizations have provided “translator” TV stations as a public service. Where a primary broadcaster cannot reach a receiver with a strong enough signal, the translator amplifies that signal with another transmitter, allowing consumers who otherwise could not get the over-the-air signal to receive important programming, including local news, weather and of course, sports. Locast.org provides the same public service, except instead of an over-the-air signal transmitter, we provide the local broadcast signal via online streaming.</description>
         <platform>all</platform>
@@ -185,7 +186,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.newson" version="1.2.5" name="NewsON" provider-name="Lunatixz">
+<addon id="plugin.video.newson" version="1.2.7" name="NewsON" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -252,7 +253,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.plutotv" version="1.5.5b" name="Pluto TV" provider-name="Lunatixz">
+<addon id="plugin.video.plutotv" version="1.5.6" name="Pluto TV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -503,7 +504,7 @@
     </extension>
 </addon>
 
-<addon id="screensaver.bing" name="Bing: Photos of the Week" version="1.0.5" provider-name="Lunatixz">
+<addon id="screensaver.bing" name="Bing: Photos of the Week" version="1.0.6" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -901,7 +902,7 @@
     <extension point="xbmc.service" library="service.py" start="login"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB"></summary>
-        <description lang="en_GB">Monitor your favorite twitter accounts, receive "realtime" tweets.</description>
+        <description lang="en_GB">Monitor your favorite twitter accounts, receive &quot;realtime&quot; tweets.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <website>https://twitter.com</website>
@@ -1004,8 +1005,8 @@
     <extension point="xbmc.python.script" library="settings.py"/>
     <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Enable closed captioning and subtitles "OnMute".</summary>
-        <description lang="en_GB">Let "OnMute" toggle closed captioning and subtitles while Kodi is muted.</description>
+        <summary lang="en_GB">Enable closed captioning and subtitles &quot;OnMute&quot;.</summary>
+        <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.onmute</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=334361</forum>

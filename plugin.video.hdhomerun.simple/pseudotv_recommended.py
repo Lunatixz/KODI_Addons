@@ -42,25 +42,32 @@ def slugify(text):
 
 def regPseudoTV():
     while not MONITOR.abortRequested():
-        if (xbmc.getCondVisibility('System.HasAddon(service.iptv.manager)') and xbmc.getCondVisibility('System.HasAddon(plugin.video.pseudotv.live)')):
-            if REAL_SETTINGS.getSettingBool('iptv.enabled'):
-                try:
-                    # Manager Info
-                    IPTV_MANAGER = xbmcaddon.Addon(id='service.iptv.manager')
-                    IPTV_PATH    = IPTV_MANAGER.getAddonInfo('profile')
-                    IPTV_M3U     = os.path.join(IPTV_PATH,'playlist.m3u8')
-                    IPTV_XMLTV   = os.path.join(IPTV_PATH,'epg.xml')
-                except Exception as e:
-                    xbmc.log('%s-%s-regPseudoTV failed! %s'%(ADDON_ID,ADDON_VERSION,e),xbmc.LOGERROR)
-                    break
-                
-                asset = {'iptv':{'type':'iptv','name':ADDON_NAME,'icon':ICON.replace(ADDON_PATH,'special://home/addons/%s/'%(ADDON_ID)).replace('\\','/'),'m3u':{'path':IPTV_M3U,'slug':'@%s'%(slugify(ADDON_NAME))},'xmltv':{'path':IPTV_XMLTV},'id':ADDON_ID}}
-                asset['vod'] = [{'type':'vod','name':'HDHomerun %s'%(LANGUAGE(30111)),'description':'','icon':LOGO,'path':'plugin://%s/recordings/All'%(ADDON_ID),'id':ADDON_ID}]
-                xbmcgui.Window(10000).setProperty(PROP_KEY, json.dumps(asset))
-                WAIT_TIME = 900
-            else:
-                xbmcgui.Window(10000).clearProperty(PROP_KEY)
-                WAIT_TIME = 300
+        WAIT_TIME = 300
+            
+        if xbmc.getCondVisibility('System.HasAddon(plugin.video.pseudotv.live)'):   
+            try:    asset = json.loads(xbmcgui.Window(10000).getProperty(PROP_KEY))
+            except: asset = {}
+            asset['vod'] = [{'type':'vod','name':'HDHomerun %s'%(LANGUAGE(30111)),'description':'','icon':LOGO,'path':'plugin://%s/recordings/All'%(ADDON_ID),'id':ADDON_ID}]
+        
+            if xbmc.getCondVisibility('System.HasAddon(service.iptv.manager)'):
+                if REAL_SETTINGS.getSettingBool('iptv.enabled'):
+                    WAIT_TIME = 900
+                    try: # Manager Info
+                        IPTV_MANAGER = xbmcaddon.Addon(id='service.iptv.manager')
+                        IPTV_PATH    = IPTV_MANAGER.getAddonInfo('profile')
+                        IPTV_M3U     = os.path.join(IPTV_PATH,'playlist.m3u8')
+                        IPTV_XMLTV   = os.path.join(IPTV_PATH,'epg.xml')
+                        asset['iptv'] = {'type':'iptv','name':ADDON_NAME,'icon':ICON.replace(ADDON_PATH,'special://home/addons/%s/'%(ADDON_ID)).replace('\\','/'),'m3u':{'path':IPTV_M3U,'slug':'@%s'%(slugify(ADDON_NAME))},'xmltv':{'path':IPTV_XMLTV},'id':ADDON_ID}
+                    except Exception as e:
+                        asset['iptv'] = {}
+                        xbmc.log('%s-%s-regPseudoTV failed! %s'%(ADDON_ID,ADDON_VERSION,e),xbmc.LOGERROR)
+                else: 
+                    asset['iptv'] = {}
+                    
+            xbmcgui.Window(10000).setProperty(PROP_KEY, json.dumps(asset))
+        else:
+            xbmcgui.Window(10000).clearProperty(PROP_KEY)
+                    
         if MONITOR.waitForAbort(WAIT_TIME): break
         
 if __name__ == '__main__': regPseudoTV()

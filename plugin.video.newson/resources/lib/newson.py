@@ -18,7 +18,7 @@
 
 # -*- coding: utf-8 -*-
 import os, sys, time, datetime, traceback, random, routing
-import socket, json, requests, collections, base64
+import socket, json, requests, collections, base64, gzip
 
 from six.moves     import urllib
 from itertools     import repeat, cycle, chain, zip_longest
@@ -26,10 +26,14 @@ from simplecache   import SimpleCache, use_cache
 from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 
 try:
-    from multiprocessing      import cpu_count
-    from multiprocessing.pool import ThreadPool 
+    from StringIO import StringIO ## for Python 2
+except ImportError:
+    from io import StringIO ## for Python 3
+    
+try:
+    from multiprocessing.dummy import Pool as ThreadPool
     ENABLE_POOL = True
-    CORES = cpu_count()
+    CORES       = 4
 except: ENABLE_POOL = False
 
 PY2 = sys.version_info[0] == 2
@@ -60,6 +64,7 @@ APIKEY           = REAL_SETTINGS.getSetting('MAPQUEST_API')
 DEBUG            = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 
 BASE_API      = 'https://newson.us/api'
+OLD_API       = 'http://watchnewson.com/api/linear/channels'
 LOGO_URL      = 'https://dummyimage.com/512x512/035e8b/FFFFFF.png&text=%s'
 FAN_URL       = 'https://dummyimage.com/1280x720/035e8b/FFFFFF.png&text=%s'
 MAP_URL       = 'https://www.mapquestapi.com/staticmap/v5/map?key=%s&center=%s&size=@2x'
@@ -67,7 +72,11 @@ MAP_URL       = 'https://www.mapquestapi.com/staticmap/v5/map?key=%s&center=%s&s
 @ROUTER.route('/')
 def buildMenu():
     NewsOn().buildMenu()
-    
+
+@ROUTER.route('/live')
+def buildLive(): pass
+    # NewsOn().browse('now')
+  
 @ROUTER.route('/now')
 def buildNow():
     NewsOn().browse('now')
@@ -237,7 +246,7 @@ class NewsOn(object):
             self.addLink(label, (playURL,encodeString(url)), infoList=infoLabel, infoArt=infoArt)
             return True
         
-
+        
     @use_cache(1)
     def getCoordinates(self):
         log('getCoordinates')
@@ -280,16 +289,19 @@ class NewsOn(object):
         except: return FANART
             
         
-    def openURL(self, url, param={}):
+    def openURL(self, url, param={}, life=datetime.timedelta(minutes=15)):
         try:
             log('openURL, url = %s'%(url))
             cacheName = '%s.openURL, url = %s.%s'%(ADDON_NAME,url,json.dumps(param))
             cacheresponse = self.cache.get(cacheName)
             if not cacheresponse:
-                req = requests.get(url, param, headers={'User-Agent':'Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)'})
-                cacheresponse = req.json()
+                req = requests.get(url, param, headers={'Accept-Encoding':'gzip','User-Agent':'Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)'})
+                try:
+                    cacheresponse = json.loads(gzip.GzipFile(fileobj=StringIO(req.content)))
+                except:
+                    cacheresponse = req.json()
                 req.close()
-                self.cache.set(cacheName, json.dumps(cacheresponse), checksum=len(json.dumps(cacheresponse)), expiration=datetime.timedelta(minutes=5))
+                self.cache.set(cacheName, json.dumps(cacheresponse), checksum=len(json.dumps(cacheresponse)), expiration=life)
                 return cacheresponse
             else: return json.loads(cacheresponse)
         except Exception as e: 

@@ -27,10 +27,9 @@ from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_enc
 from favorites     import *
 
 try:
-    from multiprocessing import cpu_count 
-    from multiprocessing.pool import ThreadPool 
+    from multiprocessing.dummy import Pool as ThreadPool
     ENABLE_POOL = True
-    CORES = cpu_count()
+    CORES       = 4
 except: ENABLE_POOL = False
 
 try:
@@ -545,7 +544,11 @@ class PlutoTV(object):
                     "logo"  :(chlogo or LOGO),
                     "preset":stnum,
                     "group" :[category,ADDON_NAME],
-                    "radio" :False}
+                    "radio" :False}#,
+                    #"kodiprops":{"inputstream":inputstream,
+                    #             "%s.manifest_type":"hls"%(inputstream),
+                    #             "http-reconnect":"true"}
+                    
         if favorite: channel['group'].append(LANGUAGE(49012))
         channel['group'] = ';'.join(channel['group'])
         if REAL_SETTINGS.getSettingBool('Build_Favorites') and not favorite: return None
@@ -571,6 +574,7 @@ class PlutoTV(object):
                            "date"       :aired.strftime('%Y-%m-%d'),
                            "credits"    :"",
                            "stream"     :'plugin://%s/play/vod/%s'%(ADDON_ID,uri)}
+
                 programmes[channel['id']].append(program)
             return programmes
              
@@ -629,10 +633,13 @@ class PlutoTV(object):
         liz.setInfo(type="Video", infoLabels={"mediatype":"video","label":name,"title":name,"duration":epdur})
         liz.setArt({'thumb':data.get('thumbnail',ICON),'fanart':data.get('thumbnail',FANART)})
         liz.setProperty("IsPlayable","true")
+        liz.setProperty('IsInternetStream','true')
+        
         if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
             inputstream = getInputStream()
             liz.setProperty('inputstream',inputstream)
             liz.setProperty('%s.manifest_type'%(inputstream),'hls')
+            liz.setProperty('http-reconnect','true')
             liz.setMimeType('application/vnd.apple.mpegurl')
         xbmcplugin.setResolvedUrl(ROUTER.handle, True, liz)
         
@@ -652,10 +659,14 @@ class PlutoTV(object):
             url = url.replace('deviceType=&','deviceType=web&').replace('deviceMake=&','deviceMake=Chrome&') .replace('deviceModel=&','deviceModel=Chrome&').replace('appName=&','appName=web&')#todo replace with regex!
             log('playVideo, url = %s'%url)
             liz.setPath(url)
+            liz.setProperty("IsPlayable","true")
+            liz.setProperty('IsInternetStream','true')
+        
             if 'm3u8' in liz.getPath().lower() and inputstreamhelper.Helper('hls').check_inputstream():
                 inputstream = getInputStream()
                 liz.setProperty('inputstream',inputstream)
                 liz.setProperty('%s.manifest_type'%(inputstream),'hls')
+                liz.setProperty('http-reconnect','true')
                 liz.setMimeType('application/vnd.apple.mpegurl')
         xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
 

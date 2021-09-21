@@ -62,25 +62,28 @@ class regPseudoTV:
     def run(self):
         while not MONITOR.abortRequested():
             WAIT_TIME = 300
+            
             if xbmc.getCondVisibility('System.HasAddon(plugin.video.pseudotv.live)'):   
                 try:    asset = json.loads(xbmcgui.Window(10000).getProperty(PROP_KEY))
                 except: asset = {}
-                
+                    
                 if self.chkVOD():# Build Recommend VOD
                     asset['vod'] = [] #clear older list
                     items = load(self.getDirs('plugin://%s/ondemand'%(ADDON_ID),ADDON_VERSION)).get('result',{}).get('files',[])
                     for item in items:
-                        if item.get('filetype') == 'directory':
-                            label = '%s (%s)'%(item.get('label'),ADDON_NAME)
-                            plot  = (item.get("plot","") or item.get("plotoutline","") or item.get("description",""))
-                            icon  = (item.get('art',{}).get('logo','') or item.get('art',{}).get('thumb','') or LOGO)
-                            asset.setdefault('vod',[]).append({'type':'vod','name':label,'description':plot,'icon':icon,'path':item.get('file'),'id':ADDON_ID})
+                        try:
+                            if item.get('filetype') == 'directory':
+                                label = '%s (%s)'%(item.get('label'),ADDON_NAME)
+                                plot  = (item.get("plot","") or item.get("plotoutline","") or item.get("description",""))
+                                icon  = (item.get('art',{}).get('icon','') or item.get('art',{}).get('thumb','') or LOGO)
+                                asset.setdefault('vod',[]).append({'type':'vod','name':label,'description':plot,'icon':icon,'path':item.get('file'),'id':ADDON_ID})
+                        except: pass
                     xbmcgui.Window(10000).setProperty('Last_VOD',str(time.time()))
-                        
+                    
                 if xbmc.getCondVisibility('System.HasAddon(service.iptv.manager)'):
                     if REAL_SETTINGS.getSettingBool('iptv.enabled'):
-                        try:
-                            # Manager Info
+                        WAIT_TIME = 900
+                        try: # Manager Info
                             IPTV_MANAGER  = xbmcaddon.Addon(id='service.iptv.manager')
                             IPTV_PATH     = IPTV_MANAGER.getAddonInfo('profile')
                             IPTV_M3U      = os.path.join(IPTV_PATH,'playlist.m3u8')
@@ -91,7 +94,11 @@ class regPseudoTV:
                             xbmc.log('%s-%s-regPseudoTV failed! %s'%(ADDON_ID,ADDON_VERSION,e),xbmc.LOGERROR)
                     else: 
                         asset['iptv'] = {}
+
                 xbmcgui.Window(10000).setProperty(PROP_KEY, json.dumps(asset))
+            else:
+                xbmcgui.Window(10000).clearProperty(PROP_KEY)
+                
             if MONITOR.waitForAbort(WAIT_TIME): break
         
 if __name__ == '__main__': regPseudoTV().run()

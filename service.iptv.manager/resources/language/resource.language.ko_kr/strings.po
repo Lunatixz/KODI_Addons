@@ -3,98 +3,103 @@
 # Addon id: service.iptv.manager
 msgid ""
 msgstr ""
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"PO-Revision-Date: 2021-09-21 19:29+0000\n"
+"Last-Translator: Minho Park <parkmino@gmail.com>\n"
+"Language-Team: Korean <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/ko_kr/>\n"
 "Language: ko_kr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.8\n"
 
 # CONTEXT MENU
 msgctxt "#30600"
 msgid "Play with IPTV Manager"
-msgstr ""
+msgstr "IPTV 관리자로 플레이"
 
 # MESSAGES
 msgctxt "#30700"
 msgid "Are you sure you want to setup IPTV Simple for the use with IPTV Manager? Any existing configuration of IPTV Simple will be overwritten."
-msgstr ""
+msgstr "IPTV 관리자와 함께 사용하기 위해 IPTV Simple을 설정하시겠습니까? 기존 IPTV Simple 구성을 덮어씁니다."
 
 msgctxt "#30701"
 msgid "IPTV Simple is configured for use with IPTV Manager!"
-msgstr ""
+msgstr "IPTV Simple은 IPTV 관리자와 함께 사용하도록 구성되었습니다!"
 
 msgctxt "#30702"
 msgid "The configuration of IPTV Simple has failed. Please check the log files for more information."
-msgstr ""
+msgstr "IPTV Simple 구성에 실패했습니다. 자세한 내용은 로그 파일을 확인하십시오."
 
 msgctxt "#30703"
 msgid "Detecting IPTV add-ons..."
-msgstr ""
+msgstr "IPTV 애드온 확인 중..."
 
 msgctxt "#30704"
 msgid "Fetching channels and guide of {addon}..."
-msgstr ""
+msgstr "{addon}의 채널 및 가이드를 가져오는 중..."
 
 msgctxt "#30705"
 msgid "Updating channels and guide..."
-msgstr ""
+msgstr "채널 및 가이드 업데이트 중..."
 
 msgctxt "#30706"
 msgid "This program isn't available to play."
-msgstr ""
+msgstr "이 프로그램은 재생할 수 없습니다."
 
 # SETTINGS
 msgctxt "#30800"
 msgid "Channels"
-msgstr ""
+msgstr "채널"
 
 msgctxt "#30801"
 msgid "Refreshing"
-msgstr ""
+msgstr "새로 고침"
 
 msgctxt "#30802"
 msgid "Refresh interval [I](in hours)[/I]"
-msgstr ""
+msgstr "새로 고침 간격 [I](시간 단위)[/I]"
 
 msgctxt "#30803"
 msgid "Refresh channels and guide now…"
-msgstr ""
+msgstr "지금 채널과 가이드 새로 고침…"
 
 msgctxt "#30820"
 msgid "IPTV Simple"
-msgstr ""
+msgstr "IPTV Simple"
 
 msgctxt "#30821"
 msgid "Configuration"
-msgstr ""
+msgstr "설정"
 
 msgctxt "#30822"
 msgid "Configure IPTV Simple automatically…"
-msgstr ""
+msgstr "자동으로 IPTV Simple 설정…"
 
 msgctxt "#30823"
 msgid "Open IPTV Simple settings…"
-msgstr ""
+msgstr "IPTV Simple 설정 열기…"
 
 msgctxt "#30824"
 msgid "Automatically restart IPTV Simple to refresh the data"
-msgstr ""
+msgstr "IPTV Simple을 자동으로 다시 시작하여 데이터 새로 고침"
 
 msgctxt "#30880"
 msgid "Expert"
-msgstr ""
+msgstr "전문가"
 
 msgctxt "#30881"
 msgid "Logging"
-msgstr ""
+msgstr "로그"
 
 msgctxt "#30882"
 msgid "Enable debug logging"
-msgstr ""
+msgstr "디버그 로그 사용"
 
 msgctxt "#30883"
 msgid "Install Kodi Logfile Uploader…"
-msgstr ""
+msgstr "Kodi 로그 파일 업로더 설치…"
 
 msgctxt "#30884"
 msgid "Open Kodi Logfile Uploader…"
-msgstr ""
+msgstr "Kodi 로그 파일 업로더 열기…"

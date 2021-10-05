@@ -26,19 +26,14 @@ from simplecache   import SimpleCache, use_cache
 from itertools     import repeat, cycle, chain, zip_longest
 from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 from pyhdhr        import PyHDHR
-
+    
 try:
-    from multiprocessing.dummy import Pool as ThreadPool
-    ENABLE_POOL = True
-    CORES       = 4
-except: ENABLE_POOL = False
+    if xbmc.getCondVisibility('System.Platform.Android'): raise Exception('Using Android threading')
+    from multiprocessing.pool import ThreadPool
+    SUPPORTS_POOL = True
+except Exception:
+    SUPPORTS_POOL = False
 
-PY2 = sys.version_info[0] == 2
-PY3 = sys.version_info[0] == 3
-if PY3: 
-    basestring = str
-    unicode = str
-  
 # Plugin Info
 ADDON_ID      = 'plugin.video.hdhomerun.simple'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
@@ -520,6 +515,7 @@ class HDHR(object):
         self.setDevice(tunerkey)
         info  = self.pyHDHR.getLiveTVChannelInfo(channel)
         if not info: return liz
+            
         url   = info.getURL()
         tuner = info.getTuner()
         if tuner.getModelNumber() == "HDTC-2US":
@@ -603,13 +599,13 @@ class HDHR(object):
     def addContextMenu(self, liz, infoList={}):
         log('addContextMenu')
         return liz
-        
-
+         
+         
     def poolList(self, method, items=None, args=None, chunk=25):
         log("poolList")
         results = []
-        if ENABLE_POOL:
-            pool = ThreadPool(CORES)
+        if SUPPORTS_POOL:
+            pool = ThreadPool()
             if args is not None: 
                 results = pool.map(method, zip(items,repeat(args)))
             elif items: 

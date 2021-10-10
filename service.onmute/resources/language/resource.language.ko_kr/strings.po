@@ -16,6 +16,14 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.8\n"
 
+msgctxt "Addon Summary"
+msgid "Enable closed captioning and subtitles \"OnMute\"."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Let \"OnMute\" toggle closed captioning and subtitles while Kodi is muted."
+msgstr ""
+
 msgctxt "#32001"
 msgid "Enable Debugging"
 msgstr "디버그 사용"

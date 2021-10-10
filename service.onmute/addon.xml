@@ -6,8 +6,6 @@
     <extension point="xbmc.python.script" library="settings.py"/>
     <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Enable closed captioning and subtitles &quot;OnMute&quot;.</summary>
-        <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.onmute</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=334361</forum>
@@ -17,5 +15,7 @@
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
+        <summary lang="en_GB">Enable closed captioning and subtitles &quot;OnMute&quot;.</summary>
+        <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>
     </extension>
 </addon>

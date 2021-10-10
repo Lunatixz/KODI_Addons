@@ -8,8 +8,6 @@
         <provides>executable</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Test your devices python performance.</summary>
-        <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
         <license>MIT</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/script.pystone.benchmark</source>
@@ -20,5 +18,7 @@
             <fanart>resources/images/fanart.jpg</fanart>
             <screenshot>resources/images/screenshot01.png</screenshot>
         </assets>
+        <summary lang="en_GB">Test your devices python performance.</summary>
+        <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
     </extension>
 </addon>

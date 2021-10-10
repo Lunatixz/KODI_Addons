@@ -16,6 +16,18 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.8\n"
 
+msgctxt "Addon Summary"
+msgid "Download and Install Kodi packages."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds."
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid "UWP not supported! Not intended for Kodi installation through the Windows Store."
+msgstr ""
+
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr "디버그 사용 [오류 기록]"

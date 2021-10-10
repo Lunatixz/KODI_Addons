@@ -15,6 +15,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n % 10 != 1 || n % 100 == 11;\n"
 
+msgctxt "Addon Summary"
+msgid "Download and Install Kodi packages."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds."
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid "UWP not supported! Not intended for Kodi installation through the Windows Store."
+msgstr ""
+
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr ""

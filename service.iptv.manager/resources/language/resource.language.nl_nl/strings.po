@@ -9,6 +9,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "Addon Summary"
+msgid "Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus"
+msgstr "Integreer IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's"
+
+msgctxt "Addon Description"
+msgid "IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus."
+msgstr "IPTV Manager integreert IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's."
+
 # CONTEXT MENU
 msgctxt "#30600"
 msgid "Play with IPTV Manager"

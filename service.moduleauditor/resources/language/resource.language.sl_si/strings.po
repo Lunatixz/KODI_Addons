@@ -15,6 +15,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3;\n"
 
+msgctxt "Addon Summary"
+msgid "Scan and Compare installed modules w/official Kodi repository."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Scan and Compare installed modules w/official Kodi repository."
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid "Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories."
+msgstr ""
+
 msgctxt "#32000"
 msgid "Enable Debugging"
 msgstr ""

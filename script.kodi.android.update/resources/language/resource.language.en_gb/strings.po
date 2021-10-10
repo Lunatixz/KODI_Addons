@@ -4,8 +4,8 @@
 # Addon Provider: Lunatixz
 msgid ""
 msgstr ""
-"Project-Id-Version:\script.kodi.android.update\n"
-"Report-Msgid-Bugs-To: https://forum.kodi.tv/"
+"Project-Id-Version: script.kodi.android.update\n"
+"Report-Msgid-Bugs-To: https://forum.kodi.tv/\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Lunatixz Translation Team\n"

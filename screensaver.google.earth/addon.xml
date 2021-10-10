@@ -9,8 +9,6 @@
     </requires>
     <extension point="xbmc.ui.screensaver" library="default.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
-        <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
         <license>GPL-3.0-or-later</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.google.earth</source>
@@ -24,5 +22,7 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
+        <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
     </extension>
 </addon>

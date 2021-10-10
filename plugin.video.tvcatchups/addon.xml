@@ -12,7 +12,6 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <description lang="en_GB">TVCatchup is an Internet television service for viewing free-to-air UK channels. It operates as a cable service and retransmits BBC, Channel 4, Channel 5, and ITV, amongst others, only in the UK.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.tvcatchups</source>
@@ -27,5 +26,6 @@
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
+        <description lang="en_GB">TVCatchup is an Internet television service for viewing free-to-air UK channels. It operates as a cable service and retransmits BBC, Channel 4, Channel 5, and ITV, amongst others, only in the UK.</description>
     </extension>
 </addon>

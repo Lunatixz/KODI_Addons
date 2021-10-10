@@ -16,6 +16,18 @@ msgstr ""
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "Addon Summary"
+msgid "Create a screensaver from any Kodi video source."
+msgstr "Crea un protector de pantalla de cualquier fuente de vídeo en Kodi."
+
+msgctxt "Addon Description"
+msgid "Dynamic screensaver using Local content, SmartPlaylists, Plugins and UPNP Servers."
+msgstr "Protector de pantalla dinámico que utiliza contenido local, listas de reproducción inteligentes, complementos y servidores UPNP."
+
+msgctxt "Addon Disclaimer"
+msgid "Streaming sources not recommend for metered Internet."
+msgstr "Se recomienda no usar recursos en Streaming para conexiones a Internet de uso medido."
+
 msgctxt "#32001"
 msgid ""
 msgstr ""

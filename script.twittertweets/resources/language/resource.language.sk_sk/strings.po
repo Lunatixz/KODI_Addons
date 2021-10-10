@@ -16,6 +16,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
+msgctxt "Addon Description"
+msgid "Monitor your favorite twitter accounts, receive \"realtime\" tweets."
+msgstr ""
+
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr ""

@@ -17,6 +17,18 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.8\n"
 
+msgctxt "Addon Summary"
+msgid "Simple HDHomeRun Interface."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Automatically find all the compatible HDHomeRun devices on your network, Simple and Easy HDHomeRun Interface."
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid "Requires a compatible HDHomeRun device"
+msgstr ""
+
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr "디버그 사용 [오류 기록]"

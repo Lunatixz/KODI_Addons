@@ -10,8 +10,6 @@
     <extension point="xbmc.python.script" library="default.py"/>
     <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Download and Install Kodi packages.</summary>
-        <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <license>GPL-3.0-or-later</license>
         <platform>android</platform>
         <website>http://kodi.tv</website>
@@ -26,5 +24,7 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="en_GB">Download and Install Kodi packages.</summary>
+        <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
     </extension>
 </addon>

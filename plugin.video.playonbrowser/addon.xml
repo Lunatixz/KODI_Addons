@@ -11,9 +11,6 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Browse PlayOn from Kodi.</summary>
-        <description lang="en_GB">PlayOn is a streaming media brand and software suite that enables users to view and record videos from numerous online content providers.</description>
-        <disclaimer lang="en_GB">Requires Playon Server Software</disclaimer>
         <platform>all</platform>
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <license>GPL-3.0-or-later</license>
@@ -29,5 +26,8 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="en_GB">Browse PlayOn from Kodi.</summary>
+        <description lang="en_GB">PlayOn is a streaming media brand and software suite that enables users to view and record videos from numerous online content providers.</description>
+        <disclaimer lang="en_GB">Requires Playon Server Software</disclaimer>
     </extension>
 </addon>

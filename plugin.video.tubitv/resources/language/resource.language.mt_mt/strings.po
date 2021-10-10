@@ -13,6 +13,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=n==1 ? 0 : n==0 || ( n%100>1 && n%100<11) ? 1 : (n%100>10 && n%100<20 ) ? 2 : 3;\n"
 
+msgctxt "Addon Summary"
+msgid "tubitv"
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Tubi TV has the largest library of FREE videos of hit and cult TV shows and films"
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid "Feel free to use this script. For information visit the wiki."
+msgstr ""
+
 msgctxt "#30010"
 msgid "Search"
 msgstr ""

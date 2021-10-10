@@ -16,6 +16,14 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "Addon Summary"
+msgid "Enable closed captioning and subtitles \"OnMute\"."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Let \"OnMute\" toggle closed captioning and subtitles while Kodi is muted."
+msgstr ""
+
 msgctxt "#32001"
 msgid "Enable Debugging"
 msgstr ""

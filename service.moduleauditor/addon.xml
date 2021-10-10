@@ -9,13 +9,10 @@
     <extension point="xbmc.python.script" library="scan.py"/>
     <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</summary>
-        <description lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.moduleauditor</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=335539</forum>
-        <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
         <news>Matrix Branch Added</news>
         <assets>
             <icon>resources/images/icon.png</icon>
@@ -25,5 +22,8 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</summary>
+        <description lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</description>
+        <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
     </extension>
 </addon>

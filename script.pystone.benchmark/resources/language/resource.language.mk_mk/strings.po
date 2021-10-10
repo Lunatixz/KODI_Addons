@@ -16,6 +16,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n==1 || n%10==1 ? 0 : 1;\n"
 
+msgctxt "Addon Summary"
+msgid "Test your devices python performance."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "How fast does your device run python code? Pystone evaluates CPU performance running in a python environment."
+msgstr ""
+
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr ""

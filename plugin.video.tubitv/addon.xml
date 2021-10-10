@@ -12,9 +12,6 @@
   </extension>
   <extension point="xbmc.service" library="pseudotv_recommended.py"/>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">tubitv</summary>
-    <description lang="en_GB">Tubi TV has the largest library of FREE videos of hit and cult TV shows and films</description>
-    <disclaimer lang="en_GB">Feel free to use this script. For information visit the wiki.</disclaimer>
     <platform>all</platform>
     <language>en</language>
     <license>GPL-2.0-or-later</license>
@@ -25,5 +22,8 @@
         <icon>resources/images/icon.png</icon>
         <fanart>resources/images/fanart.jpg</fanart>
     </assets>
+    <summary lang="en_GB">tubitv</summary>
+    <description lang="en_GB">Tubi TV has the largest library of FREE videos of hit and cult TV shows and films</description>
+    <disclaimer lang="en_GB">Feel free to use this script. For information visit the wiki.</disclaimer>
   </extension>
 </addon>

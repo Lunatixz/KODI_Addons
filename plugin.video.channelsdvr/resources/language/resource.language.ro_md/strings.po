@@ -16,6 +16,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n == 0 || n % 100 >= 2 && n % 100 <= 19) ? 1 : 2);\n"
 
+msgctxt "Addon Summary"
+msgid "Live TV, everywhere"
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Watch your favorite programs on Kodi. Channels delivers a unified experience across all your TVs, devices, and streaming platforms."
+msgstr ""
+
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr ""

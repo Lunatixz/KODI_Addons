@@ -8,8 +8,6 @@
     </requires>
     <extension point="xbmc.ui.screensaver" library="default.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</summary>
-        <description lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</description>
         <license>GPL-3.0-or-later</license>
         <platform>all</platform>
         <website>https://unsplash.com/</website>
@@ -24,5 +22,7 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</summary>
+        <description lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</description>
     </extension>
 </addon>

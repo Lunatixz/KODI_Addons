@@ -16,6 +16,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n % 10 == 0 || n % 100 >= 11 && n % 100 <= 19) ? 0 : ((n % 10 == 1 && n % 100 != 11) ? 1 : 2);\n"
 
+msgctxt "Addon Summary"
+msgid "Crackle delivers popular, award-winning TV, movies and originals. With no limit to how much you can watch across all your devices, you can binge all you want, wherever you want."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Crackle is a video streaming distributor of original web shows, Hollywood movies, and TV shows. Founded in the early 2000s as Grouper, and rebranded in 2007, Crackle is owned by Sony Pictures Entertainment."
+msgstr ""
+
 msgctxt "#30000"
 msgid "Crackle"
 msgstr ""

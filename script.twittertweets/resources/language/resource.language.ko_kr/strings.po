@@ -17,6 +17,10 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.8\n"
 
+msgctxt "Addon Description"
+msgid "Monitor your favorite twitter accounts, receive \"realtime\" tweets."
+msgstr ""
+
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr "디버그 사용 [오류 기록]"

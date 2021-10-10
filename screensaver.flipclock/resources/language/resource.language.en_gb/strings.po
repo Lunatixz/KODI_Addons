@@ -16,6 +16,14 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "Addon Summary"
+msgid "Flip clock screensaver."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Flip clock screensaver."
+msgstr ""
+
 msgctxt "#32001"
 msgid "Clock Mode"
 msgstr ""

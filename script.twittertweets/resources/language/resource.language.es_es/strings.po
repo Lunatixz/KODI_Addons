@@ -17,6 +17,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.0.3\n"
 
+msgctxt "Addon Description"
+msgid "Monitor your favorite twitter accounts, receive \"realtime\" tweets."
+msgstr ""
+
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr "Habilitar debugging [Registrar errores]"

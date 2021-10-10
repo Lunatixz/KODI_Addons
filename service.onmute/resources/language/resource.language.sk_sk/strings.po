@@ -15,6 +15,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
+msgctxt "Addon Summary"
+msgid "Enable closed captioning and subtitles \"OnMute\"."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Let \"OnMute\" toggle closed captioning and subtitles while Kodi is muted."
+msgstr ""
+
 msgctxt "#32001"
 msgid "Enable Debugging"
 msgstr ""

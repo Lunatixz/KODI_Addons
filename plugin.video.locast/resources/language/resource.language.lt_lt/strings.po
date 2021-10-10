@@ -29,7 +29,9 @@ msgid "Content is Geo-restricted and may not be available in your location."
 msgstr ""
 
 msgctxt "Addon Lifecyclestate"
-msgid "Locast is suspending operations, effective immediately.\nVisit www.locast.org for details..."
+msgid ""
+"Locast is suspending operations, effective immediately.\n"
+"Visit www.locast.org for details..."
 msgstr ""
 
 msgctxt "#30000"
@@ -129,7 +131,9 @@ msgid "User Information"
 msgstr ""
 
 msgctxt "#30025"
-msgid "Could not determine geo-location\nVerify that your internet is not blocking %s"
+msgid ""
+"Could not determine geo-location\n"
+"Verify that your internet is not blocking %s"
 msgstr ""
 
 msgctxt "#30044"

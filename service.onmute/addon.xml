@@ -16,6 +16,8 @@
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
         <summary lang="en_GB">Enable closed captioning and subtitles &quot;OnMute&quot;.</summary>
+        <summary lang="pl_PL">Włącz napisy kodowane i napisy „OnMute”.</summary>
         <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>
+        <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>
     </extension>
 </addon>

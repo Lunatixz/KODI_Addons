@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
-"PO-Revision-Date: 2021-10-03 14:02+0000\n"
+"PO-Revision-Date: 2021-10-10 21:35+0000\n"
 "Last-Translator: Marek Adamski <fevbew@wp.pl>\n"
 "Language-Team: Polish <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/pl_pl/>\n"
 "Language: pl_pl\n"
@@ -15,11 +15,11 @@ msgstr ""
 
 msgctxt "Addon Summary"
 msgid "Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus"
-msgstr ""
+msgstr "Zintegruj kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio"
 
 msgctxt "Addon Description"
 msgid "IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus."
-msgstr ""
+msgstr "IPTV Manager integruje kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio."
 
 # CONTEXT MENU
 msgctxt "#30600"

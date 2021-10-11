@@ -39,11 +39,13 @@
         <summary lang="en_GB">Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus</summary>
         <summary lang="hu_HU">Más kiegészítők által szolgáltatott IPTV csatornák integrációja a Kodi PVR felületbe</summary>
         <summary lang="nl_NL">Integreer IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's</summary>
+        <summary lang="pl_PL">Zintegruj kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio</summary>
         <summary lang="ru_RU">Интеграция IPTV каналов из других дополнений в Kodi PVR</summary>
         <description lang="el_GR">Το πρόσθετο αυτο ενσωματώνει τα κανάλια IPTV από άλλα πρόσθετα στο PVR του Kodi.</description>
         <description lang="en_GB">IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus.</description>
         <description lang="hu_HU">Ez a kiegészítő lehetővé teszi más kiegészítők számára, hogy saját IPTV csatornákat publikáljanak a Kodi PVR felületébe.</description>
         <description lang="nl_NL">IPTV Manager integreert IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's.</description>
+        <description lang="pl_PL">IPTV Manager integruje kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio.</description>
         <description lang="ru_RU">Это дополнение интегрирует IPTV каналы из других дополнений в Kodi PVR.</description>
     </extension>
 </addon>

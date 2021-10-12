@@ -3,10 +3,15 @@
 # Addon id: service.iptv.manager
 msgid ""
 msgstr ""
-"Language: ru\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"PO-Revision-Date: 2021-10-12 17:02+0000\n"
+"Last-Translator: Dmitry Petrov <dimakrm361@gmail.com>\n"
+"Language-Team: Russian <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/ru_ru/>\n"
+"Language: ru_ru\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Weblate 4.8\n"
 
 msgctxt "Addon Summary"
 msgid "Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus"
@@ -48,7 +53,7 @@ msgstr "Обновление каналов и программы..."
 
 msgctxt "#30706"
 msgid "This program isn't available to play."
-msgstr ""
+msgstr "Эта программа не доступна для просмотра."
 
 # SETTINGS
 msgctxt "#30800"
@@ -93,16 +98,16 @@ msgstr ""
 
 msgctxt "#30881"
 msgid "Logging"
-msgstr ""
+msgstr "Журнал"
 
 msgctxt "#30882"
 msgid "Enable debug logging"
-msgstr ""
+msgstr "Включить журнал отладки"
 
 msgctxt "#30883"
 msgid "Install Kodi Logfile Uploader…"
-msgstr ""
+msgstr "Установить Kodi Logfile Uploader…"
 
 msgctxt "#30884"
 msgid "Open Kodi Logfile Uploader…"
-msgstr ""
+msgstr "Открыть Kodi Logfile Uploader…"

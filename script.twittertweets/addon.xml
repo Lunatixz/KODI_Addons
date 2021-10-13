@@ -22,5 +22,6 @@
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
         <description lang="en_GB">Monitor your favorite twitter accounts, receive &quot;realtime&quot; tweets.</description>
+        <description lang="ko_KR">좋아하는 트위터 계정을 모니터링하고 &quot;실시간&quot; 트윗을 받으세요.</description>
     </extension>
 </addon>

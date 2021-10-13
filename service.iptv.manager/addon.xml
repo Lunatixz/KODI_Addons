@@ -35,15 +35,19 @@
             <screenshot>resources/screenshot06.png</screenshot>
         </assets>
         <reuselanguageinvoker>true</reuselanguageinvoker>
+        <summary lang="de_DE">IPTV-Kanäle aus anderen Addons in Kodis TV- und Radiomenüs integrieren</summary>
         <summary lang="el_GR">Ενσωμάτωση καναλιών IPTV από άλλα πρόσθετα στο PVR του Kodi</summary>
         <summary lang="en_GB">Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus</summary>
         <summary lang="hu_HU">Más kiegészítők által szolgáltatott IPTV csatornák integrációja a Kodi PVR felületbe</summary>
+        <summary lang="ko_KR">Kodi TV 및 라디오 메뉴의 다른 애드온에서 IPTV 채널 통합</summary>
         <summary lang="nl_NL">Integreer IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's</summary>
         <summary lang="pl_PL">Zintegruj kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio</summary>
         <summary lang="ru_RU">Интеграция IPTV каналов из других дополнений в Kodi PVR</summary>
+        <description lang="de_DE">IPTV Mananger integriert IPTV-Kanälen aus anderen Addons in die TV- und Radiomenüs von Kodi.</description>
         <description lang="el_GR">Το πρόσθετο αυτο ενσωματώνει τα κανάλια IPTV από άλλα πρόσθετα στο PVR του Kodi.</description>
         <description lang="en_GB">IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus.</description>
         <description lang="hu_HU">Ez a kiegészítő lehetővé teszi más kiegészítők számára, hogy saját IPTV csatornákat publikáljanak a Kodi PVR felületébe.</description>
+        <description lang="ko_KR">IPTV 관리자는 Kodi TV 및 라디오 메뉴에 있는 다른 애드온의 IPTV 채널을 통합합니다.</description>
         <description lang="nl_NL">IPTV Manager integreert IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's.</description>
         <description lang="pl_PL">IPTV Manager integruje kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio.</description>
         <description lang="ru_RU">Это дополнение интегрирует IPTV каналы из других дополнений в Kodi PVR.</description>

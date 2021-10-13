@@ -25,7 +25,12 @@
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
         <summary lang="en_GB">Download and Install Kodi packages.</summary>
+        <summary lang="ko_KR">Kodi 패키지를 다운로드하고 설치합니다.</summary>
+        <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
         <description lang="en_GB">Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
+        <description lang="ko_KR">Kodi 윈도 실행 파일을 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
         <disclaimer lang="en_GB">UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
+        <disclaimer lang="ko_KR">UWP가 지원되지 않습니다! 윈도 스토어를 통한 Kodi 설치용이 아닙니다.</disclaimer>
+        <disclaimer lang="ru_RU">Не поддерживается UWP! Не предназначен для установки Kodi через Магазин Windows.</disclaimer>
     </extension>
 </addon>

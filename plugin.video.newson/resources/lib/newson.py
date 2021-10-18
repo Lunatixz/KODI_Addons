@@ -31,17 +31,12 @@ except ImportError:
     from io import StringIO ## for Python 3
     
 try:
-    from multiprocessing.dummy import Pool as ThreadPool
-    ENABLE_POOL = True
-    CORES       = 4
-except: ENABLE_POOL = False
+    if xbmc.getCondVisibility('System.Platform.Android'): raise Exception('Using Android threading')
+    from multiprocessing.pool import ThreadPool
+    SUPPORTS_POOL = True
+except Exception:
+    SUPPORTS_POOL = False
 
-PY2 = sys.version_info[0] == 2
-PY3 = sys.version_info[0] == 3
-if PY3: 
-    basestring = str
-    unicode = str
-  
 # Plugin Info
 ADDON_ID      = 'plugin.video.newson'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
@@ -125,6 +120,7 @@ def log(msg, level=xbmc.LOGDEBUG):
     xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
 
 def encodeString(text):
+    if not isinstance(text,str): text = str(text)
     return urllib.parse.quote_plus(text)
 
 def decodeString(text):
@@ -318,16 +314,16 @@ class NewsOn(object):
         liz.setProperty('IsInternetStream','true')
         xbmcplugin.setResolvedUrl(ROUTER.handle, True, liz)
 
-
+             
     def poolList(self, method, items=None, args=None, chunk=25):
         log("poolList")
         results = []
-        if ENABLE_POOL:
-            pool = ThreadPool(CORES)
+        if SUPPORTS_POOL:
+            pool = ThreadPool()
             if args is not None: 
-                results = pool.map(method, zip(items,repeat(args)))
+                results = pool.imap(method, zip(items,repeat(args)))
             elif items: 
-                results = pool.map(method, items)#, chunksize=chunk)
+                results = pool.imap(method, items)#, chunksize=chunk)
             pool.close()
             pool.join()
         else:
@@ -341,7 +337,6 @@ class NewsOn(object):
     def addPlaylist(self, name, path='', infoList={}, infoArt={}, infoVideo={}, infoAudio={}, infoType='video'):
         log('addPlaylist, name = %s'%name)
 
-    
     
     def addLink(self, name, uri=(''), infoList={}, infoArt={}, infoVideo={}, infoAudio={}, infoType='video', total=0):
         log('addLink, name = %s'%name)

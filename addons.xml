@@ -18,8 +18,6 @@
     <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
-        <summary lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV.</summary>
-        <description lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp; Comedy. Stream Anime &amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you.</description>
         <platform>all</platform>
         <license>GPL-3.0-or-later</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.airytv</source>
@@ -34,6 +32,8 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV.</summary>
+        <description lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp; Comedy. Stream Anime &amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you.</description>
     </extension>
 </addon>
 
@@ -56,8 +56,6 @@
     <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
-        <summary lang="en_GB">Live TV, everywhere</summary>
-        <description lang="en_GB">Watch your favorite programs on Kodi. Channels delivers a unified experience across all your TVs, devices, and streaming platforms.</description>
         <platform>all</platform>
         <license>GPL-3.0-or-later</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.channelsdvr</source>
@@ -72,6 +70,8 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="en_GB">Live TV, everywhere</summary>
+        <description lang="en_GB">Watch your favorite programs on Kodi. Channels delivers a unified experience across all your TVs, devices, and streaming platforms.</description>
     </extension>
 </addon>
 
@@ -88,8 +88,6 @@
   <extension point="xbmc.service" library="pseudotv_recommended.py"/>
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
-    <summary lang="en_GB">Crackle delivers popular, award-winning TV, movies and originals. With no limit to how much you can watch across all your devices, you can binge all you want, wherever you want.</summary>
-    <description lang="en_GB">Crackle is a video streaming distributor of original web shows, Hollywood movies, and TV shows. Founded in the early 2000s as Grouper, and rebranded in 2007, Crackle is owned by Sony Pictures Entertainment.</description>
       <news>
         - PseudoTV Live support (temporary build until eracknaphobia repository update).
       </news>
@@ -102,6 +100,8 @@
         <icon>icon.png</icon>
         <fanart>fanart.jpg</fanart>
     </assets>
+    <summary lang="en_GB">Crackle delivers popular, award-winning TV, movies and originals. With no limit to how much you can watch across all your devices, you can binge all you want, wherever you want.</summary>
+    <description lang="en_GB">Crackle is a video streaming distributor of original web shows, Hollywood movies, and TV shows. Founded in the early 2000s as Grouper, and rebranded in 2007, Crackle is owned by Sony Pictures Entertainment.</description>
   </extension>
 </addon>
 
@@ -123,9 +123,6 @@
     <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
-        <summary lang="en_GB">Simple HDHomeRun Interface.</summary>
-        <description lang="en_GB">Automatically find all the compatible HDHomeRun devices on your network, Simple and Easy HDHomeRun Interface.</description>
-        <disclaimer lang="en_GB">Requires a compatible HDHomeRun device</disclaimer>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.hdhomerun.simple</source>
@@ -141,6 +138,9 @@
             <screenshot>resources/images/screenshot04.jpg</screenshot>
             <screenshot>resources/images/screenshot05.jpg</screenshot>
         </assets>
+        <summary lang="en_GB">Simple HDHomeRun Interface.</summary>
+        <description lang="en_GB">Automatically find all the compatible HDHomeRun devices on your network, Simple and Easy HDHomeRun Interface.</description>
+        <disclaimer lang="en_GB">Requires a compatible HDHomeRun device</disclaimer>
     </extension>
 </addon>
 
@@ -165,16 +165,12 @@
     <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
-        <lifecyclestate type="broken" lang="en_GB">Locast is suspending operations, effective immediately.\nVisit www.locast.org for details...</lifecyclestate>
-        <summary lang="en_GB">Locast is a public service to Americans, providing local broadcast signals over the Internet in select cities like New York, Philadelphia, Boston, Chicago, Houston and Dallas ...</summary>
-        <description lang="en_GB">All you have to do is sign up online, provide your name and email address, and certify that you live in, and are logging on from, one of the select US cities (“Designated Market Area”). Then, you can select among local broadcasters and stream your favorite local station. Locast.org is a “digital translator,” meaning that Locast.org operates just like a traditional broadcast translator service, except instead of using an over-the-air signal to boost a broadcaster’s reach, we stream the signal over the Internet to consumers located within select US cities. Ever since the dawn of TV broadcasting in the mid-20th Century, non-profit organizations have provided “translator” TV stations as a public service. Where a primary broadcaster cannot reach a receiver with a strong enough signal, the translator amplifies that signal with another transmitter, allowing consumers who otherwise could not get the over-the-air signal to receive important programming, including local news, weather and of course, sports. Locast.org provides the same public service, except instead of an over-the-air signal transmitter, we provide the local broadcast signal via online streaming.</description>
         <platform>all</platform>
         <news>v1.1.7[CR]- Fixed login issues[CR]v1.1.7[CR]- IPTV Simple Guidedata fix, Inputstream beta build support for uninterrupted playback.</news>
         <license>GPL-3.0-or-later</license>
         <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.locast</source>
         <website>https://www.locast.org</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=334947</forum>
-        <disclaimer lang="en_GB">Content is Geo-restricted and may not be available in your location.</disclaimer>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -183,10 +179,14 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="en_GB">Locast is a public service to Americans, providing local broadcast signals over the Internet in select cities like New York, Philadelphia, Boston, Chicago, Houston and Dallas ...</summary>
+        <description lang="en_GB">All you have to do is sign up online, provide your name and email address, and certify that you live in, and are logging on from, one of the select US cities (“Designated Market Area”). Then, you can select among local broadcasters and stream your favorite local station. Locast.org is a “digital translator,” meaning that Locast.org operates just like a traditional broadcast translator service, except instead of using an over-the-air signal to boost a broadcaster’s reach, we stream the signal over the Internet to consumers located within select US cities. Ever since the dawn of TV broadcasting in the mid-20th Century, non-profit organizations have provided “translator” TV stations as a public service. Where a primary broadcaster cannot reach a receiver with a strong enough signal, the translator amplifies that signal with another transmitter, allowing consumers who otherwise could not get the over-the-air signal to receive important programming, including local news, weather and of course, sports. Locast.org provides the same public service, except instead of an over-the-air signal transmitter, we provide the local broadcast signal via online streaming.</description>
+        <disclaimer lang="en_GB">Content is Geo-restricted and may not be available in your location.</disclaimer>
+        <lifecyclestate type="broken" lang="en_GB">Locast is suspending operations, effective immediately.\nVisit www.locast.org for details...</lifecyclestate>
     </extension>
 </addon>
 
-<addon id="plugin.video.newson" version="1.2.7" name="NewsON" provider-name="Lunatixz">
+<addon id="plugin.video.newson" version="1.2.9" name="NewsON" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -201,8 +201,6 @@
     <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
-        <summary lang="en_GB">Local News Nationwide</summary>
-        <description lang="en_GB">NewsON provides instant access to live or on-demand broadcasts from over 175 local stations in 114 U.S. markets. Access previous newscasts for up to 48 hours after they air, and share interesting stories with the integrated social media share function directly from the app. Search for a local station with the interactive map or watch the station closest to you on smartphones, tablets, or Roku streaming players. Save favorite stations, and stay updated with breaking news alerts sent directly to mobile devices from the local source of the news. Stay connected anytime, anywhere without a cable subscription or login.</description>
         <platform>all</platform>
         <license>GPL-3.0-or-later</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.newson</source>
@@ -217,6 +215,8 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="en_GB">Local News Nationwide</summary>
+        <description lang="en_GB">NewsON provides instant access to live or on-demand broadcasts from over 175 local stations in 114 U.S. markets. Access previous newscasts for up to 48 hours after they air, and share interesting stories with the integrated social media share function directly from the app. Search for a local station with the interactive map or watch the station closest to you on smartphones, tablets, or Roku streaming players. Save favorite stations, and stay updated with breaking news alerts sent directly to mobile devices from the local source of the news. Stay connected anytime, anywhere without a cable subscription or login.</description>
     </extension>
 </addon>
 
@@ -232,9 +232,6 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Browse PlayOn from Kodi.</summary>
-        <description lang="en_GB">PlayOn is a streaming media brand and software suite that enables users to view and record videos from numerous online content providers.</description>
-        <disclaimer lang="en_GB">Requires Playon Server Software</disclaimer>
         <platform>all</platform>
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <license>GPL-3.0-or-later</license>
@@ -250,10 +247,16 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="en_GB">Browse PlayOn from Kodi.</summary>
+        <summary lang="ru_RU">Просматривайте PlayOn из Kodi.</summary>
+        <description lang="en_GB">PlayOn is a streaming media brand and software suite that enables users to view and record videos from numerous online content providers.</description>
+        <description lang="ru_RU">PlayOn - это бренд потокового мультимедиа и программный пакет, который позволяет пользователям просматривать и записывать видео от многочисленных поставщиков онлайн контента.</description>
+        <disclaimer lang="en_GB">Requires Playon Server Software</disclaimer>
+        <disclaimer lang="ru_RU">Требуется серверное ПО Playon</disclaimer>
     </extension>
 </addon>
 
-<addon id="plugin.video.plutotv" version="1.5.6" name="Pluto TV" provider-name="Lunatixz">
+<addon id="plugin.video.plutotv" version="1.5.8" name="Pluto TV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -270,8 +273,6 @@
     <extension point="xbmc.service" library="pseudotv_recommended.py"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
-        <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
-        <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV's 100+ channels of news, sports, and the Internet's best, completely free on your Kodi device.</description>
         <platform>all</platform>
         <license>GPL-3.0-or-later</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.plutotv</source>
@@ -286,6 +287,8 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
+        <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV's 100+ channels of news, sports, and the Internet's best, completely free on your Kodi device.</description>
     </extension>
 </addon>
 
@@ -304,7 +307,6 @@
     </extension>
     <extension point="xbmc.service" library="pseudotv_recommended.py" start="startup"/>
     <extension point="xbmc.addon.metadata">
-        <description lang="en_GB">Transponder.tv takes things to the next level in providing each user with their own remote tv set for controlling and viewing wherever they are. With the majority of UK Free to Air channels available and a soon to be launched recording feature, you will be able to watch your own tv wherever you are and whenever you want and who doesn't want free TV?</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.transponder.tv</source>
@@ -320,6 +322,7 @@
             <screenshot>resources/images/screenshot04.png</screenshot>
             <screenshot>resources/images/screenshot05.png</screenshot>
         </assets>
+        <description lang="en_GB">Transponder.tv takes things to the next level in providing each user with their own remote tv set for controlling and viewing wherever they are. With the majority of UK Free to Air channels available and a soon to be launched recording feature, you will be able to watch your own tv wherever you are and whenever you want and who doesn't want free TV?</description>
     </extension>
 </addon>
 
@@ -336,9 +339,6 @@
   </extension>
   <extension point="xbmc.service" library="pseudotv_recommended.py"/>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">tubitv</summary>
-    <description lang="en_GB">Tubi TV has the largest library of FREE videos of hit and cult TV shows and films</description>
-    <disclaimer lang="en_GB">Feel free to use this script. For information visit the wiki.</disclaimer>
     <platform>all</platform>
     <language>en</language>
     <license>GPL-2.0-or-later</license>
@@ -349,6 +349,9 @@
         <icon>resources/images/icon.png</icon>
         <fanart>resources/images/fanart.jpg</fanart>
     </assets>
+    <summary lang="en_GB">tubitv</summary>
+    <description lang="en_GB">Tubi TV has the largest library of FREE videos of hit and cult TV shows and films</description>
+    <disclaimer lang="en_GB">Feel free to use this script. For information visit the wiki.</disclaimer>
   </extension>
 </addon>
 
@@ -365,7 +368,6 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <description lang="en_GB">TVCatchup is an Internet television service for viewing free-to-air UK channels. It operates as a cable service and retransmits BBC, Channel 4, Channel 5, and ITV, amongst others, only in the UK.</description>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.tvcatchups</source>
@@ -380,6 +382,7 @@
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
+        <description lang="en_GB">TVCatchup is an Internet television service for viewing free-to-air UK channels. It operates as a cable service and retransmits BBC, Channel 4, Channel 5, and ITV, amongst others, only in the UK.</description>
     </extension>
 </addon>
 
@@ -394,7 +397,6 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <description lang="en_GB">Xumo.TV brings you the best content from digital networks, presented just like the channels on your TV and mobile devices, only with more cool features.</description>
         <platform>android freebsd ios linux osx windows</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.xumotv</source>
@@ -408,6 +410,7 @@
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
+        <description lang="en_GB">Xumo.TV brings you the best content from digital networks, presented just like the channels on your TV and mobile devices, only with more cool features.</description>
     </extension>
 </addon>
 
@@ -514,8 +517,6 @@
     </requires>
     <extension point="xbmc.ui.screensaver" library="default.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Explore breathtaking images from the Bing homepage... </summary>
-        <description lang="en_GB">Explore breathtaking images from the Bing homepage... </description>
         <license>GPL-3.0-or-later</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/screensaver.bing</source>
@@ -529,6 +530,8 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="en_GB">Explore breathtaking images from the Bing homepage... </summary>
+        <description lang="en_GB">Explore breathtaking images from the Bing homepage... </description>
     </extension>
 </addon>
 
@@ -539,8 +542,6 @@
 	<extension point="xbmc.ui.screensaver" library="default.py"/>
     <extension point="xbmc.python.script"  library="default.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Flip clock screensaver.</summary>
-        <description lang="en_GB">Flip clock screensaver.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.flipclock</source>
@@ -552,6 +553,8 @@
             <screenshot>screenshot01.png</screenshot>
             <screenshot>screenshot02.png</screenshot>
         </assets>
+        <summary lang="en_GB">Flip clock screensaver.</summary>
+        <description lang="en_GB">Flip clock screensaver.</description>
     </extension>
 </addon>
 
@@ -565,8 +568,6 @@
     </requires>
     <extension point="xbmc.ui.screensaver" library="default.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
-        <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
         <license>GPL-3.0-or-later</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.google.earth</source>
@@ -580,6 +581,8 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
+        <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
     </extension>
 </addon>
 
@@ -592,8 +595,6 @@
     </requires>
     <extension point="xbmc.ui.screensaver" library="default.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</summary>
-        <description lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</description>
         <license>GPL-3.0-or-later</license>
         <platform>all</platform>
         <website>https://unsplash.com/</website>
@@ -608,6 +609,8 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</summary>
+        <description lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</description>
     </extension>
 </addon>
 
@@ -620,21 +623,21 @@
     </requires>
     <extension point="xbmc.ui.screensaver" library="default.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Create a screensaver from any Kodi video source.</summary>
-        <description lang="en_GB">Dynamic screensaver using Local content, SmartPlaylists, Plugins and UPNP Servers.</description>
-        <summary lang="es_ES">Crea un protector de pantalla de cualquier fuente de vídeo en Kodi.</summary>
-        <description lang="es_ES">Protector de pantalla dinámico que utiliza contenido local, listas de reproducción inteligentes, complementos y servidores UPNP.</description>
         <license>GPL-3.0-or-later</license>
         <platform>all</platform>
         <forum>https://forum.kodi.tv/showthread.php?tid=319730</forum>
         <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/screensaver.videosaver</source>
-        <disclaimer lang="en_GB" >Streaming sources not recommend for metered Internet.</disclaimer>
-        <disclaimer lang="es_ES" >Se recomienda no usar recursos en Streaming para conexiones a Internet de uso medido.</disclaimer>
         <news>v.1.1.0[CR]- Fixed Volume</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
+        <summary lang="en_GB">Create a screensaver from any Kodi video source.</summary>
+        <summary lang="es_ES">Crea un protector de pantalla de cualquier fuente de vídeo en Kodi.</summary>
+        <description lang="en_GB">Dynamic screensaver using Local content, SmartPlaylists, Plugins and UPNP Servers.</description>
+        <description lang="es_ES">Protector de pantalla dinámico que utiliza contenido local, listas de reproducción inteligentes, complementos y servidores UPNP.</description>
+        <disclaimer lang="en_GB">Streaming sources not recommend for metered Internet.</disclaimer>
+        <disclaimer lang="es_ES">Se recomienda no usar recursos en Streaming para conexiones a Internet de uso medido.</disclaimer>
     </extension>
 </addon>
 
@@ -649,8 +652,6 @@
     <extension point="xbmc.python.script" library="default.py"/>
     <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Download and Install Kodi packages.</summary>
-        <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <license>GPL-3.0-or-later</license>
         <platform>android</platform>
         <website>http://kodi.tv</website>
@@ -665,6 +666,11 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="en_GB">Download and Install Kodi packages.</summary>
+        <summary lang="ko_KR">Kodi 패키지를 다운로드하고 설치합니다.</summary>
+        <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
+        <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
+        <description lang="ko_KR">Kodi 안드로이드 패키지를 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
     </extension>
 </addon>
 
@@ -679,14 +685,11 @@
     <extension point="xbmc.python.script" library="default.py"/>
     <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Download and Install Kodi packages.</summary>
-        <description lang="en_GB">Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <license>GPL-3.0-or-later</license>
         <platform>windows</platform>
         <website>http://kodi.tv</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.windows.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=325226</forum>
-        <disclaimer lang="en_GB">UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
         <news>v1.3.0[CR]-Matrix[CR]v1.1.3[CR]-PY3[CR]v1.0.7[CR]-UI Update[CR]v1.0.6[CR]-Fixed Listings[CR]v1.0.5[CR]-Improved UWP Detection[CR]v1.0.4[CR]-Improved UI[CR]v1.0.2[CR]-WIndows Platform Detection[CR]-Streamlined Navigation[CR]-Windows Version Detection[CR]v1.0.1[CR]-Improved functionality</news>
         <assets>
             <icon>resources/images/icon.png</icon>
@@ -696,6 +699,14 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="en_GB">Download and Install Kodi packages.</summary>
+        <summary lang="ko_KR">Kodi 패키지를 다운로드하고 설치합니다.</summary>
+        <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
+        <description lang="en_GB">Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
+        <description lang="ko_KR">Kodi 윈도 실행 파일을 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
+        <disclaimer lang="en_GB">UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
+        <disclaimer lang="ko_KR">UWP가 지원되지 않습니다! 윈도 스토어를 통한 Kodi 설치용이 아닙니다.</disclaimer>
+        <disclaimer lang="ru_RU">Не поддерживается UWP! Не предназначен для установки Kodi через Магазин Windows.</disclaimer>
     </extension>
 </addon>
 
@@ -878,8 +889,6 @@
         <provides>executable</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Test your devices python performance.</summary>
-        <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
         <license>MIT</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/script.pystone.benchmark</source>
@@ -890,6 +899,10 @@
             <fanart>resources/images/fanart.jpg</fanart>
             <screenshot>resources/images/screenshot01.png</screenshot>
         </assets>
+        <summary lang="en_GB">Test your devices python performance.</summary>
+        <summary lang="ko_KR">장치 파이썬 성능을 테스트하십시오.</summary>
+        <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
+        <description lang="ko_KR">당신의 기기는 얼마나 빨리 파이썬 코드를 실행할까요? Pystone은 Python 환경에서 실행되는 CPU 성능을 평가합니다.</description>
     </extension>
 </addon>
 
@@ -901,8 +914,6 @@
     <extension point="xbmc.python.script" library="settings.py"/>
     <extension point="xbmc.service" library="service.py" start="login"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
-        <description lang="en_GB">Monitor your favorite twitter accounts, receive &quot;realtime&quot; tweets.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <website>https://twitter.com</website>
@@ -917,6 +928,8 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <description lang="en_GB">Monitor your favorite twitter accounts, receive &quot;realtime&quot; tweets.</description>
+        <description lang="ko_KR">좋아하는 트위터 계정을 모니터링하고 &quot;실시간&quot; 트윗을 받으세요.</description>
     </extension>
 </addon>
 
@@ -942,16 +955,6 @@
         </menu>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus</summary>
-        <summary lang="nl_NL">Integreer IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's</summary>
-        <summary lang="ru_RU">Интеграция IPTV каналов из других дополнений в Kodi PVR</summary>
-        <summary lang="hu_HU">Más kiegészítők által szolgáltatott IPTV csatornák integrációja a Kodi PVR felületbe</summary>
-        <summary lang="el_GR">Ενσωμάτωση καναλιών IPTV από άλλα πρόσθετα στο PVR του Kodi</summary>
-        <description lang="en_GB">IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus.</description>
-        <description lang="nl_NL">IPTV Manager integreert IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's.</description>
-        <description lang="ru_RU">Это дополнение интегрирует IPTV каналы из других дополнений в Kodi PVR.</description>
-        <description lang="hu_HU">Ez a kiegészítő lehetővé teszi más kiegészítők számára, hogy saját IPTV csatornákat publikáljanak a Kodi PVR felületébe.</description>
-        <description lang="el_GR">Το πρόσθετο αυτο ενσωματώνει τα κανάλια IPTV από άλλα πρόσθετα στο PVR του Kodi.</description>
         <platform>all</platform>
         <license>GPL-3.0-only</license>
         <news>v0.2.3a Temporary Build to workaround IPTV-Manager shortcomings.</news>
@@ -966,6 +969,22 @@
             <screenshot>resources/screenshot06.png</screenshot>
         </assets>
         <reuselanguageinvoker>true</reuselanguageinvoker>
+        <summary lang="de_DE">IPTV-Kanäle aus anderen Addons in Kodis TV- und Radiomenüs integrieren</summary>
+        <summary lang="el_GR">Ενσωμάτωση καναλιών IPTV από άλλα πρόσθετα στο PVR του Kodi</summary>
+        <summary lang="en_GB">Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus</summary>
+        <summary lang="hu_HU">Más kiegészítők által szolgáltatott IPTV csatornák integrációja a Kodi PVR felületbe</summary>
+        <summary lang="ko_KR">Kodi TV 및 라디오 메뉴의 다른 애드온에서 IPTV 채널 통합</summary>
+        <summary lang="nl_NL">Integreer IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's</summary>
+        <summary lang="pl_PL">Zintegruj kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio</summary>
+        <summary lang="ru_RU">Интеграция IPTV каналов из других дополнений в Kodi PVR</summary>
+        <description lang="de_DE">IPTV Mananger integriert IPTV-Kanälen aus anderen Addons in die TV- und Radiomenüs von Kodi.</description>
+        <description lang="el_GR">Το πρόσθετο αυτο ενσωματώνει τα κανάλια IPTV από άλλα πρόσθετα στο PVR του Kodi.</description>
+        <description lang="en_GB">IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus.</description>
+        <description lang="hu_HU">Ez a kiegészítő lehetővé teszi más kiegészítők számára, hogy saját IPTV csatornákat publikáljanak a Kodi PVR felületébe.</description>
+        <description lang="ko_KR">IPTV 관리자는 Kodi TV 및 라디오 메뉴에 있는 다른 애드온의 IPTV 채널을 통합합니다.</description>
+        <description lang="nl_NL">IPTV Manager integreert IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's.</description>
+        <description lang="pl_PL">IPTV Manager integruje kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio.</description>
+        <description lang="ru_RU">Это дополнение интегрирует IPTV каналы из других дополнений в Kodi PVR.</description>
     </extension>
 </addon>
 
@@ -979,13 +998,10 @@
     <extension point="xbmc.python.script" library="scan.py"/>
     <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</summary>
-        <description lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.moduleauditor</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=335539</forum>
-        <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
         <news>Matrix Branch Added</news>
         <assets>
             <icon>resources/images/icon.png</icon>
@@ -995,6 +1011,18 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="de_DE">Durchsuche und vergleiche installierte Addons mit denen aus dem offiziellen Kodi-Repository.</summary>
+        <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</summary>
+        <summary lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</summary>
+        <summary lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</summary>
+        <description lang="de_DE">Durchsuche und vergleiche installierte Addons mit denen aus dem offiziellen Kodi-Repository.</description>
+        <description lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</description>
+        <description lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</description>
+        <description lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</description>
+        <disclaimer lang="de_DE">Module auditor schützt nicht gegen Malware. Wenn nichts gefunden wird, ist das keine Garantie für ein malware-freies System. Bitte gesunden Menschenverstand beim Installieren von Repositories von Drittanbietern benutzen.</disclaimer>
+        <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
+        <disclaimer lang="ko_KR">모듈 감시자는 맬웨어로부터 사용자를 방지하거나 보호하지 않습니다. 클린 스캔은 시스템에 맬웨어가 없음을 보장하지 않습니다. 타사 저장소를 설치할 때 고려하십시오.</disclaimer>
+        <disclaimer lang="pl_PL">Moduł Auditor nie zapobiega ani nie chroni przed złośliwym oprogramowaniem. Czyste skanowanie nie gwarantuje, że system jest wolny od złośliwego oprogramowania. Podczas instalowania repozytoriów zewnętrznych należy kierować się zdrowym rozsądkiem.</disclaimer>
     </extension>
 </addon>
 
@@ -1005,8 +1033,6 @@
     <extension point="xbmc.python.script" library="settings.py"/>
     <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Enable closed captioning and subtitles &quot;OnMute&quot;.</summary>
-        <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.onmute</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=334361</forum>
@@ -1016,6 +1042,14 @@
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
+        <summary lang="de_DE">Untertitel, auch solche mit erklärendem Text, beim Stummschalten von Kodi aktivieren.</summary>
+        <summary lang="en_GB">Enable closed captioning and subtitles &quot;OnMute&quot;.</summary>
+        <summary lang="ko_KR">폐쇄 자막 및 &quot;OnMute&quot; 자막을 활성화합니다.</summary>
+        <summary lang="pl_PL">Włącz napisy kodowane i napisy „OnMute”.</summary>
+        <description lang="de_DE">OnMute handhabt Untertitel, auch solche mit erklärendem Text, während Kodi stummschaltet ist.</description>
+        <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>
+        <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &quot;OnMute&quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
+        <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>
     </extension>
 </addon>
 </addons>

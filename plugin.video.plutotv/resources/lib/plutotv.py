@@ -27,10 +27,11 @@ from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_enc
 from favorites     import *
 
 try:
-    from multiprocessing.dummy import Pool as ThreadPool
-    ENABLE_POOL = True
-    CORES       = 4
-except: ENABLE_POOL = False
+    if xbmc.getCondVisibility('System.Platform.Android'): raise Exception('Using Android threading')
+    from multiprocessing.pool import ThreadPool
+    SUPPORTS_POOL = True
+except Exception:
+    SUPPORTS_POOL = False
 
 try:
   basestring #py2
@@ -116,6 +117,10 @@ def getSeason(sid):
 @ROUTER.route('/play/vod')#unknown bug causing this route to be called during /ondemand parse. todo find issue.
 def dummy():
     pass
+    
+@ROUTER.route('/play/live')#unknown bug causing this route to be called during /ondemand parse. todo find issue.
+def dummy():
+    pass
 
 @ROUTER.route('/play/vod/<id>')
 def playOD(id):
@@ -145,7 +150,7 @@ def iptv_epg():
      
 def getInputStream():
     if xbmc.getCondVisibility('System.AddonIsEnabled(%s)'%(INPUTSTREAM_BETA)):
-        return INPUTSTREAM_BETA
+          return INPUTSTREAM_BETA
     else: return INPUTSTREAM
 
 def setUUID():
@@ -586,8 +591,8 @@ class PlutoTV(object):
     def poolList(self, method, items=None, args=None, chunk=25):
         log("poolList")
         results = []
-        if ENABLE_POOL:
-            pool = ThreadPool(CORES)
+        if SUPPORTS_POOL:
+            pool = ThreadPool()
             if args is not None: 
                 results = pool.map(method, zip(items,repeat(args)))
             elif items: 

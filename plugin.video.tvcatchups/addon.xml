@@ -27,5 +27,6 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
         <description lang="en_GB">TVCatchup is an Internet television service for viewing free-to-air UK channels. It operates as a cable service and retransmits BBC, Channel 4, Channel 5, and ITV, amongst others, only in the UK.</description>
+        <description lang="ko_KR">TVCatchup은 무료 영국 채널을 시청하기 위한 인터넷 텔레비전 서비스입니다. 그것은 케이블 서비스로 운영되며 영국에서만 BBC, 채널 4, 채널 5 및 ITV를 재전송합니다.</description>
     </extension>
 </addon>

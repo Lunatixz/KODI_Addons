@@ -24,5 +24,6 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
         <description lang="en_GB">Xumo.TV brings you the best content from digital networks, presented just like the channels on your TV and mobile devices, only with more cool features.</description>
+        <description lang="ko_KR">Xumo.TV는 디지털 네트워크에서 제공하는 최고의 콘텐츠를 제공하고, TV 및 모바일 장치의 채널처럼 더 멋진 기능을 제공합니다.</description>
     </extension>
 </addon>

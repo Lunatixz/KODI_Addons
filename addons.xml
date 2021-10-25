@@ -33,7 +33,7 @@
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
         <summary lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV.</summary>
-        <description lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp; Comedy. Stream Anime &amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you.</description>
+        <description lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp;amp; Comedy. Stream Anime &amp;amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you.</description>
     </extension>
 </addon>
 
@@ -326,7 +326,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.tubitv" name="TubiTV" version="5.0.1" provider-name="Lunatixz">
+<addon id="plugin.video.tubitv" name="TubiTV" version="5.0.2" provider-name="Lunatixz">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.t1mlib" version="4.0.2"/>
@@ -352,6 +352,7 @@
     <summary lang="en_GB">tubitv</summary>
     <description lang="en_GB">Tubi TV has the largest library of FREE videos of hit and cult TV shows and films</description>
     <disclaimer lang="en_GB">Feel free to use this script. For information visit the wiki.</disclaimer>
+    <lifecyclestate type="broken" lang="en_GB">No longer maintaining this project!</lifecyclestate>
   </extension>
 </addon>
 
@@ -929,8 +930,8 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
-        <description lang="en_GB">Monitor your favorite twitter accounts, receive &quot;realtime&quot; tweets.</description>
-        <description lang="ko_KR">좋아하는 트위터 계정을 모니터링하고 &quot;실시간&quot; 트윗을 받으세요.</description>
+        <description lang="en_GB">Monitor your favorite twitter accounts, receive &amp;quot;realtime&amp;quot; tweets.</description>
+        <description lang="ko_KR">좋아하는 트위터 계정을 모니터링하고 &amp;quot;실시간&amp;quot; 트윗을 받으세요.</description>
     </extension>
 </addon>
 
@@ -1044,12 +1045,12 @@
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
         <summary lang="de_DE">Untertitel, auch solche mit erklärendem Text, beim Stummschalten von Kodi aktivieren.</summary>
-        <summary lang="en_GB">Enable closed captioning and subtitles &quot;OnMute&quot;.</summary>
-        <summary lang="ko_KR">폐쇄 자막 및 &quot;OnMute&quot; 자막을 활성화합니다.</summary>
+        <summary lang="en_GB">Enable closed captioning and subtitles &amp;quot;OnMute&amp;quot;.</summary>
+        <summary lang="ko_KR">폐쇄 자막 및 &amp;quot;OnMute&amp;quot; 자막을 활성화합니다.</summary>
         <summary lang="pl_PL">Włącz napisy kodowane i napisy „OnMute”.</summary>
         <description lang="de_DE">OnMute handhabt Untertitel, auch solche mit erklärendem Text, während Kodi stummschaltet ist.</description>
-        <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>
-        <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &quot;OnMute&quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
+        <description lang="en_GB">Let &amp;quot;OnMute&amp;quot; toggle closed captioning and subtitles while Kodi is muted.</description>
+        <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &amp;quot;OnMute&amp;quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
         <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>
     </extension>
 </addon>

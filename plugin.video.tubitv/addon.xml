@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.tubitv" name="TubiTV" version="5.0.1" provider-name="Lunatixz">
+<addon id="plugin.video.tubitv" name="TubiTV" version="5.0.2" provider-name="Lunatixz">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.t1mlib" version="4.0.2"/>
@@ -25,5 +25,6 @@
     <summary lang="en_GB">tubitv</summary>
     <description lang="en_GB">Tubi TV has the largest library of FREE videos of hit and cult TV shows and films</description>
     <disclaimer lang="en_GB">Feel free to use this script. For information visit the wiki.</disclaimer>
+    <lifecyclestate type="broken" lang="en_GB">No longer maintaining this project!</lifecyclestate>
   </extension>
 </addon>

@@ -28,7 +28,9 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="da_DK">Lokale nyheder på landsplan</summary>
         <summary lang="en_GB">Local News Nationwide</summary>
+        <description lang="da_DK">NewsON giver øjeblikkelig adgang til direkte- eller on-demand-udsendelser fra over 175 lokale stationer på 114 amerikanske markeder. Få adgang til tidligere nyhedsudsendelser i op til 48 timer, efter de er blevet sendt, og del interessante historier med den integrerede delefunktion på sociale medier direkte fra appen. Søg efter en lokal station med det interaktive kort, eller se stationen tættest på dig på smartphones, tablets eller Roku-streamingafspillere. Gem favoritstationer, og hold dig opdateret med alarmer om seneste nyheder sendt direkte til mobile enheder fra den lokale nyhedskilde. Hold forbindelsen når som helst og hvor som helst uden et kabelabonnement eller login.</description>
         <description lang="en_GB">NewsON provides instant access to live or on-demand broadcasts from over 175 local stations in 114 U.S. markets. Access previous newscasts for up to 48 hours after they air, and share interesting stories with the integrated social media share function directly from the app. Search for a local station with the interactive map or watch the station closest to you on smartphones, tablets, or Roku streaming players. Save favorite stations, and stay updated with breaking news alerts sent directly to mobile devices from the local source of the news. Stay connected anytime, anywhere without a cable subscription or login.</description>
     </extension>
 </addon>

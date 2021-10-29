@@ -22,7 +22,9 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="da_DK">Udforsk betagende billeder fra Bing-hjemmesiden... </summary>
         <summary lang="en_GB">Explore breathtaking images from the Bing homepage... </summary>
+        <description lang="da_DK">Udforsk betagende billeder fra Bing-hjemmesiden... </description>
         <description lang="en_GB">Explore breathtaking images from the Bing homepage... </description>
     </extension>
 </addon>

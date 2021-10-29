@@ -17,7 +17,9 @@
             <screenshot>screenshot01.png</screenshot>
             <screenshot>screenshot02.png</screenshot>
         </assets>
+        <summary lang="da_DK">Flip-ur pause skærm.</summary>
         <summary lang="en_GB">Flip clock screensaver.</summary>
+        <description lang="da_DK">Flip-ur pause skærm.</description>
         <description lang="en_GB">Flip clock screensaver.</description>
     </extension>
 </addon>

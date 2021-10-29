@@ -31,9 +31,7 @@ msgstr "Indholdet er geografisk begrænset og er muligvis ikke tilgængeligt på
 
 msgctxt "Addon Lifecyclestate"
 msgid "Locast is suspending operations, effective immediately.\nVisit www.locast.org for details..."
-msgstr ""
-"Locast indstiller driften med øjeblikkelig virkning.\n"
-"Besøg www.locast.org for detaljer..."
+msgstr "Locast indstiller driften med øjeblikkelig virkning.\nBesøg www.locast.org for detaljer..."
 
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"

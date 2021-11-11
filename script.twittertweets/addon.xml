@@ -24,5 +24,6 @@
         <description lang="da_DK">Overvåg dine foretrukne twitter-konti, modtag &quot;realtime&quot; tweets.</description>
         <description lang="en_GB">Monitor your favorite twitter accounts, receive &quot;realtime&quot; tweets.</description>
         <description lang="ko_KR">좋아하는 트위터 계정을 모니터링하고 &quot;실시간&quot; 트윗을 받으세요.</description>
+        <description lang="zh_CN">监控您喜爱的推特帐户，接收“实时”推文。</description>
     </extension>
 </addon>

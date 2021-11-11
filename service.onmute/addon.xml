@@ -15,12 +15,14 @@
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
+        <summary lang="cs_CZ">Povoluje skryté titulky a titulky &quot;OnMute&quot; (při vypnutí zvuku).</summary>
         <summary lang="da_DK">Aktiver tekster for hørehæmmede og undertekster &quot;OnMute&quot;.</summary>
         <summary lang="de_DE">Untertitel, auch solche mit erklärendem Text, beim Stummschalten von Kodi aktivieren.</summary>
         <summary lang="en_GB">Enable closed captioning and subtitles &quot;OnMute&quot;.</summary>
         <summary lang="ko_KR">폐쇄 자막 및 &quot;OnMute&quot; 자막을 활성화합니다.</summary>
         <summary lang="pl_PL">Włącz napisy kodowane i napisy „OnMute”.</summary>
         <summary lang="zh_CN">启用闭路字幕和字幕“OnMute”。</summary>
+        <description lang="cs_CZ">Nechte &quot;OnMute&quot; přepínat skryté titulky a titulky když je v Kodi vypnutý zvuk.</description>
         <description lang="da_DK">Lad &quot;OnMute&quot; skifte tekster for hørehæmmede og undertekster, mens Kodi er slået fra.</description>
         <description lang="de_DE">OnMute handhabt Untertitel, auch solche mit erklärendem Text, während Kodi stummschaltet ist.</description>
         <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>

@@ -27,11 +27,11 @@ from itertools     import repeat, cycle, chain, zip_longest
 from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 
 try:
-    from multiprocessing.dummy import Pool as ThreadPool     
-    from multiprocessing       import cpu_count
-    CORES = cpu_count()
-    ENABLE_POOL = True
-except: ENABLE_POOL = False
+    if xbmc.getCondVisibility('System.Platform.Android'): raise Exception('Using Android threading')
+    from multiprocessing.pool import ThreadPool
+    SUPPORTS_POOL = True
+except Exception:
+    SUPPORTS_POOL = False
 
 # Plugin Info
 ADDON_ID      = 'plugin.video.channelsdvr'
@@ -463,17 +463,17 @@ class Channels(object):
         log('addContextMenu')
         return liz
         
-        
+             
     def poolList(self, method, items=None, args=None, chunk=25):
         log("poolList")
         results = []
-        if ENABLE_POOL:
-            pool = ThreadPool(CORES)
+        if SUPPORTS_POOL:
+            pool = ThreadPool()
             if args is not None: 
                 results = pool.map(method, zip(items,repeat(args)))
             elif items: 
                 results = pool.map(method, items)#, chunksize=chunk)
-            pool.close()   
+            pool.close()
             pool.join()
         else:
             if args is not None: 

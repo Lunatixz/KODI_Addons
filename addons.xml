@@ -32,8 +32,10 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="da_DK">Airy TV er underholdningsdestinationen for at se 100% gratis tv.</summary>
         <summary lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV.</summary>
-        <description lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp;amp; Comedy. Stream Anime &amp;amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you.</description>
+        <description lang="da_DK">Airy TV er underholdningsdestinationen for at se 100% gratis tv, film og komik. Stream anime og sport, al din underholdning på ét sted. Streaming har aldrig været nemmere! Airy TV har ingen kontrakt, ingen gebyrer, no-nonsense, kun gratis tv, film, komik, anime, sport, al din underholdning leveret til dig.</description>
+        <description lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp; Comedy. Stream Anime &amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you.</description>
     </extension>
 </addon>
 
@@ -70,7 +72,9 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="da_DK">Direkte tv overalt</summary>
         <summary lang="en_GB">Live TV, everywhere</summary>
+        <description lang="da_DK">Se dine yndlingsprogrammer i Kodi. Kanaler leverer en samlet oplevelse på tværs af alle dine tv, enheder og streamingplatforme.</description>
         <description lang="en_GB">Watch your favorite programs on Kodi. Channels delivers a unified experience across all your TVs, devices, and streaming platforms.</description>
     </extension>
 </addon>
@@ -100,8 +104,12 @@
         <icon>icon.png</icon>
         <fanart>fanart.jpg</fanart>
     </assets>
+    <summary lang="da_DK">Crackle leverer populære, prisvindende tv, film og originaler. Uden grænser for, hvor meget du kan se på tværs af alle dine enheder, kan du binge alt, hvad du vil, uanset hvor du vil.</summary>
     <summary lang="en_GB">Crackle delivers popular, award-winning TV, movies and originals. With no limit to how much you can watch across all your devices, you can binge all you want, wherever you want.</summary>
+    <summary lang="ko_KR">Crackle은 수상 경력에 빛나는 인기 있는 TV, 영화 및 원본을 제공합니다. 모든 장치에서 볼 수 있는 양에 제한 없이 원하는 곳 어디서나 원하는 대로 즐길 수 있습니다.</summary>
+    <description lang="da_DK">Crackle er en distributør af videostreaming af originale webserier, Hollywoodfilm og tv-serier. Grundlagt i begyndelsen af 2000'erne som Grouper og omdøbt i 2007, er Crackle ejet af Sony Pictures Entertainment.</description>
     <description lang="en_GB">Crackle is a video streaming distributor of original web shows, Hollywood movies, and TV shows. Founded in the early 2000s as Grouper, and rebranded in 2007, Crackle is owned by Sony Pictures Entertainment.</description>
+    <description lang="ko_KR">Crackle은 오리지널 웹 쇼, 헐리우드 영화 및 TV 쇼의 비디오 스트리밍 유통업체입니다. 2000년대 초에 Grouper로 설립되어 2007년에 브랜드 이름을 변경한 Crackle은 Sony Pictures Entertainment의 소유입니다.</description>
   </extension>
 </addon>
 
@@ -138,8 +146,11 @@
             <screenshot>resources/images/screenshot04.jpg</screenshot>
             <screenshot>resources/images/screenshot05.jpg</screenshot>
         </assets>
+        <summary lang="da_DK">Simpel HDHomeRun brugerflade.</summary>
         <summary lang="en_GB">Simple HDHomeRun Interface.</summary>
+        <description lang="da_DK">Find automatisk alle de kompatible HDHomeRun-enheder på dit netværk, enkel og nem HDHomeRun-brugerflade.</description>
         <description lang="en_GB">Automatically find all the compatible HDHomeRun devices on your network, Simple and Easy HDHomeRun Interface.</description>
+        <disclaimer lang="da_DK">Kræver en kompatibel HDHomeRun-enhed</disclaimer>
         <disclaimer lang="en_GB">Requires a compatible HDHomeRun device</disclaimer>
     </extension>
 </addon>
@@ -179,9 +190,13 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="da_DK">Locast er en offentlig tjeneste til amerikanere, der leverer lokale udsendelsessignaler over internettet i udvalgte byer som f.eks. New York, Philadelphia, Boston, Chicago, Houston og Dallas...</summary>
         <summary lang="en_GB">Locast is a public service to Americans, providing local broadcast signals over the Internet in select cities like New York, Philadelphia, Boston, Chicago, Houston and Dallas ...</summary>
+        <description lang="da_DK">Alt du skal gøre er at tilmelde dig online, angive dit navn og emailadresse og bekræfte, at du bor i og logger på fra en af de udvalgte amerikanske byer (&quot;Designated Market Area&quot;). Derefter kan du vælge blandt lokale tv-stationer og streame din foretrukne lokale station. Locast.org er en &quot;digital oversætter&quot;, hvilket betyder, at Locast.org fungerer ligesom en traditionel broadcast-oversættertjeneste, bortset fra at i stedet for at bruge et luftbåret signal til at øge en tv-stations rækkevidde, streamer vi signalet over internettet til forbrugerne placeret i udvalgte amerikanske byer. Lige siden begyndelsen af tv-udsendelser i midten af det 20. århundrede, har non-profit organisationer leveret &quot;oversætter&quot; tv-stationer som en offentlig tjeneste. Hvor en primær udsender ikke kan nå en modtager med et stærkt nok signal, forstærker oversætteren dette signal med en anden sender, hvilket gør det muligt for forbrugere, der ellers ikke kunne få det trådløse signal, at modtage vigtig programindhold, herunder lokale nyheder, vejr og selvfølgelig , sport. Locast.org leverer den samme offentlige service, men i stedet for en luftbåret signalsender, leverer vi det lokale udsendelsessignal via online streaming.</description>
         <description lang="en_GB">All you have to do is sign up online, provide your name and email address, and certify that you live in, and are logging on from, one of the select US cities (“Designated Market Area”). Then, you can select among local broadcasters and stream your favorite local station. Locast.org is a “digital translator,” meaning that Locast.org operates just like a traditional broadcast translator service, except instead of using an over-the-air signal to boost a broadcaster’s reach, we stream the signal over the Internet to consumers located within select US cities. Ever since the dawn of TV broadcasting in the mid-20th Century, non-profit organizations have provided “translator” TV stations as a public service. Where a primary broadcaster cannot reach a receiver with a strong enough signal, the translator amplifies that signal with another transmitter, allowing consumers who otherwise could not get the over-the-air signal to receive important programming, including local news, weather and of course, sports. Locast.org provides the same public service, except instead of an over-the-air signal transmitter, we provide the local broadcast signal via online streaming.</description>
+        <disclaimer lang="da_DK">Indholdet er geografisk begrænset og er muligvis ikke tilgængeligt på din placering.</disclaimer>
         <disclaimer lang="en_GB">Content is Geo-restricted and may not be available in your location.</disclaimer>
+        <lifecyclestate type="broken" lang="da_DK">Locast indstiller driften med øjeblikkelig virkning.\nBesøg www.locast.org for detaljer...</lifecyclestate>
         <lifecyclestate type="broken" lang="en_GB">Locast is suspending operations, effective immediately.\nVisit www.locast.org for details...</lifecyclestate>
     </extension>
 </addon>
@@ -215,7 +230,9 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="da_DK">Lokale nyheder på landsplan</summary>
         <summary lang="en_GB">Local News Nationwide</summary>
+        <description lang="da_DK">NewsON giver øjeblikkelig adgang til direkte- eller on-demand-udsendelser fra over 175 lokale stationer på 114 amerikanske markeder. Få adgang til tidligere nyhedsudsendelser i op til 48 timer, efter de er blevet sendt, og del interessante historier med den integrerede delefunktion på sociale medier direkte fra appen. Søg efter en lokal station med det interaktive kort, eller se stationen tættest på dig på smartphones, tablets eller Roku-streamingafspillere. Gem favoritstationer, og hold dig opdateret med alarmer om seneste nyheder sendt direkte til mobile enheder fra den lokale nyhedskilde. Hold forbindelsen når som helst og hvor som helst uden et kabelabonnement eller login.</description>
         <description lang="en_GB">NewsON provides instant access to live or on-demand broadcasts from over 175 local stations in 114 U.S. markets. Access previous newscasts for up to 48 hours after they air, and share interesting stories with the integrated social media share function directly from the app. Search for a local station with the interactive map or watch the station closest to you on smartphones, tablets, or Roku streaming players. Save favorite stations, and stay updated with breaking news alerts sent directly to mobile devices from the local source of the news. Stay connected anytime, anywhere without a cable subscription or login.</description>
     </extension>
 </addon>
@@ -247,10 +264,13 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="da_DK">Gennemse PlayOn fra Kodi.</summary>
         <summary lang="en_GB">Browse PlayOn from Kodi.</summary>
         <summary lang="ru_RU">Просматривайте PlayOn из Kodi.</summary>
+        <description lang="da_DK">PlayOn er et streaming mediemærke og softwaresuite, der gør det muligt for brugere at se og optage videoer fra adskillige online indholdsudbydere.</description>
         <description lang="en_GB">PlayOn is a streaming media brand and software suite that enables users to view and record videos from numerous online content providers.</description>
         <description lang="ru_RU">PlayOn - это бренд потокового мультимедиа и программный пакет, который позволяет пользователям просматривать и записывать видео от многочисленных поставщиков онлайн контента.</description>
+        <disclaimer lang="da_DK">Kræver Playon server software</disclaimer>
         <disclaimer lang="en_GB">Requires Playon Server Software</disclaimer>
         <disclaimer lang="ru_RU">Требуется серверное ПО Playon</disclaimer>
     </extension>
@@ -322,6 +342,7 @@
             <screenshot>resources/images/screenshot04.png</screenshot>
             <screenshot>resources/images/screenshot05.png</screenshot>
         </assets>
+        <description lang="da_DK">Transponder.tv tager tingene til det næste niveau ved at give hver bruger sit eget fjernsyn til kontrol og visning, uanset hvor de er. Med størstedelen af UK Free to Air-kanaler tilgængelige og en optagefunktion, der snart lanceres, vil du kunne se dit eget tv, uanset hvor du er, og når du vil. Hvem vil ikke have gratis tv?</description>
         <description lang="en_GB">Transponder.tv takes things to the next level in providing each user with their own remote tv set for controlling and viewing wherever they are. With the majority of UK Free to Air channels available and a soon to be launched recording feature, you will be able to watch your own tv wherever you are and whenever you want and who doesn't want free TV?</description>
     </extension>
 </addon>
@@ -383,6 +404,7 @@
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
+        <description lang="da_DK">TVCatchup er en internet-fjernsynstjeneste til visning af gratis britiske kanaler. Den fungerer som en kabeltjeneste og genudsender blandt andet BBC, Channel 4, Channel 5 og ITV, kun i Storbritannien.</description>
         <description lang="en_GB">TVCatchup is an Internet television service for viewing free-to-air UK channels. It operates as a cable service and retransmits BBC, Channel 4, Channel 5, and ITV, amongst others, only in the UK.</description>
         <description lang="ko_KR">TVCatchup은 무료 영국 채널을 시청하기 위한 인터넷 텔레비전 서비스입니다. 그것은 케이블 서비스로 운영되며 영국에서만 BBC, 채널 4, 채널 5 및 ITV를 재전송합니다.</description>
     </extension>
@@ -412,6 +434,7 @@
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
+        <description lang="da_DK">Xumo.TV bringer dig det bedste indhold fra digitale netværk, præsenteret ligesom kanalerne på dit tv og dine mobile enheder, kun med flere fede funktioner.</description>
         <description lang="en_GB">Xumo.TV brings you the best content from digital networks, presented just like the channels on your TV and mobile devices, only with more cool features.</description>
         <description lang="ko_KR">Xumo.TV는 디지털 네트워크에서 제공하는 최고의 콘텐츠를 제공하고, TV 및 모바일 장치의 채널처럼 더 멋진 기능을 제공합니다.</description>
     </extension>
@@ -533,8 +556,12 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="da_DK">Udforsk betagende billeder fra Bing-hjemmesiden... </summary>
         <summary lang="en_GB">Explore breathtaking images from the Bing homepage... </summary>
+        <summary lang="zh_CN">浏览必应主页上令人叹为观止的图片... </summary>
+        <description lang="da_DK">Udforsk betagende billeder fra Bing-hjemmesiden... </description>
         <description lang="en_GB">Explore breathtaking images from the Bing homepage... </description>
+        <description lang="zh_CN">浏览必应主页上令人叹为观止的图片... </description>
     </extension>
 </addon>
 
@@ -556,8 +583,12 @@
             <screenshot>screenshot01.png</screenshot>
             <screenshot>screenshot02.png</screenshot>
         </assets>
+        <summary lang="da_DK">Flip-ur pause skærm.</summary>
         <summary lang="en_GB">Flip clock screensaver.</summary>
+        <summary lang="zh_CN">翻转时钟屏幕保护程序。</summary>
+        <description lang="da_DK">Flip-ur pause skærm.</description>
         <description lang="en_GB">Flip clock screensaver.</description>
+        <description lang="zh_CN">翻转时钟屏幕保护程序。</description>
     </extension>
 </addon>
 
@@ -584,8 +615,12 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="da_DK">Earth View viser et smukt satellitbillede fra Google Earth...</summary>
         <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
+        <summary lang="zh_CN">地球视图显示谷歌地球的美丽卫星图像......</summary>
+        <description lang="da_DK">Earth View er en samling af de smukkeste og mest slående landskaber, der findes i Google Earth.</description>
         <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
+        <description lang="zh_CN">地球视图是谷歌地球中发现最美丽醒目的景观的集合。</description>
     </extension>
 </addon>
 
@@ -613,7 +648,9 @@
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
         <summary lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</summary>
+        <summary lang="zh_CN">美丽，免费的照片。世界上最慷慨的摄影师社区。</summary>
         <description lang="en_GB">Beautiful, free photos. Gifted by the world's most generous community of photographers.</description>
+        <description lang="zh_CN">美丽，免费的照片。世界上最慷慨的摄影师社区。</description>
     </extension>
 </addon>
 
@@ -668,11 +705,20 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="cs_CZ">Stáhnout a nainstalovat Kodi balíčky.</summary>
+        <summary lang="da_DK">Hent og installer Kodi-installationspakker.</summary>
         <summary lang="en_GB">Download and Install Kodi packages.</summary>
+        <summary lang="fi_FI">Lataa ja asenna Kodi paketteja.</summary>
         <summary lang="ko_KR">Kodi 패키지를 다운로드하고 설치합니다.</summary>
+        <summary lang="pl_PL">Pobieraj i instaluj pakiety Kodi.</summary>
         <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
+        <summary lang="zh_CN">下载并安装 Kodi 软件包。</summary>
+        <description lang="cs_CZ">Stáhnout a nainstalovat Kodi android balíčky; vyberte z  Nightlies, Releases, Snapshots and Test-builds.</description>
+        <description lang="da_DK">Download og installer Android eksekverbare filer til Kodi; vælg fra Nightlies, Udgivelser, Snapshots og Test-builds.</description>
         <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="ko_KR">Kodi 안드로이드 패키지를 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
+        <description lang="pl_PL">Pobieraj i instaluj pliki wykonywalne Kodi: kompilacje nocne, testowe, wydania finalne, migawki.</description>
+        <description lang="zh_CN">下载并安装 Kodi android 软件包。从 Nightlies、Releases、Snapshots 和 Test-builds 中选择。</description>
     </extension>
 </addon>
 
@@ -700,15 +746,26 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="cs_CZ">Stáhnout a nainstalovat Kodi balíčky.</summary>
+        <summary lang="da_DK">Hent og installer Kodi-installationspakker.</summary>
         <summary lang="en_GB">Download and Install Kodi packages.</summary>
+        <summary lang="fi_FI">Lataa ja asenna Kodi paketteja.</summary>
         <summary lang="ko_KR">Kodi 패키지를 다운로드하고 설치합니다.</summary>
+        <summary lang="pl_PL">Pobieraj i instaluj pakiety Kodi.</summary>
         <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
+        <summary lang="zh_CN">下载并安装 Kodi 软件包。</summary>
+        <description lang="da_DK">Download og installer Windows eksekverbare filer til Kodi; vælg fra Nightlies, Udgivelser, Snapshots og Test-builds.</description>
         <description lang="en_GB">Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="ko_KR">Kodi 윈도 실행 파일을 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
+        <description lang="pl_PL">Pobieraj i instaluj pliki wykonywalne Kodi: kompilacje nocne, testowe, wydania finalne, migawki.</description>
         <description lang="ru_RU">Загрузка и установка исполняемых файлов Kodi: ночные и тестовые сборки, релизы, снапшоты.</description>
+        <description lang="zh_CN">下载并安装 Kodi windows 可执行文件。从 Nightlies、Releases、Snapshots 和 Test-builds 中选择。</description>
+        <disclaimer lang="da_DK">UWP understøttes ikke! Ikke beregnet til Kodi-installation gennem Windows Store.</disclaimer>
         <disclaimer lang="en_GB">UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
         <disclaimer lang="ko_KR">UWP가 지원되지 않습니다! 윈도 스토어를 통한 Kodi 설치용이 아닙니다.</disclaimer>
+        <disclaimer lang="pl_PL">Platforma UWP nie jest obsługiwana! Nie jest przeznaczony do instalacji Kodi za pośrednictwem Windows Store.</disclaimer>
         <disclaimer lang="ru_RU">Не поддерживается UWP! Не предназначен для установки Kodi через Магазин Windows.</disclaimer>
+        <disclaimer lang="zh_CN">不支持 UWP！不适用于通过 Windows 应用商店安装 Kodi。</disclaimer>
     </extension>
 </addon>
 
@@ -901,10 +958,14 @@
             <fanart>resources/images/fanart.jpg</fanart>
             <screenshot>resources/images/screenshot01.png</screenshot>
         </assets>
+        <summary lang="da_DK">Test din enheds python-ydeevne.</summary>
         <summary lang="en_GB">Test your devices python performance.</summary>
         <summary lang="ko_KR">장치 파이썬 성능을 테스트하십시오.</summary>
+        <summary lang="zh_CN">测试设备的 python 性能。</summary>
+        <description lang="da_DK">Hvor hurtigt kører din enhed pythonkode? Pystone evaluerer CPU-ydelse, der kører i et pythonmiljø.</description>
         <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
         <description lang="ko_KR">당신의 기기는 얼마나 빨리 파이썬 코드를 실행할까요? Pystone은 Python 환경에서 실행되는 CPU 성능을 평가합니다.</description>
+        <description lang="zh_CN">您的设备运行 python 代码的速度有多快？Pystone 评估在 python 环境中运行的 CPU 性能。</description>
     </extension>
 </addon>
 
@@ -930,8 +991,10 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
-        <description lang="en_GB">Monitor your favorite twitter accounts, receive &amp;quot;realtime&amp;quot; tweets.</description>
-        <description lang="ko_KR">좋아하는 트위터 계정을 모니터링하고 &amp;quot;실시간&amp;quot; 트윗을 받으세요.</description>
+        <description lang="da_DK">Overvåg dine foretrukne twitter-konti, modtag &quot;realtime&quot; tweets.</description>
+        <description lang="en_GB">Monitor your favorite twitter accounts, receive &quot;realtime&quot; tweets.</description>
+        <description lang="ko_KR">좋아하는 트위터 계정을 모니터링하고 &quot;실시간&quot; 트윗을 받으세요.</description>
+        <description lang="zh_CN">监控您喜爱的推特帐户，接收“实时”推文。</description>
     </extension>
 </addon>
 
@@ -971,6 +1034,8 @@
             <screenshot>resources/screenshot06.png</screenshot>
         </assets>
         <reuselanguageinvoker>true</reuselanguageinvoker>
+        <summary lang="cs_CZ">Integruje IPTV kanály z jiných doplňků do nabídky Kodi TV a Rádio</summary>
+        <summary lang="da_DK">Integrer IPTV-kanaler fra andre add-ons i Kodi tv- og radio-menuerne</summary>
         <summary lang="de_DE">IPTV-Kanäle aus anderen Addons in Kodis TV- und Radiomenüs integrieren</summary>
         <summary lang="el_GR">Ενσωμάτωση καναλιών IPTV από άλλα πρόσθετα στο PVR του Kodi</summary>
         <summary lang="en_GB">Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus</summary>
@@ -979,6 +1044,9 @@
         <summary lang="nl_NL">Integreer IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's</summary>
         <summary lang="pl_PL">Zintegruj kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio</summary>
         <summary lang="ru_RU">Интеграция IPTV каналов из других дополнений в Kodi PVR</summary>
+        <summary lang="zh_CN">在KODI电视和电台菜单中集成来自其他插件的IPTV频道</summary>
+        <description lang="cs_CZ">IPTV Manager integruje IPTV kanály z jiných doplňků do nabídky Kodi TV a Rádio.</description>
+        <description lang="da_DK">IPTV Manager integrerer IPTV-kanaler fra andre add-ons i Kodi tv- og radio-menuerne.</description>
         <description lang="de_DE">IPTV Mananger integriert IPTV-Kanälen aus anderen Addons in die TV- und Radiomenüs von Kodi.</description>
         <description lang="el_GR">Το πρόσθετο αυτο ενσωματώνει τα κανάλια IPTV από άλλα πρόσθετα στο PVR του Kodi.</description>
         <description lang="en_GB">IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus.</description>
@@ -987,6 +1055,7 @@
         <description lang="nl_NL">IPTV Manager integreert IPTV kanalen van andere add-ons in de Kodi TV en Radio menu's.</description>
         <description lang="pl_PL">IPTV Manager integruje kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio.</description>
         <description lang="ru_RU">Это дополнение интегрирует IPTV каналы из других дополнений в Kodi PVR.</description>
+        <description lang="zh_CN">IPTV管理器可以在KODI电视和电台菜单中集成来自其他插件的IPTV频道。</description>
     </extension>
 </addon>
 
@@ -1013,18 +1082,24 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="da_DK">Scan og sammenlign installerede moduler med det officielle Kodi fjernlager.</summary>
         <summary lang="de_DE">Durchsuche und vergleiche installierte Addons mit denen aus dem offiziellen Kodi-Repository.</summary>
         <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</summary>
         <summary lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</summary>
         <summary lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</summary>
+        <summary lang="zh_CN">通过官方KODI插件源扫描并比较已安装的模块。</summary>
+        <description lang="da_DK">Scan og sammenlign installerede moduler med det officielle Kodi fjernlager.</description>
         <description lang="de_DE">Durchsuche und vergleiche installierte Addons mit denen aus dem offiziellen Kodi-Repository.</description>
         <description lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</description>
         <description lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</description>
         <description lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</description>
+        <description lang="zh_CN">通过官方KODI插件源扫描并比较已安装的模块。</description>
+        <disclaimer lang="da_DK">Modul Auditor forhindrer eller beskytter dig ikke mod malware. En ren scanning garanterer ikke, at systemet er frit for malware. Brug sund fornuft, når du installerer tredjeparts fjernlagre.</disclaimer>
         <disclaimer lang="de_DE">Module auditor schützt nicht gegen Malware. Wenn nichts gefunden wird, ist das keine Garantie für ein malware-freies System. Bitte gesunden Menschenverstand beim Installieren von Repositories von Drittanbietern benutzen.</disclaimer>
         <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
         <disclaimer lang="ko_KR">모듈 감시자는 맬웨어로부터 사용자를 방지하거나 보호하지 않습니다. 클린 스캔은 시스템에 맬웨어가 없음을 보장하지 않습니다. 타사 저장소를 설치할 때 고려하십시오.</disclaimer>
         <disclaimer lang="pl_PL">Moduł Auditor nie zapobiega ani nie chroni przed złośliwym oprogramowaniem. Czyste skanowanie nie gwarantuje, że system jest wolny od złośliwego oprogramowania. Podczas instalowania repozytoriów zewnętrznych należy kierować się zdrowym rozsądkiem.</disclaimer>
+        <disclaimer lang="zh_CN">Module Auditor不会阻止或保护您免受恶意软件的攻击。干净扫描并不能保证系统没有恶意软件。安装第三方插件库时请通过常识判断。</disclaimer>
     </extension>
 </addon>
 
@@ -1044,14 +1119,20 @@
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
+        <summary lang="cs_CZ">Povoluje skryté titulky a titulky &quot;OnMute&quot; (při vypnutí zvuku).</summary>
+        <summary lang="da_DK">Aktiver tekster for hørehæmmede og undertekster &quot;OnMute&quot;.</summary>
         <summary lang="de_DE">Untertitel, auch solche mit erklärendem Text, beim Stummschalten von Kodi aktivieren.</summary>
-        <summary lang="en_GB">Enable closed captioning and subtitles &amp;quot;OnMute&amp;quot;.</summary>
-        <summary lang="ko_KR">폐쇄 자막 및 &amp;quot;OnMute&amp;quot; 자막을 활성화합니다.</summary>
+        <summary lang="en_GB">Enable closed captioning and subtitles &quot;OnMute&quot;.</summary>
+        <summary lang="ko_KR">폐쇄 자막 및 &quot;OnMute&quot; 자막을 활성화합니다.</summary>
         <summary lang="pl_PL">Włącz napisy kodowane i napisy „OnMute”.</summary>
+        <summary lang="zh_CN">启用闭路字幕和字幕“OnMute”。</summary>
+        <description lang="cs_CZ">Nechte &quot;OnMute&quot; přepínat skryté titulky a titulky když je v Kodi vypnutý zvuk.</description>
+        <description lang="da_DK">Lad &quot;OnMute&quot; skifte tekster for hørehæmmede og undertekster, mens Kodi er slået fra.</description>
         <description lang="de_DE">OnMute handhabt Untertitel, auch solche mit erklärendem Text, während Kodi stummschaltet ist.</description>
-        <description lang="en_GB">Let &amp;quot;OnMute&amp;quot; toggle closed captioning and subtitles while Kodi is muted.</description>
-        <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &amp;quot;OnMute&amp;quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
+        <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>
+        <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &quot;OnMute&quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
         <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>
+        <description lang="zh_CN">让“OnMute”在 Kodi 静音时切换闭路字幕和字幕。</description>
     </extension>
 </addon>
 </addons>

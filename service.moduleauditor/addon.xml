@@ -22,17 +22,23 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="da_DK">Scan og sammenlign installerede moduler med det officielle Kodi fjernlager.</summary>
         <summary lang="de_DE">Durchsuche und vergleiche installierte Addons mit denen aus dem offiziellen Kodi-Repository.</summary>
         <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</summary>
         <summary lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</summary>
         <summary lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</summary>
+        <summary lang="zh_CN">通过官方KODI插件源扫描并比较已安装的模块。</summary>
+        <description lang="da_DK">Scan og sammenlign installerede moduler med det officielle Kodi fjernlager.</description>
         <description lang="de_DE">Durchsuche und vergleiche installierte Addons mit denen aus dem offiziellen Kodi-Repository.</description>
         <description lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</description>
         <description lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</description>
         <description lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</description>
+        <description lang="zh_CN">通过官方KODI插件源扫描并比较已安装的模块。</description>
+        <disclaimer lang="da_DK">Modul Auditor forhindrer eller beskytter dig ikke mod malware. En ren scanning garanterer ikke, at systemet er frit for malware. Brug sund fornuft, når du installerer tredjeparts fjernlagre.</disclaimer>
         <disclaimer lang="de_DE">Module auditor schützt nicht gegen Malware. Wenn nichts gefunden wird, ist das keine Garantie für ein malware-freies System. Bitte gesunden Menschenverstand beim Installieren von Repositories von Drittanbietern benutzen.</disclaimer>
         <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
         <disclaimer lang="ko_KR">모듈 감시자는 맬웨어로부터 사용자를 방지하거나 보호하지 않습니다. 클린 스캔은 시스템에 맬웨어가 없음을 보장하지 않습니다. 타사 저장소를 설치할 때 고려하십시오.</disclaimer>
         <disclaimer lang="pl_PL">Moduł Auditor nie zapobiega ani nie chroni przed złośliwym oprogramowaniem. Czyste skanowanie nie gwarantuje, że system jest wolny od złośliwego oprogramowania. Podczas instalowania repozytoriów zewnętrznych należy kierować się zdrowym rozsądkiem.</disclaimer>
+        <disclaimer lang="zh_CN">Module Auditor不会阻止或保护您免受恶意软件的攻击。干净扫描并不能保证系统没有恶意软件。安装第三方插件库时请通过常识判断。</disclaimer>
     </extension>
 </addon>

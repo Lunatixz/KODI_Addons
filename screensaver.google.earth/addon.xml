@@ -22,7 +22,11 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="da_DK">Earth View viser et smukt satellitbillede fra Google Earth...</summary>
         <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
+        <summary lang="zh_CN">地球视图显示谷歌地球的美丽卫星图像......</summary>
+        <description lang="da_DK">Earth View er en samling af de smukkeste og mest slående landskaber, der findes i Google Earth.</description>
         <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
+        <description lang="zh_CN">地球视图是谷歌地球中发现最美丽醒目的景观的集合。</description>
     </extension>
 </addon>

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plugin.video.plutotv\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: http://forum.kodi.tv/showthread.php?tid=315513\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: 2021-10-12 17:02+0000\n"
 "Last-Translator: Dmitry Petrov <dimakrm361@gmail.com>\n"
@@ -22,7 +22,7 @@ msgid "Airy TV is the entertainment destination for watching 100% Free TV."
 msgstr ""
 
 msgctxt "Addon Description"
-msgid "Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp; Comedy. Stream Anime &amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you."
+msgid "Airy TV is the entertainment destination for watching 100% Free TV, Movies & Comedy. Stream Anime & Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you."
 msgstr ""
 
 msgctxt "#30000"

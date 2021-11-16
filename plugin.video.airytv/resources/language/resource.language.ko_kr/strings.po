@@ -22,7 +22,7 @@ msgid "Airy TV is the entertainment destination for watching 100% Free TV."
 msgstr ""
 
 msgctxt "Addon Description"
-msgid "Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp; Comedy. Stream Anime &amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you."
+msgid "Airy TV is the entertainment destination for watching 100% Free TV, Movies & Comedy. Stream Anime & Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you."
 msgstr ""
 
 msgctxt "#30000"

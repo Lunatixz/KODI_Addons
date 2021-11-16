@@ -26,10 +26,13 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="da_DK">Gennemse PlayOn fra Kodi.</summary>
         <summary lang="en_GB">Browse PlayOn from Kodi.</summary>
         <summary lang="ru_RU">Просматривайте PlayOn из Kodi.</summary>
+        <description lang="da_DK">PlayOn er et streaming mediemærke og softwaresuite, der gør det muligt for brugere at se og optage videoer fra adskillige online indholdsudbydere.</description>
         <description lang="en_GB">PlayOn is a streaming media brand and software suite that enables users to view and record videos from numerous online content providers.</description>
         <description lang="ru_RU">PlayOn - это бренд потокового мультимедиа и программный пакет, который позволяет пользователям просматривать и записывать видео от многочисленных поставщиков онлайн контента.</description>
+        <disclaimer lang="da_DK">Kræver Playon server software</disclaimer>
         <disclaimer lang="en_GB">Requires Playon Server Software</disclaimer>
         <disclaimer lang="ru_RU">Требуется серверное ПО Playon</disclaimer>
     </extension>

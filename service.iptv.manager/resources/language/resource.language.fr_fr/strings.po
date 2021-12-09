@@ -3,69 +3,74 @@
 # Addon id: service.iptv.manager
 msgid ""
 msgstr ""
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"PO-Revision-Date: 2021-11-28 18:13+0000\n"
+"Last-Translator: Matthieu Sontag <matthieu.sontag@gmail.com>\n"
+"Language-Team: French (France) <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/fr_fr/>\n"
 "Language: fr_fr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.9.1\n"
 
 msgctxt "Addon Summary"
 msgid "Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus"
-msgstr ""
+msgstr "Intégrer les chaines IPTV d'autres extensions dans les menus Radio et TV de Kodi"
 
 msgctxt "Addon Description"
 msgid "IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus."
-msgstr ""
+msgstr "IPTV Manager intègre des chaines IPTV d'autres extensions dans les menus TV et Radio de Kodi."
 
 # CONTEXT MENU
 msgctxt "#30600"
 msgid "Play with IPTV Manager"
-msgstr ""
+msgstr "Lire avec IPTV Manager"
 
 # MESSAGES
 msgctxt "#30700"
 msgid "Are you sure you want to setup IPTV Simple for the use with IPTV Manager? Any existing configuration of IPTV Simple will be overwritten."
-msgstr ""
+msgstr "Êtes-vous sûr de vouloir configurer l'utilisation d’IPTV Simple pour IPTV Manager ? Toute configuration existante d’IPTV Simple sera écrasée."
 
 msgctxt "#30701"
 msgid "IPTV Simple is configured for use with IPTV Manager!"
-msgstr ""
+msgstr "IPTV Simple est configuré pour être utilisé avec IPTV Manager !"
 
 msgctxt "#30702"
 msgid "The configuration of IPTV Simple has failed. Please check the log files for more information."
-msgstr ""
+msgstr "La configuration d’IPTV Simple a échouée. Vérifiez le fichier de log pour plus d'informations."
 
 msgctxt "#30703"
 msgid "Detecting IPTV add-ons..."
-msgstr ""
+msgstr "Détection des extensions IPTV..."
 
 msgctxt "#30704"
 msgid "Fetching channels and guide of {addon}..."
-msgstr ""
+msgstr "Récupération des chaînes et du guide de {addon}..."
 
 msgctxt "#30705"
 msgid "Updating channels and guide..."
-msgstr ""
+msgstr "Mise à jour des chaînes et du guide..."
 
 msgctxt "#30706"
 msgid "This program isn't available to play."
-msgstr ""
+msgstr "Ce programme n’est pas disponible pour la lecture."
 
 # SETTINGS
 msgctxt "#30800"
 msgid "Channels"
-msgstr ""
+msgstr "Chaînes"
 
 msgctxt "#30801"
 msgid "Refreshing"
-msgstr ""
+msgstr "Mise à jour"
 
 msgctxt "#30802"
 msgid "Refresh interval [I](in hours)[/I]"
-msgstr ""
+msgstr "Intervalle de mise à jour [I](en heures)[/I]"
 
 msgctxt "#30803"
 msgid "Refresh channels and guide now…"
-msgstr ""
+msgstr "Mise à jour des chaînes et du guide en cours…"
 
 msgctxt "#30820"
 msgid "IPTV Simple"
@@ -73,31 +78,31 @@ msgstr ""
 
 msgctxt "#30821"
 msgid "Configuration"
-msgstr ""
+msgstr "Configuration"
 
 msgctxt "#30822"
 msgid "Configure IPTV Simple automatically…"
-msgstr ""
+msgstr "Configurer IPTV Simple automatiquement…"
 
 msgctxt "#30823"
 msgid "Open IPTV Simple settings…"
-msgstr ""
+msgstr "Ouvrir la configuration d’IPTV Simple…"
 
 msgctxt "#30824"
 msgid "Automatically restart IPTV Simple to refresh the data"
-msgstr ""
+msgstr "Redémarrer IPTV Simple automatiquement pour mettre à jour les données"
 
 msgctxt "#30880"
 msgid "Expert"
-msgstr ""
+msgstr "Expert"
 
 msgctxt "#30881"
 msgid "Logging"
-msgstr ""
+msgstr "Journalisation"
 
 msgctxt "#30882"
 msgid "Enable debug logging"
-msgstr ""
+msgstr "Activer la journalisation de niveau debug"
 
 msgctxt "#30883"
 msgid "Install Kodi Logfile Uploader…"

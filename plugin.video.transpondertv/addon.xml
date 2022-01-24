@@ -30,6 +30,6 @@
             <screenshot>resources/images/screenshot05.png</screenshot>
         </assets>
         <description lang="da_DK">Transponder.tv tager tingene til det næste niveau ved at give hver bruger sit eget fjernsyn til kontrol og visning, uanset hvor de er. Med størstedelen af UK Free to Air-kanaler tilgængelige og en optagefunktion, der snart lanceres, vil du kunne se dit eget tv, uanset hvor du er, og når du vil. Hvem vil ikke have gratis tv?</description>
-        <description lang="en_GB">Transponder.tv takes things to the next level in providing each user with their own remote tv set for controlling and viewing wherever they are. With the majority of UK Free to Air channels available and a soon to be launched recording feature, you will be able to watch your own tv wherever you are and whenever you want and who doesn't want free TV?</description>
+        <description lang="en_GB">Transponder.tv takes things to the next level in providing each user with their own remote tv set for controlling and viewing wherever they are. With the majority of UK Free to Air channels available and a soon to be launched recording feature, you will be able to watch your own tv wherever you are and whenever you want and who doesn&#x27;t want free TV?</description>
     </extension>
 </addon>

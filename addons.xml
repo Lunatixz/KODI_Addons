@@ -107,7 +107,7 @@
     <summary lang="da_DK">Crackle leverer populære, prisvindende tv, film og originaler. Uden grænser for, hvor meget du kan se på tværs af alle dine enheder, kan du binge alt, hvad du vil, uanset hvor du vil.</summary>
     <summary lang="en_GB">Crackle delivers popular, award-winning TV, movies and originals. With no limit to how much you can watch across all your devices, you can binge all you want, wherever you want.</summary>
     <summary lang="ko_KR">Crackle은 수상 경력에 빛나는 인기 있는 TV, 영화 및 원본을 제공합니다. 모든 장치에서 볼 수 있는 양에 제한 없이 원하는 곳 어디서나 원하는 대로 즐길 수 있습니다.</summary>
-    <description lang="da_DK">Crackle er en distributør af videostreaming af originale webserier, Hollywoodfilm og tv-serier. Grundlagt i begyndelsen af 2000&#x27;erne som Grouper og omdøbt i 2007, er Crackle ejet af Sony Pictures Entertainment.</description>
+    <description lang="da_DK">Crackle er en distributør af videostreaming af originale webserier, Hollywoodfilm og tv-serier. Grundlagt i begyndelsen af 2000&apos;erne som Grouper og omdøbt i 2007, er Crackle ejet af Sony Pictures Entertainment.</description>
     <description lang="en_GB">Crackle is a video streaming distributor of original web shows, Hollywood movies, and TV shows. Founded in the early 2000s as Grouper, and rebranded in 2007, Crackle is owned by Sony Pictures Entertainment.</description>
     <description lang="ko_KR">Crackle은 오리지널 웹 쇼, 헐리우드 영화 및 TV 쇼의 비디오 스트리밍 유통업체입니다. 2000년대 초에 Grouper로 설립되어 2007년에 브랜드 이름을 변경한 Crackle은 Sony Pictures Entertainment의 소유입니다.</description>
   </extension>
@@ -312,8 +312,8 @@
         </assets>
         <summary lang="da_DK">Tv-kanaler dedikeret til dine yndlingsting, lavet af storfilm fra Paramount... &quot;Det geniale ved Pluto TV: dette er ægte internet-tv&quot;.</summary>
         <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
-        <description lang="da_DK">Se gratis tv i Kodi! Stream Pluto TV&#x27;s mere end 100 kanaler med nyheder, sport og internettets bedste, helt gratis på din Kodi-enhed.</description>
-        <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV&#x27;s 100+ channels of news, sports, and the Internet&#x27;s best, completely free on your Kodi device.</description>
+        <description lang="da_DK">Se gratis tv i Kodi! Stream Pluto TV&apos;s mere end 100 kanaler med nyheder, sport og internettets bedste, helt gratis på din Kodi-enhed.</description>
+        <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV&apos;s 100+ channels of news, sports, and the Internet&apos;s best, completely free on your Kodi device.</description>
     </extension>
 </addon>
 
@@ -348,7 +348,7 @@
             <screenshot>resources/images/screenshot05.png</screenshot>
         </assets>
         <description lang="da_DK">Transponder.tv tager tingene til det næste niveau ved at give hver bruger sit eget fjernsyn til kontrol og visning, uanset hvor de er. Med størstedelen af UK Free to Air-kanaler tilgængelige og en optagefunktion, der snart lanceres, vil du kunne se dit eget tv, uanset hvor du er, og når du vil. Hvem vil ikke have gratis tv?</description>
-        <description lang="en_GB">Transponder.tv takes things to the next level in providing each user with their own remote tv set for controlling and viewing wherever they are. With the majority of UK Free to Air channels available and a soon to be launched recording feature, you will be able to watch your own tv wherever you are and whenever you want and who doesn&#x27;t want free TV?</description>
+        <description lang="en_GB">Transponder.tv takes things to the next level in providing each user with their own remote tv set for controlling and viewing wherever they are. With the majority of UK Free to Air channels available and a soon to be launched recording feature, you will be able to watch your own tv wherever you are and whenever you want and who doesn&apos;t want free TV?</description>
     </extension>
 </addon>
 
@@ -655,10 +655,10 @@
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
         <summary lang="da_DK">Smukke, gratis billeder. Begavet af verdens mest generøse fællesskab af fotografer.</summary>
-        <summary lang="en_GB">Beautiful, free photos. Gifted by the world&#x27;s most generous community of photographers.</summary>
+        <summary lang="en_GB">Beautiful, free photos. Gifted by the world&apos;s most generous community of photographers.</summary>
         <summary lang="zh_CN">美丽，免费的照片。世界上最慷慨的摄影师社区。</summary>
         <description lang="da_DK">Smukke, gratis billeder. Begavet af verdens mest generøse fællesskab af fotografer.</description>
-        <description lang="en_GB">Beautiful, free photos. Gifted by the world&#x27;s most generous community of photographers.</description>
+        <description lang="en_GB">Beautiful, free photos. Gifted by the world&apos;s most generous community of photographers.</description>
         <description lang="zh_CN">美丽，免费的照片。世界上最慷慨的摄影师社区。</description>
     </extension>
 </addon>
@@ -722,6 +722,7 @@
         </assets>
         <summary lang="cs_CZ">Stáhnout a nainstalovat Kodi balíčky.</summary>
         <summary lang="da_DK">Hent og installer Kodi-installationspakker.</summary>
+        <summary lang="de_DE">Kodi-Pakete herunterladen und installieren.</summary>
         <summary lang="en_GB">Download and Install Kodi packages.</summary>
         <summary lang="es_MX">Descarga e instala paquetes de Kodi.</summary>
         <summary lang="et_EE">Laadi alla ja paigalda Kodi pakette.</summary>
@@ -732,6 +733,7 @@
         <summary lang="zh_CN">下载并安装 Kodi 软件包。</summary>
         <description lang="cs_CZ">Stáhnout a nainstalovat Kodi android balíčky; vyberte z  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="da_DK">Download og installer Android eksekverbare filer til Kodi; vælg fra Nightlies, Udgivelser, Snapshots og Test-builds.</description>
+        <description lang="de_DE">Kodi-Pakete für Android herunterladen und installieren. Auswählen zwischen Nightlies, Releases, Snapshopts und Test-Builds.</description>
         <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="et_EE">Laadi alla ja paigalda Kodi android pakette; valikus on Nightlies, Releases, Snapshots ja Test-builds.</description>
         <description lang="fi_FI">Lataa ja asenna Kodi -Android paketteja; Valitse vaihtoehdoista Nightlies, Releases, Snapshots ja Test-builds.</description>
@@ -767,6 +769,7 @@
         </assets>
         <summary lang="cs_CZ">Stáhnout a nainstalovat Kodi balíčky.</summary>
         <summary lang="da_DK">Hent og installer Kodi-installationspakker.</summary>
+        <summary lang="de_DE">Kodi-Pakete herunterladen und installieren.</summary>
         <summary lang="en_GB">Download and Install Kodi packages.</summary>
         <summary lang="es_MX">Descarga e instala paquetes de Kodi.</summary>
         <summary lang="et_EE">Laadi alla ja paigalda Kodi pakette.</summary>
@@ -776,6 +779,7 @@
         <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
         <summary lang="zh_CN">下载并安装 Kodi 软件包。</summary>
         <description lang="da_DK">Download og installer Windows eksekverbare filer til Kodi; vælg fra Nightlies, Udgivelser, Snapshots og Test-builds.</description>
+        <description lang="de_DE">Kodi für Windows herunterladen und installieren. Auswählen zwischen Nightlies, Releases, Snapshopts und Test-Builds.</description>
         <description lang="en_GB">Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="es_MX">Descarga e instala ejecutables de Kodi para Windows; selecciona entre  Nightlies, Releases, Snapshots y Test-builds.</description>
         <description lang="ko_KR">Kodi 윈도 실행 파일을 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
@@ -783,6 +787,7 @@
         <description lang="ru_RU">Загрузка и установка исполняемых файлов Kodi: ночные и тестовые сборки, релизы, снапшоты.</description>
         <description lang="zh_CN">下载并安装 Kodi windows 可执行文件。从 Nightlies、Releases、Snapshots 和 Test-builds 中选择。</description>
         <disclaimer lang="da_DK">UWP understøttes ikke! Ikke beregnet til Kodi-installation gennem Windows Store.</disclaimer>
+        <disclaimer lang="de_DE">UWP wird nicht unterstützt! Nicht vorgesehen für Kodi-Installation über den Windows Store.</disclaimer>
         <disclaimer lang="en_GB">UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
         <disclaimer lang="es_MX">¡No se soporta UWP! No se pretende utilizara para la instalación de Kodi desde la tienda de Windows.</disclaimer>
         <disclaimer lang="ko_KR">UWP가 지원되지 않습니다! 윈도 스토어를 통한 Kodi 설치용이 아닙니다.</disclaimer>
@@ -1067,10 +1072,10 @@
         <summary lang="el_GR">Ενσωμάτωση καναλιών IPTV από άλλα πρόσθετα στο PVR του Kodi</summary>
         <summary lang="en_GB">Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus</summary>
         <summary lang="es_MX">Integra canales IPTV de otros complementos en los menús de TV y Radio de Kodi</summary>
-        <summary lang="fr_FR">Intégrer les chaines IPTV d&#x27;autres extensions dans les menus Radio et TV de Kodi</summary>
+        <summary lang="fr_FR">Intégrer les chaines IPTV d&apos;autres extensions dans les menus Radio et TV de Kodi</summary>
         <summary lang="hu_HU">Más kiegészítők által szolgáltatott IPTV csatornák integrációja a Kodi PVR felületbe</summary>
         <summary lang="ko_KR">Kodi TV 및 라디오 메뉴의 다른 애드온에서 IPTV 채널 통합</summary>
-        <summary lang="nl_NL">Integreer IPTV kanalen van andere add-ons in de Kodi TV en Radio menu&#x27;s</summary>
+        <summary lang="nl_NL">Integreer IPTV kanalen van andere add-ons in de Kodi TV en Radio menu&apos;s</summary>
         <summary lang="pl_PL">Zintegruj kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio</summary>
         <summary lang="ru_RU">Интеграция IPTV каналов из других дополнений в Kodi PVR</summary>
         <summary lang="zh_CN">在KODI电视和电台菜单中集成来自其他插件的IPTV频道</summary>
@@ -1080,10 +1085,10 @@
         <description lang="el_GR">Το πρόσθετο αυτο ενσωματώνει τα κανάλια IPTV από άλλα πρόσθετα στο PVR του Kodi.</description>
         <description lang="en_GB">IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus.</description>
         <description lang="es_MX">IPTV Manager integra canales IPTV de otros complementos en los menús de TV y Radio de Kodi.</description>
-        <description lang="fr_FR">IPTV Manager intègre des chaines IPTV d&#x27;autres extensions dans les menus TV et Radio de Kodi.</description>
+        <description lang="fr_FR">IPTV Manager intègre des chaines IPTV d&apos;autres extensions dans les menus TV et Radio de Kodi.</description>
         <description lang="hu_HU">Ez a kiegészítő lehetővé teszi más kiegészítők számára, hogy saját IPTV csatornákat publikáljanak a Kodi PVR felületébe.</description>
         <description lang="ko_KR">IPTV 관리자는 Kodi TV 및 라디오 메뉴에 있는 다른 애드온의 IPTV 채널을 통합합니다.</description>
-        <description lang="nl_NL">IPTV Manager integreert IPTV kanalen van andere add-ons in de Kodi TV en Radio menu&#x27;s.</description>
+        <description lang="nl_NL">IPTV Manager integreert IPTV kanalen van andere add-ons in de Kodi TV en Radio menu&apos;s.</description>
         <description lang="pl_PL">IPTV Manager integruje kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio.</description>
         <description lang="ru_RU">Это дополнение интегрирует IPTV каналы из других дополнений в Kodi PVR.</description>
         <description lang="zh_CN">IPTV管理器可以在KODI电视和电台菜单中集成来自其他插件的IPTV频道。</description>
@@ -1171,7 +1176,7 @@
         <description lang="de_DE">OnMute handhabt Untertitel, auch solche mit erklärendem Text, während Kodi stummschaltet ist.</description>
         <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>
         <description lang="es_MX">Permitir que &quot;OnMute&quot; cambie entre subtítulos cerrados y subtítulos mientras Kodi está silenciado.</description>
-        <description lang="fr_FR">Permettre à « OnMute »d&#x27;activer le sous-titrage quand Kodi est mis en sourdine.</description>
+        <description lang="fr_FR">Permettre à « OnMute »d&apos;activer le sous-titrage quand Kodi est mis en sourdine.</description>
         <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &quot;OnMute&quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
         <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>
         <description lang="zh_CN">让“OnMute”在 Kodi 静音时切换闭路字幕和字幕。</description>

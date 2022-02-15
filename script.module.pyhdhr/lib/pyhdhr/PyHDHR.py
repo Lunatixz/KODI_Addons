@@ -55,10 +55,10 @@ class Logger(object):
         except: pass
     
 #Globals
-Log = Logger()     
-URL_DISCOVER = 'http://my.hdhomerun.com/discover'
-URL_GUIDE_BASE = 'http://my.hdhomerun.com/api/guide.php?DeviceAuth='
-URL_RECORDING_RULES = 'http://my.hdhomerun.com/api/recording_rules?DeviceAuth='
+Log = Logger()      
+URL_DISCOVER = 'http://ipv4-api.hdhomerun.com/discover'
+URL_GUIDE_BASE = 'https://api.hdhomerun.com/api/guide.php?DeviceAuth='
+URL_RECORDING_RULES = 'https://api.hdhomerun.com/api/recording_rules?DeviceAuth='
 
 def searchString(needle,haystack):
     needles = needle.split(' ')
@@ -1134,8 +1134,20 @@ class PyHDHR:
         f.write("Full Discovery\n")
         try:
             f.write("\nDiscover: "+URL_DISCOVER+"\n")
-            response = urllib.request.urlopen(URL_DISCOVER,None,5)
+            
+            import cookielib
+            import urllib2
+            cookiejar= cookielib.LWPCookieJar()
+            opener= urllib.build_opener( urllib2.HTTPCookieProcessor(cookiejar) )
+            response = opener.urlopen(URL_DISCOVER,None,5)
+            # response = urllib.request.urlopen(URL_DISCOVER,None,5)
             data = json.loads(response.read())
+            
+            
+            
+            
+            
+            
             f.write("\nRAW:\n"+str(data)+"\n\nFormatted:\n")
             for item in data:
                 for key in item:

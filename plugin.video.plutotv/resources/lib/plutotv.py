@@ -1,4 +1,4 @@
-#   Copyright (C) 2021 Lunatixz
+#   Copyright (C) 2022 Lunatixz
 #
 #
 # This file is part of PlutoTV.
@@ -23,14 +23,22 @@ import socket, json, inputstreamhelper, requests, collections
 from six.moves     import urllib
 from simplecache   import SimpleCache, use_cache
 from itertools     import repeat, cycle, chain, zip_longest
+from functools     import partial
 from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 from favorites     import *
 
 try:
-    if xbmc.getCondVisibility('System.Platform.Android'): raise Exception('Using Android threading')
-    from multiprocessing.pool import ThreadPool
+    if (xbmc.getCondVisibility('System.Platform.Android') or xbmc.getCondVisibility('System.Platform.Windows')):
+        from multiprocessing.dummy import Pool as ThreadPool
+    else:
+        from multiprocessing.pool  import ThreadPool
+        
+    from multiprocessing  import cpu_count
+    from _multiprocessing import SemLock, sem_unlink #hack to raise two python issues. _multiprocessing import error, sem_unlink missing from native python (android).
     SUPPORTS_POOL = True
-except Exception:
+    CPU_COUNT     = cpu_count()
+except Exception as e:
+    CPU_COUNT     = 2
     SUPPORTS_POOL = False
 
 try:
@@ -55,12 +63,13 @@ ROUTER        = routing.Plugin()
 LOGO          = os.path.join('special://home/addons/%s/'%(ADDON_ID),'resources','images','logo.png')
 DEBUG         = REAL_SETTINGS.getSettingBool('Enable_Debugging')
 GUIDE_URL     = 'https://service-channels.clusters.pluto.tv/v1/guide?start=%s&stop=%s&%s'
+MEDIA_VOD     = 'https://service-vod.clusters.pluto.tv/v4/vod/categories/%s/items?offset=1000'
 BASE_API      = 'https://api.pluto.tv'
 BASE_LINEUP   = BASE_API + '/v2/channels.json?%s'
 BASE_GUIDE    = BASE_API + '/v2/channels?start=%s&stop=%s&%s'
 LOGIN_URL     = BASE_API + '/v1/auth/local?deviceType=web&%s'
 BASE_CLIPS    = BASE_API + '/v2/episodes/%s/clips.json'
-BASE_VOD      = BASE_API + '/v3/vod/categories?includeItems=true&deviceType=web&%s'
+BASE_VOD      = BASE_API + '/v3/vod/categories?offset=1000&includeItems=true&deviceType=web&%s'
 SEASON_VOD    = BASE_API + '/v3/vod/series/%s/seasons?includeItems=true&deviceType=web&%s'
 
 INPUTSTREAM       = 'inputstream.adaptive'
@@ -186,7 +195,36 @@ def slugify(text):
     text = non_url_safe_regex.sub('', text).strip()
     text = u'_'.join(re.split(r'\s+', text))
     return text
+    
+class Session(object):
+    def __init__(self):
+        self._headers = HEADERS
+        self._session = requests.sessions.Session()
 
+    def _set_auth_headers(self, session_token=""):
+        self._headers["Authorization"] = "Bearer {}".format(session_token)
+
+    def _get(self, url):
+        session = self._session.get(url, headers=self._headers)
+        if session.ok:
+            return session
+        if not session.ok:
+            raise Exception(f"{session.status_code} {session.reason}")
+
+    def _post(self, url, data, redirect=True):
+        session = self._session.post(url,
+                                     data,
+                                     headers=self._headers,
+                                     allow_redirects=redirect)
+        if session.ok:
+            return session
+        if not session.ok:
+            raise Exception(f"{session.status_code} {session.reason}")
+
+    def terminate(self):
+        self._set_auth_headers()
+        return
+        
 class PlutoTV(object):
     def __init__(self, sysARG=sys.argv):
         log('__init__, sysARG = %s'%(sysARG))
@@ -213,13 +251,14 @@ class PlutoTV(object):
 
       
     def buildHeader(self):
-        header_dict               = {}
-        header_dict['Accept']     = 'application/json, text/javascript, */*; q=0.01'
-        header_dict['Host']       = 'api.pluto.tv'
-        header_dict['Connection'] = 'keep-alive'
-        header_dict['Referer']    = 'http://pluto.tv/'
-        header_dict['Origin']     = 'http://pluto.tv'
-        header_dict['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.2; rv:24.0) Gecko/20100101 Firefox/24.0'
+        header_dict                  = {}
+        header_dict['Accept']        = 'application/json, text/javascript, */*; q=0.01'
+        header_dict['Host']          = 'api.pluto.tv'
+        header_dict['Connection']    = 'keep-alive'
+        header_dict['Referer']       = 'http://pluto.tv/'
+        header_dict['Origin']        = 'http://pluto.tv'
+        header_dict['User-Agent']    = 'Mozilla/5.0 (Windows NT 6.2; rv:24.0) Gecko/20100101 Firefox/24.0'
+        header_dict['authority']     = 'service-vod.clusters.pluto.tv'
         return header_dict
 
 
@@ -461,10 +500,21 @@ class PlutoTV(object):
     def browseOndemand(self, id=None, opt='ondemand'):
         log('browseOndemand, opt = %s'%(opt))
         self.browseGuide(id, opt, data=self.getOndemand().get('categories',[]))
+        # if opt == 'vod':
+            # print(id)
+            # content = self.getContent(id)
+            # print(content)
+        # else: 
+            # content = self.getOndemand().get('categories',[])
+        # self.browseGuide(id, opt, data=content)
         
        
     def getOndemand(self):
         return self.getURL(BASE_VOD%(LANGUAGE(30022)%(getUUID())), header=self.buildHeader(), life=datetime.timedelta(hours=1))
+
+
+    def getContent(self, id):
+        return self.getURL(MEDIA_VOD%(id), header=self.buildHeader(), life=datetime.timedelta(hours=1))
 
 
     def getVOD(self, epid):
@@ -587,24 +637,21 @@ class PlutoTV(object):
     def cleanString(self, text):
         return text.replace(' (Embed)','')
              
-             
-    def poolList(self, method, items=None, args=None, chunk=25):
-        log("poolList")
+        
+    def poolList(self, func, items=[], args=None, timeout=300, chunksize=1): 
         results = []
         if SUPPORTS_POOL:
-            pool = ThreadPool()
-            if args is not None: 
-                results = pool.map(method, zip(items,repeat(args)))
-            elif items: 
-                results = pool.map(method, items)#, chunksize=chunk)
-            pool.close()
-            pool.join()
-        else:
-            if args is not None: 
-                results = [method((item, args)) for item in items]
-            elif items: 
-                results = [method(item) for item in items]
-        return filter(None, results)
+            try:    
+                pool = ThreadPool(processes=CPU_COUNT)
+                results = pool.imap(func, items, chunksize)
+                pool.close()
+                pool.join()
+            except Exception as e: 
+                log("poolList, threadPool Failed! %s"%(e), xbmc.LOGERROR)
+                
+        if not results: results = [results.append(func(i)) for i in items]
+        try:    return list(filter(None,results))
+        except: return list(results)
 
 
     def resolveURL(self, id, opt):

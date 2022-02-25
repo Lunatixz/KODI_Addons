@@ -195,36 +195,7 @@ def slugify(text):
     text = non_url_safe_regex.sub('', text).strip()
     text = u'_'.join(re.split(r'\s+', text))
     return text
-    
-class Session(object):
-    def __init__(self):
-        self._headers = HEADERS
-        self._session = requests.sessions.Session()
-
-    def _set_auth_headers(self, session_token=""):
-        self._headers["Authorization"] = "Bearer {}".format(session_token)
-
-    def _get(self, url):
-        session = self._session.get(url, headers=self._headers)
-        if session.ok:
-            return session
-        if not session.ok:
-            raise Exception(f"{session.status_code} {session.reason}")
-
-    def _post(self, url, data, redirect=True):
-        session = self._session.post(url,
-                                     data,
-                                     headers=self._headers,
-                                     allow_redirects=redirect)
-        if session.ok:
-            return session
-        if not session.ok:
-            raise Exception(f"{session.status_code} {session.reason}")
-
-    def terminate(self):
-        self._set_auth_headers()
-        return
-        
+ 
 class PlutoTV(object):
     def __init__(self, sysARG=sys.argv):
         log('__init__, sysARG = %s'%(sysARG))
@@ -533,7 +504,7 @@ class PlutoTV(object):
         start = (datetime.datetime.fromtimestamp(getLocalTime()).strftime('%Y-%m-%dT%H:00:00Z'))
         stop  = (datetime.datetime.fromtimestamp(getLocalTime()) + datetime.timedelta(hours=4)).strftime('%Y-%m-%dT%H:00:00Z')
         if full: return self.getURL(GUIDE_URL %(start,stop,LANGUAGE(30022)%(getUUID())), life=datetime.timedelta(hours=1))
-        else: return sorted((self.getURL(BASE_GUIDE %(start,stop,LANGUAGE(30022)%(getUUID())), life=datetime.timedelta(hours=1))), key=lambda i: i['number'])
+        else:    return sorted((self.getURL(BASE_GUIDE %(start,stop,LANGUAGE(30022)%(getUUID())), life=datetime.timedelta(hours=1))), key=lambda i: i['number'])
 
         
     def getCategories(self):
@@ -561,16 +532,16 @@ class PlutoTV(object):
         
             
     def getChans(self):
-        log('getChannels')
+        log('getChans')
         # https://github.com/add-ons/service.iptv.manager/wiki/JSON-STREAMS-format
-        stations  = self.getGuidedata(full=True).get('channels',[])
+        stations = self.getGuidedata(full=True).get('channels',[])
         return list(self.poolList(self.buildStation, stations,'channel'))
 
 
     def getGuide(self):
         log('getGuide')
         # https://github.com/add-ons/service.iptv.manager/wiki/JSON-EPG-format
-        stations  = self.getGuidedata(full=True).get('channels',[])
+        stations = self.getGuidedata(full=True).get('channels',[])
         return {k:v for x in self.poolList(self.buildStation, stations,'programmes') for k,v in x.items()}
         
 
@@ -638,12 +609,15 @@ class PlutoTV(object):
         return text.replace(' (Embed)','')
              
         
-    def poolList(self, func, items=[], args=None, timeout=300, chunksize=1): 
+    def poolList(self, func, items=[], args=None, chunk=1): 
         results = []
         if SUPPORTS_POOL:
             try:    
                 pool = ThreadPool(processes=CPU_COUNT)
-                results = pool.imap(func, items, chunksize)
+                if args is not None: 
+                    results = pool.imap(func, zip(items,repeat(args)), chunksize=chunk)
+                else:
+                    results = pool.imap(func, items, chunksize=chunk)
                 pool.close()
                 pool.join()
             except Exception as e: 

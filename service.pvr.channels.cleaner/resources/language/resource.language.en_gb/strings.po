@@ -16,6 +16,18 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "Addon Summary"
+msgid "Clean "ChannelsDVR" PVR Buffer"
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!"
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid "For Personal use; not meant for general use"
+msgstr ""
+
 msgctxt "#32001"
 msgid "Enable Debugging"
 msgstr ""

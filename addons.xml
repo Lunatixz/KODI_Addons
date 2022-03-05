@@ -967,6 +967,27 @@
     </extension>
 </addon>
 
+<addon id="script.pvr.channels.cleaner" version="1.0.0" name="ChannelsDVR PVR Cleaning Service" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.kodi-six" version="0.1.3.1"/>
+    </requires>
+    <extension point="xbmc.service" library="service.py"/>
+    <extension point="xbmc.python.script" library="settings.py"/>
+    <extension point="xbmc.addon.metadata">
+        <license>GPL-3.0-or-later</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/service.pvr.channels.cleaner</source>
+        <forum>https://forum.kodi.tv/showthread.php</forum>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+        <summary lang="en_GB">Clean &quot;ChannelsDVR&quot; PVR Buffer</summary>
+        <description lang="en_GB">Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!</description>
+        <disclaimer lang="en_GB">For Personal use; not meant for general use</disclaimer>
+    </extension>
+</addon>
+
 <addon id="script.pystone.benchmark" name="CPU Benchmark" version="1.1.5" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
@@ -1180,27 +1201,6 @@
         <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &quot;OnMute&quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
         <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>
         <description lang="zh_CN">让“OnMute”在 Kodi 静音时切换闭路字幕和字幕。</description>
-    </extension>
-</addon>
-
-<addon id="service.pvr.channels.cleaner" version="1.0.0" name="ChannelsDVR PVR Cleaning Service" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.kodi-six" version="0.1.3.1"/>
-    </requires>
-    <extension point="xbmc.service" library="service.py"/>
-    <extension point="xbmc.python.script" library="settings.py"/>
-    <extension point="xbmc.addon.metadata">
-        <license>GPL-3.0-or-later</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/service.pvr.channels.cleaner</source>
-        <forum>https://forum.kodi.tv/showthread.php</forum>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-        <summary lang="en_GB">Clean &quot;ChannelsDVR&quot; PVR Buffer</summary>
-        <description lang="en_GB">Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!</description>
-        <disclaimer lang="en_GB">For Personal use; not meant for general use</disclaimer>
     </extension>
 </addon>
 </addons>

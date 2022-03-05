@@ -18,6 +18,6 @@
 
 from kodi_six import xbmcaddon
 
-ADDON_ID      = 'script.pvr.channels.cleaner'
+ADDON_ID      = 'service.pvr.channels.cleaner'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 REAL_SETTINGS.openSettings() 

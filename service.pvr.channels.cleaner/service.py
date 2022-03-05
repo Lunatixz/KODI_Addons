@@ -20,7 +20,7 @@ import time, traceback, json, os, platform, pathlib, re, datetime
 from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
 
 # Plugin Info
-ADDON_ID            = 'script.pvr.channels.cleaner'
+ADDON_ID            = 'service.pvr.channels.cleaner'
 REAL_SETTINGS       = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME          = REAL_SETTINGS.getAddonInfo('name')
 SETTINGS_LOC        = REAL_SETTINGS.getAddonInfo('profile')

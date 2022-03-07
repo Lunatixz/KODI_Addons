@@ -1,4 +1,4 @@
-#   Copyright (C) 2021 Lunatixz
+#   Copyright (C) 2022 Lunatixz
 #
 #
 # This file is part of Video ScreenSaver.
@@ -43,6 +43,9 @@ KEYLOCK        = REAL_SETTINGS.getSetting("LockAction") == 'true'
 DISABLE_TRAKT  = REAL_SETTINGS.getSetting("TraktDisable") == 'true'
 VIDEO_FILE     = REAL_SETTINGS.getSetting("VideoFile")
 VIDEO_PATH     = REAL_SETTINGS.getSetting("VideoFolder")
+
+
+#todo add random playback seek (user request).
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -162,10 +165,9 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
     def onInit(self):
         self.winid = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
         self.winid.setProperty('ss_time', 'okay' if REAL_SETTINGS.getSetting("Time") == 'true' else 'nope')
-        self.myPlayer.play(self.buildPlaylist())
-
         if saveVolume(): 
             setVolume(int(REAL_SETTINGS.getSetting('SetVolume')))
+        self.myPlayer.play(self.buildPlaylist())
         setRepeat('all')
         
         
@@ -180,7 +182,7 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
         setRepeat(REAL_SETTINGS.getSetting('RepeatState').lower())
         xbmcgui.Window(10000).clearProperty('script.trakt.paused')
         xbmcgui.Window(10000).clearProperty('%s.Running'%(ADDON_ID))
-        setVolume(int(xbmcgui.Window(10000).getProperty('%s.RESTORE'%ADDON_ID)))
+        setVolume(int((xbmcgui.Window(10000).getProperty('%s.RESTORE'%ADDON_ID) or '0')))
         self.myPlayer.stop()
         self.playList.clear()
         self.close()
@@ -204,7 +206,8 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
         itemLST   = []
         dirLST    = []
         with busy_dialog():
-            response = self.getDirectory(path, end=limit).get('result',{}).get('files',[])
+            try:    response = self.getDirectory(path, end=limit).get('result',{}).get('files',[])
+            except: return xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(32020), ICON, 4000)
             for idx, item in enumerate(response):
                 if self.fileCount > limit: break
                 file     = item.get('file','')
@@ -223,9 +226,9 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
 
     def buildItem(self, responce):
         log('buildItem')
-        if 'result' in responce and 'filedetails' in responce['result']: key = 'filedetails'
+        if   'result' in responce and 'filedetails' in responce['result']: key = 'filedetails'
         elif 'result' in responce and 'files' in responce['result']: key = 'files'
-        else: xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
+        else: xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(32001), ICON, 4000)
         for item in responce['result'][key]:
             if key == 'files' and item.get('filetype','') == 'directory': continue
             yield responce['result'][key]['file']
@@ -243,20 +246,21 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
         elif not VIDEO_FILE.startswith(('plugin://','upnp://','pvr://')): 
             playListItem = list(self.buildItem(getFileDetails(VIDEO_FILE)))
         else: return VIDEO_FILE
-            
-        for idx, playItem in enumerate(playListItem): 
-            self.playList.add(playItem, index=idx)
-            
-        if RANDOM_PLAY: 
-            self.playList.shuffle()
-        else: 
-            self.playList.unshuffle()
-        return self.playList
+        
+        if playListItem:
+            for idx, playItem in enumerate(playListItem): 
+                self.playList.add(playItem, index=idx)
+                
+            if RANDOM_PLAY: 
+                self.playList.shuffle()
+            else: 
+                self.playList.unshuffle()
+            return self.playList
         
         
 class Start():
     def __init__(self):
-        self.myBackground = BackgroundWindow('%s.background.xml'%ADDON_ID, ADDON_PATH, "Default")
+        self.myBackground = BackgroundWindow('%s.background.xml'%ADDON_ID, ADDON_PATH, "default")
         self.myBackground.doModal()
         del self.myBackground
         

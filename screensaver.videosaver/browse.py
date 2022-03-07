@@ -54,6 +54,8 @@ def browseDialog(type=0, heading=ADDON_NAME, default='', shares='', mask='', opt
                         {"label":"Network"         , "label2":"Local Drives and Network Share", "default":""                                   , "mask":""         , "type":type, "multi":False}]
         if type == 0: 
             options.insert(0,{"label":"Video Playlists" , "label2":"Video Playlists"               , "default":"special://profile/playlists/video/" , "mask":'.xsp'     , "type":1, "multi":False})
+        
+        
         listitems = [buildMenuListItem(option['label'],option['label2']) for option in options]
         select    = selectDialog(listitems, LANGUAGE(32018), multi=False)
         if select is not None:
@@ -62,6 +64,7 @@ def browseDialog(type=0, heading=ADDON_NAME, default='', shares='', mask='', opt
             type      = options[select]['type']
             multi     = options[select]['multi']
             default   = options[select]['default']
+        else: return
             
     if multi == True:
         # https://codedocs.xyz/xbmc/xbmc/group__python___dialog.html#ga856f475ecd92b1afa37357deabe4b9e4
@@ -77,10 +80,8 @@ def browseDialog(type=0, heading=ADDON_NAME, default='', shares='', mask='', opt
         # 2	ShowAndGetImage
         # 3	ShowAndGetWriteableDirectory
         retval = xbmcgui.Dialog().browseSingle(type, heading, shares, mask, useThumbs, treatAsFolder, default)
-    if retval:
-        if prompt and retval == default: return None
-        return retval
-    return None
+    if options is not None and default == retval: return
+    return retval
       
 if __name__ == '__main__':
     if not xbmcgui.Window(10000).getProperty("%s.Running"%(ADDON_ID)) == "True":

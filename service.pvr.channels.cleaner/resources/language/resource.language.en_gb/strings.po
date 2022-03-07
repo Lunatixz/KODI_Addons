@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgctxt "Addon Summary"
-msgid "Clean "ChannelsDVR" PVR Buffer"
+msgid "Clean ChannelsDVR PVR Buffer"
 msgstr ""
 
 msgctxt "Addon Description"

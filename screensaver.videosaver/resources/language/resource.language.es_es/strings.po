@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: XBMC Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2022-03-01 16:01+0000\n"
-"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"PO-Revision-Date: 2022-03-09 13:42+0000\n"
+"Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
 "Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-look-and-feel/screensaver-videosaver/es_es/>\n"
 "Language: es_es\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.11\n"
+"X-Generator: Weblate 4.11.2\n"
 
 msgctxt "Addon Summary"
 msgid "Create a screensaver from any Kodi video source."
@@ -30,7 +30,7 @@ msgstr "Se recomienda no usar recursos en Streaming para conexiones a Internet d
 
 msgctxt "#32001"
 msgid "Something went wrong, Try again later ..."
-msgstr ""
+msgstr "Algo ha ido mal. Inténtelo más tarde..."
 
 msgctxt "#32002"
 msgid "Video Type"
@@ -70,7 +70,7 @@ msgstr "Multiples vídeos"
 
 msgctxt "#32011"
 msgid "Set ScreenSaver Volume [Restored to Previous Level]"
-msgstr ""
+msgstr "Establecer Volúmen de SalvaPantallas [Restaurado al Nivel Anterior]"
 
 msgctxt "#32012"
 msgid "Enable Debugging [Log errors]"
@@ -82,15 +82,15 @@ msgstr "Construyendo lista de reproducción"
 
 msgctxt "#32014"
 msgid "Select File"
-msgstr ""
+msgstr "Elegir Archivo"
 
 msgctxt "#32015"
 msgid "Select Folder"
-msgstr ""
+msgstr "Elegir Carpeta"
 
 msgctxt "#32016"
 msgid "Repeat Return State"
-msgstr ""
+msgstr "Repetir Estado Retorno"
 
 msgctxt "#32017"
 msgid "General"
@@ -98,11 +98,15 @@ msgstr "General"
 
 msgctxt "#32018"
 msgid "Select Source Type"
-msgstr ""
+msgstr "Elegir Tipo de Origen"
 
 msgctxt "#32019"
 msgid "Display Time & Weather"
-msgstr ""
+msgstr "Mostrar Hora & Meteorología"
+
+msgctxt "#32020"
+msgid "Path In-Valid, No media found!"
+msgstr "Ruta No Válida. ¡No Hay Contenido!"
 
 #~ msgctxt "#32011"
 #~ msgid "Set ScreenSaver Volume"

@@ -102,3 +102,7 @@ msgstr ""
 msgctxt "#32019"
 msgid "Display Time & Weather"
 msgstr ""
+
+msgctxt "#32020"
+msgid "Path In-Valid, No media found!"
+msgstr ""

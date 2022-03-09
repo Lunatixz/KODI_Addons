@@ -14,7 +14,7 @@
         <assets>
             <icon>icon.png</icon>
         </assets>
-        <summary lang="en_GB">Clean &quot;ChannelsDVR&quot; PVR Buffer</summary>
+        <summary lang="en_GB">Clean ChannelsDVR PVR Buffer</summary>
         <description lang="en_GB">Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!</description>
         <disclaimer lang="en_GB">For Personal use; not meant for general use</disclaimer>
     </extension>

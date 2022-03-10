@@ -279,7 +279,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.plutotv" version="1.6.0" name="Pluto TV" provider-name="Lunatixz">
+<addon id="plugin.video.plutotv" version="1.6.1" name="Pluto TV" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -592,9 +592,11 @@
         </assets>
         <summary lang="da_DK">Flip-ur pause skærm.</summary>
         <summary lang="en_GB">Flip clock screensaver.</summary>
+        <summary lang="ru_RU">Заставка Flip clock.</summary>
         <summary lang="zh_CN">翻转时钟屏幕保护程序。</summary>
         <description lang="da_DK">Flip-ur pause skærm.</description>
         <description lang="en_GB">Flip clock screensaver.</description>
+        <description lang="ru_RU">Заставка Flip clock.</description>
         <description lang="zh_CN">翻转时钟屏幕保护程序。</description>
     </extension>
 </addon>
@@ -1198,7 +1200,7 @@
         <assets>
             <icon>icon.png</icon>
         </assets>
-        <summary lang="en_GB">Clean &quot;ChannelsDVR&quot; PVR Buffer</summary>
+        <summary lang="en_GB">Clean ChannelsDVR PVR Buffer</summary>
         <description lang="en_GB">Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!</description>
         <disclaimer lang="en_GB">For Personal use; not meant for general use</disclaimer>
     </extension>

@@ -35,6 +35,7 @@ try:
         
     from multiprocessing  import cpu_count
     from _multiprocessing import SemLock, sem_unlink #hack to raise two python issues. _multiprocessing import error, sem_unlink missing from native python (android).
+
     SUPPORTS_POOL = True
     CPU_COUNT     = cpu_count()
 except Exception as e:
@@ -195,7 +196,7 @@ def slugify(text):
     text = non_url_safe_regex.sub('', text).strip()
     text = u'_'.join(re.split(r'\s+', text))
     return text
- 
+
 class PlutoTV(object):
     def __init__(self, sysARG=sys.argv):
         log('__init__, sysARG = %s'%(sysARG))
@@ -535,7 +536,7 @@ class PlutoTV(object):
         log('getChans')
         # https://github.com/add-ons/service.iptv.manager/wiki/JSON-STREAMS-format
         stations = self.getGuidedata(full=True).get('channels',[])
-        return list(self.poolList(self.buildStation, stations,'channel'))
+        return list(self.poolList(self.buildStation, stations, 'channel'))
 
 
     def getGuide(self):
@@ -612,7 +613,7 @@ class PlutoTV(object):
     def poolList(self, func, items=[], args=None, chunk=1): 
         results = []
         if SUPPORTS_POOL:
-            try:    
+            try:
                 pool = ThreadPool(processes=CPU_COUNT)
                 if args is not None: 
                     results = pool.imap(func, zip(items,repeat(args)), chunksize=chunk)
@@ -623,7 +624,10 @@ class PlutoTV(object):
             except Exception as e: 
                 log("poolList, threadPool Failed! %s"%(e), xbmc.LOGERROR)
                 
-        if not results: results = [results.append(func(i)) for i in items]
+        if not results:
+            if args is not None: 
+                items = zip(items,repeat(args))
+            results = [results.append(func(i)) for i in items]
         try:    return list(filter(None,results))
         except: return list(results)
 
@@ -702,7 +706,12 @@ class PlutoTV(object):
         liz = xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable','true')
         liz.setProperty('IsInternetStream','true')
-        if infoList:  liz.setInfo(type=infoType, infoLabels=infoList)
+        if infoList:  
+            if infoList.get('label'): liz.setLabel(infoList.pop('label',''))
+# ERROR <general>: NEWADDON Unknown Video Info Key "chname"
+# ERROR <general>: NEWADDON Unknown Video Info Key "chnum"
+# ERROR <general>: NEWADDON Unknown Video Info Key "favorite"
+            liz.setInfo(type=infoType, infoLabels=infoList)
         else:         liz.setInfo(type=infoType, infoLabels={"mediatype":infoType,"label":name,"title":name})
         if infoArt:   liz.setArt(infoArt)
         else:         liz.setArt({'thumb':ICON,'fanart':FANART})
@@ -716,7 +725,9 @@ class PlutoTV(object):
         liz = xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable','true')
         liz.setProperty('IsInternetStream','true')
-        if infoList:  liz.setInfo(type=infoType, infoLabels=infoList)
+        if infoList:  
+            if infoList.get('label'): liz.setLabel(infoList.pop('label',''))
+            liz.setInfo(type=infoType, infoLabels=infoList)
         else:         liz.setInfo(type=infoType, infoLabels={"mediatype":infoType,"label":name,"title":name})
         if infoArt:   liz.setArt(infoArt)
         else:         liz.setArt({'thumb':ICON,'fanart':FANART})
@@ -730,7 +741,9 @@ class PlutoTV(object):
         log('addDir, name = %s'%name)
         liz = xbmcgui.ListItem(name)
         liz.setProperty('IsPlayable','false')
-        if infoList: liz.setInfo(type=infoType, infoLabels=infoList)
+        if infoList: 
+            if infoList.get('label'): liz.setLabel(infoList.pop('label',''))
+            liz.setInfo(type=infoType, infoLabels=infoList)
         else:        liz.setInfo(type=infoType, infoLabels={"mediatype":infoType,"label":name,"title":name})
         if infoArt:  liz.setArt(infoArt)
         else:        liz.setArt({'thumb':ICON,'fanart':FANART})

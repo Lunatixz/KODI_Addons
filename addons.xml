@@ -665,7 +665,7 @@
     </extension>
 </addon>
 
-<addon id="screensaver.videosaver" name="Video ScreenSaver" version="1.1.1" provider-name="Lunatixz">
+<addon id="screensaver.videosaver" name="Video ScreenSaver" version="1.1.2" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -728,7 +728,7 @@
         <summary lang="en_GB">Download and Install Kodi packages.</summary>
         <summary lang="es_MX">Descarga e instala paquetes de Kodi.</summary>
         <summary lang="et_EE">Laadi alla ja paigalda Kodi pakette.</summary>
-        <summary lang="fi_FI">Lataa ja asenna Kodi paketteja.</summary>
+        <summary lang="fi_FI">Lataa ja asenna Kodi-paketteja.</summary>
         <summary lang="ko_KR">Kodi 패키지를 다운로드하고 설치합니다.</summary>
         <summary lang="pl_PL">Pobieraj i instaluj pakiety Kodi.</summary>
         <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
@@ -738,7 +738,7 @@
         <description lang="de_DE">Kodi-Pakete für Android herunterladen und installieren. Auswählen zwischen Nightlies, Releases, Snapshopts und Test-Builds.</description>
         <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="et_EE">Laadi alla ja paigalda Kodi android pakette; valikus on Nightlies, Releases, Snapshots ja Test-builds.</description>
-        <description lang="fi_FI">Lataa ja asenna Kodi -Android paketteja; Valitse vaihtoehdoista Nightlies, Releases, Snapshots ja Test-builds.</description>
+        <description lang="fi_FI">Lataa ja asenna Kodin Android-paketteja kehityshaaroista Release, Nightly, Snapshot ja Test.</description>
         <description lang="ko_KR">Kodi 안드로이드 패키지를 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
         <description lang="pl_PL">Pobieraj i instaluj pliki wykonywalne Kodi: kompilacje nocne, testowe, wydania finalne, migawki.</description>
         <description lang="zh_CN">下载并安装 Kodi android 软件包。从 Nightlies、Releases、Snapshots 和 Test-builds 中选择。</description>
@@ -775,7 +775,7 @@
         <summary lang="en_GB">Download and Install Kodi packages.</summary>
         <summary lang="es_MX">Descarga e instala paquetes de Kodi.</summary>
         <summary lang="et_EE">Laadi alla ja paigalda Kodi pakette.</summary>
-        <summary lang="fi_FI">Lataa ja asenna Kodi paketteja.</summary>
+        <summary lang="fi_FI">Lataa ja asenna Kodi-paketteja.</summary>
         <summary lang="ko_KR">Kodi 패키지를 다운로드하고 설치합니다.</summary>
         <summary lang="pl_PL">Pobieraj i instaluj pakiety Kodi.</summary>
         <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
@@ -784,6 +784,7 @@
         <description lang="de_DE">Kodi für Windows herunterladen und installieren. Auswählen zwischen Nightlies, Releases, Snapshopts und Test-Builds.</description>
         <description lang="en_GB">Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="es_MX">Descarga e instala ejecutables de Kodi para Windows; selecciona entre  Nightlies, Releases, Snapshots y Test-builds.</description>
+        <description lang="fi_FI">Lataa ja asenna Kodin Windows-asennuksia kehityshaaroista Release, Nightly, Snapshot ja Test.</description>
         <description lang="ko_KR">Kodi 윈도 실행 파일을 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
         <description lang="pl_PL">Pobieraj i instaluj pliki wykonywalne Kodi: kompilacje nocne, testowe, wydania finalne, migawki.</description>
         <description lang="ru_RU">Загрузка и установка исполняемых файлов Kodi: ночные и тестовые сборки, релизы, снапшоты.</description>
@@ -792,6 +793,7 @@
         <disclaimer lang="de_DE">UWP wird nicht unterstützt! Nicht vorgesehen für Kodi-Installation über den Windows Store.</disclaimer>
         <disclaimer lang="en_GB">UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
         <disclaimer lang="es_MX">¡No se soporta UWP! No se pretende utilizara para la instalación de Kodi desde la tienda de Windows.</disclaimer>
+        <disclaimer lang="fi_FI">UWP-versiota ei tueta! Lisäosaa ei ole tarkoitettu Microsoft Storesta asennetuille Kodi-asennuksille.</disclaimer>
         <disclaimer lang="ko_KR">UWP가 지원되지 않습니다! 윈도 스토어를 통한 Kodi 설치용이 아닙니다.</disclaimer>
         <disclaimer lang="pl_PL">Platforma UWP nie jest obsługiwana! Nie jest przeznaczony do instalacji Kodi za pośrednictwem Windows Store.</disclaimer>
         <disclaimer lang="ru_RU">Не поддерживается UWP! Не предназначен для установки Kodi через Магазин Windows.</disclaimer>
@@ -991,12 +993,14 @@
         <summary lang="da_DK">Test din enheds python-ydeevne.</summary>
         <summary lang="en_GB">Test your devices python performance.</summary>
         <summary lang="es_MX">Prueba el rendimiento de Python de tus dispositivos.</summary>
+        <summary lang="fi_FI">Testaa laitteesi Python-suorituskyky.</summary>
         <summary lang="ko_KR">장치 파이썬 성능을 테스트하십시오.</summary>
         <summary lang="pl_PL">Przetestuj wydajność swoich urządzeń w Pythonie.</summary>
         <summary lang="zh_CN">测试设备的 python 性能。</summary>
         <description lang="da_DK">Hvor hurtigt kører din enhed pythonkode? Pystone evaluerer CPU-ydelse, der kører i et pythonmiljø.</description>
         <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
         <description lang="es_MX">¿Qué tan rápido ejecuta código Python tu dispositivo? Pystone evalúa el rendimiento de CPU ejecutándose en un entorno Python.</description>
+        <description lang="fi_FI">Miten nopeasti laitteesi suorittaa Python-koodin? Pystone arvioi suorittimen tehokkuutta Python ympäristössä.</description>
         <description lang="ko_KR">당신의 기기는 얼마나 빨리 파이썬 코드를 실행할까요? Pystone은 Python 환경에서 실행되는 CPU 성능을 평가합니다.</description>
         <description lang="pl_PL">Jak szybko Twoje urządzenie uruchamia kod Pythona? Pystone ocenia wydajność procesora działającego w środowisku Pythona.</description>
         <description lang="zh_CN">您的设备运行 python 代码的速度有多快？Pystone 评估在 python 环境中运行的 CPU 性能。</description>
@@ -1027,6 +1031,7 @@
         </assets>
         <description lang="da_DK">Overvåg dine foretrukne twitter-konti, modtag &quot;realtime&quot; tweets.</description>
         <description lang="en_GB">Monitor your favorite twitter accounts, receive &quot;realtime&quot; tweets.</description>
+        <description lang="fi_FI">Seuraa suosimiasi Twitter-tilejä ja vastaanota twiittejä &quot;reaaliaikaisesti&quot;.</description>
         <description lang="ko_KR">좋아하는 트위터 계정을 모니터링하고 &quot;실시간&quot; 트윗을 받으세요.</description>
         <description lang="zh_CN">监控您喜爱的推特帐户，接收“实时”推文。</description>
     </extension>
@@ -1074,6 +1079,7 @@
         <summary lang="el_GR">Ενσωμάτωση καναλιών IPTV από άλλα πρόσθετα στο PVR του Kodi</summary>
         <summary lang="en_GB">Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus</summary>
         <summary lang="es_MX">Integra canales IPTV de otros complementos en los menús de TV y Radio de Kodi</summary>
+        <summary lang="fi_FI">Lisää muiden lisäosien IPTV-kanavat Kodin televisio- ja radiovalikoihin</summary>
         <summary lang="fr_FR">Intégrer les chaines IPTV d&apos;autres extensions dans les menus Radio et TV de Kodi</summary>
         <summary lang="hu_HU">Más kiegészítők által szolgáltatott IPTV csatornák integrációja a Kodi PVR felületbe</summary>
         <summary lang="ko_KR">Kodi TV 및 라디오 메뉴의 다른 애드온에서 IPTV 채널 통합</summary>
@@ -1087,6 +1093,7 @@
         <description lang="el_GR">Το πρόσθετο αυτο ενσωματώνει τα κανάλια IPTV από άλλα πρόσθετα στο PVR του Kodi.</description>
         <description lang="en_GB">IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus.</description>
         <description lang="es_MX">IPTV Manager integra canales IPTV de otros complementos en los menús de TV y Radio de Kodi.</description>
+        <description lang="fi_FI">IPTV Manager lisää muiden lisäosien IPTV-kanavat Kodin televisio- ja radiovalikoihin.</description>
         <description lang="fr_FR">IPTV Manager intègre des chaines IPTV d&apos;autres extensions dans les menus TV et Radio de Kodi.</description>
         <description lang="hu_HU">Ez a kiegészítő lehetővé teszi más kiegészítők számára, hogy saját IPTV csatornákat publikáljanak a Kodi PVR felületébe.</description>
         <description lang="ko_KR">IPTV 관리자는 Kodi TV 및 라디오 메뉴에 있는 다른 애드온의 IPTV 채널을 통합합니다.</description>
@@ -1169,6 +1176,7 @@
         <summary lang="de_DE">Untertitel, auch solche mit erklärendem Text, beim Stummschalten von Kodi aktivieren.</summary>
         <summary lang="en_GB">Enable closed captioning and subtitles &quot;OnMute&quot;.</summary>
         <summary lang="es_MX">Activa subtítulos cerrados y subtítulos &quot;OnMute&quot;.</summary>
+        <summary lang="fi_FI">Ota kuvaavat tekstitykset (CC) ja tekstitykset käyttöön &quot;OnMute&quot; -toiminnolla.</summary>
         <summary lang="fr_FR">Activer le sous-titrage « OnMute ».</summary>
         <summary lang="ko_KR">폐쇄 자막 및 &quot;OnMute&quot; 자막을 활성화합니다.</summary>
         <summary lang="pl_PL">Włącz napisy kodowane i napisy „OnMute”.</summary>
@@ -1178,6 +1186,7 @@
         <description lang="de_DE">OnMute handhabt Untertitel, auch solche mit erklärendem Text, während Kodi stummschaltet ist.</description>
         <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>
         <description lang="es_MX">Permitir que &quot;OnMute&quot; cambie entre subtítulos cerrados y subtítulos mientras Kodi está silenciado.</description>
+        <description lang="fi_FI">Mahdollista &quot;OnMute&quot; -toiminnon kytkeä tekstitykset ja kuvaavat tekstitykset kun Kodi vaimennetaan.</description>
         <description lang="fr_FR">Permettre à « OnMute »d&apos;activer le sous-titrage quand Kodi est mis en sourdine.</description>
         <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &quot;OnMute&quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
         <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>

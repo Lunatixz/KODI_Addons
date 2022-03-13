@@ -48,14 +48,10 @@ def buildMenuListItem(label1="", label2="", path="", art={'thumb':ICON,'fanart':
 def browseDialog(type=0, heading=ADDON_NAME, default='', shares='', mask='', options=None, useThumbs=True, treatAsFolder=False, prompt=True, multi=False):
     if prompt and not default:
         if options is None:
-            options  = [{"label":"Video"           , "label2":"Video Sources"                 , "default":"library://video/"                   , "mask":VIDEO_EXTS , "type":type, "multi":False},
-                        {"label":"Files"           , "label2":"File Sources"                  , "default":""                                   , "mask":""         , "type":type, "multi":False},
-                        {"label":"Local"           , "label2":"Local Drives"                  , "default":""                                   , "mask":""         , "type":type, "multi":False},
-                        {"label":"Network"         , "label2":"Local Drives and Network Share", "default":""                                   , "mask":""         , "type":type, "multi":False}]
-        if type == 0: 
-            options.insert(0,{"label":"Video Playlists" , "label2":"Video Playlists"               , "default":"special://profile/playlists/video/" , "mask":'.xsp'     , "type":1, "multi":False})
-        
-        
+            options = [{"label":"Video", "label2":"Video Sources", "default":"library://video/", "mask":VIDEO_EXTS , "type":type, "multi":False}]
+            if type == 0: 
+                options.insert(0,{"label":"Video Playlists" , "label2":"Video Playlists"               , "default":"special://profile/playlists/video/" , "mask":'.xsp'     , "type":1, "multi":False})
+
         listitems = [buildMenuListItem(option['label'],option['label2']) for option in options]
         select    = selectDialog(listitems, LANGUAGE(32018), multi=False)
         if select is not None:

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: plugin.video.cbr\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2022-03-09 13:42+0000\n"
+"PO-Revision-Date: 2022-03-19 06:49+0000\n"
 "Last-Translator: Oskari Lavinto <olavinto@protonmail.com>\n"
 "Language-Team: Finnish <https://kodi.weblate.cloud/projects/kodi-add-ons-scripts/script-media-maintenance/fi_fi/>\n"
 "Language: fi_fi\n"
@@ -27,59 +27,59 @@ msgstr "Jotain meni pieleen. Yritä uudelleen..."
 
 msgctxt "#30002"
 msgid "Select TV Shows to Monitor"
-msgstr "Valitse seurattavat TV-sarjat"
+msgstr "Valitse seurattavat sarjat"
 
 msgctxt "#30003"
 msgid "Scanning..."
-msgstr "Haetaan..."
+msgstr "Päivitetään..."
 
 msgctxt "#30004"
 msgid "Scan Complete"
-msgstr "Haku valmis"
+msgstr "Nouto on valmis"
 
 msgctxt "#30005"
 msgid "Monitored TV Shows"
-msgstr "Seuratut TV-sarjat"
+msgstr "Seuratut sarjat"
 
 msgctxt "#30006"
 msgid "Add Sonarr Monitored TV Shows"
-msgstr "Lisää Sonarr:ssa seuratut TV-sarjat"
+msgstr "Lisää Sonarrissa seuratut sarjat"
 
 msgctxt "#30007"
 msgid "IP:Port"
-msgstr "IP:Portti"
+msgstr "IP-osoite:portti"
 
 msgctxt "#30008"
 msgid "API-Key"
-msgstr "API-Avain"
+msgstr "API-avain"
 
 msgctxt "#30009"
 msgid "Scanning Sonarrr"
-msgstr "Haetaan Sonarr:sta"
+msgstr "Noudetaan Sonarrista"
 
 msgctxt "#30010"
 msgid "Monitoring [B](%s)[/B] TV Show%s"
-msgstr "Seurataan [B](%s)[/B] TV-sarjaa%s"
+msgstr "Seurataan [B]%s[/B] sarjaa"
 
 msgctxt "#30011"
 msgid "Last Scanned (%s)"
-msgstr "Viimeksi haettu (%s)"
+msgstr "Edellinen nouto %s"
 
 msgctxt "#30012"
 msgid "Clear Monitored TV Shows"
-msgstr "Poista seuratut TV-sarjat"
+msgstr "Siivoa seuratut sarjat"
 
 msgctxt "#30013"
 msgid "Enable add-on to [B]DELETE[/B] your media"
-msgstr "Ota lisäosa käyttöön [B]POISTAAKSESI[/B] mediasi"
+msgstr "Käytä lisäosaa [B]POISTAAKSESI[/B] mediasi"
 
 msgctxt "#30014"
 msgid "Warning!! Selecting "Remove" will [B]PERMANENTLY DELETE[/B] media"
-msgstr "Varoitus!! \"Poista\" valinta [B]POISTAA PYSYVÄSTI[/B] mediasi"
+msgstr "Varoitus! Poista-valinta poistaa mediatiedostot [B]PYSYVÄSTI[/B]"
 
 msgctxt "#30015"
 msgid "TV Shows"
-msgstr "TV-Sarjat"
+msgstr "Sarjat"
 
 msgctxt "#30016"
 msgid "Sonarr"
@@ -87,7 +87,7 @@ msgstr "Sonarr"
 
 msgctxt "#30017"
 msgid "Cleared Monitored TV Shows"
-msgstr "Poistettiin seuratut TV-sarjat"
+msgstr "Seuratut sarjat siivottiin"
 
 msgctxt "#30018"
 msgid "Movies"
@@ -99,19 +99,19 @@ msgstr "Radarr"
 
 msgctxt "#30020"
 msgid "Watched after"
-msgstr "Katsottu jälkeen"
+msgstr "Merkitään katsotuksi, kun katsottu"
 
 msgctxt "#30021"
 msgid "Remove (%s)"
-msgstr "Poista (%s)"
+msgstr "Poista %s"
 
 msgctxt "#30022"
 msgid "Permission required, Check file access."
-msgstr "Lupa vaaditaan, tarkista tiedostojen käyttöoikeus."
+msgstr "Vaatii käyttöoikeuden. Tarkista tiedostojen oikeudet."
 
 msgctxt "#30023"
 msgid ""%s" Removed!"
-msgstr "\"%s\" Poistettu!"
+msgstr "'%s' poistettiin!"
 
 msgctxt "#30024"
 msgid "Monitor Movies"
@@ -119,11 +119,11 @@ msgstr "Seuraa elokuvia"
 
 msgctxt "#30025"
 msgid "Clear Monitored Movies"
-msgstr "Tyhjennä Seuratut Elokuvat"
+msgstr "Siivoa seuratut elokuvat"
 
 msgctxt "#30026"
 msgid "Scan Radarr for Monitored Movies"
-msgstr "Päivitä Radarr seuratuille elokuville"
+msgstr "Nouda Radarrissa seuratut elokuvat"
 
 msgctxt "#30027"
 msgid ""
@@ -131,15 +131,15 @@ msgstr ""
 
 msgctxt "#30028"
 msgid "Monitors"
-msgstr "Seuraimet"
+msgstr "Seurannat"
 
 msgctxt "#30029"
 msgid "Only Remove TV episodes after completing the season"
-msgstr "Poista TV-jaksot vasta kauden päätyttyä"
+msgstr "Poista sarjojen jaksot vasta kauden päätyttyä"
 
 msgctxt "#30030"
 msgid "Scheduling"
-msgstr "Aikataulu"
+msgstr "Ajoitus"
 
 msgctxt "#30031"
 msgid "Scan Library"
@@ -147,7 +147,7 @@ msgstr "Päivitä kirjasto"
 
 msgctxt "#30032"
 msgid "Clean Library"
-msgstr "Puhdista kirjasto"
+msgstr "Siivoa kirjasto"
 
 msgctxt "#30033"
 msgid "No Duplicates Found"
@@ -155,7 +155,7 @@ msgstr "Kaksoiskappaleita ei löytynyt"
 
 msgctxt "#30034"
 msgid "Scan Library for duplicate Movies"
-msgstr "Etsi kirjastosta päällekkäisiä elokuvia"
+msgstr "Etsi kirjastosta elokuvien kaksoiskappaleita"
 
 msgctxt "#30035"
 msgid "Open Settings"
@@ -167,31 +167,31 @@ msgstr "Valitse poistettavat kaksoiskappaleet"
 
 msgctxt "#30037"
 msgid "Select one or multiple TV Shows"
-msgstr "Valitse yksi tai useampi TV-sarja"
+msgstr "Valitse yksi tai useampi sarja"
 
 msgctxt "#30038"
 msgid "Scanning TV Shows..."
-msgstr "Haetaan TV-sarjoja..."
+msgstr "Tarkastetaan sarjoja..."
 
 msgctxt "#30039"
 msgid "Scanning Movies..."
-msgstr "Haetaan elokuvia..."
+msgstr "Tarkastetaan elokuvia..."
 
 msgctxt "#30040"
 msgid "Removing duplicate Movies..."
-msgstr "Poistetaan päällekkäisiä elokuvia..."
+msgstr "Poistetaan elokuvien kaksoiskappaleita..."
 
 msgctxt "#30041"
 msgid "Match duplicate Movies by"
-msgstr "Elokuvien kaksoiskappaleiden kohdistusperuste on"
+msgstr "Elokuvien kaksoiskappaleiden tunnistusperuste on"
 
 msgctxt "#30042"
 msgid "Add to Monitor List"
-msgstr "Lisää seurattavien listaan"
+msgstr "Lisää seurantalistaan"
 
 msgctxt "#30043"
 msgid "Add "%s" to Monitored TV Shows"
-msgstr "Lisää \"%s\" seurattuihin TV-sarjoihin"
+msgstr "Lisää '%s' seurattuihin sarjoihin"
 
 msgctxt "#30044"
 msgid "Select All"
@@ -215,7 +215,7 @@ msgstr "Poista kaikki valinnat"
 
 msgctxt "#30049"
 msgid "Remove all show monitors"
-msgstr "Poista kaikki sarjojen seuraimet"
+msgstr "Poista kaikki sarjojen seurannat"
 
 msgctxt "#30050"
 msgid "Scanning Movies for duplicates..."
@@ -223,4 +223,4 @@ msgstr "Etsitään elokuvien kaksoiskappaleita..."
 
 msgctxt "#30051"
 msgid ""%s" Deleted!"
-msgstr "\"%s\" Poistettu!"
+msgstr "'%s' poistettiin!"

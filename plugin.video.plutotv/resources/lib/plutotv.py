@@ -35,7 +35,10 @@ try:
         
     from multiprocessing  import cpu_count
     from _multiprocessing import SemLock, sem_unlink #hack to raise two python issues. _multiprocessing import error, sem_unlink missing from native python (android).
-
+    
+    if xbmcgui.Window(10000).getProperty('PseudoTVRunning') == "True": 
+        raise Exception('Running PseudoTV, Disabling multi-processing')
+        
     SUPPORTS_POOL = True
     CPU_COUNT     = cpu_count()
 except Exception as e:

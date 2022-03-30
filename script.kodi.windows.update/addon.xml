@@ -43,6 +43,7 @@
         <description lang="pl_PL">Pobieraj i instaluj pliki wykonywalne Kodi: kompilacje nocne, testowe, wydania finalne, migawki.</description>
         <description lang="ru_RU">Загрузка и установка исполняемых файлов Kodi: ночные и тестовые сборки, релизы, снапшоты.</description>
         <description lang="zh_CN">下载并安装 Kodi windows 可执行文件。从 Nightlies、Releases、Snapshots 和 Test-builds 中选择。</description>
+        <disclaimer lang="cs_CZ">UWP není podporováno! Není určeno pro instalaci Kodi přes Microsoft Store.</disclaimer>
         <disclaimer lang="da_DK">UWP understøttes ikke! Ikke beregnet til Kodi-installation gennem Windows Store.</disclaimer>
         <disclaimer lang="de_DE">UWP wird nicht unterstützt! Nicht vorgesehen für Kodi-Installation über den Windows Store.</disclaimer>
         <disclaimer lang="en_GB">UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>

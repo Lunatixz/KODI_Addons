@@ -628,8 +628,7 @@ class PlutoTV(object):
                 log("poolList, threadPool Failed! %s"%(e), xbmc.LOGERROR)
                 
         if not results:
-            if args is not None: 
-                items = zip(items,repeat(args))
+            if args is not None: items = zip(items,repeat(args))
             results = [results.append(func(i)) for i in items]
         try:    return list(filter(None,results))
         except: return list(results)

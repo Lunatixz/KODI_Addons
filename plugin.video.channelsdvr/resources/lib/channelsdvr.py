@@ -1,4 +1,4 @@
-#   Copyright (C) 2021 Lunatixz
+#   Copyright (C) 2022 Lunatixz
 #
 #
 # This file is part of Channels DVR.
@@ -27,10 +27,21 @@ from itertools     import repeat, cycle, chain, zip_longest
 from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 
 try:
-    if xbmc.getCondVisibility('System.Platform.Android'): raise Exception('Using Android threading')
-    from multiprocessing.pool import ThreadPool
+    if (xbmc.getCondVisibility('System.Platform.Android') or xbmc.getCondVisibility('System.Platform.Windows')):
+        from multiprocessing.dummy import Pool as ThreadPool
+    else:
+        from multiprocessing.pool  import ThreadPool
+        
+    from multiprocessing  import cpu_count
+    from _multiprocessing import SemLock, sem_unlink #hack to raise two python issues. _multiprocessing import error, sem_unlink missing from native python (android).
+    
+    if xbmcgui.Window(10000).getProperty('PseudoTVRunning') == "True": 
+        raise Exception('Running PseudoTV, Disabling multi-processing')
+        
     SUPPORTS_POOL = True
-except Exception:
+    CPU_COUNT     = cpu_count()
+except Exception as e:
+    CPU_COUNT     = 2
     SUPPORTS_POOL = False
 
 # Plugin Info
@@ -464,23 +475,26 @@ class Channels(object):
         return liz
         
              
-    def poolList(self, method, items=None, args=None, chunk=25):
+    def poolList(self, func, items=[], args=None, chunk=1): 
         log("poolList")
         results = []
         if SUPPORTS_POOL:
-            pool = ThreadPool()
-            if args is not None: 
-                results = pool.map(method, zip(items,repeat(args)))
-            elif items: 
-                results = pool.map(method, items)#, chunksize=chunk)
-            pool.close()
-            pool.join()
-        else:
-            if args is not None: 
-                results = [method((item, args)) for item in items]
-            elif items: 
-                results = [method(item) for item in items]
-        return filter(None, results)
+            try:
+                pool = ThreadPool(processes=CPU_COUNT)
+                if args is not None: 
+                    results = pool.imap(func, zip(items,repeat(args)), chunksize=chunk)
+                else:
+                    results = pool.imap(func, items, chunksize=chunk)
+                pool.close()
+                pool.join()
+            except Exception as e: 
+                log("poolList, threadPool Failed! %s"%(e), xbmc.LOGERROR)
+                
+        if not results:
+            if args is not None: items = zip(items,repeat(args))
+            results = [results.append(func(i)) for i in items]
+        try:    return list(filter(None,results))
+        except: return list(results)
 
 
     def buildChannels(self):

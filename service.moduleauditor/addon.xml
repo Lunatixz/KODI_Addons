@@ -29,6 +29,7 @@
         <summary lang="es_MX">Escanea y compara módulos instalados con los del repositorio oficial de Kodi.</summary>
         <summary lang="hu_HU">Felrakott Kodi modulok összehasonlítása a hivatalos programtárral</summary>
         <summary lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</summary>
+        <summary lang="nl_NL">Scan en vergelijk geïnstalleerde modules met de officiële Kodi repository.</summary>
         <summary lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</summary>
         <summary lang="sv_SE">Skanna och jämför installerade moduler med officiellt Kodi-förråd.</summary>
         <summary lang="zh_CN">通过官方KODI插件源扫描并比较已安装的模块。</summary>
@@ -39,6 +40,7 @@
         <description lang="es_MX">Escanea y compara módulos instalados con los del repositorio oficial de Kodi.</description>
         <description lang="hu_HU">Felrakott Kodi modulok összehasonlítása a hivatalos programtárral.</description>
         <description lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</description>
+        <description lang="nl_NL">Scan en vergelijk geïnstalleerde modules met de officiële  Kodi repository.</description>
         <description lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</description>
         <description lang="sv_SE">Skanna och jämför installerade moduler med officiellt Kodi-förråd.</description>
         <description lang="zh_CN">通过官方KODI插件源扫描并比较已安装的模块。</description>

@@ -352,36 +352,6 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.tubitv" name="TubiTV" version="5.0.2" provider-name="Lunatixz">
-  <requires>
-    <import addon="xbmc.python" version="3.0.0"/>
-    <import addon="script.module.t1mlib" version="4.0.2"/>
-    <import addon="script.module.requests" version="2.22.0"/>
-    <import addon="inputstream.adaptive" version="2.6.0"/>
-    <import addon="script.module.kodi-six" version="0.1.3.1"/>
-  </requires>
-  <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-  </extension>
-  <extension point="xbmc.service" library="pseudotv_recommended.py"/>
-  <extension point="xbmc.addon.metadata">
-    <platform>all</platform>
-    <language>en</language>
-    <license>GPL-2.0-or-later</license>
-    <forum>http://forum.kodi.tv/showthread.php?tid=</forum>
-    <website>http://www.tubitv.com/</website>
-    <news>v.5.0.1[CR]PseudoTV Live support</news>
-    <assets>
-        <icon>resources/images/icon.png</icon>
-        <fanart>resources/images/fanart.jpg</fanart>
-    </assets>
-    <summary lang="en_GB">tubitv</summary>
-    <description lang="en_GB">Tubi TV has the largest library of FREE videos of hit and cult TV shows and films</description>
-    <disclaimer lang="en_GB">Feel free to use this script. For information visit the wiki.</disclaimer>
-    <lifecyclestate type="broken" lang="en_GB">No longer maintaining this project!</lifecyclestate>
-  </extension>
-</addon>
-
 <addon id="plugin.video.tvcatchups" version="1.0.8" name="TVCatchup" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
@@ -665,7 +635,7 @@
     </extension>
 </addon>
 
-<addon id="screensaver.videosaver" name="Video ScreenSaver" version="1.1.2" provider-name="Lunatixz">
+<addon id="screensaver.videosaver" name="Video ScreenSaver" version="1.1.3" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -678,7 +648,7 @@
         <platform>all</platform>
         <forum>https://forum.kodi.tv/showthread.php?tid=319730</forum>
         <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/screensaver.videosaver</source>
-        <news>v.1.1.1[CR]- Added "No-Media" Notification</news>
+        <news>v.1.1.3[CR]- Added Dimmer</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>

@@ -11,6 +11,7 @@
     <setting id="TraktDisable" type="bool"      label="32007" default="true"/>
     <setting id="LockAction"   type="bool"      label="32008" default="false"/>
     <setting id="SetVolume"    type="slider"    label="32011" default="100" range="0,1,100" option="int" />
+    <setting id="SetDimmer"    type="slider"    label="32021" default="0"   range="0,5,100" option="int" />
     <setting id="RepeatState"  type="labelenum" label="32016" default="Off" values="Off|One|All"/>
     <setting id="Enable_Debugging" type="bool"  label="32012" default="false" />
   </category>

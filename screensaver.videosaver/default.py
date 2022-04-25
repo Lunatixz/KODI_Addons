@@ -165,8 +165,12 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
     def onInit(self):
         self.winid = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
         self.winid.setProperty('ss_time', 'okay' if REAL_SETTINGS.getSetting("Time") == 'true' else 'nope')
-        if saveVolume(): 
-            setVolume(int(REAL_SETTINGS.getSetting('SetVolume')))
+        
+        if saveVolume(): setVolume(REAL_SETTINGS.getSettingInt('SetVolume'))
+        
+        self.dimid = self.getControl(41001)
+        self.dimid.setAnimations([('Conditional', 'effect=fade start=%s end=%s condition=True'%(REAL_SETTINGS.getSettingInt('SetDimmer'),REAL_SETTINGS.getSettingInt('SetDimmer')))])
+        
         self.myPlayer.play(self.buildPlaylist())
         setRepeat('all')
         

@@ -3,10 +3,15 @@
 # Addon id: service.iptv.manager
 msgid ""
 msgstr ""
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"PO-Revision-Date: 2022-04-04 21:08+0000\n"
+"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"Language-Team: Turkish <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/tr_tr/>\n"
 "Language: tr_tr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.11.2\n"
 
 msgctxt "Addon Summary"
 msgid "Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus"
@@ -93,7 +98,7 @@ msgstr ""
 
 msgctxt "#30881"
 msgid "Logging"
-msgstr ""
+msgstr "Günlük"
 
 msgctxt "#30882"
 msgid "Enable debug logging"

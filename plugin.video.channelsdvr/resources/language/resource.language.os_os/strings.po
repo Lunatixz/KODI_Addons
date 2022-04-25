@@ -121,7 +121,7 @@ msgid "%s not found, Please Install"
 msgstr ""
 
 msgctxt "#30024"
-msgid "Devices"
+msgid "Sources"
 msgstr ""
 
 msgctxt "#49000"

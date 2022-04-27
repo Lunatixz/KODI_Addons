@@ -25,10 +25,12 @@
         <summary lang="da_DK">Udforsk betagende billeder fra Bing-hjemmesiden... </summary>
         <summary lang="en_GB">Explore breathtaking images from the Bing homepage... </summary>
         <summary lang="pt_BR">Explore imagens deslumbrantes da página inicial do Bing... </summary>
+        <summary lang="ru_RU">Исследуйте изображения, захватывающие дух, с домашней страницы Bing... </summary>
         <summary lang="zh_CN">浏览必应主页上令人叹为观止的图片... </summary>
         <description lang="da_DK">Udforsk betagende billeder fra Bing-hjemmesiden... </description>
         <description lang="en_GB">Explore breathtaking images from the Bing homepage... </description>
         <description lang="pt_BR">Explore imagens deslumbrantes da página inicial do Bing... </description>
+        <description lang="ru_RU">Исследуйте изображения, захватывающие дух, с домашней страницы Bing... </description>
         <description lang="zh_CN">浏览必应主页上令人叹为观止的图片... </description>
     </extension>
 </addon>

@@ -69,8 +69,8 @@ msgid "Multiple Videos"
 msgstr "多视频"
 
 msgctxt "#32011"
-msgid "Set ScreenSaver Volume [Restored to Previous Level]"
-msgstr "设置屏幕保护程序音量 [恢复到上一级别]"
+msgid "Set ScreenSaver Volume [Restored to Previous Level on Stop]"
+msgstr ""
 
 msgctxt "#32012"
 msgid "Enable Debugging [Log errors]"
@@ -107,3 +107,11 @@ msgstr "显示时间和天气"
 msgctxt "#32020"
 msgid "Path In-Valid, No media found!"
 msgstr ""
+
+msgctxt "#32021"
+msgid "Set Dimmer Level"
+msgstr ""
+
+#~ msgctxt "#32011"
+#~ msgid "Set ScreenSaver Volume [Restored to Previous Level]"
+#~ msgstr "设置屏幕保护程序音量 [恢复到上一级别]"

@@ -42,6 +42,7 @@
         <description lang="fi_FI">Lataa ja asenna Kodin Android-paketteja kehityshaaroista Release, Nightly, Snapshot ja Test.</description>
         <description lang="ko_KR">Kodi 안드로이드 패키지를 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
         <description lang="pl_PL">Pobieraj i instaluj pliki wykonywalne Kodi: kompilacje nocne, testowe, wydania finalne, migawki.</description>
+        <description lang="ru_RU">Скачивание и установка Kodi пакетов для Android; выбор из  Ночных, Релизных, Тестовых сборок и Снапшотов.</description>
         <description lang="zh_CN">下载并安装 Kodi android 软件包。从 Nightlies、Releases、Snapshots 和 Test-builds 中选择。</description>
     </extension>
 </addon>

@@ -264,7 +264,7 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
         
 class Start():
     def __init__(self):
-        self.myBackground = BackgroundWindow('%s.background.xml'%ADDON_ID, ADDON_PATH, "default")
+        self.myBackground = BackgroundWindow('%s.background.xml'%ADDON_ID, ADDON_PATH, "Default")
         self.myBackground.doModal()
         del self.myBackground
         

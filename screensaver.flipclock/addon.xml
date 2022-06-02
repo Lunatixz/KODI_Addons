@@ -21,11 +21,13 @@
         <summary lang="en_GB">Flip clock screensaver.</summary>
         <summary lang="es_ES">Salvapantallas Flip clock</summary>
         <summary lang="ru_RU">Заставка Flip clock.</summary>
+        <summary lang="uk_UA">Заставка &quot;Перекидний годинник&quot;.</summary>
         <summary lang="zh_CN">翻转时钟屏幕保护程序。</summary>
         <description lang="da_DK">Flip-ur pause skærm.</description>
         <description lang="en_GB">Flip clock screensaver.</description>
         <description lang="es_ES">Salvapantallas Flip clock.</description>
         <description lang="ru_RU">Заставка Flip clock.</description>
+        <description lang="uk_UA">Заставка з механічним годинником стилю &quot;ретро&quot;, циферблат якого - перекидний.</description>
         <description lang="zh_CN">翻转时钟屏幕保护程序。</description>
     </extension>
 </addon>

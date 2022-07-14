@@ -29,7 +29,7 @@
         <description lang="da_DK">Hvor hurtigt kører din enhed pythonkode? Pystone evaluerer CPU-ydelse, der kører i et pythonmiljø.</description>
         <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
         <description lang="es_MX">¿Qué tan rápido ejecuta código Python tu dispositivo? Pystone evalúa el rendimiento de CPU ejecutándose en un entorno Python.</description>
-        <description lang="fi_FI">Miten nopeasti laitteesi suorittaa Python-koodin? Pystone arvioi suorittimen tehokkuutta Python ympäristössä.</description>
+        <description lang="fi_FI">Miten nopeasti laitteesi suorittaa Python-koodin? Pystone arvioi prosessorin tehokkuutta Python ympäristössä.</description>
         <description lang="ko_KR">당신의 기기는 얼마나 빨리 파이썬 코드를 실행할까요? Pystone은 Python 환경에서 실행되는 CPU 성능을 평가합니다.</description>
         <description lang="pl_PL">Jak szybko Twoje urządzenie uruchamia kod Pythona? Pystone ocenia wydajność procesora działającego w środowisku Pythona.</description>
         <description lang="ru_RU">Как быстро ваше устройство запускает код Python. Pystone оценивает производительность процессора в среде Python.</description>

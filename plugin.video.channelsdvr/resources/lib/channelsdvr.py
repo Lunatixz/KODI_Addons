@@ -37,7 +37,6 @@ try:
     
     if xbmcgui.Window(10000).getProperty('PseudoTVRunning') == "True": 
         raise Exception('Running PseudoTV, Disabling multi-processing')
-        
     SUPPORTS_POOL = True
     CPU_COUNT     = cpu_count()
 except Exception as e:
@@ -189,24 +188,25 @@ class Channels(object):
                 serialized = False
                 val = '?format=ts' if REAL_SETTINGS.getSettingBool('Enable_TS') else ''
                 url = M3U_URL.format(TS=val)
-            log('openURL, url = %s'%(url))
             
             cacheName  = '%s.openURL.%s'%(ADDON_ID,url)
             cacheResponse = self.cache.get(cacheName, checksum=ADDON_VERSION, json_data=serialized)
             if not cacheResponse:
+                log('openURL, url = %s'%(url))
                 req = requests.get(url, timeout=TIMEOUT)
                 if url.startswith(M3U_URL): 
                     cacheResponse = req.text
                 else:
                     cacheResponse = req.json()
                 req.close()
-                self.cache.set(cacheName, cacheResponse, checksum=ADDON_VERSION, expiration=life, json_data=serialized)
+                if cacheResponse: 
+                    self.cache.set(cacheName, cacheResponse, checksum=ADDON_VERSION, expiration=life, json_data=serialized)
             return cacheResponse
         except Exception as e: 
             log("openURL, Failed! %s"%(e), xbmc.LOGERROR)
             notificationDialog(LANGUAGE(30001))
             return ''
-        
+
 
     def buildMenu(self):
         log('buildMenu')
@@ -233,8 +233,8 @@ class Channels(object):
                 break
 
 
-    def getChannelsM3U(self):
-        log('getChannelsM3U')
+    def getChannelsFromM3U(self):
+        log('getChannelsFromM3U')
         m3uListTMP = self.openURL(M3U_URL).split('\n')
         lines = ['%s\n%s'%(line,m3uListTMP[idx+1]) for idx, line in enumerate(m3uListTMP) if line.startswith('#EXTINF:')]
         items = []
@@ -249,19 +249,20 @@ class Channels(object):
                               'url'   :groups.group(6)})
         return sorted(items, key=lambda k: k['number'])
         
+        
     def getChannels(self):
         #todo rewrite to remove parse and dict() rebuild? no longer needed since we moved away from m3u parsing.
+        TS       = REAL_SETTINGS.getSettingBool('Enable_TS')
+        SHIFT    = REAL_SETTINGS.getSettingBool('Enable_Timeshift')
+        
         items    = []
         channels = self.openURL(CHANNELS_URL)
         
-        if REAL_SETTINGS.getSettingBool('Enable_TS'):
-            playURL = PLAY_MPG
-        else: 
-            playURL = PLAY_URL
-        TS_VAL = '?format=ts'   if REAL_SETTINGS.getSettingBool('Enable_TS')            else ''
-        CO_VAL = '?vcodec=copy' if not REAL_SETTINGS.getSettingBool('Enable_Timeshift') else ''
-        log('getChannels, playURL = %s, TS_VAL = %s, CO_VAL = %s'%(playURL,TS_VAL,CO_VAL))
-        
+        if TS: playURL = PLAY_MPG
+        else:  playURL = PLAY_URL
+            
+        TS_VAL = '?format=ts'   if TS else ''
+        CO_VAL = '?vcodec=copy' if not SHIFT else ''
         for key in channels.keys():
             channel = channels[key]
             if channel.get('Hidden',False): continue
@@ -292,12 +293,11 @@ class Channels(object):
         
     def buildLineup(self, chid=None):
         log('buildLineup, chid = %s'%(chid))
-        programmes = self.getGuidedata()
         if chid is None:
-            self.poolList(self.buildLineupItem, programmes)
+            self.poolList(self.buildLineupItem, self.getGuidedata())
         else:
-            data = [program for program in programmes if program['Channel']['Number'] == chid]
-            self.poolList(self.buildPlayItem, data, ('lineup',False))
+            content = self.matchGuide({'number':chid})
+            self.poolList(self.buildPlayItem, [content], ('lineup',False))
 
   
     def buildLineupItem(self, content):
@@ -393,16 +393,17 @@ class Channels(object):
         self.listitems = []
         self.playlist  = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         self.playlist.clear()
-        programmes = self.getGuidedata()
-        data = [program for program in programmes if program['Channel']['Number'] == id]
-        channel = list(filter(lambda channel:channel['number'] == id, self.getChannels()))[0]
-        self.poolList(self.buildPlayItem, data, ('play',False))
-        liz = xbmcgui.ListItem(channel['name'],path=channel['url'])
+        
+        #todo remove getChannels, parse all channel data from guide rpc.
+        cdata = self.matchChannel({'Number':id})
+        content = self.matchGuide(cdata)
+        self.poolList(self.buildPlayItem, [content], ('play',False))
+        liz = xbmcgui.ListItem(cdata['name'],path=cdata['url'])
         liz.setProperty('IsPlayable','true')
         if opt != 'pvr':
-            [self.playlist.add(channel['url'],lz,idx) for idx,lz in enumerate(self.listitems)]
+            [self.playlist.add(cdata['url'],lz,idx) for idx,lz in enumerate(self.listitems)]
             liz = self.listitems.pop(0)
-            liz.setPath(path=channel['url'])
+            liz.setPath(path=cdata['url'])
         return liz
         
  
@@ -417,17 +418,17 @@ class Channels(object):
             liz   = self.resolveURL(id, opt)
             url   = liz.getPath()
             log('playLive, url = %s'%(url))
-            if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
-                if REAL_SETTINGS.getSettingBool('Enable_Timeshift'):
-                    log('playLive, timeshift enabled')
-                    liz.setProperty('inputstream','inputstream.ffmpegdirect')
-                    liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
-                else:
-                    liz.setProperty('inputstream','inputstream.adaptive')
-                    liz.setProperty('inputstream.adaptive.manifest_type','hls')
-            elif url.endswith('?format=ts'): 
-                log('playLive, TS-MPEG enabled')
-                liz.setProperty('inputstream.adaptive.mime_type','vnd.apple.mpegurl')
+            # if 'm3u8' in url.lower() and inputstreamhelper.Helper('hls').check_inputstream():
+                # if REAL_SETTINGS.getSettingBool('Enable_Timeshift'):
+                    # log('playLive, timeshift enabled')
+                    # liz.setProperty('inputstream','inputstream.ffmpegdirect')
+                    # liz.setProperty('inputstream.ffmpegdirect.stream_mode','timeshift')
+                # else:
+                    # liz.setProperty('inputstream','inputstream.adaptive')
+                    # liz.setProperty('inputstream.adaptive.manifest_type','hls')
+            # elif url.endswith('?format=ts'): 
+                # log('playLive, TS-MPEG enabled')
+                # liz.setProperty('inputstream.adaptive.mime_type','vnd.apple.mpegurl')
         xbmcplugin.setResolvedUrl(ROUTER.handle, found, liz)
 
    
@@ -476,59 +477,77 @@ class Channels(object):
         
              
     def poolList(self, func, items=[], args=None, chunk=1): 
-        log("poolList")
+        log('poolList, SUPPORTS_POOL = %s'%(SUPPORTS_POOL))
         results = []
         if SUPPORTS_POOL:
             try:
                 pool = ThreadPool(processes=CPU_COUNT)
-                if args is not None: 
-                    results = pool.imap(func, zip(items,repeat(args)), chunksize=chunk)
+                if args is not None:
+                    results = pool.map(func, zip(items,repeat(args)), chunksize=chunk)
                 else:
-                    results = pool.imap(func, items, chunksize=chunk)
+                    results = pool.map(func, items, chunksize=chunk)
                 pool.close()
                 pool.join()
             except Exception as e: 
                 log("poolList, threadPool Failed! %s"%(e), xbmc.LOGERROR)
-                
+        
         if not results:
-            if args is not None: items = zip(items,repeat(args))
+            if args is not None: items = list(zip(items,repeat(args)))
             results = [results.append(func(i)) for i in items]
-        try:    return list(filter(None,results))
-        except: return list(results)
+            
+        try:
+            return list(filter(None,results))
+        except: 
+            return list(results)
 
-
+        
+    def matchChannel(self, match):
+        channels = self.getChannels()
+        for channel in channels:
+            if channel['number'] == match['Number']:
+                return channel
+        
+        
+    def matchGuide(self, match):
+        programmes = self.getGuidedata()
+        for program in programmes:
+            if program['Channel']['Number'] == match['number']:
+                return program
+                
+                
     def buildChannels(self):
         log('buildChannels')
         # https://github.com/add-ons/service.iptv.manager/wiki/JSON-STREAMS-format
-        channels  = self.getChannels()
-        guidedata = self.getGuidedata()
-        return list(self.poolList(self.buildStation, guidedata, (channels,'channel')))
-
-
+        return self.poolList(self.buildStation, self.getGuidedata(), 'channel')
+             
+             
     def buildGuide(self):
-        log('getGuide')
+        log('buildGuide')
         # https://github.com/add-ons/service.iptv.manager/wiki/JSON-EPG-format
-        channels  = self.getChannels()
-        guidedata = self.getGuidedata()
-        return {k:v for x in self.poolList(self.buildStation, guidedata, (channels,'programmes')) for k,v in x.items()}
-        
+        return {k:v for x in self.poolList(self.buildStation, self.getGuidedata(), 'programmes') for k,v in x.items()}
+ 
 
     def buildStation(self, data):
-        content, data = data
-        channels, opt = data
+        content, opt = data
         station  = content['Channel']
-        cdata    = list(filter(lambda c:c['number'] == station['Number'], channels))[0]
-        favorite = 'Favorites' in cdata['groups']
+        cdata    = self.matchChannel(station)
+        favorite = ('Favorites' in cdata['groups'] or cdata.get('Favorite',False) == True)
         cdata['groups'].append(ADDON_NAME)
-        channel  = {"name"  :station['Name'],
-                    "stream":"plugin://%s/play/pvr/%s"%(ADDON_ID,station['Number']), 
-                    "id"    :"%s.%s@%s"%(station['Number'],slugify(station['Name']),slugify(ADDON_NAME)), 
-                    "logo"  :(station.get('Image','') or LOGO), 
-                    "preset":station['Number'],
-                    "group" :';'.join(cdata['groups']),
-                    "radio" :False}
-        if REAL_SETTINGS.getSettingBool('Build_Favorites') and not favorite: return None
-        elif opt == 'channel': return channel
+        if favorite: cdata['groups'].append('Favorites')
+        cdata['groups'] = list(set(cdata['groups']))
+        
+        channel= {"name"  :station['Name'],
+                  "stream":"plugin://%s/play/pvr/%s"%(ADDON_ID,station['Number']), 
+                  "id"    :"%s.%s@%s"%(station['Number'],slugify(station['Name']),slugify(ADDON_NAME)), 
+                  "logo"  :(station.get('Image','') or LOGO), 
+                  "preset":station['Number'],
+                  "group" :';'.join(cdata['groups']),
+                  "radio" :False}
+                    
+        if REAL_SETTINGS.getSettingBool('Build_Favorites') and not favorite: 
+            return None
+        elif opt == 'channel': 
+            return channel
         else:
             programmes = {channel['id']:[]}
             listings   = content.get('Airings',[])

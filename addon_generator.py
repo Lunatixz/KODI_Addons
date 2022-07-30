@@ -28,10 +28,10 @@ import xml.etree.ElementTree
 from zipfile import ZipFile
 from shutil import copyfile
 
-CHKPATH    = 'D:/GitHub/addon-check/'
-GITPATH    = 'D:/GitHub/KODI_Addons/'
+CHKPATH    = 'C:/GitHub/addon-check/'
+GITPATH    = 'C:/GitHub/KODI_Addons'
 ZIPPATH    = os.path.join(GITPATH,'zips','')
-DELETE_EXT = ('.pyc', '.pyo', '.db')
+DELETE_EXT = ('.pyc', '.pyo', '.db', '.bak')
 DELETE_FOLDERS = ['__pycache__','.idea','Corel Auto-Preserve']
 
 # Compatibility with 3.0, 3.1 and 3.2 not supporting u"" literals

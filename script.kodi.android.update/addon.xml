@@ -31,6 +31,7 @@
         <summary lang="et_EE">Laadi alla ja paigalda Kodi pakette.</summary>
         <summary lang="fi_FI">Lataa ja asenna Kodi-paketteja.</summary>
         <summary lang="fr_FR">Télécharger et installer les packages Kodi.</summary>
+        <summary lang="it_IT">Scarica e installa i pacchetti Kodi.</summary>
         <summary lang="ko_KR">Kodi 패키지를 다운로드하고 설치합니다.</summary>
         <summary lang="pl_PL">Pobieraj i instaluj pakiety Kodi.</summary>
         <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
@@ -41,6 +42,7 @@
         <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="et_EE">Laadi alla ja paigalda Kodi android pakette; valikus on Nightlies, Releases, Snapshots ja Test-builds.</description>
         <description lang="fi_FI">Lataa ja asenna Kodin Android-paketteja kehityshaaroista Release, Nightly, Snapshot ja Test.</description>
+        <description lang="it_IT">Scarica e installa i pacchetti Android Kodi; seleziona da Nightlies, Release, Snapshot e Test build.</description>
         <description lang="ko_KR">Kodi 안드로이드 패키지를 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
         <description lang="pl_PL">Pobieraj i instaluj pliki wykonywalne Kodi: kompilacje nocne, testowe, wydania finalne, migawki.</description>
         <description lang="ru_RU">Скачивание и установка Kodi пакетов для Android; выбор из  Ночных, Релизных, Тестовых сборок и Снапшотов.</description>

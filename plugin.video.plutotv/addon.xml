@@ -32,7 +32,9 @@
         </assets>   
         <summary lang="da_DK">Tv-kanaler dedikeret til dine yndlingsting, lavet af storfilm fra Paramount... &quot;Det geniale ved Pluto TV: dette er ægte internet-tv&quot;.</summary>
         <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
+        <summary lang="fi_FI">Suosikkiasioillesi omistettuja TV-kanavia, jotka koostuvat Paramountin menestyselokuvista... &quot;Pluto TV:n neroutta: Tämä on todellinen Internet-televisio&quot;.</summary>
         <description lang="da_DK">Se gratis tv i Kodi! Stream Pluto TV&apos;s mere end 100 kanaler med nyheder, sport og internettets bedste, helt gratis på din Kodi-enhed.</description>
         <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV&apos;s 100+ channels of news, sports, and the Internet&apos;s best, completely free on your Kodi device.</description>
+        <description lang="fi_FI">Katso televisiota ilmaiseksi Kodissa! Suoratoista Pluto TV:n yli 100 uutis-, urheilu- ja Internet-kanavaa täysin veloituksetta Kodi-laitteellasi.</description>
     </extension>
 </addon>

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: plugin.video.plutotv\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2022-07-28 10:14+0000\n"
+"PO-Revision-Date: 2022-08-15 05:14+0000\n"
 "Last-Translator: Oskari Lavinto <olavinto@protonmail.com>\n"
 "Language-Team: Finnish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-plutotv/fi_fi/>\n"
 "Language: fi_fi\n"
@@ -19,23 +19,23 @@ msgstr ""
 
 msgctxt "Addon Summary"
 msgid "TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”."
-msgstr ""
+msgstr "Suosikkiasioillesi omistettuja TV-kanavia, jotka koostuvat Paramountin menestyselokuvista... \"Pluto TV:n neroutta: Tämä on todellinen Internet-televisio\"."
 
 msgctxt "Addon Description"
 msgid "Watch Free TV on Kodi! Stream Pluto TV's 100+ channels of news, sports, and the Internet's best, completely free on your Kodi device."
-msgstr ""
+msgstr "Katso televisiota ilmaiseksi Kodissa! Suoratoista Pluto TV:n yli 100 uutis-, urheilu- ja Internet-kanavaa täysin veloituksetta Kodi-laitteellasi."
 
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
-msgstr "Käytä vianselvitystä [kirjaa virheet]"
+msgstr "Käytä vianselvitystä (kirjaa virheet)"
 
 msgctxt "#30011"
 msgid "Live"
-msgstr "Suorat"
+msgstr "Live"
 
 msgctxt "#30012"
 msgid "OnDemand"
-msgstr ""
+msgstr "Pyydettäessä"
 
 msgctxt "#30013"
 msgid "Guide"
@@ -47,11 +47,11 @@ msgstr "Kaikki kanavat"
 
 msgctxt "#30015"
 msgid ">> Next"
-msgstr ""
+msgstr ">> Seuraava"
 
 msgctxt "#30016"
 msgid "Featured"
-msgstr ""
+msgstr "Esittelyssä"
 
 msgctxt "#30017"
 msgid "Categories"
@@ -59,7 +59,7 @@ msgstr "Kategoriat"
 
 msgctxt "#30018"
 msgid "Lineup"
-msgstr ""
+msgstr "Kanavalista"
 
 msgctxt "#30019"
 msgid "&deviceMake=&deviceModel=&sid"
@@ -79,19 +79,19 @@ msgstr ""
 
 msgctxt "#30023"
 msgid "On Now"
-msgstr ""
+msgstr "Lähetetään parhaillaan"
 
 msgctxt "#30024"
 msgid "Channel lineup"
-msgstr ""
+msgstr "Kanavalista"
 
 msgctxt "#30025"
 msgid "Channel by genre"
-msgstr ""
+msgstr "Kanavat lajityypeittäin"
 
 msgctxt "#30026"
 msgid "Video On Demand"
-msgstr ""
+msgstr "Video pyydettäessä"
 
 msgctxt "#30029"
 msgid "Coming Up Later..."
@@ -99,19 +99,19 @@ msgstr "Tulossa myöhemmin..."
 
 msgctxt "#30030"
 msgid "Allow this plugin to automatically configure IPTV Simple PVR Backend?"
-msgstr ""
+msgstr "Sallitaanko tämän lisäosan määrittää IPTV Simple -lisäosan asetukset automaatisesti?"
 
 msgctxt "#30031"
 msgid "%s Updating..."
-msgstr ""
+msgstr "%s päivittyy..."
 
 msgctxt "#30032"
 msgid "M3U/XMLTV Path"
-msgstr ""
+msgstr "M3U-/XMLTV-sijainti"
 
 msgctxt "#30033"
 msgid "Enable M3U/XMLTV Generator Service"
-msgstr ""
+msgstr "Käytä M3U-/XMLTV-generointipalvelua"
 
 msgctxt "#30034"
 msgid "?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&sid=246&deviceId=5331d5fb753499095a00045a&deviceVersion=DNT&appVersion=DNT&deviceDNT=0&userId=&advertisingId=&deviceLat=&deviceLon=&app_name=&appName=web&buildVersion=&appStoreUrl=&architecture=&includeExtendedEvents=false&marketingRegion=US&serverSideAds=false"
@@ -119,39 +119,39 @@ msgstr ""
 
 msgctxt "#30035"
 msgid "Build Only Favorites"
-msgstr ""
+msgstr "Rakenna vain suosikit"
 
 msgctxt "#30036"
 msgid "%s added to Favorites"
-msgstr ""
+msgstr "\"%s\" lisättiin suosikkeihin"
 
 msgctxt "#30037"
 msgid "%s removed from Favorites"
-msgstr ""
+msgstr "\"%s\" poistettiin suosikeista"
 
 msgctxt "#30038"
 msgid "Add Channel to Favorites"
-msgstr ""
+msgstr "Lisää kanava suosikkeihin"
 
 msgctxt "#30039"
 msgid "Remove Channel from Favorites"
-msgstr ""
+msgstr "Poista kanava suosikeista"
 
 msgctxt "#30040"
 msgid "Live (Favorites)"
-msgstr ""
+msgstr "Suora (suosikit)"
 
 msgctxt "#30041"
 msgid "Use Direct stream"
-msgstr ""
+msgstr "Käytä suoraa mediavirtaa"
 
 msgctxt "#30042"
 msgid "PseudoTV Live Supported through Recommended Services"
-msgstr ""
+msgstr "PseudoTV Livea tuetaan suositelluilla palveluilla"
 
 msgctxt "#30043"
 msgid "Prefer Color Channel Logos"
-msgstr ""
+msgstr "Suosi värillisiä kanavalogoja"
 
 msgctxt "#30044"
 msgid "General"

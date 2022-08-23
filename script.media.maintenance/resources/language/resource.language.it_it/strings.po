@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: plugin.video.cbr\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2022-08-15 22:34+0000\n"
+"PO-Revision-Date: 2022-08-21 16:24+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
 "Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-scripts/script-media-maintenance/it_it/>\n"
 "Language: it_it\n"
@@ -79,7 +79,7 @@ msgstr "Avvertimento!! Selezionando \"Rimuovi\" [B]ELIMINERÀ PERMANENTEMENTE[/B
 
 msgctxt "#30015"
 msgid "TV Shows"
-msgstr "Serie TV"
+msgstr "Programmi TV"
 
 msgctxt "#30016"
 msgid "Sonarr"

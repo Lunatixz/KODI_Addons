@@ -20,6 +20,7 @@
         <summary lang="da_DK">Opret en pauseskærm fra enhver Kodi-videokilde.</summary>
         <summary lang="en_GB">Create a screensaver from any Kodi video source.</summary>
         <summary lang="es_ES">Crea un protector de pantalla de cualquier fuente de vídeo en Kodi.</summary>
+        <summary lang="fi_FI">Luo näytönsäästäjä mistä tahansa Kodin videolähteestä.</summary>
         <summary lang="fr_FR">Créer un économiseur d&apos;écran à partir de n&apos;importe quelle source vidéo Kodi.</summary>
         <summary lang="zh_CN">从任意 Kodi 视频源创建屏幕保护程序。</summary>
         <description lang="da_DK">Dynamisk pauseskærm der benytter lokalt indhold, smarte playlister, plugins og UPNP-servere.</description>
@@ -31,6 +32,7 @@
         <disclaimer lang="da_DK">Streamingkilder anbefales ikke til forbrugsbetalt internet.</disclaimer>
         <disclaimer lang="en_GB">Streaming sources not recommend for metered Internet.</disclaimer>
         <disclaimer lang="es_ES">Se recomienda no usar recursos en Streaming para conexiones a Internet de uso medido.</disclaimer>
+        <disclaimer lang="fi_FI">Suoratoistolähteitä ei suositella tiedonsiirtomäärän mukaan veloitettavilla yhteyksillä.</disclaimer>
         <disclaimer lang="fr_FR">Les sources de streaming ne sont pas recommandées pour Internet contrôlé.</disclaimer>
         <disclaimer lang="zh_CN">流媒体源不建议通过互联网。</disclaimer>
     </extension>

@@ -19,9 +19,6 @@
 # -*- coding: utf-8 -*-
 from default import *
 
-def isPseudoTV():
-    return xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True"
-    
 class Player(xbmc.Player):
     def __init__(self):
         xbmc.Player.__init__(self)
@@ -33,8 +30,7 @@ class Player(xbmc.Player):
         
         
     def assertPlaying(self):
-        if isPseudoTV(): return False
-        elif self.isPlayingVideo(): return True
+        if self.isPlayingVideo() and not isPseudoTV(): return True
         return False
         
         
@@ -45,8 +41,7 @@ class Player(xbmc.Player):
 
     def getPlayerItem(self):
         log('getPlayerItem')
-        try:    return self.getPlayingItem() #Kodi v20. todo
-        except: return self.myService.myUtils.getPlayerItem()
+        return self.myService.myUtils.getPlayerItem()
         
         
     def getPlayerTotalTime(self):

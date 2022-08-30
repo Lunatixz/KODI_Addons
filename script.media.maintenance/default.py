@@ -1,4 +1,4 @@
-#   Copyright (C) 2021 Lunatixz
+#   Copyright (C) 2022 Lunatixz
 #
 #
 # This file is part of Media Maintenance.
@@ -80,7 +80,10 @@ def loadJSON(string1):
         try: return json.loads(string1, strict=False)
         except Exception as e: log("loadJSON failed! %s \n %s"%(e,string1), xbmc.LOGERROR)
     return {}
-           
+      
+def isPseudoTV():
+    return xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True"
+         
 def sendJSON(command, cache=False):
     response = loadJSON(xbmc.executeJSONRPC(command))
     log('sendJSON, command = %s, response = %s'%(command, response))
@@ -354,7 +357,7 @@ class MM(object):
                 if REAL_SETTINGS.getSetting('Monitor_Movies') == 'false': return
             elif type in ['season','tvshow']: return self.removeSeason(playingItem)
             elif type == 'episode':
-                tvshow   = playingItem["showtitle"]
+                tvshow   = (playingItem.get("showtitle") or playingItem.get("tvshowtitle",""))
                 userList = self.getUserList()
                 if tvshow not in userList and not bypass: return
                 mediaInfo = '%s - %sx%s - %s'%(tvshow,playingItem["season"],playingItem["episode"],mediaInfo)
@@ -421,11 +424,12 @@ class MM(object):
         return id
 
 
-    def getPlayerItem(self, playlist=False):
+    def getPlayerItem(self, playlist=False, cache=True):
         self.log('getPlayerItem, playlist = %s' % (playlist))
-        if playlist: json_query = '{"jsonrpc":"2.0","method":"Playlist.GetItems","params":{"playlistid":%s,"properties":["runtime","title","plot","genre","year","studio","mpaa","season","episode","showtitle","thumbnail","uniqueid","file","customproperties"]},"id":1}'%(self.getActivePlaylist())
+        if playlist: json_query = '{"jsonrpc":"2.0","method":"Playlist.GetItems","params":{"playlistid":%s,"properties":["runtime","title","plot","genre","year","studio","mpaa","season","episode","tvshowtitle","showtitle","thumbnail","uniqueid","file","customproperties"]},"id":1}'%(self.getActivePlaylist())
         else:        json_query = '{"jsonrpc":"2.0","method":"Player.GetItem","params":{"playerid":%s,"properties":["file","writer","channel","channels","channeltype","mediapath","uniqueid","customproperties"]}, "id": 1}'%(self.getActivePlayer())
-        result = self.cacheJSON(json_query).get('result', {})
+        if cache:    result = self.cacheJSON(json_query).get('result', {})
+        else:        result = sendJSON(command).get('result', {})
         return (result.get('item', {}) or result.get('items', []))
 
 
@@ -504,7 +508,7 @@ class MM(object):
             if len(items) == 0 or chunksize < 1: chunksize = 1 #set min. size
             self.log("poolList, chunksize = %s, items = %s"%(chunksize,len(items)))
             
-            pool = ThreadPool(self.cpuCount)
+            pool = ThreadPool(cpuCount=self.cpuCount)
             if kwargs and isinstance(kwargs,dict):
                 results = pool.imap(partial(func, **kwargs), items, chunksize)
             else:

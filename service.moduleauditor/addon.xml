@@ -34,6 +34,7 @@
         <summary lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</summary>
         <summary lang="nl_NL">Scan en vergelijk geïnstalleerde modules met de officiële Kodi repository.</summary>
         <summary lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</summary>
+        <summary lang="ru_RU">Сканировать и Сравнить установленные модули с официальным репозиторием Kodi.</summary>
         <summary lang="sv_SE">Skanna och jämför installerade moduler med officiellt Kodi-förråd.</summary>
         <summary lang="zh_CN">通过官方KODI插件源扫描并比较已安装的模块。</summary>
         <description lang="cs_CZ">Projít a porovnat nainstalované doplňky s oficiálním repozitářem Kodi.</description>

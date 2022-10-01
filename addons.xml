@@ -35,9 +35,11 @@
         <summary lang="da_DK">Airy TV er underholdningsdestinationen for at se 100% gratis tv.</summary>
         <summary lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV.</summary>
         <summary lang="fi_FI">Airy TV on viihdekohde 100 % ilmaiseen television katseluun.</summary>
+        <summary lang="it_IT">Airy TV è la meta del divertimento della TV gratuita al 100%.</summary>
         <description lang="da_DK">Airy TV er underholdningsdestinationen for at se 100% gratis tv, film og komik. Stream anime og sport - al din underholdning på ét sted. Streaming har aldrig været nemmere! Airy TV har ingen kontrakt, ingen gebyrer, no-nonsense, kun gratis tv, film, komik, anime, sport - al din underholdning leveret til dig.</description>
         <description lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp; Comedy. Stream Anime &amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you.</description>
         <description lang="fi_FI">Airy TV on viihdekohde, josta voit katsoa televisiota, elokuvia ja komedioita 100 % ilmaiseksi. Suoratoista animea ja urheilua, kaikki viihteesi yhdessä paikassa. ... Suoratoisto ei ole koskaan ollut sujuvampaa! Airy TV ei sisällä sopimuksia, maksuja tai tyhjänpäiväisyyksiä, vaan yksinkertaisesti ilmaista televisiota, elokuvia, komedioita, animea, urheilua. Kaikki viihteesi sinulle toimitettuna.</description>
+        <description lang="it_IT">Airy TV è la meta del divertimento per guardare TV, film e commedie gratuiti al 100% . Trasmetti in streaming anime e sport, tutto il tuo intrattenimento in un unico posto. ... Lo streaming non è mai stato così fluido! Airy TV non ha nessun contratto, nessuna tariffa, nessuna sciocchezza, solo TV gratuita: film, anime, sport, tutto il tuo intrattenimento ti viene consegnato a costo zero.</description>
     </extension>
 </addon>
 
@@ -78,10 +80,12 @@
         <summary lang="en_GB">Live TV, everywhere</summary>
         <summary lang="es_ES">TV en directo en cualquier sitio</summary>
         <summary lang="fi_FI">Televisiolähetykset, kaikkialla</summary>
+        <summary lang="it_IT">TV in diretta, ovunque</summary>
         <description lang="da_DK">Se dine yndlingsprogrammer i Kodi. Kanaler leverer en samlet oplevelse på tværs af alle dine tv, enheder og streamingplatforme.</description>
         <description lang="en_GB">Watch your favorite programs on Kodi. Channels delivers a unified experience across all your TVs, devices, and streaming platforms.</description>
         <description lang="es_ES">Mira tus programas favoritos en Kodi. Canales entrega una experiencia unificada en todos tus dispositivos, TVs y plataformas de emisión.</description>
         <description lang="fi_FI">Katsele suosikkiohjelmiasi Kodissa. Kanavat toimittavat yksilöllisen kokemuksen kaikille televisioillesi, laitteillesi ja suoratoistoalustoille.</description>
+        <description lang="it_IT">Guarda i tuoi programmi preferiti su Kodi. I canali offrono un&apos;esperienza unificata su tutti i tuoi TV, dispositivi e piattaforme di streaming.</description>
     </extension>
 </addon>
 
@@ -113,13 +117,17 @@
     <summary lang="da_DK">Crackle leverer populære, prisvindende tv, film og originaler. Uden grænser for, hvor meget du kan se på tværs af alle dine enheder, kan du binge alt, hvad du vil, uanset hvor du vil.</summary>
     <summary lang="en_GB">Crackle delivers popular, award-winning TV, movies and originals. With no limit to how much you can watch across all your devices, you can binge all you want, wherever you want.</summary>
     <summary lang="fi_FI">Crackle tarjoaa suosittuja ja palkittuja sarjoja, elokuvia ja omia tuotantojaan. Ilman katselumäärän rajoituksia voit nauttia sisällöstä kaikilla laitteillasi kaikkialla ja koska tahansa.</summary>
+    <summary lang="it_IT">Crackle offre TV, film e originali famosi e pluripremiati. Senza limiti, in quanto puoi guardarli su tutti i tuoi dispositivi, puoi abbuffarti di tutto ciò che vuoi, dove vuoi.</summary>
     <summary lang="ko_KR">Crackle은 수상 경력에 빛나는 인기 있는 TV, 영화 및 원본을 제공합니다. 모든 장치에서 볼 수 있는 양에 제한 없이 원하는 곳 어디서나 원하는 대로 즐길 수 있습니다.</summary>
     <summary lang="pl_PL">Crackle dostarcza popularne, nagradzane programy telewizyjne, filmy i oryginały. Bez ograniczeń co do tego, ile możesz oglądać na wszystkich swoich urządzeniach; możesz napadowo oglądać do woli, gdziekolwiek chcesz.</summary>
+    <summary lang="ru_RU">Crackle поставляет популярные, отмеченные наградами телепередачи, фильмы и оригинальные шоу. Вы можете смотреть что угодно и когда угодно на всех своих устройствах без каких-либо ограничений.</summary>
     <description lang="da_DK">Crackle er en distributør af videostreaming af originale webserier, Hollywoodfilm og tv-serier. Grundlagt i begyndelsen af 2000&apos;erne som Grouper og omdøbt i 2007, er Crackle ejet af Sony Pictures Entertainment.</description>
     <description lang="en_GB">Crackle is a video streaming distributor of original web shows, Hollywood movies, and TV shows. Founded in the early 2000s as Grouper, and rebranded in 2007, Crackle is owned by Sony Pictures Entertainment.</description>
     <description lang="fi_FI">Crackle on suoratoistopalvelu, joka tuottaa omia verkkosarjojaan ja jakelee Hollywood-elokuvia ja sarjoja. Crackle perustettiin 2000-luvun alussa nimellä Grouper ja nimetiin uudelleen vuonna 2007 ja sen omistaa Sony Pictures Entertainment.</description>
+    <description lang="it_IT">Crackle è un distributore di streaming video di programmi web originali, film di Hollywood e programmi TV. Fondata all&apos;inizio degli anni 2000 come Grouper e rinominata nel 2007, Crackle è di proprietà di Sony Pictures Entertainment.</description>
     <description lang="ko_KR">Crackle은 오리지널 웹 쇼, 헐리우드 영화 및 TV 쇼의 비디오 스트리밍 유통업체입니다. 2000년대 초에 Grouper로 설립되어 2007년에 브랜드 이름을 변경한 Crackle은 Sony Pictures Entertainment의 소유입니다.</description>
     <description lang="pl_PL">Crackle to dystrybutor strumieniowego przesyłania wideo oryginalnych programów internetowych, filmów z Hollywood i programów telewizyjnych. Założona na początku 2000 roku jako Grouper i przemianowana w 2007 roku, Crackle jest własnością Sony Pictures Entertainment.</description>
+    <description lang="ru_RU">Crackle — потоковый дистрибьютор оригинальных веб-шоу, голливудских фильмов и телешоу. Crackle принадлежит Sony Pictures Entertainment. Был основан в начале 2000-х годов как Grouper и переименован в 2007 году.</description>
   </extension>
 </addon>
 
@@ -245,8 +253,10 @@
         </assets>
         <summary lang="da_DK">Lokale nyheder på landsplan</summary>
         <summary lang="en_GB">Local News Nationwide</summary>
+        <summary lang="it_IT">Notizie locali a livello nazionale</summary>
         <description lang="da_DK">NewsON giver øjeblikkelig adgang til direkte- eller on-demand-udsendelser fra over 175 lokale stationer på 114 amerikanske markeder. Få adgang til tidligere nyhedsudsendelser i op til 48 timer, efter de er blevet sendt, og del interessante historier med den integrerede delefunktion på sociale medier direkte fra appen. Søg efter en lokal station med det interaktive kort, eller se stationen tættest på dig på smartphones, tablets eller Roku-streamingafspillere. Gem favoritstationer, og hold dig opdateret med alarmer om seneste nyheder sendt direkte til mobile enheder fra den lokale nyhedskilde. Hold forbindelsen når som helst og hvor som helst uden et kabelabonnement eller login.</description>
         <description lang="en_GB">NewsON provides instant access to live or on-demand broadcasts from over 175 local stations in 114 U.S. markets. Access previous newscasts for up to 48 hours after they air, and share interesting stories with the integrated social media share function directly from the app. Search for a local station with the interactive map or watch the station closest to you on smartphones, tablets, or Roku streaming players. Save favorite stations, and stay updated with breaking news alerts sent directly to mobile devices from the local source of the news. Stay connected anytime, anywhere without a cable subscription or login.</description>
+        <description lang="it_IT">NewsON fornisce accesso istantaneo a trasmissioni in diretta o on-demand da oltre 175 stazioni locali in 114 mercati statunitensi. Accedi ai telegiornali precedenti fino a 48 ore dopo la loro messa in onda e condividi storie interessanti con la funzione di condivisione sui social media integrata direttamente dall&apos;app. Cerca una stazione locale con la mappa interattiva o guarda la stazione più vicina a te su smartphone, tablet o lettori di streaming Roku. Salva le stazioni preferite e rimani aggiornato con gli avvisi delle ultime notizie inviati direttamente ai dispositivi mobili dalla fonte locale delle notizie. Rimani connesso sempre e ovunque senza un abbonamento via cavo o un accesso.</description>
     </extension>
 </addon>
 
@@ -326,9 +336,11 @@
         <summary lang="da_DK">Tv-kanaler dedikeret til dine yndlingsting, lavet af storfilm fra Paramount... &quot;Det geniale ved Pluto TV: dette er ægte internet-tv&quot;.</summary>
         <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
         <summary lang="fi_FI">Suosikkiasioillesi omistettuja TV-kanavia, jotka koostuvat Paramountin menestyselokuvista... &quot;Pluto TV:n neroutta: Tämä on todellinen Internet-televisio&quot;.</summary>
+        <summary lang="it_IT">Canali TV dedicati alle tue cose preferite, ai film di successo della Paramount, ... &quot;Il genio di Pluto TV: questa è la vera televisione su Internet&quot;.</summary>
         <description lang="da_DK">Se gratis tv i Kodi! Stream Pluto TV&apos;s mere end 100 kanaler med nyheder, sport og internettets bedste, helt gratis på din Kodi-enhed.</description>
         <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV&apos;s 100+ channels of news, sports, and the Internet&apos;s best, completely free on your Kodi device.</description>
         <description lang="fi_FI">Katso televisiota ilmaiseksi Kodissa! Suoratoista Pluto TV:n yli 100 uutis-, urheilu- ja Internet-kanavaa täysin veloituksetta Kodi-laitteellasi.</description>
+        <description lang="it_IT">Guarda la TV gratis su Kodi! Riproduci in streaming gli oltre 100 canali di notizie, sport e Internet di Pluto TV, completamente gratuiti sul tuo dispositivo Kodi.</description>
     </extension>
 </addon>
 
@@ -398,6 +410,7 @@
         <description lang="en_GB">TVCatchup is an Internet television service for viewing free-to-air UK channels. It operates as a cable service and retransmits BBC, Channel 4, Channel 5, and ITV, amongst others, only in the UK.</description>
         <description lang="fi_FI">TVCatchup on Internet-televisiopalvelu Iso-Britannian ilmaiskanavien katseluun. Se toimii kaapelipalveluna ja lähettää edelleen mm. BBC, Channel 4, Channel 5 ja ITV -kanavia, joskin vain Isossa-Britanniassa.</description>
         <description lang="fr_FR">TVCatchup est un service de télévision sur Internet permettant de visionner des chaînes britanniques gratuites. Il fonctionne comme un service de câble et retransmet BBC, Channel 4, Channel 5 et ITV, entre autres, uniquement au Royaume-Uni.</description>
+        <description lang="it_IT">TVCatchup è un servizio televisivo Internet per la visualizzazione di canali in chiaro del Regno Unito. Funziona come un servizio via cavo e ritrasmette BBC, Channel 4, Channel 5 e ITV, tra gli altri, solo nel Regno Unito.</description>
         <description lang="ko_KR">TVCatchup은 무료 영국 채널을 시청하기 위한 인터넷 텔레비전 서비스입니다. 그것은 케이블 서비스로 운영되며 영국에서만 BBC, 채널 4, 채널 5 및 ITV를 재전송합니다.</description>
     </extension>
 </addon>
@@ -429,6 +442,7 @@
         <description lang="da_DK">Xumo.TV bringer dig det bedste indhold fra digitale netværk, præsenteret ligesom kanalerne på dit tv og dine mobile enheder, kun med flere fede funktioner.</description>
         <description lang="en_GB">Xumo.TV brings you the best content from digital networks, presented just like the channels on your TV and mobile devices, only with more cool features.</description>
         <description lang="fi_FI">Xumo.TV tuo sinulle parhaan sisällön digitaalisista verkoista televisiokanavien ja mobiililaitteiden tapaan, hienoilla lisäominaisuuksilla.</description>
+        <description lang="it_IT">Xumo.TV ti offre i migliori contenuti delle reti digitali, presentati proprio come i canali della TV e dei dispositivi mobili, solo con funzionalità più interessanti.</description>
         <description lang="ko_KR">Xumo.TV는 디지털 네트워크에서 제공하는 최고의 콘텐츠를 제공하고, TV 및 모바일 장치의 채널처럼 더 멋진 기능을 제공합니다.</description>
     </extension>
 </addon>
@@ -553,6 +567,7 @@
         <summary lang="en_GB">Explore breathtaking images from the Bing homepage... </summary>
         <summary lang="fi_FI">Nauti hengityksen salpaavista kuvista Bing-palvelun etusivulta... </summary>
         <summary lang="fr_FR">Explorez des images à couper le souffle depuis la page d&apos;accueil de Bing.. </summary>
+        <summary lang="it_IT">Esplora immagini mozzafiato dalla home page di Bing... </summary>
         <summary lang="nl_NL">Verken adembenemende beelden van de homepagina van Bing... </summary>
         <summary lang="pt_BR">Explore imagens deslumbrantes da página inicial do Bing... </summary>
         <summary lang="ru_RU">Исследуйте изображения, захватывающие дух, с домашней страницы Bing... </summary>
@@ -562,6 +577,7 @@
         <description lang="en_GB">Explore breathtaking images from the Bing homepage... </description>
         <description lang="fi_FI">Nauti hengityksen salpaavista kuvista Bing-palvelun etusivulta... </description>
         <description lang="fr_FR">Explorez des images à couper le souffle depuis la page d&apos;accueil de Bing... </description>
+        <description lang="it_IT">Esplora immagini mozzafiato dalla home page di Bing... </description>
         <description lang="nl_NL">Verken adembenemende beelden van de homepagina van Bing... </description>
         <description lang="pt_BR">Explore imagens deslumbrantes da página inicial do Bing... </description>
         <description lang="ru_RU">Исследуйте изображения, захватывающие дух, с домашней страницы Bing... </description>
@@ -593,6 +609,7 @@
         <summary lang="es_ES">Salvapantallas Flip clock</summary>
         <summary lang="fi_FI">Kääntökellonäytönsäästäjä.</summary>
         <summary lang="fr_FR">Économiseur d&apos;écran d&apos;une horloge à bascule.</summary>
+        <summary lang="it_IT">Salvaschermo orologio capovolto.</summary>
         <summary lang="ru_RU">Заставка Flip clock.</summary>
         <summary lang="uk_UA">Заставка &quot;Перекидний годинник&quot;.</summary>
         <summary lang="zh_CN">翻转时钟屏幕保护程序。</summary>
@@ -601,6 +618,7 @@
         <description lang="es_ES">Salvapantallas Flip clock.</description>
         <description lang="fi_FI">Kääntökellonäytönsäästäjä.</description>
         <description lang="fr_FR">Économiseur d&apos;écran d&apos;une horloge à bascule.</description>
+        <description lang="it_IT">Salvaschermo orologio capovolto.</description>
         <description lang="ru_RU">Заставка Flip clock.</description>
         <description lang="uk_UA">Заставка з механічним годинником стилю &quot;ретро&quot;, циферблат якого - перекидний.</description>
         <description lang="zh_CN">翻转时钟屏幕保护程序。</description>
@@ -634,6 +652,7 @@
         <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
         <summary lang="fi_FI">Earth View näyttää kauniin satelliittikuvan Google Earthista...</summary>
         <summary lang="fr_FR">Earth View affiche une belle image satellite de Google Earth...</summary>
+        <summary lang="it_IT">Earth View mostra una bellissima immagine satellitare da Google Earth...</summary>
         <summary lang="nl_NL">Earth View toont mooie satellietbeelden van Google Earth...</summary>
         <summary lang="ru_RU">Earth View отображает красивое спутниковое изображение из Google Earth...</summary>
         <summary lang="uk_UA">Заставка &quot;Earth View&quot; показує красивий супутниковий знімок із Google Earth...</summary>
@@ -642,6 +661,7 @@
         <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
         <description lang="fi_FI">Earth View on kokoelma Google Earthin kauneimpia ja silmiinpistävimpiä maisemia.</description>
         <description lang="fr_FR">Earth View est une collection des paysages les plus beaux et les plus saisissants trouvés dans Google Earth.</description>
+        <description lang="it_IT">Earth View è una raccolta dei paesaggi più belli e suggestivi trovati in Google Earth.</description>
         <description lang="nl_NL">Earth View is een verzameling van de meest mooie en indrukwekkende landschappen van Google Earth.</description>
         <description lang="ru_RU">Earth View — это коллекция самых красивых и ярких пейзажей, найденных в Google Earth.</description>
         <description lang="uk_UA">Earth View — це колекція найбільш красивих і яскравих пейзажів, що знайдені в Google Earth.</description>
@@ -675,11 +695,13 @@
         <summary lang="da_DK">Smukke, gratis billeder. Begavet af verdens mest generøse fællesskab af fotografer.</summary>
         <summary lang="en_GB">Beautiful, free photos. Gifted by the world&apos;s most generous community of photographers.</summary>
         <summary lang="fi_FI">Upeita, ilmaisia valokuvia, jotka ovat maailman avokätisimmän valokuvausyhteisön lahjoittamia.</summary>
+        <summary lang="it_IT">Belle foto gratuite. Regalato dalla comunità di fotografi più generosa del mondo.</summary>
         <summary lang="nl_NL">Mooie, vrij verkrijgbare foto&apos;s. Geschonken door de meeste gulle gemeenschap van fotografen.</summary>
         <summary lang="zh_CN">美丽，免费的照片。世界上最慷慨的摄影师社区。</summary>
         <description lang="da_DK">Smukke, gratis billeder. Begavet af verdens mest generøse fællesskab af fotografer.</description>
         <description lang="en_GB">Beautiful, free photos. Gifted by the world&apos;s most generous community of photographers.</description>
         <description lang="fi_FI">Upeita, ilmaisia valokuvia, jotka ovat maailman avokätisimmän valokuvausyhteisön lahjoittamia.</description>
+        <description lang="it_IT">Belle foto gratuite. Regalato dalla comunità di fotografi più generosa del mondo.</description>
         <description lang="nl_NL">Mooie, vrij verkrijgbare foto&apos;s. Geschonken door de meeste gulle gemeenschap van fotografen.</description>
         <description lang="zh_CN">美丽，免费的照片。世界上最慷慨的摄影师社区。</description>
     </extension>
@@ -708,6 +730,7 @@
         <summary lang="es_ES">Crea un protector de pantalla de cualquier fuente de vídeo en Kodi.</summary>
         <summary lang="fi_FI">Luo näytönsäästäjä mistä tahansa Kodin videolähteestä.</summary>
         <summary lang="fr_FR">Créer un économiseur d&apos;écran à partir de n&apos;importe quelle source vidéo Kodi.</summary>
+        <summary lang="it_IT">Crea uno screensaver da qualsiasi sorgente video Kodi.</summary>
         <summary lang="zh_CN">从任意 Kodi 视频源创建屏幕保护程序。</summary>
         <description lang="da_DK">Dynamisk pauseskærm der benytter lokalt indhold, smarte playlister, plugins og UPNP-servere.</description>
         <description lang="en_GB">Dynamic screensaver using Local content, SmartPlaylists, Plugins and UPNP Servers.</description>
@@ -1146,6 +1169,7 @@
         <summary lang="fi_FI">Lisää muiden lisäosien IPTV-kanavat Kodin televisio- ja radiovalikoihin</summary>
         <summary lang="fr_FR">Intégrer les chaines IPTV d&apos;autres extensions dans les menus Radio et TV de Kodi</summary>
         <summary lang="hu_HU">Más kiegészítők által szolgáltatott IPTV csatornák integrációja a Kodi PVR felületbe</summary>
+        <summary lang="it_IT">Integra i canali IPTV da altri add-on nei menu Kodi TV e Radio</summary>
         <summary lang="ko_KR">Kodi TV 및 라디오 메뉴의 다른 애드온에서 IPTV 채널 통합</summary>
         <summary lang="nl_NL">Integreer IPTV kanalen van andere add-ons in de Kodi TV en Radio menu&apos;s</summary>
         <summary lang="pl_PL">Zintegruj kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio</summary>
@@ -1160,6 +1184,7 @@
         <description lang="fi_FI">IPTV Manager lisää muiden lisäosien IPTV-kanavat Kodin televisio- ja radiovalikoihin.</description>
         <description lang="fr_FR">IPTV Manager intègre des chaines IPTV d&apos;autres extensions dans les menus TV et Radio de Kodi.</description>
         <description lang="hu_HU">Ez a kiegészítő lehetővé teszi más kiegészítők számára, hogy saját IPTV csatornákat publikáljanak a Kodi PVR felületébe.</description>
+        <description lang="it_IT">IPTV Manager integra i canali IPTV di altri add-on nei menu Kodi TV e Radio.</description>
         <description lang="ko_KR">IPTV 관리자는 Kodi TV 및 라디오 메뉴에 있는 다른 애드온의 IPTV 채널을 통합합니다.</description>
         <description lang="nl_NL">IPTV Manager integreert IPTV kanalen van andere add-ons in de Kodi TV en Radio menu&apos;s.</description>
         <description lang="pl_PL">IPTV Manager integruje kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio.</description>
@@ -1199,9 +1224,11 @@
         <summary lang="fi_FI">Tutki ja vertaa asennettuja moduuleja ilman virallista Kodi-ohjelmavarastoa.</summary>
         <summary lang="fr_FR">Analyser et comparer les modules installés avec le référentiel Kodi officiel.</summary>
         <summary lang="hu_HU">Felrakott Kodi modulok összehasonlítása a hivatalos programtárral</summary>
+        <summary lang="it_IT">Scansiona e confronta i moduli installati con il repository Kodi ufficiale.</summary>
         <summary lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</summary>
         <summary lang="nl_NL">Scan en vergelijk geïnstalleerde modules met de officiële Kodi repository.</summary>
         <summary lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</summary>
+        <summary lang="ru_RU">Сканировать и Сравнить установленные модули с официальным репозиторием Kodi.</summary>
         <summary lang="sv_SE">Skanna och jämför installerade moduler med officiellt Kodi-förråd.</summary>
         <summary lang="zh_CN">通过官方KODI插件源扫描并比较已安装的模块。</summary>
         <description lang="cs_CZ">Projít a porovnat nainstalované doplňky s oficiálním repozitářem Kodi.</description>
@@ -1212,6 +1239,7 @@
         <description lang="fi_FI">Tutki ja vertaa asennettuja moduuleja ilman virallista Kodi-ohjelmavarastoa.</description>
         <description lang="fr_FR">Analyser et comparer les modules installés avec le référentiel Kodi officiel.</description>
         <description lang="hu_HU">Felrakott Kodi modulok összehasonlítása a hivatalos programtárral.</description>
+        <description lang="it_IT">Scansiona e confronta i moduli installati con il repository Kodi ufficiale.</description>
         <description lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</description>
         <description lang="nl_NL">Scan en vergelijk geïnstalleerde modules met de officiële Kodi repository.</description>
         <description lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</description>
@@ -1224,6 +1252,7 @@
         <disclaimer lang="es_MX">Module Auditor no previene ni protege de Mal-ware. Una búsqueda limpia no garantiza un sistema limpio de malware. Usa el sentido común al instalar repositorios de terceros.</disclaimer>
         <disclaimer lang="fi_FI">Module Auditor ei estä tai suojaa sinua haittaohjelmilta. Puhdas tarkastustulos ei takaa, että järjestelmä on haittaohjelmavapaa. Käytä maalaisjärkeä asentaessasi ulkopuolisia ohjelmavarastoja.</disclaimer>
         <disclaimer lang="fr_FR">Module Auditor ne vous empêche ni ne vous protège contre les logiciels malveillants. Une analyse propre ne garantit pas un système exempt de Malware. Faites preuve de bon sens lors de l&apos;installation de référentiels tiers.</disclaimer>
+        <disclaimer lang="it_IT">Module Auditor non previene né protegge dal malware. Una scansione pulita non garantisce un sistema privo di malware. Usa il buon senso quando installi repository di terze parti.</disclaimer>
         <disclaimer lang="ko_KR">모듈 감시자는 맬웨어로부터 사용자를 방지하거나 보호하지 않습니다. 클린 스캔은 시스템에 맬웨어가 없음을 보장하지 않습니다. 타사 저장소를 설치할 때 고려하십시오.</disclaimer>
         <disclaimer lang="pl_PL">Moduł Auditor nie zapobiega ani nie chroni przed złośliwym oprogramowaniem. Czyste skanowanie nie gwarantuje, że system jest wolny od złośliwego oprogramowania. Podczas instalowania repozytoriów zewnętrznych należy kierować się zdrowym rozsądkiem.</disclaimer>
         <disclaimer lang="zh_CN">Module Auditor不会阻止或保护您免受恶意软件的攻击。干净扫描并不能保证系统没有恶意软件。安装第三方插件库时请通过常识判断。</disclaimer>
@@ -1253,6 +1282,7 @@
         <summary lang="es_MX">Activa subtítulos cerrados y subtítulos &quot;OnMute&quot;.</summary>
         <summary lang="fi_FI">Käytä &quot;OnMute&quot; -toiminnon kanssa kuvaavia (CC) ja tavallisia tekstityksiä.</summary>
         <summary lang="fr_FR">Activer le sous-titrage « OnMute ».</summary>
+        <summary lang="it_IT">Abilita didascalie e sottotitoli &quot;OnMute&quot;.</summary>
         <summary lang="ko_KR">폐쇄 자막 및 &quot;OnMute&quot; 자막을 활성화합니다.</summary>
         <summary lang="pl_PL">Włącz napisy kodowane i napisy „OnMute”.</summary>
         <summary lang="zh_CN">启用闭路字幕和字幕“OnMute”。</summary>
@@ -1263,6 +1293,7 @@
         <description lang="es_MX">Permitir que &quot;OnMute&quot; cambie entre subtítulos cerrados y subtítulos mientras Kodi está silenciado.</description>
         <description lang="fi_FI">Salli &quot;OnMute&quot; -toiminnon kytkeä tavalliset ja kuvaavat tekstitykset käyttöön, kun Kodi mykistetään.</description>
         <description lang="fr_FR">Permettre à « OnMute »d&apos;activer le sous-titrage quand Kodi est mis en sourdine.</description>
+        <description lang="it_IT">Lascia che &quot;OnMute&quot; attivi didascalie e sottotitoli mentre Kodi è disattivato.</description>
         <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &quot;OnMute&quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
         <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>
         <description lang="zh_CN">让“OnMute”在 Kodi 静音时切换闭路字幕和字幕。</description>

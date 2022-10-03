@@ -1,4 +1,4 @@
-#   Copyright (C) 2021 Lunatixz
+#   Copyright (C) 2022 Lunatixz
 #
 #
 # This file is part of NewsOn.
@@ -31,10 +31,18 @@ except ImportError:
     from io import StringIO ## for Python 3
     
 try:
-    if xbmc.getCondVisibility('System.Platform.Android'): raise Exception('Using Android threading')
-    from multiprocessing.pool import ThreadPool
+    if (xbmc.getCondVisibility('System.Platform.Android') or xbmc.getCondVisibility('System.Platform.Windows')):
+        from multiprocessing.dummy import Pool as ThreadPool
+    else:
+        from multiprocessing.pool  import ThreadPool
+        
+    from multiprocessing  import cpu_count
+    from _multiprocessing import SemLock, sem_unlink #hack to raise two python issues. _multiprocessing import error, sem_unlink missing from native python (android).
+
     SUPPORTS_POOL = True
-except Exception:
+    CPU_COUNT     = cpu_count()
+except Exception as e:
+    CPU_COUNT     = 2
     SUPPORTS_POOL = False
 
 # Plugin Info
@@ -125,7 +133,7 @@ def encodeString(text):
 
 def decodeString(text):
     return urllib.parse.unquote_plus(text)
- 
+
 class NewsOn(object):
     def __init__(self, sysARG=sys.argv):
         log('__init__, sysARG = %s'%(sysARG))

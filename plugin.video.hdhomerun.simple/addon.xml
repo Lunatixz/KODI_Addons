@@ -18,7 +18,7 @@
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <license>GPL-3.0-or-later</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.hdhomerun.simple</source>
         <website>https://www.hdhomerun.com</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=327117</forum>

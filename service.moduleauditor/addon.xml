@@ -29,6 +29,7 @@
         <summary lang="es_MX">Escanea y compara módulos instalados con los del repositorio oficial de Kodi.</summary>
         <summary lang="fi_FI">Tutki ja vertaa asennettuja moduuleja ilman virallista Kodi-ohjelmavarastoa.</summary>
         <summary lang="fr_FR">Analyser et comparer les modules installés avec le référentiel Kodi officiel.</summary>
+        <summary lang="hr_HR">Pretraži i usporedi instalirane module w/službeni Kodi repozitorij.</summary>
         <summary lang="hu_HU">Felrakott Kodi modulok összehasonlítása a hivatalos programtárral</summary>
         <summary lang="it_IT">Scansiona e confronta i moduli installati con il repository Kodi ufficiale.</summary>
         <summary lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</summary>
@@ -44,6 +45,7 @@
         <description lang="es_MX">Escanea y compara módulos instalados con los del repositorio oficial de Kodi.</description>
         <description lang="fi_FI">Tutki ja vertaa asennettuja moduuleja ilman virallista Kodi-ohjelmavarastoa.</description>
         <description lang="fr_FR">Analyser et comparer les modules installés avec le référentiel Kodi officiel.</description>
+        <description lang="hr_HR">Pretraži i usporedi instalirane module w/službeni Kodi repozitorij.</description>
         <description lang="hu_HU">Felrakott Kodi modulok összehasonlítása a hivatalos programtárral.</description>
         <description lang="it_IT">Scansiona e confronta i moduli installati con il repository Kodi ufficiale.</description>
         <description lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</description>
@@ -58,6 +60,7 @@
         <disclaimer lang="es_MX">Module Auditor no previene ni protege de Mal-ware. Una búsqueda limpia no garantiza un sistema limpio de malware. Usa el sentido común al instalar repositorios de terceros.</disclaimer>
         <disclaimer lang="fi_FI">Module Auditor ei estä tai suojaa sinua haittaohjelmilta. Puhdas tarkastustulos ei takaa, että järjestelmä on haittaohjelmavapaa. Käytä maalaisjärkeä asentaessasi ulkopuolisia ohjelmavarastoja.</disclaimer>
         <disclaimer lang="fr_FR">Module Auditor ne vous empêche ni ne vous protège contre les logiciels malveillants. Une analyse propre ne garantit pas un système exempt de Malware. Faites preuve de bon sens lors de l&apos;installation de référentiels tiers.</disclaimer>
+        <disclaimer lang="hr_HR">Module Auditor ne štiti vas od malvera. Čista pretraga ne jamči vam da je vaš sustav slobodan od malvera. Koristite zdrav razum kada instalirate repozitorije treće strane.</disclaimer>
         <disclaimer lang="it_IT">Module Auditor non previene né protegge dal malware. Una scansione pulita non garantisce un sistema privo di malware. Usa il buon senso quando installi repository di terze parti.</disclaimer>
         <disclaimer lang="ko_KR">모듈 감시자는 맬웨어로부터 사용자를 방지하거나 보호하지 않습니다. 클린 스캔은 시스템에 맬웨어가 없음을 보장하지 않습니다. 타사 저장소를 설치할 때 고려하십시오.</disclaimer>
         <disclaimer lang="pl_PL">Moduł Auditor nie zapobiega ani nie chroni przed złośliwym oprogramowaniem. Czyste skanowanie nie gwarantuje, że system jest wolny od złośliwego oprogramowania. Podczas instalowania repozytoriów zewnętrznych należy kierować się zdrowym rozsądkiem.</disclaimer>

@@ -290,14 +290,17 @@
         <summary lang="da_DK">Gennemse PlayOn fra Kodi.</summary>
         <summary lang="en_GB">Browse PlayOn from Kodi.</summary>
         <summary lang="es_MX">Explora PlayOn desde Kodi.</summary>
+        <summary lang="it_IT">Sfoglia PlayOn da Kodi.</summary>
         <summary lang="ru_RU">Просматривайте PlayOn из Kodi.</summary>
         <description lang="da_DK">PlayOn er et streaming mediemærke og softwaresuite, der gør det muligt for brugere at se og optage videoer fra adskillige online indholdsudbydere.</description>
         <description lang="en_GB">PlayOn is a streaming media brand and software suite that enables users to view and record videos from numerous online content providers.</description>
         <description lang="es_MX">PlayOn es una compañía de transmisión de medios y una suite de software que permite a sus usuarios ver y grabar videos de numerosos proveedores de contenido en línea.</description>
+        <description lang="it_IT">PlayOn è un marchio di streaming multimediale e una suite di software che consente agli utenti di visualizzare e registrare video da numerosi fornitori di contenuti online.</description>
         <description lang="ru_RU">PlayOn - это бренд потокового мультимедиа и программный пакет, который позволяет пользователям просматривать и записывать видео от многочисленных поставщиков онлайн контента.</description>
         <disclaimer lang="da_DK">Kræver Playon server software</disclaimer>
         <disclaimer lang="en_GB">Requires Playon Server Software</disclaimer>
         <disclaimer lang="es_MX">Requiere el software de servidor Playon</disclaimer>
+        <disclaimer lang="it_IT">Richiede il software Playon Server</disclaimer>
         <disclaimer lang="ru_RU">Требуется серверное ПО Playon</disclaimer>
     </extension>
 </addon>
@@ -334,11 +337,13 @@
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
         <summary lang="da_DK">Tv-kanaler dedikeret til dine yndlingsting, lavet af storfilm fra Paramount... &quot;Det geniale ved Pluto TV: dette er ægte internet-tv&quot;.</summary>
+        <summary lang="de_DE">TV Kanäle gewidmet für deine Vorlieben, gemacht von Blockbuster Movies von Paramount, ... &quot;Das Genie von Pluto-TV: Das ist das echte Internet Fernsehen&quot;.</summary>
         <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
         <summary lang="fi_FI">Suosikkiasioillesi omistettuja TV-kanavia, jotka koostuvat Paramountin menestyselokuvista... &quot;Pluto TV:n neroutta: Tämä on todellinen Internet-televisio&quot;.</summary>
         <summary lang="it_IT">Canali TV dedicati alle tue cose preferite, ai film di successo della Paramount, ... &quot;Il genio di Pluto TV: questa è la vera televisione su Internet&quot;.</summary>
         <summary lang="sv_SE">TV-kanaler ägnade åt dina favoritsaker, gjorda av storfilmer från Paramount, ... &quot;Genialiteten med Pluto TV: Det här är riktig internet-TV&quot;.</summary>
         <description lang="da_DK">Se gratis tv i Kodi! Stream Pluto TV&apos;s mere end 100 kanaler med nyheder, sport og internettets bedste, helt gratis på din Kodi-enhed.</description>
+        <description lang="de_DE">Schaue freie TV Kanäle mit Kodi! Streame mehr als 100 Kanäle von Pluto TV mit Nachrichten, Sport, und dem besten aus dem Internet, komplett kostenlos auf deinem Kodi Gerät.</description>
         <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV&apos;s 100+ channels of news, sports, and the Internet&apos;s best, completely free on your Kodi device.</description>
         <description lang="fi_FI">Katso televisiota ilmaiseksi Kodissa! Suoratoista Pluto TV:n yli 100 uutis-, urheilu- ja Internet-kanavaa täysin veloituksetta Kodi-laitteellasi.</description>
         <description lang="it_IT">Guarda la TV gratis su Kodi! Riproduci in streaming gli oltre 100 canali di notizie, sport e Internet di Pluto TV, completamente gratuiti sul tuo dispositivo Kodi.</description>
@@ -378,6 +383,7 @@
         </assets>
         <description lang="da_DK">Transponder.tv tager tingene til det næste niveau ved at give hver bruger sit eget fjernsyn til kontrol og visning, uanset hvor de er. Med størstedelen af UK Free to Air-kanaler tilgængelige og en optagefunktion, der snart lanceres, vil du kunne se dit eget tv, uanset hvor du er, og når du vil. Hvem vil ikke have gratis tv?</description>
         <description lang="en_GB">Transponder.tv takes things to the next level in providing each user with their own remote tv set for controlling and viewing wherever they are. With the majority of UK Free to Air channels available and a soon to be launched recording feature, you will be able to watch your own tv wherever you are and whenever you want and who doesn&apos;t want free TV?</description>
+        <description lang="it_IT">Transponder.tv porta le cose al livello successivo fornendo a ciascun utente il proprio televisore remoto per il controllo e la visualizzazione ovunque si trovi. Con la maggior parte dei canali in chiaro del Regno Unito disponibili e una funzione di registrazione che verrà lanciata presto, sarai in grado di guardare la tua TV ovunque tu sia e quando vuoi e chi non vuole la TV gratuita?</description>
     </extension>
 </addon>
 
@@ -566,6 +572,7 @@
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
         <summary lang="da_DK">Udforsk betagende billeder fra Bing-hjemmesiden... </summary>
+        <summary lang="de_DE">Atemberaubende Bilder von der Bing-Homepage entdecken ... </summary>
         <summary lang="en_GB">Explore breathtaking images from the Bing homepage... </summary>
         <summary lang="fi_FI">Nauti hengityksen salpaavista kuvista Bing-palvelun etusivulta... </summary>
         <summary lang="fr_FR">Explorez des images à couper le souffle depuis la page d&apos;accueil de Bing.. </summary>
@@ -576,6 +583,7 @@
         <summary lang="uk_UA">Досліджуйте захоплювальні зображення з домашньої сторінки Bing... </summary>
         <summary lang="zh_CN">浏览必应主页上令人叹为观止的图片... </summary>
         <description lang="da_DK">Udforsk betagende billeder fra Bing-hjemmesiden... </description>
+        <description lang="de_DE">Atemberaubende Bilder von der Bing-Homepage erforschen ... </description>
         <description lang="en_GB">Explore breathtaking images from the Bing homepage... </description>
         <description lang="fi_FI">Nauti hengityksen salpaavista kuvista Bing-palvelun etusivulta... </description>
         <description lang="fr_FR">Explorez des images à couper le souffle depuis la page d&apos;accueil de Bing... </description>
@@ -654,6 +662,7 @@
         <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
         <summary lang="fi_FI">Earth View näyttää kauniin satelliittikuvan Google Earthista...</summary>
         <summary lang="fr_FR">Earth View affiche une belle image satellite de Google Earth...</summary>
+        <summary lang="hr_HR">Pogled zemlje prikazuje prekrasne Satelitske slike s Google Eartha...</summary>
         <summary lang="it_IT">Earth View mostra una bellissima immagine satellitare da Google Earth...</summary>
         <summary lang="nl_NL">Earth View toont mooie satellietbeelden van Google Earth...</summary>
         <summary lang="ru_RU">Earth View отображает красивое спутниковое изображение из Google Earth...</summary>
@@ -663,6 +672,7 @@
         <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
         <description lang="fi_FI">Earth View on kokoelma Google Earthin kauneimpia ja silmiinpistävimpiä maisemia.</description>
         <description lang="fr_FR">Earth View est une collection des paysages les plus beaux et les plus saisissants trouvés dans Google Earth.</description>
+        <description lang="hr_HR">Pogled zemlje je kolekcija prekrasnih pejzaža pronađenih na Google Earthu.</description>
         <description lang="it_IT">Earth View è una raccolta dei paesaggi più belli e suggestivi trovati in Google Earth.</description>
         <description lang="nl_NL">Earth View is een verzameling van de meest mooie en indrukwekkende landschappen van Google Earth.</description>
         <description lang="ru_RU">Earth View — это коллекция самых красивых и ярких пейзажей, найденных в Google Earth.</description>
@@ -697,12 +707,14 @@
         <summary lang="da_DK">Smukke, gratis billeder. Begavet af verdens mest generøse fællesskab af fotografer.</summary>
         <summary lang="en_GB">Beautiful, free photos. Gifted by the world&apos;s most generous community of photographers.</summary>
         <summary lang="fi_FI">Upeita, ilmaisia valokuvia, jotka ovat maailman avokätisimmän valokuvausyhteisön lahjoittamia.</summary>
+        <summary lang="hr_HR">Prekrasne, besplatne fotografije. Darovane od strane najdarežljivije zajednice i fotografa na svijetu.</summary>
         <summary lang="it_IT">Belle foto gratuite. Regalato dalla comunità di fotografi più generosa del mondo.</summary>
         <summary lang="nl_NL">Mooie, vrij verkrijgbare foto&apos;s. Geschonken door de meeste gulle gemeenschap van fotografen.</summary>
         <summary lang="zh_CN">美丽，免费的照片。世界上最慷慨的摄影师社区。</summary>
         <description lang="da_DK">Smukke, gratis billeder. Begavet af verdens mest generøse fællesskab af fotografer.</description>
         <description lang="en_GB">Beautiful, free photos. Gifted by the world&apos;s most generous community of photographers.</description>
         <description lang="fi_FI">Upeita, ilmaisia valokuvia, jotka ovat maailman avokätisimmän valokuvausyhteisön lahjoittamia.</description>
+        <description lang="hr_HR">Prekrasne, besplatne fotografije. Darovane od strane najdarežljivije zajednice i fotografa na svijetu.</description>
         <description lang="it_IT">Belle foto gratuite. Regalato dalla comunità di fotografi più generosa del mondo.</description>
         <description lang="nl_NL">Mooie, vrij verkrijgbare foto&apos;s. Geschonken door de meeste gulle gemeenschap van fotografen.</description>
         <description lang="zh_CN">美丽，免费的照片。世界上最慷慨的摄影师社区。</description>
@@ -732,6 +744,7 @@
         <summary lang="es_ES">Crea un protector de pantalla de cualquier fuente de vídeo en Kodi.</summary>
         <summary lang="fi_FI">Luo näytönsäästäjä mistä tahansa Kodin videolähteestä.</summary>
         <summary lang="fr_FR">Créer un économiseur d&apos;écran à partir de n&apos;importe quelle source vidéo Kodi.</summary>
+        <summary lang="hr_HR">Stvori čuvara zaslona iz Kodi video izvora.</summary>
         <summary lang="it_IT">Crea uno screensaver da qualsiasi sorgente video Kodi.</summary>
         <summary lang="zh_CN">从任意 Kodi 视频源创建屏幕保护程序。</summary>
         <description lang="da_DK">Dynamisk pauseskærm der benytter lokalt indhold, smarte playlister, plugins og UPNP-servere.</description>
@@ -739,17 +752,19 @@
         <description lang="es_ES">Protector de pantalla dinámico que utiliza contenido local, listas de reproducción inteligentes, complementos y servidores UPNP.</description>
         <description lang="fi_FI">Dynaaminen näytönsäästäjä, joka hyödyntää paikallista sisältöä, älytoistolistoja, lisäosia sekä UPnP-palvelimia.</description>
         <description lang="fr_FR">Économiseur d&apos;écran dynamique utilisant le contenu local, les SmartPlaylists, les plugins et les serveurs UPNP.</description>
+        <description lang="hr_HR">Promjenjivi čuvar zaslona koji koristi lokalni sadržaj, pametne popise izvođrnja, dodatke i UPNP poslužitelje.</description>
         <description lang="zh_CN">使用本地内容、智能播放列表、插件和 UPNP 服务器的动态屏幕保护程序。</description>
         <disclaimer lang="da_DK">Streamingkilder anbefales ikke til forbrugsbetalt internet.</disclaimer>
         <disclaimer lang="en_GB">Streaming sources not recommend for metered Internet.</disclaimer>
         <disclaimer lang="es_ES">Se recomienda no usar recursos en Streaming para conexiones a Internet de uso medido.</disclaimer>
         <disclaimer lang="fi_FI">Suoratoistolähteitä ei suositella tiedonsiirtomäärän mukaan veloitettavilla yhteyksillä.</disclaimer>
         <disclaimer lang="fr_FR">Les sources de streaming ne sont pas recommandées pour Internet contrôlé.</disclaimer>
+        <disclaimer lang="hr_HR">Izvori strujanja nisu preporučeni s mrežama ograničenim podacima.</disclaimer>
         <disclaimer lang="zh_CN">流媒体源不建议通过互联网。</disclaimer>
     </extension>
 </addon>
 
-<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.3.4" provider-name="Team Kodi">
+<addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.3.5" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -781,6 +796,7 @@
         <summary lang="et_EE">Laadi alla ja paigalda Kodi pakette.</summary>
         <summary lang="fi_FI">Lataa ja asenna Kodi-paketteja.</summary>
         <summary lang="fr_FR">Télécharger et installer les packages Kodi.</summary>
+        <summary lang="hr_HR">Preuzmi i instaliraj Kodi pakete.</summary>
         <summary lang="it_IT">Scarica e installa i pacchetti Kodi.</summary>
         <summary lang="ko_KR">Kodi 패키지를 다운로드하고 설치합니다.</summary>
         <summary lang="pl_PL">Pobieraj i instaluj pakiety Kodi.</summary>
@@ -792,6 +808,7 @@
         <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="et_EE">Laadi alla ja paigalda Kodi android pakette; valikus on Nightlies, Releases, Snapshots ja Test-builds.</description>
         <description lang="fi_FI">Lataa ja asenna Kodin Android-paketteja kehityshaaroista Release, Nightly, Snapshot ja Test.</description>
+        <description lang="hr_HR">Preuzmi i instaliraj Kodi android pakete; odaberite od  Nightlies, Releases, Snapshots i Testnih-izgradnji.</description>
         <description lang="it_IT">Scarica e installa i pacchetti Android Kodi; seleziona da Nightlies, Release, Snapshot e Test build.</description>
         <description lang="ko_KR">Kodi 안드로이드 패키지를 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
         <description lang="pl_PL">Pobieraj i instaluj pliki wykonywalne Kodi: kompilacje nocne, testowe, wydania finalne, migawki.</description>
@@ -800,7 +817,7 @@
     </extension>
 </addon>
 
-<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.3.4" provider-name="Team Kodi">
+<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.3.5" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -832,6 +849,7 @@
         <summary lang="et_EE">Laadi alla ja paigalda Kodi pakette.</summary>
         <summary lang="fi_FI">Lataa ja asenna Kodi-paketteja.</summary>
         <summary lang="fr_FR">Télécharger et installer les packages Kodi.</summary>
+        <summary lang="hr_HR">Preuzmi i instaliraj Kodi pakete.</summary>
         <summary lang="it_IT">Scarica e installa i pacchetti Kodi.</summary>
         <summary lang="ko_KR">Kodi 패키지를 다운로드하고 설치합니다.</summary>
         <summary lang="pl_PL">Pobieraj i instaluj pakiety Kodi.</summary>
@@ -843,6 +861,7 @@
         <description lang="es_MX">Descarga e instala ejecutables de Kodi para Windows; selecciona entre  Nightlies, Releases, Snapshots y Test-builds.</description>
         <description lang="fi_FI">Lataa ja asenna Kodin Windows-asennuksia kehityshaaroista Release, Nightly, Snapshot ja Test.</description>
         <description lang="fr_FR">Télécharger et installer les exécutables dans la fenêtre Kodi ; sélectionner parmi Nightlies, Releases, Snapshots et Test-builds.</description>
+        <description lang="hr_HR">Preuzmi i instaliraj Kodi window izvršne datoteke; odaberi iz  Nightlies, Releases, Snapshots i Testnih-izgradnja.</description>
         <description lang="it_IT">Scarica e installa gli eseguibili Windows di Kodi; seleziona da Nightlies, Release, Snapshot e Test build.</description>
         <description lang="ko_KR">Kodi 윈도 실행 파일을 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
         <description lang="pl_PL">Pobieraj i instaluj pliki wykonywalne Kodi: kompilacje nocne, testowe, wydania finalne, migawki.</description>
@@ -855,6 +874,7 @@
         <disclaimer lang="es_MX">¡No se soporta UWP! No se pretende utilizara para la instalación de Kodi desde la tienda de Windows.</disclaimer>
         <disclaimer lang="fi_FI">UWP-versiota ei tueta! Lisäosaa ei ole tarkoitettu Microsoft Storesta asennetuille Kodi-asennuksille.</disclaimer>
         <disclaimer lang="fr_FR">UWP non pris en charge ! Non destiné à l&apos;installation de Kodi via le Windows Store.</disclaimer>
+        <disclaimer lang="hr_HR">UWP nije podržan! Nije namijenjeno za Kodi instalaciju putem Windows trgovine.</disclaimer>
         <disclaimer lang="it_IT">UWP non supportato! Non destinato all&apos;installazione di Kodi tramite Windows Store.</disclaimer>
         <disclaimer lang="ko_KR">UWP가 지원되지 않습니다! 윈도 스토어를 통한 Kodi 설치용이 아닙니다.</disclaimer>
         <disclaimer lang="pl_PL">Platforma UWP nie jest obsługiwana! Nie jest przeznaczony do instalacji Kodi za pośrednictwem Windows Store.</disclaimer>
@@ -1078,6 +1098,7 @@
         <summary lang="en_GB">Test your devices python performance.</summary>
         <summary lang="es_MX">Prueba el rendimiento de Python de tus dispositivos.</summary>
         <summary lang="fi_FI">Testaa laitteesi Python-suorituskyky.</summary>
+        <summary lang="hr_HR">Testirajte python performanse vašeg uređaja.</summary>
         <summary lang="it_IT">Metti alla prova le prestazioni di Python dei tuoi dispositivi.</summary>
         <summary lang="ko_KR">장치 파이썬 성능을 테스트하십시오.</summary>
         <summary lang="pl_PL">Przetestuj wydajność swoich urządzeń w Pythonie.</summary>
@@ -1087,6 +1108,7 @@
         <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
         <description lang="es_MX">¿Qué tan rápido ejecuta código Python tu dispositivo? Pystone evalúa el rendimiento de CPU ejecutándose en un entorno Python.</description>
         <description lang="fi_FI">Miten nopeasti laitteesi suorittaa Python-koodin? Pystone arvioi prosessorin tehokkuutta Python ympäristössä.</description>
+        <description lang="hr_HR">Koliko brzo vaš uređaj pokreće python kôd? Pystone evaluira CPU performanse pokrenute u python okruženju.</description>
         <description lang="it_IT">Quanto velocemente il tuo dispositivo esegue il codice Python? Pystone valuta le prestazioni della CPU in un ambiente Python.</description>
         <description lang="ko_KR">당신의 기기는 얼마나 빨리 파이썬 코드를 실행할까요? Pystone은 Python 환경에서 실행되는 CPU 성능을 평가합니다.</description>
         <description lang="pl_PL">Jak szybko Twoje urządzenie uruchamia kod Pythona? Pystone ocenia wydajność procesora działającego w środowisku Pythona.</description>
@@ -1120,6 +1142,7 @@
         <description lang="da_DK">Overvåg dine foretrukne twitter-konti, modtag &quot;realtime&quot; tweets.</description>
         <description lang="en_GB">Monitor your favorite twitter accounts, receive &quot;realtime&quot; tweets.</description>
         <description lang="fi_FI">Seuraa suosimiasi Twitter-tilejä ja vastaanota twiittejä &quot;reaaliaikaisesti&quot;.</description>
+        <description lang="hr_HR">Nadgledjate vaše omiljene twitter račune, primajte twitove u stvarnom vremenu.</description>
         <description lang="it_IT">Monitora i tuoi account Twitter preferiti, ricevi tweet &quot;in tempo reale&quot;.</description>
         <description lang="ko_KR">좋아하는 트위터 계정을 모니터링하고 &quot;실시간&quot; 트윗을 받으세요.</description>
         <description lang="zh_CN">监控您喜爱的推特帐户，接收“实时”推文。</description>
@@ -1170,6 +1193,7 @@
         <summary lang="es_MX">Integra canales IPTV de otros complementos en los menús de TV y Radio de Kodi</summary>
         <summary lang="fi_FI">Lisää muiden lisäosien IPTV-kanavat Kodin televisio- ja radiovalikoihin</summary>
         <summary lang="fr_FR">Intégrer les chaines IPTV d&apos;autres extensions dans les menus Radio et TV de Kodi</summary>
+        <summary lang="hr_HR">Integriraj IPTV programe s drugih dodataka u Kodi TV i Radio izbornicima</summary>
         <summary lang="hu_HU">Más kiegészítők által szolgáltatott IPTV csatornák integrációja a Kodi PVR felületbe</summary>
         <summary lang="it_IT">Integra i canali IPTV da altri add-on nei menu Kodi TV e Radio</summary>
         <summary lang="ko_KR">Kodi TV 및 라디오 메뉴의 다른 애드온에서 IPTV 채널 통합</summary>
@@ -1185,6 +1209,7 @@
         <description lang="es_MX">IPTV Manager integra canales IPTV de otros complementos en los menús de TV y Radio de Kodi.</description>
         <description lang="fi_FI">IPTV Manager lisää muiden lisäosien IPTV-kanavat Kodin televisio- ja radiovalikoihin.</description>
         <description lang="fr_FR">IPTV Manager intègre des chaines IPTV d&apos;autres extensions dans les menus TV et Radio de Kodi.</description>
+        <description lang="hr_HR">IPTV upravitelj integrira IPTV programe s drugih dadataka u Kodi TV i Radio izbornike.</description>
         <description lang="hu_HU">Ez a kiegészítő lehetővé teszi más kiegészítők számára, hogy saját IPTV csatornákat publikáljanak a Kodi PVR felületébe.</description>
         <description lang="it_IT">IPTV Manager integra i canali IPTV di altri add-on nei menu Kodi TV e Radio.</description>
         <description lang="ko_KR">IPTV 관리자는 Kodi TV 및 라디오 메뉴에 있는 다른 애드온의 IPTV 채널을 통합합니다.</description>
@@ -1225,6 +1250,7 @@
         <summary lang="es_MX">Escanea y compara módulos instalados con los del repositorio oficial de Kodi.</summary>
         <summary lang="fi_FI">Tutki ja vertaa asennettuja moduuleja ilman virallista Kodi-ohjelmavarastoa.</summary>
         <summary lang="fr_FR">Analyser et comparer les modules installés avec le référentiel Kodi officiel.</summary>
+        <summary lang="hr_HR">Pretraži i usporedi instalirane module w/službeni Kodi repozitorij.</summary>
         <summary lang="hu_HU">Felrakott Kodi modulok összehasonlítása a hivatalos programtárral</summary>
         <summary lang="it_IT">Scansiona e confronta i moduli installati con il repository Kodi ufficiale.</summary>
         <summary lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</summary>
@@ -1240,6 +1266,7 @@
         <description lang="es_MX">Escanea y compara módulos instalados con los del repositorio oficial de Kodi.</description>
         <description lang="fi_FI">Tutki ja vertaa asennettuja moduuleja ilman virallista Kodi-ohjelmavarastoa.</description>
         <description lang="fr_FR">Analyser et comparer les modules installés avec le référentiel Kodi officiel.</description>
+        <description lang="hr_HR">Pretraži i usporedi instalirane module w/službeni Kodi repozitorij.</description>
         <description lang="hu_HU">Felrakott Kodi modulok összehasonlítása a hivatalos programtárral.</description>
         <description lang="it_IT">Scansiona e confronta i moduli installati con il repository Kodi ufficiale.</description>
         <description lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</description>
@@ -1254,6 +1281,7 @@
         <disclaimer lang="es_MX">Module Auditor no previene ni protege de Mal-ware. Una búsqueda limpia no garantiza un sistema limpio de malware. Usa el sentido común al instalar repositorios de terceros.</disclaimer>
         <disclaimer lang="fi_FI">Module Auditor ei estä tai suojaa sinua haittaohjelmilta. Puhdas tarkastustulos ei takaa, että järjestelmä on haittaohjelmavapaa. Käytä maalaisjärkeä asentaessasi ulkopuolisia ohjelmavarastoja.</disclaimer>
         <disclaimer lang="fr_FR">Module Auditor ne vous empêche ni ne vous protège contre les logiciels malveillants. Une analyse propre ne garantit pas un système exempt de Malware. Faites preuve de bon sens lors de l&apos;installation de référentiels tiers.</disclaimer>
+        <disclaimer lang="hr_HR">Module Auditor ne štiti vas od malvera. Čista pretraga ne jamči vam da je vaš sustav slobodan od malvera. Koristite zdrav razum kada instalirate repozitorije treće strane.</disclaimer>
         <disclaimer lang="it_IT">Module Auditor non previene né protegge dal malware. Una scansione pulita non garantisce un sistema privo di malware. Usa il buon senso quando installi repository di terze parti.</disclaimer>
         <disclaimer lang="ko_KR">모듈 감시자는 맬웨어로부터 사용자를 방지하거나 보호하지 않습니다. 클린 스캔은 시스템에 맬웨어가 없음을 보장하지 않습니다. 타사 저장소를 설치할 때 고려하십시오.</disclaimer>
         <disclaimer lang="pl_PL">Moduł Auditor nie zapobiega ani nie chroni przed złośliwym oprogramowaniem. Czyste skanowanie nie gwarantuje, że system jest wolny od złośliwego oprogramowania. Podczas instalowania repozytoriów zewnętrznych należy kierować się zdrowym rozsądkiem.</disclaimer>
@@ -1284,6 +1312,7 @@
         <summary lang="es_MX">Activa subtítulos cerrados y subtítulos &quot;OnMute&quot;.</summary>
         <summary lang="fi_FI">Käytä &quot;OnMute&quot; -toiminnon kanssa kuvaavia (CC) ja tavallisia tekstityksiä.</summary>
         <summary lang="fr_FR">Activer le sous-titrage « OnMute ».</summary>
+        <summary lang="hr_HR">Omogući closed captioning i podnaslove &quot;Pri utišanju&quot;.</summary>
         <summary lang="it_IT">Abilita didascalie e sottotitoli &quot;OnMute&quot;.</summary>
         <summary lang="ko_KR">폐쇄 자막 및 &quot;OnMute&quot; 자막을 활성화합니다.</summary>
         <summary lang="pl_PL">Włącz napisy kodowane i napisy „OnMute”.</summary>
@@ -1295,6 +1324,7 @@
         <description lang="es_MX">Permitir que &quot;OnMute&quot; cambie entre subtítulos cerrados y subtítulos mientras Kodi está silenciado.</description>
         <description lang="fi_FI">Salli &quot;OnMute&quot; -toiminnon kytkeä tavalliset ja kuvaavat tekstitykset käyttöön, kun Kodi mykistetään.</description>
         <description lang="fr_FR">Permettre à « OnMute »d&apos;activer le sous-titrage quand Kodi est mis en sourdine.</description>
+        <description lang="hr_HR">Dopusti &quot;Pri utišanju&quot; uklj/usklj closed captioning i podnaslova dok je Kodi utišan.</description>
         <description lang="it_IT">Lascia che &quot;OnMute&quot; attivi didascalie e sottotitoli mentre Kodi è disattivato.</description>
         <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &quot;OnMute&quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
         <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>

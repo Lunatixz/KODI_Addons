@@ -19,7 +19,9 @@
             <screenshot>resources/images/screenshot01.png</screenshot>
         </assets>
         <summary lang="da_DK">Test din enheds python-ydeevne.</summary>
+        <summary lang="de_DE">Die Pythonleistung von Geräte testen.</summary>
         <summary lang="en_GB">Test your devices python performance.</summary>
+        <summary lang="es_ES">Prueba el rendimiento python de tus dispositivos.</summary>
         <summary lang="es_MX">Prueba el rendimiento de Python de tus dispositivos.</summary>
         <summary lang="fi_FI">Testaa laitteesi Python-suorituskyky.</summary>
         <summary lang="hr_HR">Testirajte python performanse vašeg uređaja.</summary>
@@ -29,7 +31,9 @@
         <summary lang="ru_RU">Тестирование ваших устройств на производительность Python.</summary>
         <summary lang="zh_CN">测试设备的 python 性能。</summary>
         <description lang="da_DK">Hvor hurtigt kører din enhed pythonkode? Pystone evaluerer CPU-ydelse, der kører i et pythonmiljø.</description>
+        <description lang="de_DE">Wie schnell führt das Gerät den Pythoncode aus? Pystone bewertet die CPU-Leistung in einer Pythonumgebung.</description>
         <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
+        <description lang="es_ES">¿A qué velocidad ejecuta código python tu dispositivo? Pystone evalúa el rendimiento de la CPU ejecutando un entorno python.</description>
         <description lang="es_MX">¿Qué tan rápido ejecuta código Python tu dispositivo? Pystone evalúa el rendimiento de CPU ejecutándose en un entorno Python.</description>
         <description lang="fi_FI">Miten nopeasti laitteesi suorittaa Python-koodin? Pystone arvioi prosessorin tehokkuutta Python ympäristössä.</description>
         <description lang="hr_HR">Koliko brzo vaš uređaj pokreće python kôd? Pystone evaluira CPU performanse pokrenute u python okruženju.</description>

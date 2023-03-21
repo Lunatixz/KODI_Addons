@@ -23,7 +23,9 @@
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
         <summary lang="da_DK">Earth View viser et smukt satellitbillede fra Google Earth...</summary>
+        <summary lang="de_DE">Earth View zeigt ein schönes Satellitenbild von Google Earth an …</summary>
         <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
+        <summary lang="es_ES">Earth View muestra una bella imagen de satélite de Google Earth...</summary>
         <summary lang="fi_FI">Earth View näyttää kauniin satelliittikuvan Google Earthista...</summary>
         <summary lang="fr_FR">Earth View affiche une belle image satellite de Google Earth...</summary>
         <summary lang="hr_HR">Pogled zemlje prikazuje prekrasne Satelitske slike s Google Eartha...</summary>
@@ -33,7 +35,9 @@
         <summary lang="uk_UA">Заставка &quot;Earth View&quot; показує красивий супутниковий знімок із Google Earth...</summary>
         <summary lang="zh_CN">地球视图显示谷歌地球的美丽卫星图像......</summary>
         <description lang="da_DK">Earth View er en samling af de smukkeste og mest slående landskaber, der findes i Google Earth.</description>
+        <description lang="de_DE">Earth View ist eine Sammlung der schönsten und eindrucksvollsten Landschaften, die in Google Earth zu finden sind.</description>
         <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
+        <description lang="es_ES">Earth View es una colección de los paisajes más bonitos e impactantes de Google Earth.</description>
         <description lang="fi_FI">Earth View on kokoelma Google Earthin kauneimpia ja silmiinpistävimpiä maisemia.</description>
         <description lang="fr_FR">Earth View est une collection des paysages les plus beaux et les plus saisissants trouvés dans Google Earth.</description>
         <description lang="hr_HR">Pogled zemlje je kolekcija prekrasnih pejzaža pronađenih na Google Earthu.</description>

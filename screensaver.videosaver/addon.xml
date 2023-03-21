@@ -18,6 +18,7 @@
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
         <summary lang="da_DK">Opret en pauseskærm fra enhver Kodi-videokilde.</summary>
+        <summary lang="de_DE">Einen Bildschirmschoner aus einer beliebigen Kodi-Videoquelle erstellen.</summary>
         <summary lang="en_GB">Create a screensaver from any Kodi video source.</summary>
         <summary lang="es_ES">Crea un protector de pantalla de cualquier fuente de vídeo en Kodi.</summary>
         <summary lang="fi_FI">Luo näytönsäästäjä mistä tahansa Kodin videolähteestä.</summary>
@@ -26,6 +27,7 @@
         <summary lang="it_IT">Crea uno screensaver da qualsiasi sorgente video Kodi.</summary>
         <summary lang="zh_CN">从任意 Kodi 视频源创建屏幕保护程序。</summary>
         <description lang="da_DK">Dynamisk pauseskærm der benytter lokalt indhold, smarte playlister, plugins og UPNP-servere.</description>
+        <description lang="de_DE">Dynamischer Bildschirmschoner mit lokalen Inhalten, SmartPlaylists, Plugins und UPnP-Servern.</description>
         <description lang="en_GB">Dynamic screensaver using Local content, SmartPlaylists, Plugins and UPNP Servers.</description>
         <description lang="es_ES">Protector de pantalla dinámico que utiliza contenido local, listas de reproducción inteligentes, complementos y servidores UPNP.</description>
         <description lang="fi_FI">Dynaaminen näytönsäästäjä, joka hyödyntää paikallista sisältöä, älytoistolistoja, lisäosia sekä UPnP-palvelimia.</description>
@@ -33,6 +35,7 @@
         <description lang="hr_HR">Promjenjivi čuvar zaslona koji koristi lokalni sadržaj, pametne popise izvođrnja, dodatke i UPNP poslužitelje.</description>
         <description lang="zh_CN">使用本地内容、智能播放列表、插件和 UPNP 服务器的动态屏幕保护程序。</description>
         <disclaimer lang="da_DK">Streamingkilder anbefales ikke til forbrugsbetalt internet.</disclaimer>
+        <disclaimer lang="de_DE">Streamingquellen werden bei kostenpflichtigen Internet nicht empfohlen.</disclaimer>
         <disclaimer lang="en_GB">Streaming sources not recommend for metered Internet.</disclaimer>
         <disclaimer lang="es_ES">Se recomienda no usar recursos en Streaming para conexiones a Internet de uso medido.</disclaimer>
         <disclaimer lang="fi_FI">Suoratoistolähteitä ei suositella tiedonsiirtomäärän mukaan veloitettavilla yhteyksillä.</disclaimer>

@@ -4,36 +4,36 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
-"PO-Revision-Date: 2021-10-12 17:02+0000\n"
-"Last-Translator: Kai Sommerfeld <kai.sommerfeld@gmx.com>\n"
+"PO-Revision-Date: 2023-02-07 22:15+0000\n"
+"Last-Translator: Kai Sommerfeld <ksooo@users.noreply.kodi.weblate.cloud>\n"
 "Language-Team: German <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/de_de/>\n"
 "Language: de_de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.8\n"
+"X-Generator: Weblate 4.15.2\n"
 
 msgctxt "Addon Summary"
 msgid "Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus"
-msgstr "IPTV-Kanäle aus anderen Addons in Kodis TV- und Radiomenüs integrieren"
+msgstr "IPTV-Sender aus anderen Addons in Kodis TV- und Radiomenüs integrieren"
 
 msgctxt "Addon Description"
 msgid "IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus."
-msgstr "IPTV Mananger integriert IPTV-Kanälen aus anderen Addons in die TV- und Radiomenüs von Kodi."
+msgstr "IPTV-Mananger integriert IPTV-Sender aus anderen Addons in die TV- und Radiomenüs von Kodi."
 
 # CONTEXT MENU
 msgctxt "#30600"
 msgid "Play with IPTV Manager"
-msgstr "Mit IPTV Manager wiedergeben"
+msgstr "Mit IPTV-Manager wiedergeben"
 
 # MESSAGES
 msgctxt "#30700"
 msgid "Are you sure you want to setup IPTV Simple for the use with IPTV Manager? Any existing configuration of IPTV Simple will be overwritten."
-msgstr "Soll IPTV Simple wirklich für die Verwendung mit IPTV Manager eingerichtet werden? Die Konfiguration von IPTV Simple wird dadurch überschrieben."
+msgstr "Soll IPTV Simple wirklich für die Verwendung mit IPTV-Manager eingerichtet werden? Die Konfiguration von IPTV Simple wird dadurch überschrieben."
 
 msgctxt "#30701"
 msgid "IPTV Simple is configured for use with IPTV Manager!"
-msgstr "IPTV Simple ist eingerichtet für die Verwendung mit IPTV Manager!"
+msgstr "IPTV Simple ist für die Verwendung mit IPTV-Manager eingerichtet!"
 
 msgctxt "#30702"
 msgid "The configuration of IPTV Simple has failed. Please check the log files for more information."
@@ -45,11 +45,11 @@ msgstr "IPTV-Addons werden gesucht ..."
 
 msgctxt "#30704"
 msgid "Fetching channels and guide of {addon}..."
-msgstr "Kanäle und Programm-Guide von {addon} werden geladen ..."
+msgstr "Sender und EPG von {addon} werden geladen ..."
 
 msgctxt "#30705"
 msgid "Updating channels and guide..."
-msgstr "Kanäle und Programm-Guide werden aktualisiert ..."
+msgstr "Sender und EPG werden aktualisiert ..."
 
 msgctxt "#30706"
 msgid "This program isn't available to play."
@@ -58,7 +58,7 @@ msgstr "Diese Sendung ist zur Wiedergabe nicht verfügbar."
 # SETTINGS
 msgctxt "#30800"
 msgid "Channels"
-msgstr "Kanäle"
+msgstr "Sender"
 
 msgctxt "#30801"
 msgid "Refreshing"
@@ -70,7 +70,7 @@ msgstr "Aktualisierungsintervall [I](in Stunden)[/I]"
 
 msgctxt "#30803"
 msgid "Refresh channels and guide now…"
-msgstr "Kanäle und Programm-Guide jetzt aktualisieren …"
+msgstr "Sender und EPG jetzt aktualisieren …"
 
 msgctxt "#30820"
 msgid "IPTV Simple"

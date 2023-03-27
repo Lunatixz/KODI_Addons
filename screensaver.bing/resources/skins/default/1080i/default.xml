@@ -23,7 +23,6 @@
             <height>auto</height> 
             <scrolltime tween="sine" easing="out">200</scrolltime>
             <autoscroll>true</autoscroll>
-            <include>contentpanelslide</include>
             <itemlayout height="auto" width="auto">
                 <control type="image">
                     <posx>0</posx> 

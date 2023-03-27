@@ -1,25 +1,36 @@
 name: Kodi Addon-Check
 
-on:
-  push:
-    branches:
-      - 'master'
-  pull_request:
-    branches:
-      - 'master'
+on: [push, pull_request]
 
 jobs:
   kodi-addon-checker:
     runs-on: ubuntu-latest
     name: Kodi addon checker
     steps:
-
-    - name: Checkout
-      uses: actions/checkout@v1
-
-    - name: Kodi addon checker validation
-      id: kodi-addon-checker
-      uses: xbmc/action-kodi-addon-checker@v1.2
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
       with:
-        kodi-version: matrix
-        is-pr: false
+        python-version: 3.8
+    - name: Install addon checker
+      run: |
+        pip install -q kodi-addon-checker
+    - name: Check with addon-checker
+      run: |
+        kodi-addon-checker --branch matrix plugin.video.channelsdvr
+        kodi-addon-checker --branch matrix plugin.video.hdhomerun.simple
+        kodi-addon-checker --branch matrix plugin.video.newson
+        kodi-addon-checker --branch matrix plugin.video.playonbrowser
+        kodi-addon-checker --branch matrix plugin.video.plutotv
+        kodi-addon-checker --branch matrix plugin.video.xumotv
+        kodi-addon-checker --branch matrix screensaver.bing
+        kodi-addon-checker --branch matrix screensaver.flipclock
+        kodi-addon-checker --branch matrix screensaver.google.earth
+        kodi-addon-checker --branch matrix screensaver.unsplash
+        kodi-addon-checker --branch matrix screensaver.videosaver
+        kodi-addon-checker --branch matrix screensaver.unsplash
+        kodi-addon-checker --branch matrix script.kodi.android.update
+        kodi-addon-checker --branch matrix script.kodi.windows.update
+        kodi-addon-checker --branch matrix script.pystone.benchmark
+        kodi-addon-checker --branch matrix service.onmute
+        

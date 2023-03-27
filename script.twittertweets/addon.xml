@@ -22,7 +22,9 @@
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
         <description lang="da_DK">Overvåg dine foretrukne twitter-konti, modtag &quot;realtime&quot; tweets.</description>
+        <description lang="de_DE">Beobachte deine Twitterfavoriten, erhalte Tweets in Echtzeit.</description>
         <description lang="en_GB">Monitor your favorite twitter accounts, receive &quot;realtime&quot; tweets.</description>
+        <description lang="es_ES">Sigue tus cuentas de Twitter favoritas, recibe tweets &quot;en tiempo real&quot;.</description>
         <description lang="fi_FI">Seuraa suosimiasi Twitter-tilejä ja vastaanota twiittejä &quot;reaaliaikaisesti&quot;.</description>
         <description lang="hr_HR">Nadgledjate vaše omiljene twitter račune, primajte twitove u stvarnom vremenu.</description>
         <description lang="it_IT">Monitora i tuoi account Twitter preferiti, ricevi tweet &quot;in tempo reale&quot;.</description>

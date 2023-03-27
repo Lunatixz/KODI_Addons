@@ -27,6 +27,7 @@
         <summary lang="da_DK">Hent og installer Kodi-installationspakker.</summary>
         <summary lang="de_DE">Kodi-Pakete herunterladen und installieren.</summary>
         <summary lang="en_GB">Download and Install Kodi packages.</summary>
+        <summary lang="es_ES">Descargar e instalar los paquetes de Kodi.</summary>
         <summary lang="es_MX">Descarga e instala paquetes de Kodi.</summary>
         <summary lang="et_EE">Laadi alla ja paigalda Kodi pakette.</summary>
         <summary lang="fi_FI">Lataa ja asenna Kodi-paketteja.</summary>
@@ -41,6 +42,7 @@
         <description lang="da_DK">Download og installer Android eksekverbare filer til Kodi; vælg fra Nightlies, Udgivelser, Snapshots og Test-builds.</description>
         <description lang="de_DE">Kodi-Pakete für Android herunterladen und installieren. Auswählen zwischen Nightlies, Releases, Snapshopts und Test-Builds.</description>
         <description lang="en_GB">Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
+        <description lang="es_ES">Descargar e instalar los paquetes android de Kodi; seleccionar entre  Nightlies, Releases, Snapshots y Test-builds.</description>
         <description lang="et_EE">Laadi alla ja paigalda Kodi android pakette; valikus on Nightlies, Releases, Snapshots ja Test-builds.</description>
         <description lang="fi_FI">Lataa ja asenna Kodin Android-paketteja kehityshaaroista Release, Nightly, Snapshot ja Test.</description>
         <description lang="hr_HR">Preuzmi i instaliraj Kodi android pakete; odaberite od  Nightlies, Releases, Snapshots i Testnih-izgradnji.</description>

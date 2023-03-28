@@ -46,6 +46,6 @@
         <disclaimer lang="es_ES">El contenido tiene restricciones geográficas y puede no estar disponible en su localidad.</disclaimer>
         <lifecyclestate type="broken" lang="da_DK">Locast indstiller driften med øjeblikkelig virkning.\nBesøg www.locast.org for detaljer...</lifecyclestate>
         <lifecyclestate type="broken" lang="en_GB">Locast is suspending operations, effective immediately.\nVisit www.locast.org for details...</lifecyclestate>
-        <lifecyclestate type="broken" lang="es_ES">[CR]Locast suspende sus operaciones con efecto inmediato.\n[CR]Visite www.locast.org para más detalles...[CR][CR]Locast suspende sus operaciones con efecto inmediato.\n[CR]Visite www.locast.org para más detalles...</lifecyclestate>
+        <lifecyclestate type="broken" lang="es_ES">[CR]Locast suspende sus operaciones con efecto inmediato.\n[CR]Visite www.locast.org para más detalles...[CR][CR]Locast suspende sus operaciones con efecto inmediato.\n[CR]Visite www.locast.org para más detalles...[CR][CR]Locast suspende sus operaciones con efecto inmediato.\n[CR]Visite www.locast.org para más detalles...</lifecyclestate>
     </extension>
 </addon>

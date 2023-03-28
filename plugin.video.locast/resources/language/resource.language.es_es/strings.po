@@ -31,7 +31,7 @@ msgstr "El contenido tiene restricciones geográficas y puede no estar disponibl
 
 msgctxt "Addon Lifecyclestate"
 msgid "Locast is suspending operations, effective immediately.\nVisit www.locast.org for details..."
-msgstr "[CR]Locast suspende sus operaciones con efecto inmediato.\n[CR]Visite www.locast.org para más detalles...[CR][CR]Locast suspende sus operaciones con efecto inmediato.\n[CR]Visite www.locast.org para más detalles..."
+msgstr "[CR]Locast suspende sus operaciones con efecto inmediato.\n[CR]Visite www.locast.org para más detalles...[CR][CR]Locast suspende sus operaciones con efecto inmediato.\n[CR]Visite www.locast.org para más detalles...[CR][CR]Locast suspende sus operaciones con efecto inmediato.\n[CR]Visite www.locast.org para más detalles..."
 
 "Locast suspende sus operaciones con efecto inmediato.\n"
 "Visite www.locast.org para más detalles..."

@@ -1,4 +1,4 @@
-#   Copyright (C) 2022 Lunatixz
+#   Copyright (C) 2023 Lunatixz
 #
 #
 # This file is part of Video ScreenSaver.
@@ -55,7 +55,13 @@ def log(msg, level=xbmc.LOGDEBUG):
 def sendJSON(command):
     log('sendJSON, command = %s'%(command))
     return json.loads(xbmc.executeJSONRPC(command))
-  
+    
+def escapeDirJSON(dir_name):
+    mydir = (dir_name)
+    if (mydir.find(":")):
+        mydir = mydir.replace("\\", "\\\\")
+    return mydir
+
 def isMute():
     state = False
     json_query = '{"jsonrpc":"2.0","method":"Application.GetProperties","params":{"properties":["muted"]},"id":1}'
@@ -228,14 +234,14 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
             return itemLST
             
 
-    def buildItem(self, responce):
+    def buildItem(self, response):
         log('buildItem')
-        if   'result' in responce and 'filedetails' in responce['result']: key = 'filedetails'
-        elif 'result' in responce and 'files' in responce['result']: key = 'files'
+        if   'result' in response and 'filedetails' in response['result']: key = 'filedetails'
+        elif 'result' in response and 'files' in response['result']: key = 'files'
         else: xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(32001), ICON, 4000)
-        for item in responce['result'][key]:
+        for item in response['result'][key]:
             if key == 'files' and item.get('filetype','') == 'directory': continue
-            yield responce['result'][key]['file']
+            yield response['result'][key]['file']
 
 
     def buildPlaylist(self):
@@ -244,12 +250,12 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
         xbmc.sleep(100)
         
         if not SINGLE_FLE: 
-            playListItem = self.buildDirectory(VIDEO_PATH, VIDEO_LIMIT)
+            playListItem = self.buildDirectory(escapeDirJSON(VIDEO_PATH), VIDEO_LIMIT)
         elif PLAYLIST_FLE: 
-            playListItem = self.buildDirectory(VIDEO_FILE, VIDEO_LIMIT)
+            playListItem = self.buildDirectory(escapeDirJSON(VIDEO_FILE), VIDEO_LIMIT)
         elif not VIDEO_FILE.startswith(('plugin://','upnp://','pvr://')): 
-            playListItem = list(self.buildItem(getFileDetails(VIDEO_FILE)))
-        else: return VIDEO_FILE
+            playListItem = list(self.buildItem(getFileDetails(escapeDirJSON(VIDEO_FILE))))
+        else: return escapeDirJSON(VIDEO_FILE)
         
         if playListItem:
             for idx, playItem in enumerate(playListItem): 

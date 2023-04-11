@@ -16,6 +16,18 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "Addon Summary"
+msgid "Enable, disabled plugins..."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Kodi Krypton 17.x disables all plugins manually installed, This plugin enables all plugins within user parameters."
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid "This software is a BETA release, bugs maybe common until final release."
+msgstr ""
+
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr ""
@@ -38,24 +50,24 @@ msgstr ""
 
 msgctxt "#30005"
 msgid "General"
-msgstr "
+msgstr ""
 
 msgctxt "#30006"
 msgid "Enable selected plugins?"
-msgstr "
+msgstr ""
 
 msgctxt "#30007"
 msgid "Mode"
-msgstr "
+msgstr ""
 
 msgctxt "#30008"
 msgid "Plugin not configured!"
-msgstr "
+msgstr ""
 
 msgctxt "#30009"
 msgid "Please configure, then run again..."
-msgstr "
+msgstr ""
 
 msgctxt "#30010"
 msgid ""
-msgstr "
+msgstr ""

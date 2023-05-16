@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: plugin.video.cbr\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2022-08-21 16:24+0000\n"
+"PO-Revision-Date: 2023-05-16 06:16+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
 "Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-scripts/script-media-maintenance/it_it/>\n"
 "Language: it_it\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.13\n"
+"X-Generator: Weblate 4.15.2\n"
 
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
-msgstr "Abilita debug [Registra errori]"
+msgstr "Abilita debug [registra errori]"
 
 msgctxt "#30001"
 msgid "Something went wrong, Try again..."
@@ -27,7 +27,7 @@ msgstr "Qualcosa è andato storto, riprova..."
 
 msgctxt "#30002"
 msgid "Select TV Shows to Monitor"
-msgstr "Seleziona Programmi TV da monitorare"
+msgstr "Seleziona serie TV da monitorare"
 
 msgctxt "#30003"
 msgid "Scanning..."
@@ -39,15 +39,15 @@ msgstr "Scansione completata"
 
 msgctxt "#30005"
 msgid "Monitored TV Shows"
-msgstr "Programmi TV monitorati"
+msgstr "Serie TV monitorate"
 
 msgctxt "#30006"
 msgid "Add Sonarr Monitored TV Shows"
-msgstr "Aggiungi programmi TV monitorati da Sonarr"
+msgstr "Aggiungi serie TV monitorate da Sonarr"
 
 msgctxt "#30007"
 msgid "IP:Port"
-msgstr "IP: porta"
+msgstr "IP:Porta"
 
 msgctxt "#30008"
 msgid "API-Key"
@@ -55,11 +55,11 @@ msgstr "Chiave API"
 
 msgctxt "#30009"
 msgid "Scanning Sonarrr"
-msgstr "Scansione Sonarrr"
+msgstr "Scansione Sonarr"
 
 msgctxt "#30010"
 msgid "Monitoring [B](%s)[/B] TV Show%s"
-msgstr "Monitoraggio [B](%s)[/B] Programma TV%s"
+msgstr "Monitoraggio di [B](%s)[/B] serie TV"
 
 msgctxt "#30011"
 msgid "Last Scanned (%s)"
@@ -67,19 +67,19 @@ msgstr "Ultima scansione (%s)"
 
 msgctxt "#30012"
 msgid "Clear Monitored TV Shows"
-msgstr "Cancella programmi TV monitorati"
+msgstr "Cancella serie TV monitorate"
 
 msgctxt "#30013"
 msgid "Enable add-on to [B]DELETE[/B] your media"
-msgstr "Abilita il componente aggiuntivo per [B]ELIMINARE[/B] i tuoi file multimediali"
+msgstr "Abilita add-on per [B]ELIMINARE[/B] i tuoi contenuti multimediali"
 
 msgctxt "#30014"
 msgid "Warning!! Selecting "Remove" will [B]PERMANENTLY DELETE[/B] media"
-msgstr "Avvertimento!! Selezionando \"Rimuovi\" [B]ELIMINERÀ PERMANENTEMENTE[/B] il media"
+msgstr "Avvertimento!! Selezionando \"Rimuovi\" verranno [B]ELIMINATI PERMANENTEMENTE[/B] tutti i contenuti multimediali"
 
 msgctxt "#30015"
 msgid "TV Shows"
-msgstr "Programmi TV"
+msgstr "Serie TV"
 
 msgctxt "#30016"
 msgid "Sonarr"
@@ -87,7 +87,7 @@ msgstr "Sonarr"
 
 msgctxt "#30017"
 msgid "Cleared Monitored TV Shows"
-msgstr "Programmi TV monitorati cancellati"
+msgstr "Sono state cancellate le serie TV monitorate"
 
 msgctxt "#30018"
 msgid "Movies"
@@ -99,7 +99,7 @@ msgstr "Radarr"
 
 msgctxt "#30020"
 msgid "Watched after"
-msgstr "Sorvegliato"
+msgstr "Guardato dopo"
 
 msgctxt "#30021"
 msgid "Remove (%s)"
@@ -107,7 +107,7 @@ msgstr "Rimuovi (%s)"
 
 msgctxt "#30022"
 msgid "Permission required, Check file access."
-msgstr "Autorizzazione richiesta, controlla l'accesso ai file."
+msgstr "È richiesta l'autorizzazione, controlla l'accesso ai file."
 
 msgctxt "#30023"
 msgid ""%s" Removed!"
@@ -115,11 +115,11 @@ msgstr "\"%s\" rimosso!"
 
 msgctxt "#30024"
 msgid "Monitor Movies"
-msgstr "Monitora i film"
+msgstr "Monitoraggio film"
 
 msgctxt "#30025"
 msgid "Clear Monitored Movies"
-msgstr "Cancella i film monitorati"
+msgstr "Cancella film monitorati"
 
 msgctxt "#30026"
 msgid "Scan Radarr for Monitored Movies"
@@ -131,7 +131,7 @@ msgstr " "
 
 msgctxt "#30028"
 msgid "Monitors"
-msgstr "Monitora"
+msgstr "Monitoraggi"
 
 msgctxt "#30029"
 msgid "Only Remove TV episodes after completing the season"
@@ -159,23 +159,23 @@ msgstr "Scansione libreria per film duplicati"
 
 msgctxt "#30035"
 msgid "Open Settings"
-msgstr "Apri Impostazioni"
+msgstr "Apri impostazioni"
 
 msgctxt "#30036"
 msgid "Select duplicates to remove"
-msgstr "Seleziona i duplicati da rimuovere"
+msgstr "Seleziona duplicati da rimuovere"
 
 msgctxt "#30037"
 msgid "Select one or multiple TV Shows"
-msgstr "Seleziona uno o più programmi TV"
+msgstr "Seleziona una o più serie TV"
 
 msgctxt "#30038"
 msgid "Scanning TV Shows..."
-msgstr "Scansione di programmi TV..."
+msgstr "Scansione serie TV..."
 
 msgctxt "#30039"
 msgid "Scanning Movies..."
-msgstr "Scansione di film..."
+msgstr "Scansione film..."
 
 msgctxt "#30040"
 msgid "Removing duplicate Movies..."
@@ -183,7 +183,7 @@ msgstr "Rimozione di film duplicati..."
 
 msgctxt "#30041"
 msgid "Match duplicate Movies by"
-msgstr "Abbina film duplicati di"
+msgstr "Abbina film duplicati per"
 
 msgctxt "#30042"
 msgid "Add to Monitor List"
@@ -191,7 +191,7 @@ msgstr "Aggiungi all'elenco monitorati"
 
 msgctxt "#30043"
 msgid "Add "%s" to Monitored TV Shows"
-msgstr "Aggiungi \"%s\" ai programmi TV monitorati"
+msgstr "Aggiungi \"%s\" alle serie TV monitorate"
 
 msgctxt "#30044"
 msgid "Select All"
@@ -199,7 +199,7 @@ msgstr "Seleziona tutto"
 
 msgctxt "#30045"
 msgid "Monitor all shows"
-msgstr "Monitora tutti i programmi"
+msgstr "Monitoraggio di tutte le serie"
 
 msgctxt "#30046"
 msgid "General"
@@ -207,7 +207,7 @@ msgstr "Generale"
 
 msgctxt "#30047"
 msgid "Monitor PVR Recordings"
-msgstr "Monitora le registrazioni PVR"
+msgstr "Monitoraggio delle registrazioni PVR"
 
 msgctxt "#30048"
 msgid "Unselect All"
@@ -215,7 +215,7 @@ msgstr "Deseleziona tutto"
 
 msgctxt "#30049"
 msgid "Remove all show monitors"
-msgstr "Rimuovi tutti i programmi monitorati"
+msgstr "Rimuovi tutte le serie monitorate"
 
 msgctxt "#30050"
 msgid "Scanning Movies for duplicates..."

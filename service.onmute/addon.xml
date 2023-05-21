@@ -24,7 +24,7 @@
         <summary lang="fi_FI">Käytä &quot;OnMute&quot; -toiminnon kanssa kuvaavia (CC) ja tavallisia tekstityksiä.</summary>
         <summary lang="fr_FR">Activer le sous-titrage « OnMute ».</summary>
         <summary lang="hr_HR">Omogući closed captioning i podnaslove &quot;Pri utišanju&quot;.</summary>
-        <summary lang="it_IT">Abilita didascalie e sottotitoli &quot;OnMute&quot;.</summary>
+        <summary lang="it_IT">Abilita sottotitoli con descrizione audio e sottotitoli &quot;OnMute&quot;.</summary>
         <summary lang="ko_KR">폐쇄 자막 및 &quot;OnMute&quot; 자막을 활성화합니다.</summary>
         <summary lang="pl_PL">Włącz napisy kodowane i napisy „OnMute”.</summary>
         <summary lang="zh_CN">启用闭路字幕和字幕“OnMute”。</summary>
@@ -37,7 +37,7 @@
         <description lang="fi_FI">Salli &quot;OnMute&quot; -toiminnon kytkeä tavalliset ja kuvaavat tekstitykset käyttöön, kun Kodi mykistetään.</description>
         <description lang="fr_FR">Permettre à « OnMute »d&apos;activer le sous-titrage quand Kodi est mis en sourdine.</description>
         <description lang="hr_HR">Dopusti &quot;Pri utišanju&quot; uklj/usklj closed captioning i podnaslova dok je Kodi utišan.</description>
-        <description lang="it_IT">Lascia che &quot;OnMute&quot; attivi didascalie e sottotitoli mentre Kodi è disattivato.</description>
+        <description lang="it_IT">Lascia che &quot;OnMute&quot; alterni sottotitoli con descrizione audio e sottotitoli mentre Kodi è silenziato.</description>
         <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &quot;OnMute&quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
         <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>
         <description lang="zh_CN">让“OnMute”在 Kodi 静音时切换闭路字幕和字幕。</description>

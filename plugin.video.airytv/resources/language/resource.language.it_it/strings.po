@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: plugin.video.plutotv\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2023-03-12 02:16+0000\n"
+"PO-Revision-Date: 2023-05-05 10:16+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
 "Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-airytv/it_it/>\n"
 "Language: it_it\n"
@@ -19,15 +19,15 @@ msgstr ""
 
 msgctxt "Addon Summary"
 msgid "Airy TV is the entertainment destination for watching 100% Free TV."
-msgstr "Airy TV è la meta del divertimento della TV gratuita al 100%."
+msgstr "Airy TV è la meta del divertimento per guardare TV gratuita al 100%."
 
 msgctxt "Addon Description"
 msgid "Airy TV is the entertainment destination for watching 100% Free TV, Movies & Comedy. Stream Anime & Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you."
-msgstr "Airy TV è la meta del divertimento per guardare TV, film e commedie gratuiti al 100% . Trasmetti in streaming anime e sport, tutto il tuo intrattenimento in un unico posto. ... Lo streaming non è mai stato così fluido! Airy TV non ha nessun contratto, nessuna tariffa, nessuna sciocchezza, solo TV gratuita: film, anime, sport, tutto il tuo intrattenimento ti viene consegnato a costo zero."
+msgstr "Airy TV è la meta del divertimento per guardare TV, film e commedie gratuiti al 100% . Trasmette anime e sport, tutto il tuo intrattenimento in un unico posto. La riproduzione non è mai stata così fluida! Airy TV non ha nessun contratto, nessuna tariffa, nessuna vincolo, solo TV gratuita: film, anime, sport, tutto il tuo intrattenimento ti viene consegnato a costo zero."
 
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
-msgstr "Abilita debug [Registra errori]"
+msgstr "Abilita debug (registra errori)"
 
 msgctxt "#30011"
 msgid "Live"
@@ -47,7 +47,7 @@ msgstr "Tutti i canali"
 
 msgctxt "#30015"
 msgid ">> Next"
-msgstr ">> avanti"
+msgstr ">> Avanti"
 
 msgctxt "#30016"
 msgid "Featured"
@@ -99,11 +99,11 @@ msgstr "In arrivo più tardi..."
 
 msgctxt "#30030"
 msgid "Allow this plugin to automatically configure IPTV Simple PVR Backend?"
-msgstr "Consenti a questo plugin di configurare automaticamente IPTV Simple PVR Backend?"
+msgstr "Consentire a questo plug-in di configurare automaticamente IPTV Simple PVR Backend?"
 
 msgctxt "#30031"
 msgid "%s Updating..."
-msgstr "%s Aggiornamento..."
+msgstr "%s in aggiornamento..."
 
 msgctxt "#30032"
 msgid "M3U/XMLTV Path"
@@ -111,7 +111,7 @@ msgstr "Percorso M3U/XMLTV"
 
 msgctxt "#30033"
 msgid "Enable M3U/XMLTV Generator Service"
-msgstr "Abilita il generatore di servizi M3U/XMLTV"
+msgstr "Abilita generatore di servizi M3U/XMLTV"
 
 msgctxt "#30034"
 msgid "?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&sid=246&deviceId=5331d5fb753499095a00045a&deviceVersion=DNT&appVersion=DNT&deviceDNT=0&userId=&advertisingId=&deviceLat=&deviceLon=&app_name=&appName=web&buildVersion=&appStoreUrl=&architecture=&includeExtendedEvents=false&marketingRegion=US&serverSideAds=false"
@@ -143,7 +143,7 @@ msgstr "Dal vivo (Preferiti)"
 
 msgctxt "#30041"
 msgid "Use Direct stream"
-msgstr "Usa stream diretto"
+msgstr "Usa streaming diretto"
 
 msgctxt "#30042"
 msgid "PseudoTV Live Supported through Recommended Services"
@@ -151,7 +151,7 @@ msgstr "PseudoTV Live supportato tramite i servizi consigliati"
 
 msgctxt "#30043"
 msgid "Prefer Color Channel Logos"
-msgstr "Preferisci loghi canali a colori"
+msgstr "Preferisci loghi dei canali a colori"
 
 msgctxt "#30044"
 msgid "General"
@@ -191,7 +191,7 @@ msgstr "%s aggiunto ai Preferiti"
 
 msgctxt "#49008"
 msgid "%s removed from Favorites"
-msgstr "%s rimossi dai Preferiti"
+msgstr "%s rimosso dai Preferiti"
 
 msgctxt "#49009"
 msgid "Add Channel to Favorites"

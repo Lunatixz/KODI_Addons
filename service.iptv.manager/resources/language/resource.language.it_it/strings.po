@@ -4,22 +4,22 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
-"PO-Revision-Date: 2022-09-10 08:14+0000\n"
+"PO-Revision-Date: 2023-05-05 10:16+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
 "Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/it_it/>\n"
 "Language: it_it\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.14\n"
+"X-Generator: Weblate 4.15.2\n"
 
 msgctxt "Addon Summary"
 msgid "Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus"
-msgstr "Integra i canali IPTV da altri add-on nei menu Kodi TV e Radio"
+msgstr "Integra i canali IPTV da altri add-on nei menu TV e radio di Kodi"
 
 msgctxt "Addon Description"
 msgid "IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus."
-msgstr "IPTV Manager integra i canali IPTV di altri add-on nei menu Kodi TV e Radio."
+msgstr "IPTV Manager integra i canali IPTV da altri add-on nei menu TV e radio di Kodi."
 
 # CONTEXT MENU
 msgctxt "#30600"
@@ -45,7 +45,7 @@ msgstr "Rilevamento add-on IPTV..."
 
 msgctxt "#30704"
 msgid "Fetching channels and guide of {addon}..."
-msgstr "Recupero dei canali e guida di {addon}..."
+msgstr "Recupero canali e guida di {addon}..."
 
 msgctxt "#30705"
 msgid "Updating channels and guide..."
@@ -62,7 +62,7 @@ msgstr "Canali"
 
 msgctxt "#30801"
 msgid "Refreshing"
-msgstr "Aggiornando"
+msgstr "Aggiornamento"
 
 msgctxt "#30802"
 msgid "Refresh interval [I](in hours)[/I]"
@@ -82,7 +82,7 @@ msgstr "Configurazione"
 
 msgctxt "#30822"
 msgid "Configure IPTV Simple automatically…"
-msgstr "Configura IPTV Simple automaticamente…"
+msgstr "Configura automaticamente IPTV Simple…"
 
 msgctxt "#30823"
 msgid "Open IPTV Simple settings…"
@@ -98,11 +98,11 @@ msgstr "Esperto"
 
 msgctxt "#30881"
 msgid "Logging"
-msgstr "Registrazione log"
+msgstr "Registrazione eventi"
 
 msgctxt "#30882"
 msgid "Enable debug logging"
-msgstr "Abilita registrazione debug"
+msgstr "Abilita registrazione eventi di debug"
 
 msgctxt "#30883"
 msgid "Install Kodi Logfile Uploader…"

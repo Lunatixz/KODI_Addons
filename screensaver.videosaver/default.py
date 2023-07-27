@@ -177,7 +177,7 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
         self.dimid = self.getControl(41001)
         self.dimid.setAnimations([('Conditional', 'effect=fade start=%s end=%s condition=True'%(REAL_SETTINGS.getSettingInt('SetDimmer'),REAL_SETTINGS.getSettingInt('SetDimmer')))])
         
-        self.myPlayer.play(self.buildPlaylist())
+        self.myPlayer.play(self.buildPlaylist(), windowed=True)
         setRepeat('all')
         
         

@@ -35,7 +35,7 @@ FANART        = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE      = REAL_SETTINGS.getLocalizedString
 DEBUG         = True
 FILENAME      = 'screensaver.system47.v.2.5.01.mp4'
-FILEPATH      = xbmcvfs.translatePath(os.path.join(SETTINGS_LOC,FILENAME))
+FILEPATH      = os.path.join(SETTINGS_LOC,FILENAME)
 # DOWNLOAD_URL  = 'http://www.mediafire.com/file/cvptnk5p5zk41zb/screensaver.system47.mp4/file'
 DOWNLOAD_URL  = 'https://www.mediafire.com/file/xjkqyiy9for97fl/screensaver.system47.v.2.5.01.mp4/file'
 CHUNK_SIZE    = 512 * 1024  # 512KB
@@ -88,7 +88,7 @@ class Download(object):
                 prefix=os.path.basename(output),
                 dir=os.path.dirname(output),
             )
-            f = open(tmp_file, 'wb')
+            f = xbmcvfs.File(tmp_file, 'wb')
         else:
             tmp_file = None
             f = output
@@ -107,7 +107,7 @@ class Download(object):
                 if not quiet:
                     if dia.iscanceled():
                         raise Exception('Download Canceled')
-                    per = int(idx*100//(total//CHUNK_SIZE))
+                    per = int((idx-1)*100//(total//CHUNK_SIZE))
                     msg = '%s (%s%%)\n%s\n%s'%(LANGUAGE(30002),per,FILENAME,FILEPATH)
                     dia.update(per,msg)
                     
@@ -116,12 +116,16 @@ class Download(object):
                 
             if tmp_file:
                 f.close()
-                shutil.move(tmp_file, output)
+                msg = '%s\n%s\n%s'%(LANGUAGE(30002),tmp_file,output)
+                dia.update(per,msg)
+                if not xbmcvfs.copy(tmp_file, output):
+                    raise Exception('Copy Failed! %s => %s'%(tmp_file, output))
         except Exception as e:
             log("start, failed! %s"%(e), xbmc.LOGERROR)
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
             return self.deletefiles(tmp_file)
         finally: self.deletefiles(tmp_file)
+        if not quiet: dia.update(100,msg)
         return output
 
         
@@ -129,7 +133,7 @@ class Download(object):
         #todo clean up all files ending with tmp
         try:
             if tmp_file:
-                os.remove(tmp_file)
+                xbmcvfs.delete(tmp_file)
         except OSError:
             pass
             

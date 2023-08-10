@@ -75,10 +75,10 @@ def setMute(state):
 class Player(xbmc.Player):
     def onAVStarted(self):
         log('onAVStarted')
+        xbmc.Monitor().waitForAbort(5.0)
         totalTime = self.getTotalTime()
         seekValue = int(totalTime//(random.randint(5,(totalTime//4)))) if RANDOM else 0
-        xbmc.Monitor().waitForAbort(5.0)
-        if seekValue > 5.0: xbmc.executebuiltin('Seek(%s)'%seekValue)
+        if seekValue > 5: xbmc.executebuiltin('Seek(%s)'%seekValue)
 
         
 class BackgroundWindow(xbmcgui.WindowXMLDialog):

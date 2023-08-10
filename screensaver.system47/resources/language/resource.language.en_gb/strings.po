@@ -39,3 +39,7 @@ msgstr ""
 msgctxt "#30004"
 msgid "Youtube/Tubed Plugins not installed!\nOpen Settings to download locally."
 msgstr ""
+
+msgctxt "#30005"
+msgid "Copying..."
+msgstr ""

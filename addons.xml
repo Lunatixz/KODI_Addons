@@ -581,7 +581,7 @@
     </extension>
 </addon>
 
-<addon id="screensaver.system47" name="System 47 - Star Trek LCARS ScreenSaver" version="2.5.01" provider-name="Lunatixz">
+<addon id="screensaver.system47" name="System 47 - Star Trek LCARS ScreenSaver" version="2.5.01a" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.six" version="1.0.0"/>

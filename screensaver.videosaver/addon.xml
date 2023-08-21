@@ -33,6 +33,7 @@
         <description lang="fi_FI">Dynaaminen näytönsäästäjä, joka hyödyntää paikallista sisältöä, älytoistolistoja, lisäosia sekä UPnP-palvelimia.</description>
         <description lang="fr_FR">Économiseur d&apos;écran dynamique utilisant le contenu local, les SmartPlaylists, les plugins et les serveurs UPNP.</description>
         <description lang="hr_HR">Promjenjivi čuvar zaslona koji koristi lokalni sadržaj, pametne popise izvođrnja, dodatke i UPNP poslužitelje.</description>
+        <description lang="uk_UA">Динамічна заставка з локальних файлів, списків SmartPlaylists, плагінів чи серверів UPNP.</description>
         <description lang="zh_CN">使用本地内容、智能播放列表、插件和 UPNP 服务器的动态屏幕保护程序。</description>
         <disclaimer lang="da_DK">Streamingkilder anbefales ikke til forbrugsbetalt internet.</disclaimer>
         <disclaimer lang="de_DE">Streamingquellen werden bei kostenpflichtigen Internet nicht empfohlen.</disclaimer>

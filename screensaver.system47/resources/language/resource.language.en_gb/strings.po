@@ -16,6 +16,14 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "Addon Summary"
+msgid "System 47 - Star Trek LCARS ScreenSaver"
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "What is LCARS? LCARS is an acronym for "Library Computer Access and Retrieval System", which is the primary computer system in the universe of Star Trek's Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There's actually another name for this type of graphical displays. It's "Okudagram". It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation."
+msgstr ""
+
 msgctxt "#32000"
 msgid "Random Start Position"
 msgstr ""

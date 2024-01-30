@@ -7,23 +7,23 @@ msgstr ""
 "Project-Id-Version: plugin.video.plutotv\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2023-08-24 23:11+0000\n"
-"Last-Translator: SlashAndRoses <contact@iandeveseleer.fr>\n"
+"PO-Revision-Date: 2024-01-20 21:00+0000\n"
+"Last-Translator: ludovik <ludo.ha@gmail.com>\n"
 "Language-Team: French (France) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-plutotv/fr_fr/>\n"
 "Language: fr_fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.18.2\n"
+"X-Generator: Weblate 5.3\n"
 
 msgctxt "Addon Summary"
 msgid "TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”."
-msgstr ""
+msgstr "Des chaînes de télévision consacrées à vos sujets préférés, à partir de films à succès de Paramount, ... \"Le génie de Pluto TV : C'est de la vraie télévision sur internet\"."
 
 msgctxt "Addon Description"
 msgid "Watch Free TV on Kodi! Stream Pluto TV's 100+ channels of news, sports, and the Internet's best, completely free on your Kodi device."
-msgstr ""
+msgstr "Regardez la TV gratuitement sur Kodi ! Regardez en continu les plus 100 chaînes de Pluto TV qui proposent des informations, du sport et le meilleur de l'Internet, totalement gratuitement sur votre appareil Kodi."
 
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
@@ -35,7 +35,7 @@ msgstr "En direct"
 
 msgctxt "#30012"
 msgid "OnDemand"
-msgstr ""
+msgstr "À la demande"
 
 msgctxt "#30013"
 msgid "Guide"
@@ -43,115 +43,119 @@ msgstr "Guide"
 
 msgctxt "#30014"
 msgid "All Channels"
-msgstr ""
+msgstr "Toutes les chaînes"
 
 msgctxt "#30015"
 msgid ">> Next"
-msgstr ""
+msgstr ">> Suivant"
 
 msgctxt "#30016"
 msgid "Featured"
-msgstr ""
+msgstr "À la une"
 
 msgctxt "#30017"
 msgid "Categories"
-msgstr ""
+msgstr "Catégories"
 
 msgctxt "#30018"
 msgid "Lineup"
 msgstr "Lineup"
 
+#, fuzzy
 msgctxt "#30019"
 msgid "&deviceMake=&deviceModel=&sid"
-msgstr ""
+msgstr "&deviceMake=&deviceModel=&sid"
 
+#, fuzzy
 msgctxt "#30020"
 msgid "&deviceMake=&deviceModel=&sid=%s&deviceId=%s"
-msgstr ""
+msgstr "&deviceMake=&deviceModel=&sid=%s&deviceId=%s"
 
 msgctxt "#30021"
 msgid ""
 msgstr ""
 
+#, fuzzy
 msgctxt "#30022"
 msgid "sid=%s&deviceId=%s"
-msgstr ""
+msgstr "sid=%s&deviceId=%s"
 
 msgctxt "#30023"
 msgid "On Now"
-msgstr ""
+msgstr "En cours"
 
 msgctxt "#30024"
 msgid "Channel lineup"
-msgstr ""
+msgstr "Liste des chaînes"
 
 msgctxt "#30025"
 msgid "Channel by genre"
-msgstr ""
+msgstr "Chaînes par genre"
 
 msgctxt "#30026"
 msgid "Video On Demand"
-msgstr ""
+msgstr "Vidéo à la demande"
 
 msgctxt "#30029"
 msgid "Coming Up Later..."
-msgstr ""
+msgstr "A venir..."
 
 msgctxt "#30030"
 msgid "Allow this plugin to automatically configure IPTV Simple PVR Backend?"
-msgstr ""
+msgstr "Autoriser ce plugin à configurer automatiquement le backend IPTV Simple PVR ?"
 
 msgctxt "#30031"
 msgid "%s Updating..."
-msgstr ""
+msgstr "Mise à jour de %s..."
 
 msgctxt "#30032"
 msgid "M3U/XMLTV Path"
-msgstr ""
+msgstr "Chemin du M3U/XMLTV"
 
 msgctxt "#30033"
 msgid "Enable M3U/XMLTV Generator Service"
-msgstr ""
+msgstr "Activer le Service Générateur M3U/XMLTV"
 
+#, fuzzy
 msgctxt "#30034"
 msgid "?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&sid=246&deviceId=5331d5fb753499095a00045a&deviceVersion=DNT&appVersion=DNT&deviceDNT=0&userId=&advertisingId=&deviceLat=&deviceLon=&app_name=&appName=web&buildVersion=&appStoreUrl=&architecture=&includeExtendedEvents=false&marketingRegion=US&serverSideAds=false"
-msgstr ""
+msgstr "?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&sid=246&deviceId=5331d5fb753499095a00045a&deviceVersion=DNT&appVersion=DNT&deviceDNT=0&userId=&advertisingId=&deviceLat=&deviceLon=&app_name=&appName=web&buildVersion=&appStoreUrl=&architecture=&includeExtendedEvents=false&marketingRegion=US&serverSideAds=false"
 
 msgctxt "#30035"
 msgid "Build Only Favorites"
-msgstr ""
+msgstr "Ne construire que des favoris"
 
 msgctxt "#30036"
 msgid "%s added to Favorites"
-msgstr ""
+msgstr "%s ajoutée aux Favoris"
 
 msgctxt "#30037"
 msgid "%s removed from Favorites"
-msgstr ""
+msgstr "%s supprimée des Favoris"
 
 msgctxt "#30038"
 msgid "Add Channel to Favorites"
-msgstr ""
+msgstr "Ajouter la chaîne aux Favoris"
 
 msgctxt "#30039"
 msgid "Remove Channel from Favorites"
-msgstr ""
+msgstr "Retirer la chaîne des Favoris"
 
 msgctxt "#30040"
 msgid "Live (Favorites)"
-msgstr ""
+msgstr "Direct (Favoris)"
 
 msgctxt "#30041"
 msgid "Use Direct stream"
-msgstr ""
+msgstr "Utiliser le stream direct"
 
 msgctxt "#30042"
 msgid "PseudoTV Live Supported through Recommended Services"
-msgstr ""
+msgstr "PseudoTV Live prise en charge par les services recommandés"
 
 msgctxt "#30043"
 msgid "Prefer Color Channel Logos"
-msgstr ""
+msgstr "Préférer les logos en couleur des chaînes"
 
 msgctxt "#30044"
 msgid "General"
@@ -163,7 +167,7 @@ msgstr "Intégration"
 
 msgctxt "#49001"
 msgid "Install PseudoTV Live add-on"
-msgstr ""
+msgstr "Installer l'extension PseudoTV Live"
 
 msgctxt "#49002"
 msgid "Install IPTV Manager add-on"
@@ -179,7 +183,7 @@ msgstr "Paramètres IPTV Manager…"
 
 msgctxt "#49005"
 msgid "PseudoTV Live settings…"
-msgstr ""
+msgstr "Paramètres de PseudoTV Live…"
 
 msgctxt "#49006"
 msgid "Only add Favorites"

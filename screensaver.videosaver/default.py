@@ -76,8 +76,8 @@ def saveVolume():
 def setVolume(state):
     log('setVolume, state = %s'%(state))
     if not isMute():
-        if state == 0: json_response = sendJSON('{"jsonrpc":"2.0","method":"Application.SetMute","params":{"mute":true},"id":1}')
-        else:          json_response = sendJSON('{"jsonrpc":"2.0","method":"Application.SetVolume","params":{"volume":%s},"id":1}'%(state))
+        # if state == 0: json_response = sendJSON('{"jsonrpc":"2.0","method":"Application.SetMute","params":{"mute":true},"id":1}')
+        json_response = sendJSON('{"jsonrpc":"2.0","method":"Application.SetVolume","params":{"volume":%s},"id":1}'%(state))
         if 'OK' in json_response: return True
     return False
     

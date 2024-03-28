@@ -665,7 +665,7 @@
     </extension>
 </addon>
 
-<addon id="screensaver.videosaver" name="Video ScreenSaver" version="1.1.4" provider-name="Lunatixz">
+<addon id="screensaver.videosaver" name="Video ScreenSaver" version="1.1.4a" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>

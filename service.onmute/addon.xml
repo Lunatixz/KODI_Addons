@@ -27,6 +27,7 @@
         <summary lang="it_IT">Abilita sottotitoli con descrizione audio e sottotitoli &quot;OnMute&quot;.</summary>
         <summary lang="ko_KR">폐쇄 자막 및 &quot;OnMute&quot; 자막을 활성화합니다.</summary>
         <summary lang="pl_PL">Włącz napisy kodowane i napisy „OnMute”.</summary>
+        <summary lang="ru_RU">Включение закрытых субтитров и субтитров &quot;OnMute&quot;.</summary>
         <summary lang="zh_CN">启用闭路字幕和字幕“OnMute”。</summary>
         <description lang="cs_CZ">Nechte &quot;OnMute&quot; přepínat skryté titulky a titulky když je v Kodi vypnutý zvuk.</description>
         <description lang="da_DK">Lad &quot;OnMute&quot; skifte tekster for hørehæmmede og undertekster, mens Kodi er slået fra.</description>
@@ -40,6 +41,7 @@
         <description lang="it_IT">Lascia che &quot;OnMute&quot; alterni sottotitoli con descrizione audio e sottotitoli mentre Kodi è silenziato.</description>
         <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &quot;OnMute&quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
         <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>
+        <description lang="ru_RU">Позволяет &quot;OnMute&quot; переключать закрытые субтитры и субтитры, когда Kodi приглушен.</description>
         <description lang="zh_CN">让“OnMute”在 Kodi 静音时切换闭路字幕和字幕。</description>
     </extension>
 </addon>

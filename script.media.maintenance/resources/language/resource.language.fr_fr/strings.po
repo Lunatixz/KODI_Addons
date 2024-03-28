@@ -7,15 +7,15 @@ msgstr ""
 "Project-Id-Version: plugin.video.cbr\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2023-01-22 10:15+0000\n"
-"Last-Translator: skypichat <skypichat@hotmail.fr>\n"
+"PO-Revision-Date: 2024-02-17 02:28+0000\n"
+"Last-Translator: Philippe Duveau <pduvax@gmail.com>\n"
 "Language-Team: French (France) <https://kodi.weblate.cloud/projects/kodi-add-ons-scripts/script-media-maintenance/fr_fr/>\n"
 "Language: fr_fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.15.1\n"
+"X-Generator: Weblate 5.4\n"
 
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
@@ -27,7 +27,7 @@ msgstr "Quelque chose s'est mal passé, essayez encore..."
 
 msgctxt "#30002"
 msgid "Select TV Shows to Monitor"
-msgstr "Sélectionner les émissions de télévision à surveiller"
+msgstr "Sélectionner les séries à surveiller"
 
 msgctxt "#30003"
 msgid "Scanning..."
@@ -39,11 +39,11 @@ msgstr "Scan terminé"
 
 msgctxt "#30005"
 msgid "Monitored TV Shows"
-msgstr "Séries TV surveillées"
+msgstr "Programmes TV surveillées"
 
 msgctxt "#30006"
 msgid "Add Sonarr Monitored TV Shows"
-msgstr "Ajouter des séries TV surveillées par Sonarr"
+msgstr "Ajouter des programmes TV surveillées par Sonarr"
 
 msgctxt "#30007"
 msgid "IP:Port"
@@ -67,7 +67,7 @@ msgstr "Dernière analyse (%s)"
 
 msgctxt "#30012"
 msgid "Clear Monitored TV Shows"
-msgstr "Effacer les séries TV surveillées"
+msgstr "Effacer les programmes TV surveillées"
 
 msgctxt "#30013"
 msgid "Enable add-on to [B]DELETE[/B] your media"
@@ -79,7 +79,7 @@ msgstr "Avertissement ! ! La sélection de \"Supprimer\" [B]SUPPRIMERA DEFINITIV
 
 msgctxt "#30015"
 msgid "TV Shows"
-msgstr "Séries TV"
+msgstr "Programmes TV"
 
 msgctxt "#30016"
 msgid "Sonarr"
@@ -87,7 +87,7 @@ msgstr "Sonarr"
 
 msgctxt "#30017"
 msgid "Cleared Monitored TV Shows"
-msgstr "Séries TV surveillées effacées"
+msgstr "Programmes TV surveillés effacés"
 
 msgctxt "#30018"
 msgid "Movies"
@@ -167,11 +167,11 @@ msgstr "Sélectionner les doublons à supprimer"
 
 msgctxt "#30037"
 msgid "Select one or multiple TV Shows"
-msgstr "Sélectionner une ou plusieurs séries TV"
+msgstr "Sélectionner un ou plusieurs programmes TV"
 
 msgctxt "#30038"
 msgid "Scanning TV Shows..."
-msgstr "Recherche de séries TV..."
+msgstr "Recherche de programmes TV..."
 
 msgctxt "#30039"
 msgid "Scanning Movies..."
@@ -191,7 +191,7 @@ msgstr "Ajouter à la liste de surveillance"
 
 msgctxt "#30043"
 msgid "Add "%s" to Monitored TV Shows"
-msgstr "Ajouter \"%s\" aux séries TV surveillées"
+msgstr "Ajouter \"%s\" aux programmes TV surveillés"
 
 msgctxt "#30044"
 msgid "Select All"
@@ -199,7 +199,7 @@ msgstr "Tout sélectionner"
 
 msgctxt "#30045"
 msgid "Monitor all shows"
-msgstr "Surveiller toutes les séries"
+msgstr "Surveiller tous les programmes"
 
 msgctxt "#30046"
 msgid "General"

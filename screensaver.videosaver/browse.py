@@ -49,8 +49,7 @@ def browseDialog(type=0, heading=ADDON_NAME, default='', shares='', mask='', opt
     if prompt and not default:
         if options is None:
             options = [{"label":"Video", "label2":"Video Sources", "default":"library://video/", "mask":VIDEO_EXTS , "type":type, "multi":False}]
-            if type == 0: 
-                options.insert(0,{"label":"Video Playlists" , "label2":"Video Playlists"               , "default":"special://profile/playlists/video/" , "mask":'.xsp'     , "type":1, "multi":False})
+            if type == 0: options.insert(0,{"label":"Video Playlists", "label2":"Video Playlists", "default":"special://profile/playlists/video/", "mask":'.xsp', "type":1, "multi":False})
 
         listitems = [buildMenuListItem(option['label'],option['label2']) for option in options]
         select    = selectDialog(listitems, LANGUAGE(32018), multi=False)

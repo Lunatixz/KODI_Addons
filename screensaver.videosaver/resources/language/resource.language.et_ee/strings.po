@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To:  \n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: 2024-03-05 01:02+0000\n"
 "Last-Translator: rimasx <riks_12@hot.ee>\n"
@@ -110,4 +110,8 @@ msgstr ""
 
 msgctxt "#32021"
 msgid "Set Dimmer Level"
+msgstr ""
+
+msgctxt "#32022"
+msgid "Enable Random Seek & Position"
 msgstr ""

@@ -111,3 +111,7 @@ msgstr ""
 msgctxt "#32021"
 msgid "Set Dimmer Level"
 msgstr ""
+
+msgctxt "#32022"
+msgid "Enable Random Seek & Position"
+msgstr ""

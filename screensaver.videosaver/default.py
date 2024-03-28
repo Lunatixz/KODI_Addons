@@ -137,34 +137,22 @@ class Player(xbmc.Player):
         
         
     def onAVStarted(self):
-        seek = random.randint(1,int(self.getTotalTime()))
-        if RANDOM_SEEK: self.seekTime(seek)
-        log('onAVStarted, seek = %s'%(seek))
+        log('onAVStarted')
+        if RANDOM_SEEK: self.seekTime(random.randint(1,int(self.getTotalTime())))
 
-
-    def onPlayBackEnded(self):
-        log('onPlayBackEnded')
-        # if SINGLE_FLE: exeAction('stop')
-        # self.myPlayer.play(self.playList)
-        
-        
-    def onPlayBackStopped(self):
-        log('onPlayBackStopped')
-        self.myBackground.onClose()
-        
 
 class BackgroundWindow(xbmcgui.WindowXMLDialog):
+    random.seed()
+    cache    = SimpleCache()
+    myPlayer = Player()
+    
     def __init__(self, *args, **kwargs):
         xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
         if DISABLE_TRAKT: xbmcgui.Window(10000).setProperty('script.trakt.paused','true')
         xbmcgui.Window(10000).setProperty('PseudoTVRunning','True') #disable third-party addons ie. nextup, etc.
-        
-        random.seed()
         self.playList  = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         self.startidx  = 0
         self.fileCount = 0
-        self.cache     = SimpleCache()
-        self.myPlayer  = Player()
         self.myPlayer.myBackground = self
         
         
@@ -193,8 +181,8 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
         xbmcgui.Window(10000).clearProperty('%s.Running'%(ADDON_ID))
         xbmcgui.Window(10000).clearProperty('PseudoTVRunning')
         setVolume(int((xbmcgui.Window(10000).getProperty('%s.RESTORE'%ADDON_ID) or '0')))
-        self.myPlayer.stop()
         self.playList.clear()
+        self.myPlayer.stop()
         self.close()
         
         

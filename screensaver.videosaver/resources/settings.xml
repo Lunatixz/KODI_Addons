@@ -5,7 +5,7 @@
     <setting id="VideoFile"    type="action"    label="32003" default="" subsetting="true" visible="eq(-1,0)" action="RunScript($CWD/browse.py, -file)"/>
     <setting id="VideoFolder"  type="action"    label="32004" default="" subsetting="true" visible="eq(-2,1)" action="RunScript($CWD/browse.py, -folder)"/>
     <setting id="VideoLimit"   type="labelenum" label="32005" default="5" values="5|25|50|100|250|500" subsetting="true" visible="eq(-3,1)"/>
-    <setting id="VideoRandom"  type="bool"      label="32006" default="false"                          subsetting="true" visible="eq(-4,1)"/>
+    <setting id="VideoRandom"  type="bool"      label="32006" default="false"                          subsetting="true" />
     <setting id="RandomSeek"   type="bool"      label="32022" default="false"                          subsetting="true" />
       
     <setting id="Time"         type="bool"      label="32019" default="true" />

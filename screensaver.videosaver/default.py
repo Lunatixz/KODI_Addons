@@ -133,7 +133,7 @@ class Player(xbmc.Player):
 
     def onPlayBackError(self):
         log('onPlayBackError')
-        # exeAction('stop')
+        self.myBackground.onClose()
         
         
     def onAVStarted(self):
@@ -157,6 +157,8 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
         if DISABLE_TRAKT: xbmcgui.Window(10000).setProperty('script.trakt.paused','true')
+        xbmcgui.Window(10000).setProperty('PseudoTVRunning','True') #disable third-party addons ie. nextup, etc.
+        
         random.seed()
         self.playList  = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         self.startidx  = 0
@@ -174,7 +176,7 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
         self.dimid = self.getControl(41001)
         self.dimid.setAnimations([('Conditional', 'effect=fade start=%s end=%s condition=True'%(REAL_SETTINGS.getSettingInt('SetDimmer'),REAL_SETTINGS.getSettingInt('SetDimmer')))])
         
-        self.myPlayer.play(self.buildPlaylist(), windowed=True, startpos=self.startidx)
+        self.myPlayer.play(self.buildPlaylist(), windowed=True, startpos=self.startidx) #todo create listitems?
         setRepeat('all')
         
         
@@ -189,6 +191,7 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
         setRepeat(REAL_SETTINGS.getSetting('RepeatState').lower())
         xbmcgui.Window(10000).clearProperty('script.trakt.paused')
         xbmcgui.Window(10000).clearProperty('%s.Running'%(ADDON_ID))
+        xbmcgui.Window(10000).clearProperty('PseudoTVRunning')
         setVolume(int((xbmcgui.Window(10000).getProperty('%s.RESTORE'%ADDON_ID) or '0')))
         self.myPlayer.stop()
         self.playList.clear()
@@ -255,9 +258,9 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
         else: return escapeDirJSON(VIDEO_FILE)
         
         if playListItem:
-            if len(playListItem) > 1:
-                if RANDOM_PLAY: random.shuffle(playListItem)
-                if RANDOM_SEEK: self.startidx = random.randint(0, len(playListItem)-1)
+            if RANDOM_PLAY and len(playListItem) > 1:
+                random.shuffle(playListItem)
+                self.startidx = random.randint(0, len(playListItem)-1)
                 
             for idx, playItem in enumerate(playListItem): 
                 self.playList.add(playItem, index=idx)

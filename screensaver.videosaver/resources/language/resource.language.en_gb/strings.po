@@ -49,7 +49,7 @@ msgid "Video Limit"
 msgstr ""
 
 msgctxt "#32006"
-msgid "Randomize"
+msgid "Random Position"
 msgstr ""
 
 msgctxt "#32007"
@@ -113,5 +113,5 @@ msgid "Set Dimmer Level"
 msgstr ""
 
 msgctxt "#32022"
-msgid "Random Seek & Position"
+msgid "Random Seek"
 msgstr ""

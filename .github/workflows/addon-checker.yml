@@ -17,20 +17,5 @@ jobs:
         pip install -q kodi-addon-checker
     - name: Check with addon-checker
       run: |
-        kodi-addon-checker --branch matrix plugin.video.channelsdvr
-        kodi-addon-checker --branch matrix plugin.video.hdhomerun.simple
-        kodi-addon-checker --branch matrix plugin.video.newson
-        kodi-addon-checker --branch matrix plugin.video.playonbrowser
-        kodi-addon-checker --branch matrix plugin.video.plutotv
-        kodi-addon-checker --branch matrix plugin.video.xumotv
-        kodi-addon-checker --branch matrix screensaver.bing
-        kodi-addon-checker --branch matrix screensaver.flipclock
-        kodi-addon-checker --branch matrix screensaver.google.earth
-        kodi-addon-checker --branch matrix screensaver.unsplash
-        kodi-addon-checker --branch matrix screensaver.videosaver
-        kodi-addon-checker --branch matrix screensaver.unsplash
-        kodi-addon-checker --branch matrix script.kodi.android.update
-        kodi-addon-checker --branch matrix script.kodi.windows.update
-        kodi-addon-checker --branch matrix script.pystone.benchmark
-        kodi-addon-checker --branch matrix service.onmute
+        kodi-addon-checker --branch omega plugin.video.pseudotv.live
         

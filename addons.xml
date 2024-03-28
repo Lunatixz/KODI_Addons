@@ -36,11 +36,13 @@
         <summary lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV.</summary>
         <summary lang="es_ES">Airy TV es el destino de entretenimiento para ver TV 100% gratis.</summary>
         <summary lang="fi_FI">Airy TV on viihdekohde 100 % ilmaiseen television katseluun.</summary>
+        <summary lang="fr_FR">Airy TV est la destination de divertissement pour regarder la télévision 100% gratuite.</summary>
         <summary lang="it_IT">Airy TV è la meta del divertimento per guardare TV gratuita al 100%.</summary>
         <description lang="da_DK">Airy TV er underholdningsdestinationen for at se 100% gratis tv, film og komik. Stream anime og sport - al din underholdning på ét sted. Streaming har aldrig været nemmere! Airy TV har ingen kontrakt, ingen gebyrer, no-nonsense, kun gratis tv, film, komik, anime, sport - al din underholdning leveret til dig.</description>
         <description lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp; Comedy. Stream Anime &amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you.</description>
         <description lang="es_ES">Airy TV es el destino de entretenimiento para ver TV, Películas y Comedia 100% Gratis. Transmisión de anime y deportes, todo su entretenimiento en un solo lugar. ... ¡La transmisión nunca ha sido tan suave! Airy TV no tiene contrato, sin cuotas, sin tonterías, sólo TV gratis, Películas, Comedia Anime, Deportes, todo su entretenimiento a su disposición.</description>
         <description lang="fi_FI">Airy TV on viihdekohde, josta voit katsoa televisiota, elokuvia ja komedioita 100 % ilmaiseksi. Suoratoista animea ja urheilua, kaikki viihteesi yhdessä paikassa. ... Suoratoisto ei ole koskaan ollut sujuvampaa! Airy TV ei sisällä sopimuksia, maksuja tai tyhjänpäiväisyyksiä, vaan yksinkertaisesti ilmaista televisiota, elokuvia, komedioita, animea, urheilua. Kaikki viihteesi sinulle toimitettuna.</description>
+        <description lang="fr_FR">Airy TV est la destination de divertissement pour regarder la télévision, les films et les comédies 100% gratuits. Stream Anime &amp; Sports, tous vos divertissements en un seul endroit. ... Le streaming n&apos;a jamais été aussi fluide ! Airy TV n&apos;a pas de contrat, pas de frais, pas de problème, juste de la TV gratuite, des films, des comédies, de l&apos;animation, des sports, tous vos divertissements livrés à vous.</description>
         <description lang="it_IT">Airy TV è la meta del divertimento per guardare TV, film e commedie gratuiti al 100% . Trasmette anime e sport, tutto il tuo intrattenimento in un unico posto. La riproduzione non è mai stata così fluida! Airy TV non ha nessun contratto, nessuna tariffa, nessuna vincolo, solo TV gratuita: film, anime, sport, tutto il tuo intrattenimento ti viene consegnato a costo zero.</description>
     </extension>
 </addon>
@@ -82,11 +84,13 @@
         <summary lang="en_GB">Live TV, everywhere</summary>
         <summary lang="es_ES">TV en directo en cualquier sitio</summary>
         <summary lang="fi_FI">Televisiolähetykset, kaikkialla</summary>
+        <summary lang="fr_FR">La TV en direct, n&apos;importe où</summary>
         <summary lang="it_IT">TV in diretta, ovunque</summary>
         <description lang="da_DK">Se dine yndlingsprogrammer i Kodi. Kanaler leverer en samlet oplevelse på tværs af alle dine tv, enheder og streamingplatforme.</description>
         <description lang="en_GB">Watch your favorite programs on Kodi. Channels delivers a unified experience across all your TVs, devices, and streaming platforms.</description>
         <description lang="es_ES">Mira tus programas favoritos en Kodi. Canales entrega una experiencia unificada en todos tus dispositivos, TVs y plataformas de emisión.</description>
         <description lang="fi_FI">Katsele suosikkiohjelmiasi Kodissa. Kanavat toimittavat yksilöllisen kokemuksen kaikille televisioillesi, laitteillesi ja suoratoistoalustoille.</description>
+        <description lang="fr_FR">Regarder vos programmes favoris sur Kodi. Channels offre une expérience unifiée sur l&apos;ensemble de vos téléviseurs, appareils et plateformes de streaming.</description>
         <description lang="it_IT">Guarda i tuoi programmi preferiti su Kodi. Channels ti offre un&apos;esperienza unificata su tutte le tue TV, dispositivi e piattaforme di streaming.</description>
     </extension>
 </addon>
@@ -313,6 +317,7 @@
         <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
         <summary lang="es_ES">Canales de TV dedicados a tus cosas favoritas, hechos a partir de éxitos de taquilla de Paramount, ... &quot;El genio de Pluto TV: Esto sí que es televisión por Internet&quot;.</summary>
         <summary lang="fi_FI">Suosikkiasioillesi omistettuja TV-kanavia, jotka koostuvat Paramountin menestyselokuvista... &quot;Pluto TV:n neroutta: Tämä on todellinen Internet-televisio&quot;.</summary>
+        <summary lang="fr_FR">Des chaînes de télévision consacrées à vos sujets préférés, à partir de films à succès de Paramount, ... &quot;Le génie de Pluto TV : C&apos;est de la vraie télévision sur internet&quot;.</summary>
         <summary lang="it_IT">Canali TV dedicati alle tue cose preferite, ai film di successo della Paramount, ... &quot;Il genio di Pluto TV: questa è la vera televisione su Internet&quot;.</summary>
         <summary lang="sv_SE">TV-kanaler ägnade åt dina favoritsaker, gjorda av storfilmer från Paramount, ... &quot;Genialiteten med Pluto TV: Det här är riktig internet-TV&quot;.</summary>
         <description lang="da_DK">Se gratis tv i Kodi! Stream Pluto TV&apos;s mere end 100 kanaler med nyheder, sport og internettets bedste, helt gratis på din Kodi-enhed.</description>
@@ -320,6 +325,7 @@
         <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV&apos;s 100+ channels of news, sports, and the Internet&apos;s best, completely free on your Kodi device.</description>
         <description lang="es_ES">¡Ver TV gratis en Kodi! Transmite los más de 100 canales de noticias, deportes y lo mejor de Internet de Pluto TV, completamente gratis en tu dispositivo Kodi.</description>
         <description lang="fi_FI">Katso televisiota ilmaiseksi Kodissa! Suoratoista Pluto TV:n yli 100 uutis-, urheilu- ja Internet-kanavaa täysin veloituksetta Kodi-laitteellasi.</description>
+        <description lang="fr_FR">Regardez la TV gratuitement sur Kodi ! Regardez en continu les plus 100 chaînes de Pluto TV qui proposent des informations, du sport et le meilleur de l&apos;Internet, totalement gratuitement sur votre appareil Kodi.</description>
         <description lang="it_IT">Guarda la TV gratis su Kodi! Riproduci in streaming gli oltre 100 canali di notizie, sport e Internet di Pluto TV, completamente gratuiti sul tuo dispositivo Kodi.</description>
         <description lang="sv_SE">Titta på gratis TV på Kodi! Strömma Pluto-TV:s 100+ kanaler med nyheter, sport och internets bästa, helt gratis på din Kodi-enhet.</description>
     </extension>
@@ -508,6 +514,7 @@
         <summary lang="de_DE">Atemberaubende Bilder von der Bing-Homepage entdecken ... </summary>
         <summary lang="en_GB">Explore breathtaking images from the Bing homepage... </summary>
         <summary lang="es_ES">Explora las impresionantes imágenes de la página de inicio de Bing... </summary>
+        <summary lang="et_EE">Avasta hingematvalt kauneid pilte Bing avalehelt... </summary>
         <summary lang="fi_FI">Nauti hengityksen salpaavista kuvista Bing-palvelun etusivulta... </summary>
         <summary lang="fr_FR">Explorez des images à couper le souffle depuis la page d&apos;accueil de Bing.. </summary>
         <summary lang="it_IT">Esplora immagini mozzafiato dalla home page di Bing... </summary>
@@ -520,6 +527,7 @@
         <description lang="de_DE">Atemberaubende Bilder von der Bing-Homepage entdecken ... </description>
         <description lang="en_GB">Explore breathtaking images from the Bing homepage... </description>
         <description lang="es_ES">Explora las impresionantes imágenes de la página de inicio de Bing... </description>
+        <description lang="et_EE">Avasta hingematvalt kauneid pilte Bing avalehelt... </description>
         <description lang="fi_FI">Nauti hengityksen salpaavista kuvista Bing-palvelun etusivulta... </description>
         <description lang="fr_FR">Explorez des images à couper le souffle depuis la page d&apos;accueil de Bing... </description>
         <description lang="it_IT">Esplora immagini mozzafiato dalla home page di Bing... </description>
@@ -558,6 +566,7 @@
         <summary lang="de_DE">Earth View zeigt ein schönes Satellitenbild von Google Earth an …</summary>
         <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
         <summary lang="es_ES">Earth View muestra una bella imagen de satélite de Google Earth...</summary>
+        <summary lang="et_EE">Earth View kuvab ilusa satelliidipildi Google Earthist...</summary>
         <summary lang="fi_FI">Earth View näyttää kauniin satelliittikuvan Google Earthista...</summary>
         <summary lang="fr_FR">Earth View affiche une belle image satellite de Google Earth...</summary>
         <summary lang="hr_HR">Pogled zemlje prikazuje prekrasne Satelitske slike s Google Eartha...</summary>
@@ -570,6 +579,7 @@
         <description lang="de_DE">Earth View ist eine Sammlung der schönsten und eindrucksvollsten Landschaften, die in Google Earth zu finden sind.</description>
         <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
         <description lang="es_ES">Earth View es una colección de los paisajes más bonitos e impactantes de Google Earth.</description>
+        <description lang="et_EE">Earth View on kogumik kõige ilusamatest ja silmatorkavamatest maastikest, mida Google Earthis leidub.</description>
         <description lang="fi_FI">Earth View on kokoelma Google Earthin kauneimpia ja silmiinpistävimpiä maisemia.</description>
         <description lang="fr_FR">Earth View est une collection des paysages les plus beaux et les plus saisissants trouvés dans Google Earth.</description>
         <description lang="hr_HR">Pogled zemlje je kolekcija prekrasnih pejzaža pronađenih na Google Earthu.</description>
@@ -593,14 +603,11 @@
     <extension point="xbmc.ui.screensaver" library="default.py"/>
     <extension point="xbmc.python.script"  library="default.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">System 47 - Star Trek LCARS ScreenSaver</summary>
-        <description lang="en_GB">What is LCARS? LCARS is an acronym for "Library Computer Access and Retrieval System", which is the primary computer system in the universe of Star Trek's Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There's actually another name for this type of graphical displays. It's "Okudagram". It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <website>http://www.mewho.com/system47/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=323285</forum>
         <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/screensaver.system47</source>
-        <disclaimer lang="en_GB" >Streaming not recommend for metered Internet, choose download option under settings.</disclaimer>
         <news>v.2.5 Updated for Kodi Nexus/Omega[CR]v.2.3[CR}- PY3 .[CR]v.2.2h[CR}- Added Mute sounds (Enabled by default).</news>
         <assets>
             <icon>resources/images/icon.png</icon>
@@ -609,6 +616,8 @@
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
+        <summary lang="en_GB">System 47 - Star Trek LCARS ScreenSaver</summary>
+        <description lang="en_GB">What is LCARS? LCARS is an acronym for Library Computer Access and Retrieval System, which is the primary computer system in the universe of Star Trek&apos;s Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There&apos;s actually another name for this type of graphical displays. It&apos;s Okudagram. It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation.</description>
     </extension>
 </addon>
 
@@ -656,7 +665,7 @@
     </extension>
 </addon>
 
-<addon id="screensaver.videosaver" name="Video ScreenSaver" version="1.1.3c" provider-name="Lunatixz">
+<addon id="screensaver.videosaver" name="Video ScreenSaver" version="1.1.4" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -669,7 +678,7 @@
         <platform>all</platform>
         <forum>https://forum.kodi.tv/showthread.php?tid=319730</forum>
         <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/screensaver.videosaver</source>
-        <news>v.1.1.3[CR]- Added Dimmer</news>
+        <news>v.1.1.4[CR]- Added Random Seek and Position</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -681,7 +690,7 @@
         <summary lang="fi_FI">Luo näytönsäästäjä mistä tahansa Kodin videolähteestä.</summary>
         <summary lang="fr_FR">Créer un économiseur d&apos;écran à partir de n&apos;importe quelle source vidéo Kodi.</summary>
         <summary lang="hr_HR">Stvori čuvara zaslona iz Kodi video izvora.</summary>
-        <summary lang="it_IT">Crea uno screensaver da qualsiasi sorgente video Kodi.</summary>
+        <summary lang="it_IT">Crea un salvaschermo da qualsiasi sorgente video Kodi.</summary>
         <summary lang="zh_CN">从任意 Kodi 视频源创建屏幕保护程序。</summary>
         <description lang="da_DK">Dynamisk pauseskærm der benytter lokalt indhold, smarte playlister, plugins og UPNP-servere.</description>
         <description lang="de_DE">Dynamischer Bildschirmschoner mit lokalen Inhalten, SmartPlaylists, Plugins und UPnP-Servern.</description>
@@ -690,6 +699,7 @@
         <description lang="fi_FI">Dynaaminen näytönsäästäjä, joka hyödyntää paikallista sisältöä, älytoistolistoja, lisäosia sekä UPnP-palvelimia.</description>
         <description lang="fr_FR">Économiseur d&apos;écran dynamique utilisant le contenu local, les SmartPlaylists, les plugins et les serveurs UPNP.</description>
         <description lang="hr_HR">Promjenjivi čuvar zaslona koji koristi lokalni sadržaj, pametne popise izvođrnja, dodatke i UPNP poslužitelje.</description>
+        <description lang="uk_UA">Динамічна заставка з локальних файлів, списків SmartPlaylists, плагінів чи серверів UPNP.</description>
         <description lang="zh_CN">使用本地内容、智能播放列表、插件和 UPNP 服务器的动态屏幕保护程序。</description>
         <disclaimer lang="da_DK">Streamingkilder anbefales ikke til forbrugsbetalt internet.</disclaimer>
         <disclaimer lang="de_DE">Streamingquellen werden bei kostenpflichtigen Internet nicht empfohlen.</disclaimer>

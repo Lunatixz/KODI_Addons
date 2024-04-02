@@ -40,6 +40,9 @@ FILEPATH      = os.path.join(SETTINGS_LOC,FILENAME)
 DOWNLOAD_URL  = 'https://www.mediafire.com/file/xjkqyiy9for97fl/screensaver.system47.v.2.5.01.mp4/file'
 CHUNK_SIZE    = 512 * 1024  # 512KB
 
+# https://www.youtube.com/watch?v=LEQ9m5IgfIc
+# https://www.youtube.com/watch?v=TepWfVIaWv8
+
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()

@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Lunatixz
+#   Copyright (C) 2024 Lunatixz
 #
 #
 # This file is part of System 47 Live in HD Screensaver.
@@ -16,11 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with System 47 Live in HD Screensaver.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, random, traceback, json, base64
+import os, random, traceback, json, base64, datetime
 # import youtube_registration # https://github.com/jdf76/plugin.video.youtube/issues/184
 
 from kodi_six    import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
-
 
 # youtube_registration.register_api_keys(addon_id=ADDON_ID,
                                        # api_key=base64.urlsafe_b64decode(REAL_SETTINGS.getSetting('AKEY')),
@@ -42,18 +41,30 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 ACTION_STOP   = 13
 MUTE          = REAL_SETTINGS.getSetting('Enable_Mute') == 'true'
 RANDOM        = REAL_SETTINGS.getSetting('Enable_Random') == 'true'
-YTID          = 'N9Sxyvz4lW4'
 FILENAME      = 'screensaver.system47.v.2.5.01.mp4'
- 
+
+# https://www.youtube.com/@system47
+YTID_LST      = ['N9Sxyvz4lW4','TepWfVIaWv8','6mTleQJn1Cc','qiIuv9RXq2c','X3tKtrqsSBg','Kxrj7PYJMQY','l8Jzp_JaL0E',
+                 'MptItr7LfS4','yL4D7rIJAc0','NjFjB1Ibuow','LGg6j0LbelM','LEQ9m5IgfIc','9nJlJQ5_o5E','9XtYJmSu5oY']
+
 def log(msg, level = xbmc.LOGDEBUG):
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
     xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg), xbmc.LOGERROR)
      
+def getDate():
+    return datetime.datetime.now().strftime('%m-%d')
+
 def getURL():
+    YTID = random.choice({'11-23':['XY7qveGGSh0'],'12-25':['7h5n7IjR08M']}.get(getDate(),YTID_LST))
+    log('getURL, YTID = ' + str(YTID))
     if xbmc.getCondVisibility('System.HasAddon(plugin.video.youtube)') and xbmc.getCondVisibility('System.AddonIsEnabled(plugin.video.youtube)'):
         return 'plugin://plugin.video.youtube/play/?video_id=%s&suggested=false&incognito=true'%(YTID)
     elif xbmc.getCondVisibility('System.HasAddon(plugin.video.tubed)') and xbmc.getCondVisibility('System.AddonIsEnabled(plugin.video.tubed)'):
         return 'plugin://plugin.video.tubed/?mode=play&video_id=%s'%(YTID)
+    elif xbmc.getCondVisibility('System.HasAddon(plugin.video.invidious)') and xbmc.getCondVisibility('System.AddonIsEnabled(plugin.video.invidious)'):
+        return 'plugin://plugin.video.invidious/?mode=play_video&video_id=%s'%(YTID)
+    elif xbmc.getCondVisibility('System.HasAddon(plugin.video.invidious)') and xbmc.getCondVisibility('System.AddonIsEnabled(plugin.video.invidious)'):
+        return 'plugin://plugin.video.invidious/?mode=play_video&video_id=%s'%(YTID)
     else:
         xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30004), ICON, 4000)
        
@@ -89,10 +100,12 @@ class BackgroundWindow(xbmcgui.WindowXMLDialog):
     
     
     def playFile(self):
-        if xbmcvfs.exists(os.path.join(SETTINGS_LOC,FILENAME)):
+        if REAL_SETTINGS.getSetting('Playlist') == '0':
+            return getURL()
+        elif xbmcvfs.exists(os.path.join(SETTINGS_LOC,FILENAME)):
             return os.path.join(SETTINGS_LOC,FILENAME)
         else:
-            return getURL()
+            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30009), ICON, 4000)
         
         
     def onInit(self):
@@ -120,3 +133,38 @@ class Start(object):
         self.background.doModal()
         
 if __name__ == '__main__': Start()
+
+#todo save state settings, and play queue
+
+        # {
+            # "control": {
+                # "delayed": false,
+                # "format": "boolean",
+                # "type": "toggle"
+            # },
+            # "default": true,
+            # "enabled": false,
+            # "help": "If music is being played, the screensaver will never be activated",
+            # "id": "screensaver.disableforaudio",
+            # "label": "Disable screensaver when playing audio",
+            # "level": "basic",
+            # "parent": "",
+            # "type": "boolean",
+            # "value": true
+        # },
+        # {
+            # "control": {
+                # "delayed": false,
+                # "format": "boolean",
+                # "type": "toggle"
+            # },
+            # "default": true,
+            # "enabled": false,
+            # "help": "Dim the display when media is paused. Not valid for the \"Dim\" screensaver mode.",
+            # "id": "screensaver.usedimonpause",
+            # "label": "Use dim if paused during video playback",
+            # "level": "standard",
+            # "parent": "",
+            # "type": "boolean",
+            # "value": true
+        # },

@@ -1,52 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.airytv" version="0.1.2" name="AiryTV" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.six" version="1.0.0"/>
-        <import addon="script.module.kodi-six" version="0.1.3.1"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.routing" version="0.2.3"/>
-        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
-        <import addon="plugin.video.tubed" version="0.0.1"/>
-        <import addon="service.iptv.manager" version="0.2.2" optional="true"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.service" library="pseudotv_recommended.py"/>
-    <extension point="xbmc.addon.metadata">
-        <reuselanguageinvoker>true</reuselanguageinvoker>
-        <platform>all</platform>
-        <license>GPL-3.0-or-later</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.airytv</source>
-        <website>https://airy.tv/</website>
-        <forum>https://forum.kodi.tv/showthread.php?tid=361486&amp;pid=3023875</forum>
-        <news>v1.0.0[CR]- Matrix Support[CR]</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.jpg</screenshot>
-            <screenshot>resources/images/screenshot02.jpg</screenshot>
-            <screenshot>resources/images/screenshot03.jpg</screenshot>
-            <screenshot>resources/images/screenshot04.jpg</screenshot>
-        </assets>
-        <summary lang="da_DK">Airy TV er underholdningsdestinationen for at se 100% gratis tv.</summary>
-        <summary lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV.</summary>
-        <summary lang="es_ES">Airy TV es el destino de entretenimiento para ver TV 100% gratis.</summary>
-        <summary lang="fi_FI">Airy TV on viihdekohde 100 % ilmaiseen television katseluun.</summary>
-        <summary lang="fr_FR">Airy TV est la destination de divertissement pour regarder la télévision 100% gratuite.</summary>
-        <summary lang="it_IT">Airy TV è la meta del divertimento per guardare TV gratuita al 100%.</summary>
-        <description lang="da_DK">Airy TV er underholdningsdestinationen for at se 100% gratis tv, film og komik. Stream anime og sport - al din underholdning på ét sted. Streaming har aldrig været nemmere! Airy TV har ingen kontrakt, ingen gebyrer, no-nonsense, kun gratis tv, film, komik, anime, sport - al din underholdning leveret til dig.</description>
-        <description lang="en_GB">Airy TV is the entertainment destination for watching 100% Free TV, Movies &amp; Comedy. Stream Anime &amp; Sports, all your entertainment in one place. ... Streaming has never been smoother! Airy TV has no contract, no fees, no-nonsense, just free TV, Movies, Comedy Anime, Sports, all your entertainment delivered to you.</description>
-        <description lang="es_ES">Airy TV es el destino de entretenimiento para ver TV, Películas y Comedia 100% Gratis. Transmisión de anime y deportes, todo su entretenimiento en un solo lugar. ... ¡La transmisión nunca ha sido tan suave! Airy TV no tiene contrato, sin cuotas, sin tonterías, sólo TV gratis, Películas, Comedia Anime, Deportes, todo su entretenimiento a su disposición.</description>
-        <description lang="fi_FI">Airy TV on viihdekohde, josta voit katsoa televisiota, elokuvia ja komedioita 100 % ilmaiseksi. Suoratoista animea ja urheilua, kaikki viihteesi yhdessä paikassa. ... Suoratoisto ei ole koskaan ollut sujuvampaa! Airy TV ei sisällä sopimuksia, maksuja tai tyhjänpäiväisyyksiä, vaan yksinkertaisesti ilmaista televisiota, elokuvia, komedioita, animea, urheilua. Kaikki viihteesi sinulle toimitettuna.</description>
-        <description lang="fr_FR">Airy TV est la destination de divertissement pour regarder la télévision, les films et les comédies 100% gratuits. Stream Anime &amp; Sports, tous vos divertissements en un seul endroit. ... Le streaming n&apos;a jamais été aussi fluide ! Airy TV n&apos;a pas de contrat, pas de frais, pas de problème, juste de la TV gratuite, des films, des comédies, de l&apos;animation, des sports, tous vos divertissements livrés à vous.</description>
-        <description lang="it_IT">Airy TV è la meta del divertimento per guardare TV, film e commedie gratuiti al 100% . Trasmette anime e sport, tutto il tuo intrattenimento in un unico posto. La riproduzione non è mai stata così fluida! Airy TV non ha nessun contratto, nessuna tariffa, nessuna vincolo, solo TV gratuita: film, anime, sport, tutto il tuo intrattenimento ti viene consegnato a costo zero.</description>
-    </extension>
-</addon>
-
 <addon id="plugin.video.channelsdvr" version="1.2.2" name="Channels DVR" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
@@ -93,50 +46,6 @@
         <description lang="fr_FR">Regarder vos programmes favoris sur Kodi. Channels offre une expérience unifiée sur l&apos;ensemble de vos téléviseurs, appareils et plateformes de streaming.</description>
         <description lang="it_IT">Guarda i tuoi programmi preferiti su Kodi. Channels ti offre un&apos;esperienza unificata su tutte le tue TV, dispositivi e piattaforme di streaming.</description>
     </extension>
-</addon>
-
-<addon id="plugin.video.crackle" name="Crackle" version="2021.5.24+matrix.1" provider-name="eracknaphobia">
-  <requires>
-      <import addon="xbmc.python" version="3.0.0"/>
-      <import addon="script.module.requests"/>
-      <import addon="script.module.inputstreamhelper"/>
-      <import addon="script.module.kodi-six" />
-  </requires>
-  <extension point="xbmc.python.pluginsource" library="main.py">
-        <provides>video</provides>
-  </extension>
-  <extension point="xbmc.service" library="pseudotv_recommended.py"/>
-  <extension point="xbmc.addon.metadata">
-    <platform>all</platform>
-      <news>
-        - PseudoTV Live support (temporary build until eracknaphobia repository update).
-      </news>
-    <language>en</language>
-    <platform>all</platform>
-    <license>GPL-2.0-or-later</license>
-    <forum></forum>
-    <source>https://github.com/eracknaphobia/plugin.video.crackle</source>
-    <assets>
-        <icon>icon.png</icon>
-        <fanart>fanart.jpg</fanart>
-    </assets>
-    <summary lang="da_DK">Crackle leverer populære, prisvindende tv, film og originaler. Uden grænser for, hvor meget du kan se på tværs af alle dine enheder, kan du binge alt, hvad du vil, uanset hvor du vil.</summary>
-    <summary lang="en_GB">Crackle delivers popular, award-winning TV, movies and originals. With no limit to how much you can watch across all your devices, you can binge all you want, wherever you want.</summary>
-    <summary lang="es_ES">Crackle ofrece televisión, películas y contenidos originales famosos y galardonados. Sin límite de visionado en todos tus dispositivos, puedes disfrutar de todo lo que quieras, donde quieras.</summary>
-    <summary lang="fi_FI">Crackle tarjoaa suosittuja ja palkittuja sarjoja, elokuvia ja omia tuotantojaan. Ilman katselumäärän rajoituksia voit nauttia sisällöstä kaikilla laitteillasi kaikkialla ja koska tahansa.</summary>
-    <summary lang="it_IT">Crackle offre TV, film e programmi originali popolari e pluripremiati. Senza limiti, in quanto puoi guardarli su tutti i tuoi dispositivi, puoi abbuffarti di tutto ciò che vuoi, dove vuoi.</summary>
-    <summary lang="ko_KR">Crackle은 수상 경력에 빛나는 인기 있는 TV, 영화 및 원본을 제공합니다. 모든 장치에서 볼 수 있는 양에 제한 없이 원하는 곳 어디서나 원하는 대로 즐길 수 있습니다.</summary>
-    <summary lang="pl_PL">Crackle dostarcza popularne, nagradzane programy telewizyjne, filmy i oryginały. Bez ograniczeń co do tego, ile możesz oglądać na wszystkich swoich urządzeniach; możesz napadowo oglądać do woli, gdziekolwiek chcesz.</summary>
-    <summary lang="ru_RU">Crackle поставляет популярные, отмеченные наградами телепередачи, фильмы и оригинальные шоу. Вы можете смотреть что угодно и когда угодно на всех своих устройствах без каких-либо ограничений.</summary>
-    <description lang="da_DK">Crackle er en distributør af videostreaming af originale webserier, Hollywoodfilm og tv-serier. Grundlagt i begyndelsen af 2000&apos;erne som Grouper og omdøbt i 2007, er Crackle ejet af Sony Pictures Entertainment.</description>
-    <description lang="en_GB">Crackle is a video streaming distributor of original web shows, Hollywood movies, and TV shows. Founded in the early 2000s as Grouper, and rebranded in 2007, Crackle is owned by Sony Pictures Entertainment.</description>
-    <description lang="es_ES">Crackle es un distribuidor de transmisión de vídeo de espectáculos web originales, películas de Hollywood y programas de televisión. Fundada a principios de la década de los 2000 con el nombre de Grouper y rebautizada en 2007, Crackle es propiedad de Sony Pictures Entertainment.</description>
-    <description lang="fi_FI">Crackle on suoratoistopalvelu, joka tuottaa omia verkkosarjojaan ja jakelee Hollywood-elokuvia ja sarjoja. Crackle perustettiin 2000-luvun alussa nimellä Grouper ja nimetiin uudelleen vuonna 2007 ja sen omistaa Sony Pictures Entertainment.</description>
-    <description lang="it_IT">Crackle è un distributore di streaming video di serie web originali, film di Hollywood e serie TV. Fondata all&apos;inizio degli anni 2000 come Grouper e rinominata nel 2007, Crackle è di proprietà di Sony Pictures Entertainment.</description>
-    <description lang="ko_KR">Crackle은 오리지널 웹 쇼, 헐리우드 영화 및 TV 쇼의 비디오 스트리밍 유통업체입니다. 2000년대 초에 Grouper로 설립되어 2007년에 브랜드 이름을 변경한 Crackle은 Sony Pictures Entertainment의 소유입니다.</description>
-    <description lang="pl_PL">Crackle to dystrybutor strumieniowego przesyłania wideo oryginalnych programów internetowych, filmów z Hollywood i programów telewizyjnych. Założona na początku 2000 roku jako Grouper i przemianowana w 2007 roku, Crackle jest własnością Sony Pictures Entertainment.</description>
-    <description lang="ru_RU">Crackle — потоковый дистрибьютор оригинальных веб-шоу, голливудских фильмов и телешоу. Crackle принадлежит Sony Pictures Entertainment. Был основан в начале 2000-х годов как Grouper и переименован в 2007 году.</description>
-  </extension>
 </addon>
 
 <addon id="plugin.video.hdhomerun.simple" name="HDHomerun Simple" provider-name="Lunatixz" version="1.0.9">
@@ -187,48 +96,6 @@
         <disclaimer lang="es_ES">Se necesita un dispositivo HDHomeRun compatible</disclaimer>
         <disclaimer lang="fi_FI">Vaatii yhteensopivan HDHomeRun-laitteen</disclaimer>
         <disclaimer lang="it_IT">Richiede un dispositivo HDHomeRun compatibile</disclaimer>
-    </extension>
-</addon>
-
-<addon id="plugin.video.newson" version="1.3.1" name="NewsON" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.six" version="1.0.0"/>
-        <import addon="script.module.kodi-six" version="0.1.3.1"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.routing" version="0.2.3"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.service" library="pseudotv_recommended.py"/>
-    <extension point="xbmc.addon.metadata">
-        <reuselanguageinvoker>true</reuselanguageinvoker>
-        <platform>all</platform>
-        <license>GPL-3.0-or-later</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.newson</source>
-        <website>http://watchnewson.com/</website>
-        <forum>https://forum.kodi.tv/showthread.php?tid=315924</forum>
-        <news>v.1.2.0[CR]-Matrix[CR]v1.0.8[CR]Added InputStream Helper[CR]-v1.0.7[CR]Updated Parser[CR]-v1.0.5[CR]-Fixed Parsing Error[CR]v1.0.4[CR]-Leia Compatibility, Added adaptive inputstream[CR]v1.0.3[CR]-Plugin improvments.[CR]v1.0.2[CR]-Updated cache parameters.[CR]v1.0.1[CR]-Updated cache parameters, Improved error detection.</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-        <summary lang="da_DK">Lokale nyheder på landsplan</summary>
-        <summary lang="en_GB">Local News Nationwide</summary>
-        <summary lang="es_ES">Noticias locales en todo el país</summary>
-        <summary lang="it_IT">Notizie locali a livello nazionale</summary>
-        <summary lang="ru_RU">Местные новости по всей стране</summary>
-        <description lang="da_DK">NewsON giver øjeblikkelig adgang til direkte- eller on-demand-udsendelser fra over 175 lokale stationer på 114 amerikanske markeder. Få adgang til tidligere nyhedsudsendelser i op til 48 timer, efter de er blevet sendt, og del interessante historier med den integrerede delefunktion på sociale medier direkte fra appen. Søg efter en lokal station med det interaktive kort, eller se stationen tættest på dig på smartphones, tablets eller Roku-streamingafspillere. Gem favoritstationer, og hold dig opdateret med alarmer om seneste nyheder sendt direkte til mobile enheder fra den lokale nyhedskilde. Hold forbindelsen når som helst og hvor som helst uden et kabelabonnement eller login.</description>
-        <description lang="en_GB">NewsON provides instant access to live or on-demand broadcasts from over 175 local stations in 114 U.S. markets. Access previous newscasts for up to 48 hours after they air, and share interesting stories with the integrated social media share function directly from the app. Search for a local station with the interactive map or watch the station closest to you on smartphones, tablets, or Roku streaming players. Save favorite stations, and stay updated with breaking news alerts sent directly to mobile devices from the local source of the news. Stay connected anytime, anywhere without a cable subscription or login.</description>
-        <description lang="es_ES">NewsON proporciona acceso instantáneo a emisiones en directo o a la carta de más de 175 emisoras locales en 114 mercados de Estados Unidos. Acceda a noticiarios emitidos hasta 48 horas después de su emisión y comparta historias interesantes con la función integrada para compartir en redes sociales directamente desde la aplicación. Busque una emisora local con el mapa interactivo o vea la emisora más cercana en teléfonos inteligentes, tabletas o reproductores de transmisiones Roku. Guarde sus emisoras favoritas y manténgase al día con las alertas de noticias de última hora enviadas directamente a los dispositivos móviles desde la fuente local de las noticias. Mantente conectado en cualquier momento y lugar sin necesidad de suscribirte a la televisión por cable ni de iniciar sesión.</description>
-        <description lang="it_IT">NewsON fornisce accesso istantaneo a trasmissioni in diretta o su richiesta da oltre 175 stazioni locali in 114 mercati statunitensi. Accedi ai notiziari fino a 48 ore dopo la loro messa in onda e condividi storie interessanti con la funzione di condivisione integrata sui social media direttamente dall&apos;app. Cerca una stazione locale con la mappa interattiva o guarda la stazione più vicina a te su smartphone, tablet o lettori streaming Roku. Salva le stazioni preferite e tieniti aggiornato con gli avvisi delle ultime notizie inviati direttamente ai dispositivi mobili dalla fonte locale delle notizie. Rimani connesso sempre e ovunque senza abbonamento via cavo o registrazione.</description>
-        <description lang="ru_RU">NewsON предоставляет мгновенный доступ к прямым или по требованию трансляциям от более чем 175 местных станций на 114 рынках США. Получите доступ к предыдущим выпускам новостей в течение 48 часов после их выхода в эфир и делитесь интересными сюжетами с помощью встроенной функции публикации в социальных сетях прямо из приложения. Найдите местную станцию с помощью интерактивной карты или смотрите ближайшую к вам станцию на смартфонах, планшетах или потоковых плеерах Roku. Сохраняйте любимые станции и будьте в курсе последних новостей, отправляемых прямо на мобильные устройства от местного источника новостей. Оставайтесь на связи в любое время и в любом месте без подписки на кабельное телевидение или входа в систему.</description>
     </extension>
 </addon>
 
@@ -286,166 +153,12 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.plutotv" version="1.6.3" name="Pluto TV" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.six" version="1.0.0"/>
-        <import addon="script.module.kodi-six" version="0.1.3.1"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.routing" version="0.2.3"/>
-        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
-        <import addon="service.iptv.manager" version="0.2.2" optional="true"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.service" library="pseudotv_recommended.py"/>
-    <extension point="xbmc.addon.metadata">
-        <reuselanguageinvoker>false</reuselanguageinvoker>
-        <platform>all</platform>
-        <license>GPL-3.0-or-later</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.plutotv</source>
-        <website>http://pluto.tv/</website>
-        <forum>http://forum.kodi.tv/showthread.php?tid=315513</forum>
-        <news>v1.5.0[CR]- Matrix Support[CR]</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.jpg</screenshot>
-            <screenshot>resources/images/screenshot02.jpg</screenshot>
-            <screenshot>resources/images/screenshot03.jpg</screenshot>
-            <screenshot>resources/images/screenshot04.jpg</screenshot>
-        </assets>
-        <summary lang="da_DK">Tv-kanaler dedikeret til dine yndlingsting, lavet af storfilm fra Paramount... &quot;Det geniale ved Pluto TV: dette er ægte internet-tv&quot;.</summary>
-        <summary lang="de_DE">TV-Sender gewidmet für deine Vorlieben, gemacht von Blockbuster Movies von Paramount, ... „Das Genie von Pluto-TV: Das ist das echte Internetfernsehen“.</summary>
-        <summary lang="en_GB">TV channels devoted to your favorite things, made from blockbuster movies from Paramount, ... “The genius of Pluto TV: This is real internet television”.</summary>
-        <summary lang="es_ES">Canales de TV dedicados a tus cosas favoritas, hechos a partir de éxitos de taquilla de Paramount, ... &quot;El genio de Pluto TV: Esto sí que es televisión por Internet&quot;.</summary>
-        <summary lang="fi_FI">Suosikkiasioillesi omistettuja TV-kanavia, jotka koostuvat Paramountin menestyselokuvista... &quot;Pluto TV:n neroutta: Tämä on todellinen Internet-televisio&quot;.</summary>
-        <summary lang="fr_FR">Des chaînes de télévision consacrées à vos sujets préférés, à partir de films à succès de Paramount, ... &quot;Le génie de Pluto TV : C&apos;est de la vraie télévision sur internet&quot;.</summary>
-        <summary lang="it_IT">Canali TV dedicati alle tue cose preferite, ai film di successo della Paramount, ... &quot;Il genio di Pluto TV: questa è la vera televisione su Internet&quot;.</summary>
-        <summary lang="sv_SE">TV-kanaler ägnade åt dina favoritsaker, gjorda av storfilmer från Paramount, ... &quot;Genialiteten med Pluto TV: Det här är riktig internet-TV&quot;.</summary>
-        <description lang="da_DK">Se gratis tv i Kodi! Stream Pluto TV&apos;s mere end 100 kanaler med nyheder, sport og internettets bedste, helt gratis på din Kodi-enhed.</description>
-        <description lang="de_DE">Kostenloses Fernsehen auf Kodi! Über 100 Sender von Pluto TV mit Nachrichten, Sport und dem Besten aus dem Internet lassen sich völlig kostenlos auf dem Kodi-Gerät streamen.</description>
-        <description lang="en_GB">Watch Free TV on Kodi! Stream Pluto TV&apos;s 100+ channels of news, sports, and the Internet&apos;s best, completely free on your Kodi device.</description>
-        <description lang="es_ES">¡Ver TV gratis en Kodi! Transmite los más de 100 canales de noticias, deportes y lo mejor de Internet de Pluto TV, completamente gratis en tu dispositivo Kodi.</description>
-        <description lang="fi_FI">Katso televisiota ilmaiseksi Kodissa! Suoratoista Pluto TV:n yli 100 uutis-, urheilu- ja Internet-kanavaa täysin veloituksetta Kodi-laitteellasi.</description>
-        <description lang="fr_FR">Regardez la TV gratuitement sur Kodi ! Regardez en continu les plus 100 chaînes de Pluto TV qui proposent des informations, du sport et le meilleur de l&apos;Internet, totalement gratuitement sur votre appareil Kodi.</description>
-        <description lang="it_IT">Guarda la TV gratis su Kodi! Riproduci in streaming gli oltre 100 canali di notizie, sport e Internet di Pluto TV, completamente gratuiti sul tuo dispositivo Kodi.</description>
-        <description lang="sv_SE">Titta på gratis TV på Kodi! Strömma Pluto-TV:s 100+ kanaler med nyheter, sport och internets bästa, helt gratis på din Kodi-enhet.</description>
-    </extension>
-</addon>
-
-<addon id="plugin.video.xumotv" version="1.0.3" name="Xumo.TV" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.uepg" version="1.0.6"/>
-        <import addon="script.module.inputstreamhelper" version="0.3.3"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <platform>android freebsd ios linux osx windows</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <source>https://github.com/Lunatixz/KODI_ADDONS/tree/master/plugin.video.xumotv</source>
-        <website>www.xumo.tv</website>
-        <news>v.1.0.1[CR]- Fixed Menu Errors</news>
-        <forum>https://forum.kodi.tv/showthread.php?tid=335453</forum>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-        </assets>
-        <description lang="da_DK">Xumo.TV bringer dig det bedste indhold fra digitale netværk, præsenteret ligesom kanalerne på dit tv og dine mobile enheder, kun med flere fede funktioner.</description>
-        <description lang="de_DE">Xumo.TV bietet die besten Inhalte von digitalen Netzwerken, die genau wie die Sender auf dem Fernseher und mobilen Geräten präsentiert werden, nur mit mehr coolen Features.</description>
-        <description lang="en_GB">Xumo.TV brings you the best content from digital networks, presented just like the channels on your TV and mobile devices, only with more cool features.</description>
-        <description lang="es_ES">Xumo.TV te trae los mejores contenidos de las redes digitales, presentados igual que los canales de tu televisor y dispositivos móviles, sólo que con más características interesantes.</description>
-        <description lang="fi_FI">Xumo.TV tuo sinulle parhaan sisällön digitaalisista verkoista televisiokanavien ja mobiililaitteiden tapaan, hienoilla lisäominaisuuksilla.</description>
-        <description lang="it_IT">Xumo.TV ti offre i migliori contenuti delle reti digitali, presentati proprio come i canali della TV e dei dispositivi mobili, ma con funzionalità più interessanti.</description>
-        <description lang="ko_KR">Xumo.TV는 디지털 네트워크에서 제공하는 최고의 콘텐츠를 제공하고, TV 및 모바일 장치의 채널처럼 더 멋진 기능을 제공합니다.</description>
-        <description lang="ru_RU">Xumo.TV предлагает вам лучший контент из цифровых сетей, представленный так же, как каналы на вашем телевизоре и мобильных устройствах, только с более крутыми функциями.</description>
-    </extension>
-</addon>
-
 <addon id="repository.lunatixz" name="Lunatixz Beta Repository (Master)" version="1.1.1" provider-name="Lunatixz">
     <extension point="xbmc.addon.repository" name="Lunatixz Master Beta Repository">
         <dir>
           <info compressed="false">https://raw.githubusercontent.com/Lunatixz/KODI_Addons/master/addons.xml</info>
           <checksum>https://raw.githubusercontent.com/Lunatixz/KODI_Addons/master/addons.xml.md5</checksum>
           <datadir zip="true">https://raw.githubusercontent.com/Lunatixz/KODI_Addons/master/zips</datadir>
-        </dir>
-        <dir>
-          <info compressed="false">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/addons.xml</info>
-          <checksum>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/addons.xml.md5</checksum>
-          <datadir zip="true">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/zips</datadir>
-        </dir>
-        <dir>
-          <info compressed="false">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/addons.xml</info>
-          <checksum>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/addons.xml.md5</checksum>
-          <datadir zip="true">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/zips</datadir>
-        </dir>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Matrix Repository</summary>
-        <description lang="en_GB">Matrix Repository, for older Kodi builds install Leia or Jarvis Repository</description>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons</source>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="repository.lunatixz.jarvis" name="Lunatixz Beta Repository (Jarvis)" version="1.0.7" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.24.0"/>
-    </requires>
-    <extension point="xbmc.addon.repository" name="Lunatixz Jarvis Beta Repository">
-        <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml</info>
-        <checksum>http://raw.github.com/Lunatixz/KODI_Addons/jarvis/addons.xml.md5</checksum>
-        <datadir zip="true">http://raw.github.com/Lunatixz/KODI_Addons/jarvis/zips</datadir>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
-        <description lang="en_GB"></description>
-        <platform>all</platform>
-        <source>http://raw.github.com/Lunatixz/KODI_Addons/jarvis</source>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="repository.lunatixz.leia" name="Lunatixz Beta Repository (Krypton/Leia)" version="1.0.7" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-    </requires>
-    <extension point="xbmc.addon.repository" name="Lunatixz Leia Beta Repository">
-        <info compressed="false">http://raw.github.com/Lunatixz/KODI_Addons/leia/addons.xml</info>
-        <checksum>http://raw.github.com/Lunatixz/KODI_Addons/leia/addons.xml.md5</checksum>
-        <datadir zip="true">http://raw.github.com/Lunatixz/KODI_Addons/leia/zips</datadir>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
-        <description lang="en_GB"></description>
-        <platform>all</platform>
-        <source>http://raw.github.com/Lunatixz/KODI_Addons/leia</source>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="repository.lunatixz.matrix" name="Lunatixz Beta Repository (Matrix)" version="1.1.0" provider-name="Lunatixz">
-    <extension point="xbmc.addon.repository" name="Lunatixz Matrix Beta Repository">
-        <dir>
-          <info compressed="false">https://raw.githubusercontent.com/Lunatixz/KODI_Addons/matrix/addons.xml</info>
-          <checksum>https://raw.githubusercontent.com/Lunatixz/KODI_Addons/matrix/addons.xml.md5</checksum>
-          <datadir zip="true">https://raw.githubusercontent.com/Lunatixz/KODI_Addons/matrix/zips</datadir>
         </dir>
         <dir>
           <info compressed="false">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/addons.xml</info>
@@ -545,59 +258,7 @@
     </extension>
 </addon>
 
-<addon id="screensaver.google.earth" name="Google Earth" version="1.0.9" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.six" version="1.0.0"/>
-        <import addon="script.module.kodi-six" version="0.1.3.1"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-    </requires>
-    <extension point="xbmc.ui.screensaver" library="default.py"/>
-    <extension point="xbmc.addon.metadata">
-        <license>GPL-3.0-or-later</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/screensaver.google.earth</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=321718</forum>
-        <news>v.1.0.8[CR]- Matrix compatibility.</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.jpg</screenshot>
-            <screenshot>resources/images/screenshot02.jpg</screenshot>
-            <screenshot>resources/images/screenshot03.jpg</screenshot>
-            <screenshot>resources/images/screenshot04.jpg</screenshot>
-        </assets>
-        <summary lang="da_DK">Earth View viser et smukt satellitbillede fra Google Earth...</summary>
-        <summary lang="de_DE">Earth View zeigt ein schönes Satellitenbild von Google Earth an …</summary>
-        <summary lang="en_GB">Earth View displays a beautiful Satellite image from Google Earth...</summary>
-        <summary lang="es_ES">Earth View muestra una bella imagen de satélite de Google Earth...</summary>
-        <summary lang="et_EE">Earth View kuvab ilusa satelliidipildi Google Earthist...</summary>
-        <summary lang="fi_FI">Earth View näyttää kauniin satelliittikuvan Google Earthista...</summary>
-        <summary lang="fr_FR">Earth View affiche une belle image satellite de Google Earth...</summary>
-        <summary lang="hr_HR">Pogled zemlje prikazuje prekrasne Satelitske slike s Google Eartha...</summary>
-        <summary lang="it_IT">Earth View mostra una bellissima immagine satellitare da Google Earth...</summary>
-        <summary lang="nl_NL">Earth View toont mooie satellietbeelden van Google Earth...</summary>
-        <summary lang="ru_RU">Earth View отображает красивое спутниковое изображение из Google Earth...</summary>
-        <summary lang="uk_UA">Заставка &quot;Earth View&quot; показує красивий супутниковий знімок із Google Earth...</summary>
-        <summary lang="zh_CN">地球视图显示谷歌地球的美丽卫星图像......</summary>
-        <description lang="da_DK">Earth View er en samling af de smukkeste og mest slående landskaber, der findes i Google Earth.</description>
-        <description lang="de_DE">Earth View ist eine Sammlung der schönsten und eindrucksvollsten Landschaften, die in Google Earth zu finden sind.</description>
-        <description lang="en_GB">Earth View is a collection of the most beautiful and striking landscapes found in Google Earth.</description>
-        <description lang="es_ES">Earth View es una colección de los paisajes más bonitos e impactantes de Google Earth.</description>
-        <description lang="et_EE">Earth View on kogumik kõige ilusamatest ja silmatorkavamatest maastikest, mida Google Earthis leidub.</description>
-        <description lang="fi_FI">Earth View on kokoelma Google Earthin kauneimpia ja silmiinpistävimpiä maisemia.</description>
-        <description lang="fr_FR">Earth View est une collection des paysages les plus beaux et les plus saisissants trouvés dans Google Earth.</description>
-        <description lang="hr_HR">Pogled zemlje je kolekcija prekrasnih pejzaža pronađenih na Google Earthu.</description>
-        <description lang="it_IT">Earth View è una raccolta dei paesaggi più belli e suggestivi trovati in Google Earth.</description>
-        <description lang="nl_NL">Earth View is een verzameling van de meest mooie en indrukwekkende landschappen van Google Earth.</description>
-        <description lang="ru_RU">Earth View — это коллекция самых красивых и ярких пейзажей, найденных в Google Earth.</description>
-        <description lang="uk_UA">Earth View — це колекція найбільш красивих і яскравих пейзажів, що знайдені в Google Earth.</description>
-        <description lang="zh_CN">地球视图是谷歌地球中发现最美丽醒目的景观的集合。</description>
-    </extension>
-</addon>
-
-<addon id="screensaver.system47" name="System 47 - Star Trek LCARS ScreenSaver" version="2.5.01a" provider-name="Lunatixz">
+<addon id="screensaver.system47" name="System 47 - Star Trek LCARS ScreenSaver" version="3.0.0" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -609,12 +270,15 @@
     <extension point="xbmc.ui.screensaver" library="default.py"/>
     <extension point="xbmc.python.script"  library="default.py"/>
     <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">System 47 - Star Trek LCARS ScreenSaver</summary>
+        <description lang="en_GB">What is LCARS? LCARS is an acronym for "Library Computer Access and Retrieval System", which is the primary computer system in the universe of Star Trek's Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There's actually another name for this type of graphical displays. It's "Okudagram". It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <website>http://www.mewho.com/system47/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=323285</forum>
         <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/screensaver.system47</source>
-        <news>v.2.5 Updated for Kodi Nexus/Omega[CR]v.2.3[CR}- PY3 .[CR]v.2.2h[CR}- Added Mute sounds (Enabled by default).</news>
+        <disclaimer lang="en_GB" >Streaming not recommend for metered Internet, choose download option under settings.</disclaimer>
+        <news>v.3.0 added random video cycling and holiday bonuses (11-23 Dr. Who, 12-25 X-Mas).[CR]v.2.5 Updated for Kodi Nexus/Omega[CR]v.2.3[CR}- PY3 .[CR]v.2.2h[CR}- Added Mute sounds (Enabled by default).</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -622,8 +286,6 @@
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
-        <summary lang="en_GB">System 47 - Star Trek LCARS ScreenSaver</summary>
-        <description lang="en_GB">What is LCARS? LCARS is an acronym for Library Computer Access and Retrieval System, which is the primary computer system in the universe of Star Trek&apos;s Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There&apos;s actually another name for this type of graphical displays. It&apos;s Okudagram. It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation.</description>
     </extension>
 </addon>
 
@@ -846,107 +508,6 @@
     </extension>
 </addon>
 
-<addon id="script.media.maintenance" version="1.1.2e" name="Media Maintenance" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.requests" version="2.7.0"/>
-        <import addon="script.module.six" version="1.0.0"/>
-        <import addon="script.module.kodi-six" version="0.1.3.1"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-        <import addon="script.module.schedule" version="1.0.0"/>
-    </requires>
-    <extension point="xbmc.python.script" library="default.py"/>
-    <extension point="xbmc.service" library="service.py"/>
-    <extension point="kodi.context.item">
-        <menu id="kodi.core.main">
-            <item library="remove.py">
-                <label>Remove $INFO[ListItem.DBTYPE]</label>
-                <visible>[!String.IsEmpty(ListItem.DBID)|String.IsEqual(ListItem.DBTYPE,season)]</visible>
-            </item>
-            <menu>
-                <label>Media Maintenance</label>
-                <item library="context.py">
-                    <label>30042</label>
-                    <visible>!String.IsEmpty(ListItem.DBID) + [String.IsEqual(ListItem.DBTYPE,tvshow)|String.IsEqual(ListItem.DBTYPE,season)|String.IsEqual(ListItem.DBTYPE,episode)]</visible>
-                </item>
-            </menu>
-        </menu>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB"></summary>
-        <description lang="en_GB"></description>
-        <platform>all</platform>
-        <license>GPL-3.0-or-later</license>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.media.maintenance</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=331996</forum>
-        <news>v.1.1.2[CR]-Matrix[CR]v.1.0.9[CR]-Added "Select All" TV Show monitor option[CR]-Restored 'Remove' Context Position[CR]v.1.0.8[CR]-Added New Context Options[CR]v.1.0.7[CR]-Improved Duplicate Movie Detection[CR]v.1.0.3[CR]-Added Duplicate Movie finder[CR]v.1.0.2[CR]-Misc. Improvements[CR]v.1.0.1[CR]-Added "Remove Media?" context menu option.[CR]-Improved usability.[CR]-Added scan/clean library scheduling.</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.module.dateutil"
-       name="python-dateutil"
-       version="2.8.2a"
-       provider-name="Paul Ganssle, Gustavo Niemeyer, Tomi Pieviläinen, Yaron de Leeuw">
-  <requires>
-    <import addon="xbmc.python" version="3.0.0"/>
-    <import addon="script.module.six" version="1.15.0+matrix.1"/>
-  </requires>
-  <extension point="xbmc.python.module"
-             library="lib" />
-  <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Extensions to the standard Python datetime module</summary>
-    <description lang="en_GB">The dateutil module provides powerful extensions to the standard datetime module, available in Python.</description>
-    <license>Apache-2.0, BSD-3-Clause</license>
-    <website>https://dateutil.readthedocs.io/en/stable/</website>
-    <source>https://github.com/dateutil/dateutil</source>
-    <assets>
-      <icon>icon.png</icon>
-    </assets>
-  </extension>
-</addon>
-
-<addon id="script.module.fuzzywuzzy" version="0.18.0" name="fuzzywuzzy" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0" />
-    </requires>
-    <extension library="lib" point="xbmc.python.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Packed for KODI from https://github.com/seatgeek/fuzzywuzzy</summary>
-        <description lang="en_GB">Packed for KODI from https://github.com/seatgeek/fuzzywuzzy</description>
-        <license>GPLv2</license>
-        <platform>all</platform>
-        <website>https://pypi.org/project/fuzzywuzzy/</website>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.fuzzywuzzy</source>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.module.pebble" version="4.6.0" name="pebble" provider-name="Lunatixz, noxdafox">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0" />
-    </requires>
-    <extension library="lib" point="xbmc.python.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">A Python module (pebble) modified for Kodi</summary>
-        <description lang="en_GB">A Python module (pebble) modified for Kodi</description>
-        <forum></forum>
-        <website>https://pypi.org/project/Pebble/</website>
-        <license>GPL-3.0-or-later</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pebble</source>
-        <news></news>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="script.module.pyhdhr" version="1.1.5" name="pyHDHR" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
@@ -964,125 +525,6 @@
         <assets>
             <icon>icon.png</icon>
         </assets>
-    </extension>
-</addon>
-
-<addon id="script.module.pylast" version="3.2.0+matrix.2" name="pyLastFM" provider-name="Lunatixz, hugovk, Amr Hassan">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0" />
-    </requires>
-    <extension library="lib" point="xbmc.python.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">A Python interface to Last.fm and Libre.fm</summary>
-        <description lang="en_GB">A Python interface to Last.fm and Libre.fm</description>
-        <website>https://pypi.org/project/pylast/</website>
-        <license>Apache-2.0</license>
-        <platform>all</platform>
-        <source>https://github.com/pylast/pylast</source>
-		<assets>
-			<icon>icon.png</icon>
-		</assets>
-    </extension>
-</addon>
-
-<addon id="script.module.pyqrcode" version="1.2.1+matrix.2" name="pyQRcode" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0" />
-    </requires>
-    <extension library="lib" point="xbmc.python.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">A Python interface to generate QR Code</summary>
-        <description lang="en_GB">A Python interface to generate QR Code</description>
-        <website>https://pypi.org/project/PyQRCode</website>
-        <license>Apache-2.0</license>
-        <platform>all</platform>
-        <source>https://github.com/mnooner256/pyqrcode</source>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.module.pySSD" version="1.0.0" name="pySSD" provider-name="Lunatixz, vuolter">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0" />
-    </requires>
-    <extension library="lib" point="xbmc.python.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_US">Module for Kodi.</summary>
-        <description lang="en_US">packed for kodi from pySSD</description>
-        <website>https://pypi.org/project/ssd/</website>
-        <license>MIT</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.pySSD</source>
-    </extension>
-</addon>
-
-<addon id="script.module.schedule" version="1.0.0" name="schedule" provider-name="Lunatixz, dbader">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0" />
-    </requires>
-    <extension library="lib" point="xbmc.python.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">A Python module (schedule) modified for Kodi</summary>
-        <description lang="en_GB">A Python module (schedule) modified for Kodi</description>
-        <forum></forum>
-        <website>https://pypi.org/project/schedule/</website>
-        <license>MIT</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.module.schedule</source>
-        <news></news>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="script.pystone.benchmark" name="CPU Benchmark" version="1.1.5" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.kodi-six" version="0.1.3.1"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>executable</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <license>MIT</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/script.pystone.benchmark</source>
-        <news>v.1.1.2-Matrix</news>
-        <forum>http://forum.kodi.tv/showthread.php?tid=314081</forum>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-        </assets>
-        <summary lang="da_DK">Test din enheds python-ydeevne.</summary>
-        <summary lang="de_DE">Die Pythonleistung von Geräte testen.</summary>
-        <summary lang="en_GB">Test your devices python performance.</summary>
-        <summary lang="es_ES">Prueba el rendimiento python de tus dispositivos.</summary>
-        <summary lang="es_MX">Prueba el rendimiento de Python de tus dispositivos.</summary>
-        <summary lang="fi_FI">Testaa laitteesi Python-suorituskyky.</summary>
-        <summary lang="fr_FR">Test les performances de python sur votre appareil.</summary>
-        <summary lang="hr_HR">Testirajte python performanse vašeg uređaja.</summary>
-        <summary lang="it_IT">Metti alla prova le prestazioni di Python dei tuoi dispositivi.</summary>
-        <summary lang="ko_KR">장치 파이썬 성능을 테스트하십시오.</summary>
-        <summary lang="pl_PL">Przetestuj wydajność swoich urządzeń w Pythonie.</summary>
-        <summary lang="ru_RU">Тестирование ваших устройств на производительность Python.</summary>
-        <summary lang="zh_CN">测试设备的 python 性能。</summary>
-        <description lang="da_DK">Hvor hurtigt kører din enhed pythonkode? Pystone evaluerer CPU-ydelse, der kører i et pythonmiljø.</description>
-        <description lang="de_DE">Wie schnell führt das Gerät den Pythoncode aus? Pystone bewertet die CPU-Leistung in einer Pythonumgebung.</description>
-        <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
-        <description lang="es_ES">¿A qué velocidad ejecuta código python tu dispositivo? Pystone evalúa el rendimiento de la CPU ejecutando un entorno python.</description>
-        <description lang="es_MX">¿Qué tan rápido ejecuta código Python tu dispositivo? Pystone evalúa el rendimiento de CPU ejecutándose en un entorno Python.</description>
-        <description lang="fi_FI">Miten nopeasti laitteesi suorittaa Python-koodin? Pystone arvioi prosessorin tehokkuutta Python ympäristössä.</description>
-        <description lang="fr_FR">À quelle vitesse votre appareil exécute-t-il du code python ? Pystone évalue les performances du CPU dans un environnement python.</description>
-        <description lang="hr_HR">Koliko brzo vaš uređaj pokreće python kôd? Pystone evaluira CPU performanse pokrenute u python okruženju.</description>
-        <description lang="it_IT">Quanto velocemente il tuo dispositivo esegue il codice Python? Pystone valuta le prestazioni della CPU in un ambiente Python.</description>
-        <description lang="ko_KR">당신의 기기는 얼마나 빨리 파이썬 코드를 실행할까요? Pystone은 Python 환경에서 실행되는 CPU 성능을 평가합니다.</description>
-        <description lang="pl_PL">Jak szybko Twoje urządzenie uruchamia kod Pythona? Pystone ocenia wydajność procesora działającego w środowisku Pythona.</description>
-        <description lang="ru_RU">Как быстро ваше устройство запускает код Python. Pystone оценивает производительность процессора в среде Python.</description>
-        <description lang="zh_CN">您的设备运行 python 代码的速度有多快？Pystone 评估在 python 环境中运行的 CPU 性能。</description>
     </extension>
 </addon>
 
@@ -1156,125 +598,6 @@
         <description lang="pl_PL">IPTV Manager integruje kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio.</description>
         <description lang="ru_RU">Это дополнение интегрирует IPTV каналы из других дополнений в Kodi PVR.</description>
         <description lang="zh_CN">IPTV管理器可以在KODI电视和电台菜单中集成来自其他插件的IPTV频道。</description>
-    </extension>
-</addon>
-
-<addon id="service.moduleauditor" version="1.0.0" name="Kodi Module Auditor" provider-name="Team Kodi">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.six" version="1.0.0"/>
-        <import addon="script.module.kodi-six" version="0.1.3.1"/>
-        <import addon="script.module.simplecache" version="1.0.0"/>
-    </requires>
-    <extension point="xbmc.python.script" library="scan.py"/>
-    <extension point="xbmc.service" library="service.py"/>
-    <extension point="xbmc.addon.metadata">
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/service.moduleauditor</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=335539</forum>
-        <news>Matrix Branch Added</news>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-            <screenshot>resources/images/screenshot01.png</screenshot>
-            <screenshot>resources/images/screenshot02.png</screenshot>
-            <screenshot>resources/images/screenshot03.png</screenshot>
-            <screenshot>resources/images/screenshot04.png</screenshot>
-        </assets>
-        <summary lang="cs_CZ">Projít a porovnat nainstalované doplňky s oficiálním repozitářem Kodi.</summary>
-        <summary lang="da_DK">Scan og sammenlign installerede moduler med det officielle Kodi fjernlager.</summary>
-        <summary lang="de_DE">Installierte Addons durchsuchen und mit denen aus dem offiziellen Kodi-Repository vergleichen.</summary>
-        <summary lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</summary>
-        <summary lang="es_ES">Escanea y compara los módulos instalados con el repositorio oficial de Kodi.</summary>
-        <summary lang="es_MX">Escanea y compara módulos instalados con los del repositorio oficial de Kodi.</summary>
-        <summary lang="fi_FI">Tutki ja vertaa asennettuja moduuleja ilman virallista Kodi-ohjelmavarastoa.</summary>
-        <summary lang="fr_FR">Analyser et comparer les modules installés avec le référentiel Kodi officiel.</summary>
-        <summary lang="hr_HR">Pretraži i usporedi instalirane module w/službeni Kodi repozitorij.</summary>
-        <summary lang="hu_HU">Felrakott Kodi modulok összehasonlítása a hivatalos programtárral</summary>
-        <summary lang="it_IT">Scansiona e confronta i moduli installati con il repository ufficiale di Kodi.</summary>
-        <summary lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</summary>
-        <summary lang="nl_NL">Scan en vergelijk geïnstalleerde modules met de officiële Kodi repository.</summary>
-        <summary lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</summary>
-        <summary lang="ru_RU">Сканировать и Сравнить установленные модули с официальным репозиторием Kodi.</summary>
-        <summary lang="sv_SE">Skanna och jämför installerade moduler med officiellt Kodi-förråd.</summary>
-        <summary lang="zh_CN">通过官方KODI插件源扫描并比较已安装的模块。</summary>
-        <description lang="cs_CZ">Projít a porovnat nainstalované doplňky s oficiálním repozitářem Kodi.</description>
-        <description lang="da_DK">Scan og sammenlign installerede moduler med det officielle Kodi fjernlager.</description>
-        <description lang="de_DE">Installierte Addons durchsuchen und mit denen aus dem offiziellen Kodi-Repository vergleichen.</description>
-        <description lang="en_GB">Scan and Compare installed modules w/official Kodi repository.</description>
-        <description lang="es_ES">Escanea y compara los módulos instalados con el repositorio oficial de Kodi.</description>
-        <description lang="es_MX">Escanea y compara módulos instalados con los del repositorio oficial de Kodi.</description>
-        <description lang="fi_FI">Tutki ja vertaa asennettuja moduuleja ilman virallista Kodi-ohjelmavarastoa.</description>
-        <description lang="fr_FR">Analyser et comparer les modules installés avec le référentiel Kodi officiel.</description>
-        <description lang="hr_HR">Pretraži i usporedi instalirane module w/službeni Kodi repozitorij.</description>
-        <description lang="hu_HU">Felrakott Kodi modulok összehasonlítása a hivatalos programtárral.</description>
-        <description lang="it_IT">Scansiona e confronta i moduli installati con il repository ufficiale di Kodi.</description>
-        <description lang="ko_KR">공식 Kodi 저장소와 함께 설치된 모듈을 스캔하고 비교합니다.</description>
-        <description lang="nl_NL">Scan en vergelijk geïnstalleerde modules met de officiële Kodi repository.</description>
-        <description lang="pl_PL">Skanuj i porównuj zainstalowane moduły z oficjalnym repozytorium Kodi.</description>
-        <description lang="sv_SE">Skanna och jämför installerade moduler med officiellt Kodi-förråd.</description>
-        <description lang="zh_CN">通过官方KODI插件源扫描并比较已安装的模块。</description>
-        <disclaimer lang="cs_CZ">Module Auditor nezabraňuje a ani vás nechrání před viry. Čistý průběh negarantuje systém čistý od virů. Používejte zdravý rozum při instalaci doplňků ze třetích zdrojů.</disclaimer>
-        <disclaimer lang="da_DK">Modul Auditor forhindrer eller beskytter dig ikke mod malware. En ren scanning garanterer ikke, at systemet er frit for malware. Brug sund fornuft, når du installerer tredjeparts fjernlagre.</disclaimer>
-        <disclaimer lang="de_DE">Module Auditor schützt nicht gegen Malware. Wenn nichts gefunden wird, ist das keine Garantie für ein malware-freies System. Bitte gesunden Menschenverstand beim Installieren von Repositorys von Drittanbietern benutzen.</disclaimer>
-        <disclaimer lang="en_GB">Module Auditor does not prevent nor protect you from Mal-ware. A clean scan does not guarantee a system free o Malware. Use common sense when installing third-party repositories.</disclaimer>
-        <disclaimer lang="es_ES">Module Auditor no previene ni protege del malware. Un escaneo limpio no garantiza un sistema libre de Malware. Use el sentido común cuando instale repositorios de terceros.</disclaimer>
-        <disclaimer lang="es_MX">Module Auditor no previene ni protege de Mal-ware. Una búsqueda limpia no garantiza un sistema limpio de malware. Usa el sentido común al instalar repositorios de terceros.</disclaimer>
-        <disclaimer lang="fi_FI">Module Auditor ei estä tai suojaa sinua haittaohjelmilta. Puhdas tarkastustulos ei takaa, että järjestelmä on haittaohjelmavapaa. Käytä maalaisjärkeä asentaessasi ulkopuolisia ohjelmavarastoja.</disclaimer>
-        <disclaimer lang="fr_FR">Module Auditor ne vous empêche ni ne vous protège contre les logiciels malveillants. Une analyse propre ne garantit pas un système exempt de Malware. Faites preuve de bon sens lors de l&apos;installation de référentiels tiers.</disclaimer>
-        <disclaimer lang="hr_HR">Module Auditor ne štiti vas od malvera. Čista pretraga ne jamči vam da je vaš sustav slobodan od malvera. Koristite zdrav razum kada instalirate repozitorije treće strane.</disclaimer>
-        <disclaimer lang="it_IT">Module Auditor non previene né protegge dal malware. Una scansione pulita non garantisce un sistema privo di malware. Usa il buon senso quando installi repository di terze parti.</disclaimer>
-        <disclaimer lang="ko_KR">모듈 감시자는 맬웨어로부터 사용자를 방지하거나 보호하지 않습니다. 클린 스캔은 시스템에 맬웨어가 없음을 보장하지 않습니다. 타사 저장소를 설치할 때 고려하십시오.</disclaimer>
-        <disclaimer lang="pl_PL">Moduł Auditor nie zapobiega ani nie chroni przed złośliwym oprogramowaniem. Czyste skanowanie nie gwarantuje, że system jest wolny od złośliwego oprogramowania. Podczas instalowania repozytoriów zewnętrznych należy kierować się zdrowym rozsądkiem.</disclaimer>
-        <disclaimer lang="zh_CN">Module Auditor不会阻止或保护您免受恶意软件的攻击。干净扫描并不能保证系统没有恶意软件。安装第三方插件库时请通过常识判断。</disclaimer>
-    </extension>
-</addon>
-
-<addon id="service.onmute" version="1.0.0" name="OnMute" provider-name="Lunatixz">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-    </requires>
-    <extension point="xbmc.python.script" library="settings.py"/>
-    <extension point="xbmc.service" library="service.py"/>
-    <extension point="xbmc.addon.metadata">
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/service.onmute</source>
-        <forum>https://forum.kodi.tv/showthread.php?tid=334361</forum>
-        <news>v1.1.0[CR]- Matrix</news>
-        <license>GPL-3.0-or-later</license>
-        <assets>
-            <icon>resources/images/icon.png</icon>
-            <fanart>resources/images/fanart.jpg</fanart>
-        </assets>
-        <summary lang="cs_CZ">Povoluje skryté titulky a titulky &quot;OnMute&quot; (při vypnutí zvuku).</summary>
-        <summary lang="da_DK">Aktiver tekster for hørehæmmede og undertekster &quot;OnMute&quot;.</summary>
-        <summary lang="de_DE">Untertitel, auch solche mit erklärendem Text, beim Stummschalten von Kodi aktivieren.</summary>
-        <summary lang="en_GB">Enable closed captioning and subtitles &quot;OnMute&quot;.</summary>
-        <summary lang="es_ES">Activar subtítulos cerrados y subtítulos &quot;OnMute&quot;.</summary>
-        <summary lang="es_MX">Activa subtítulos cerrados y subtítulos &quot;OnMute&quot;.</summary>
-        <summary lang="fi_FI">Käytä &quot;OnMute&quot; -toiminnon kanssa kuvaavia (CC) ja tavallisia tekstityksiä.</summary>
-        <summary lang="fr_FR">Activer le sous-titrage « OnMute ».</summary>
-        <summary lang="hr_HR">Omogući closed captioning i podnaslove &quot;Pri utišanju&quot;.</summary>
-        <summary lang="it_IT">Abilita sottotitoli con descrizione audio e sottotitoli &quot;OnMute&quot;.</summary>
-        <summary lang="ko_KR">폐쇄 자막 및 &quot;OnMute&quot; 자막을 활성화합니다.</summary>
-        <summary lang="pl_PL">Włącz napisy kodowane i napisy „OnMute”.</summary>
-        <summary lang="ru_RU">Включение закрытых субтитров и субтитров &quot;OnMute&quot;.</summary>
-        <summary lang="zh_CN">启用闭路字幕和字幕“OnMute”。</summary>
-        <description lang="cs_CZ">Nechte &quot;OnMute&quot; přepínat skryté titulky a titulky když je v Kodi vypnutý zvuk.</description>
-        <description lang="da_DK">Lad &quot;OnMute&quot; skifte tekster for hørehæmmede og undertekster, mens Kodi er slået fra.</description>
-        <description lang="de_DE">OnMute handhabt Untertitel, auch solche mit erklärendem Text, während Kodi stummschaltet ist.</description>
-        <description lang="en_GB">Let &quot;OnMute&quot; toggle closed captioning and subtitles while Kodi is muted.</description>
-        <description lang="es_ES">Permitir que &quot;OnMute&quot; active los subtítulos cerrados y los subtítulos mientras Kodi está silenciado.</description>
-        <description lang="es_MX">Permitir que &quot;OnMute&quot; cambie entre subtítulos cerrados y subtítulos mientras Kodi está silenciado.</description>
-        <description lang="fi_FI">Salli &quot;OnMute&quot; -toiminnon kytkeä tavalliset ja kuvaavat tekstitykset käyttöön, kun Kodi mykistetään.</description>
-        <description lang="fr_FR">Permettre à « OnMute »d&apos;activer le sous-titrage quand Kodi est mis en sourdine.</description>
-        <description lang="hr_HR">Dopusti &quot;Pri utišanju&quot; uklj/usklj closed captioning i podnaslova dok je Kodi utišan.</description>
-        <description lang="it_IT">Lascia che &quot;OnMute&quot; alterni sottotitoli con descrizione audio e sottotitoli mentre Kodi è silenziato.</description>
-        <description lang="ko_KR">Kodi가 음소거되어 있는 동안 &quot;OnMute&quot;가 폐쇄 캡션과 자막을 토글하도록 합니다.</description>
-        <description lang="pl_PL">Niech „OnMute” przełącza napisy zamknięte i napisy, gdy Kodi jest wyciszony.</description>
-        <description lang="ru_RU">Позволяет &quot;OnMute&quot; переключать закрытые субтитры и субтитры, когда Kodi приглушен.</description>
-        <description lang="zh_CN">让“OnMute”在 Kodi 静音时切换闭路字幕和字幕。</description>
     </extension>
 </addon>
 

@@ -51,3 +51,23 @@ msgstr ""
 msgctxt "#30005"
 msgid "Copying..."
 msgstr ""
+
+msgctxt "#30006"
+msgid "Select Playlist"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Random Youtube"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Singe Local File"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Open Settings to download the video file."
+msgstr ""
+
+msgctxt "#30010"
+msgid "General"
+msgstr ""

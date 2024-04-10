@@ -99,6 +99,43 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.ispot.tv" version="2.0.0" name="iSpot.tv Adverts" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.six" version="1.0.0"/>
+        <import addon="script.module.kodi-six" version="0.1.3.1"/>
+        <import addon="script.module.requests" version="2.7.0"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.routing" version="0.2.3"/>
+        <import addon="script.module.youtube.dl" version="23.04.01+matrix.1"/>
+        <import addon="script.module.infotagger" version="0.0.5" />
+        <import addon="script.module.beautifulsoup4" version="4.12.2" />
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py"/>
+    <extension point="xbmc.addon.metadata">
+        <reuselanguageinvoker>true</reuselanguageinvoker>
+        <platform>all</platform>
+        <license>GPL-3.0-or-later</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.video.ispot.tv</source>
+        <website>https://www.ispot.tv/</website>
+        <forum>https://forum.kodi.tv/showthread.php?tid=311057</forum>
+        <news></news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.png</screenshot>
+            <screenshot>resources/images/screenshot02.png</screenshot>
+            <screenshot>resources/images/screenshot03.png</screenshot>
+            <screenshot>resources/images/screenshot04.png</screenshot>
+        </assets>
+        <summary lang="en_GB">iSpot.tv internet's most comprehensive database of nationally airing TV Commercials.</summary>
+       	<description lang="en_GB">Welcome to the Internet's most comprehensive database of nationally airing TV Commercials. Explore the actors, songs and offers in the spots you see on TV.</description>
+    </extension>
+</addon>
+
 <addon id="plugin.video.playonbrowser" name="PlayOn Browser" version="2.1.0" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>

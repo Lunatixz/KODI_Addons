@@ -15,7 +15,7 @@
 				</setting>
                 <setting id="Download_Folder" type="path" label="30002" parent="Enable_Download">
                     <level>1</level>
-                    <default>special://profile/addon_data/plugin.video.ispot.tv/cache</default>
+                    <default>special://profile/addon_data/plugin.video.ispot.tv/resources</default>
                     <constraints>
                         <sources>
                             <source>files</source>
@@ -36,7 +36,7 @@
                 </setting>
 				<setting id="Enable_Debugging" type="boolean" label="30000">
 					<level>1</level>
-					<default>true</default>
+					<default>false</default>
 					<control type="toggle"/>
 				</setting>
                 <setting id="Install_Logger" type="action" label="30008" parent="Enable_Debugging">

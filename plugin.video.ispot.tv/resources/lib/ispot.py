@@ -47,7 +47,7 @@ DOWNLOAD_PATH = REAL_SETTINGS.getSetting('Download_Folder')
 RESOURCE_PATH = 'special://home/addons/resource.videos.adverts.pseudotv/resources/'
 DEFAULT_ENCODING = "utf-8"
 ENABLE_SAP    = False
-ENABLE_DOWNLOAD = REAL_SETTINGS.getSetting('Enable_Download').lower() == 'true'
+HEADER        = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
 
 MENU = {"Apparel, Footwear & Accessories"     :"https://www.ispot.tv/browse/k/apparel-footwear-and-accessories",
         "Business & Legal"                    :"https://www.ispot.tv/browse/Y/business-and-legal",
@@ -115,14 +115,15 @@ def playVideo(meta):
 class iSpotTV(object):
     def __init__(self, sysARG=sys.argv):
         log('__init__, sysARG = %s'%(sysARG))
-        self.sysARG = sysARG
-        self.cache  = SimpleCache()
+        self.sysARG    = sysARG
+        self.cache     = SimpleCache()
+        self.myMonitor = xbmc.Monitor()
         
         
     @use_cache(3)
     def getURL(self, url):
         log('getURL, url = %s'%(url))
-        try:    return requests.get(url, headers={'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}).content
+        try:    return requests.get(url, headers=HEADER).content
         except Exception as e: log('getURL Failed! %s'%(e))
     
     
@@ -184,7 +185,7 @@ class iSpotTV(object):
         return xbmcgui.ListItem(label,label2,path,offscreen)
         
         
-    @use_cache(3)
+    @use_cache(1)
     def getVideo(self, url):
           # {'id': '5Gwt-video-sm', 'title': '5Gwt-video-sm', 'timestamp': 1697567715.0, 'direct': True, 
           # 'formats': [{'format_id': 'mp4', 'url': 'https://videos-cdn.ispot.tv/ad/d0c1/5Gwt-video-sm.mp4',
@@ -195,7 +196,7 @@ class iSpotTV(object):
           # 'url': 'https://videos-cdn.ispot.tv/ad/d0c1/5Gwt-video-sm.mp4', 'vcodec': None, 'ext': 'mp4', 'format': 'mp4 - unknown', 
           # 'protocol': 'https', 'http_headers': {}}
         log('getVideo, url = %s'%url)
-        ydl = YoutubeDL({'no_color': True, 'format': 'best', 'outtmpl': '%(id)s.%(ext)s'})
+        ydl = YoutubeDL({'no_color': True, 'format': 'best', 'outtmpl': '%(id)s.%(ext)s', 'add-header': HEADER})
         with ydl:
             result = ydl.extract_info(url, download=False)
             if 'entries' in result:
@@ -225,11 +226,15 @@ class iSpotTV(object):
         
 
     def getDownloads(self):
-        if not ENABLE_DOWNLOAD: return
+        if not REAL_SETTINGS.getSetting('Enable_Download').lower() == 'true': return
         queuePool = (self.cache.get('queuePool', json_data=True) or {})
-        uris = queuePool.get('uri',[])
-        for uri in (list(chunkLst(uris,5)) or [[]])[0]:
+        uris      = queuePool.get('uri',[])
+        dia       = self.progressBGDialog(message='Preparing to download %s'%(ADDON_NAME))
+        dluris    = (list(chunkLst(uris,5)) or [[]])[0]
+        for idx, uri in enumerate(dluris):
             try: 
+                diact = int(idx*100//len(dluris))
+                dia   = self.progressBGDialog(diact, dia, message='Downloading Adverts (%s%%)'%(diact))
                 video = self.getVideo('https://www.ispot.tv%s'%(uri))
                 if not video: continue
                 url  = video['url']
@@ -238,11 +243,28 @@ class iSpotTV(object):
                 log('getDownloads, url = %s, dest = %s'%(url,dest))
                 urllib.request.urlretrieve(url, dest)
                 uris.pop(uris.index(uri))
-                if xbmc.Monitor().waitForAbort(5): break
-            except Exception as e: log('getDownloads Failed! %s'%(e))
+                if self.myMonitor.waitForAbort(5): break
+            except Exception as e:
+                log('getDownloads Failed! %s'%(e))
+                self.progressBGDialog(100, dia, message='Downloading (Canceled!)')
+        self.progressBGDialog(100, dia, message='Downloading (Finished!)')
         queuePool['uri'] = uris
         log('getDownloads, remaining urls = %s'%(len(uris)))
         self.cache.set('queuePool', queuePool, json_data=True, expiration=datetime.timedelta(days=28))
+        
+        
+    def progressBGDialog(self, percent=0, control=None, message='', header=ADDON_NAME, silent=None, wait=None):
+        if control is None and int(percent) == 0:
+            control = xbmcgui.DialogProgressBG()
+            control.create(header, message)
+        elif control:
+            if int(percent) == 100 or control.isFinished(): 
+                if hasattr(control, 'close'):
+                    control.close()
+                    return None
+            elif hasattr(control, 'update'):  control.update(int(percent), header, message)
+            if wait: self.myMonitor.waitForAbort(wait/1000)
+        return control
         
 
     def run(self): 

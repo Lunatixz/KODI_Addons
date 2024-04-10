@@ -30,12 +30,16 @@ REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 class Service(object):
     def __init__(self):
         self.myMonitor = xbmc.Monitor()
+        self.running   = False
         self._start()
         
     
     def _start(self):
         while not self.myMonitor.abortRequested():
-            if self.myMonitor.waitForAbort(600): break
-            ispot.iSpotTV(sys.argv).getDownloads()
+            if self.myMonitor.waitForAbort(900): break
+            elif not self.running:
+                self.running = True
+                ispot.iSpotTV(sys.argv).getDownloads()
+                self.running = False
             
 if __name__ == '__main__': Service()

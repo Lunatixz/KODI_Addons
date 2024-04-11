@@ -18,8 +18,8 @@
         </dir>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Matrix Repository</summary>
-        <description lang="en_GB">Matrix Repository, for older Kodi builds install Leia or Jarvis Repository</description>
+        <summary lang="en_GB">Master Repository</summary>
+        <description lang="en_GB">Master Repository</description>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/KODI_Addons</source>
         <assets>

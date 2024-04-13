@@ -190,22 +190,22 @@
     </extension>
 </addon>
 
-<addon id="repository.lunatixz" name="Lunatixz Beta Repository (Master)" version="1.1.2" provider-name="Lunatixz">
+<addon id="repository.lunatixz" name="Lunatixz Beta Repository (Master)" version="1.1.3" provider-name="Lunatixz">
     <extension point="xbmc.addon.repository" name="Lunatixz Master Beta Repository">
         <dir>
           <info compressed="false">https://raw.githubusercontent.com/Lunatixz/KODI_Addons/master/addons.xml</info>
           <checksum>https://raw.githubusercontent.com/Lunatixz/KODI_Addons/master/addons.xml.md5</checksum>
-          <datadir zip="true">https://raw.githubusercontent.com/Lunatixz/KODI_Addons/master/zips</datadir>
+          <datadir zip="true">https://raw.githubusercontent.com/Lunatixz/KODI_Addons/master/zips/</datadir>
         </dir>
         <dir>
           <info compressed="false">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/addons.xml</info>
           <checksum>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/addons.xml.md5</checksum>
-          <datadir zip="true">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/zips</datadir>
+          <datadir zip="true">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/zips/</datadir>
         </dir>
         <dir>
           <info compressed="false">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/addons.xml</info>
           <checksum>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/addons.xml.md5</checksum>
-          <datadir zip="true">>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/zips</datadir>
+          <datadir zip="true">>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/zips/</datadir>
         </dir>
     </extension>
     <extension point="xbmc.addon.metadata">
@@ -215,30 +215,6 @@
         <source>https://github.com/Lunatixz/KODI_Addons</source>
         <assets>
             <icon>icon.png</icon>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="repository.pseudotv" name="PseudoTV Repository" version="1.0.3" provider-name="Lunatixz">
-    <extension point="xbmc.addon.repository" name="PseudoTV Repository">
-        <dir>
-          <info compressed="false">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/addons.xml</info>
-          <checksum>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/addons.xml.md5</checksum>
-          <datadir zip="true">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Live/master/zips</datadir>
-        </dir>
-        <dir>
-          <info compressed="false">https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/addons.xml</info>
-          <checksum>https://raw.githubusercontent.com/PseudoTV/PseudoTV_Resources/master/addons.xml.md5</checksum>
-          <datadir zip="true">https://media.githubusercontent.com/media/PseudoTV/PseudoTV_Resources/master/zips</datadir>
-        </dir>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <description lang="en_GB">PseudoTV Live acts similar to normal broadcast or cable TV, complete with pre-defined and user-defined channels. EPG Provided by Kodi.</description>
-        <platform>all</platform>
-        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/repository.pseudotv</source>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
         </assets>
     </extension>
 </addon>

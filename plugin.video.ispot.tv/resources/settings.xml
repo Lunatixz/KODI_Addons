@@ -15,7 +15,7 @@
 				</setting>
                 <setting id="Download_Folder" type="path" label="30002" parent="Enable_Download">
                     <level>1</level>
-                    <default>special://profile/addon_data/plugin.video.ispot.tv/resources</default>
+                    <default>special://profile/addon_data/plugin.video.ispot.tv/resources/</default>
                     <constraints>
                         <sources>
                             <source>files</source>

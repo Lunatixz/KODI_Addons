@@ -43,7 +43,7 @@ ROUTER        = routing.Plugin()
 CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
 DEBUG_ENABLED = REAL_SETTINGS.getSetting('Enable_Debugging').lower() == 'true'
-DOWNLOAD_PATH = REAL_SETTINGS.getSetting('Download_Folder')
+DOWNLOAD_PATH = os.path.join(REAL_SETTINGS.getSetting('Download_Folder'),'resources').replace('/resources/resources','/resources')
 RESOURCE_PATH = 'special://home/addons/resource.videos.adverts.pseudotv/resources/'
 DEFAULT_ENCODING = "utf-8"
 ENABLE_SAP    = False

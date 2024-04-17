@@ -43,8 +43,8 @@ ROUTER        = routing.Plugin()
 CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
 DEBUG_ENABLED = REAL_SETTINGS.getSetting('Enable_Debugging').lower() == 'true'
+ENABLE_DOWNLOAD = REAL_SETTINGS.getSetting('Enable_Download').lower() == 'true'
 DOWNLOAD_PATH = os.path.join(REAL_SETTINGS.getSetting('Download_Folder'),'resources').replace('/resources/resources','/resources')
-RESOURCE_PATH = 'special://home/addons/resource.videos.adverts.pseudotv/resources/'
 DEFAULT_ENCODING = "utf-8"
 ENABLE_SAP    = False
 HEADER        = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
@@ -148,7 +148,7 @@ class iSpotTV(object):
             for row in self.getSoup(MENU.get(category)).find_all('div', {'class': 'mb-0'}):
                 label, label2 = row.a['adname'].split(' - ')
                 if label.lower().endswith('[spanish]') and not ENABLE_SAP: continue
-                if xbmcgui.Window(10000).getProperty('PseudoTVRunning') == "True": self.queDownload(row.a['href'])
+                if ENABLE_DOWNLOAD: self.queDownload(row.a['href'])
                 self.addLink(label,(playVideo,'%s|%s'%(row.a['adname'],encodeString(row.a['href']))),info={'label':label,'label2':label2,'title':label},art={"thumb":row.img['src'],"poster":row.img['src'],"fanart":FANART,"icon":LOGO,"logo":LOGO})
         except Exception as e: log('buildCategory Failed! %s'%(e))
 
@@ -209,7 +209,7 @@ class iSpotTV(object):
         found = True
         file = os.path.join(DOWNLOAD_PATH,'%s.mp4'%(slugify(uri)))
         if not xbmcvfs.exists(file):
-            if xbmcgui.Window(10000).getProperty('PseudoTVRunning') == "True": self.queDownload(uri)
+            if ENABLE_DOWNLOAD: self.queDownload(uri)
             video = self.getVideo('https://www.ispot.tv%s'%(uri))
             if not video: found = False
             else: file = video['url']
@@ -226,7 +226,7 @@ class iSpotTV(object):
         
 
     def getDownloads(self):
-        if not REAL_SETTINGS.getSetting('Enable_Download').lower() == 'true': return
+        if not ENABLE_DOWNLOAD: return
         queuePool = (self.cache.get('queuePool', json_data=True) or {})
         uris      = queuePool.get('uri',[])
         dia       = self.progressBGDialog(message='Preparing to download %s'%(ADDON_NAME))
@@ -238,10 +238,11 @@ class iSpotTV(object):
                 video = self.getVideo('https://www.ispot.tv%s'%(uri))
                 if not video: continue
                 url  = video['url']
+                if not xbmcvfs.exists(DOWNLOAD_PATH): xbmcvfs.mkdir(DOWNLOAD_PATH)
                 dest = xbmcvfs.translatePath(os.path.join(DOWNLOAD_PATH,'%s.mp4'%(slugify(uri))))
-                if not xbmcvfs.exists(dest): xbmcvfs.mkdir(DOWNLOAD_PATH)
-                log('getDownloads, url = %s, dest = %s'%(url,dest))
-                urllib.request.urlretrieve(url, dest)
+                if not xbmcvfs.exists(dest):
+                    urllib.request.urlretrieve(url, dest)
+                    log('getDownloads, url = %s, dest = %s'%(url,dest))
                 uris.pop(uris.index(uri))
                 if self.myMonitor.waitForAbort(5): break
             except Exception as e:

@@ -11,14 +11,11 @@
     <extension point="xbmc.ui.screensaver" library="default.py"/>
     <extension point="xbmc.python.script"  library="default.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">System 47 - Star Trek LCARS ScreenSaver</summary>
-        <description lang="en_GB">What is LCARS? LCARS is an acronym for "Library Computer Access and Retrieval System", which is the primary computer system in the universe of Star Trek's Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There's actually another name for this type of graphical displays. It's "Okudagram". It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <platform>all</platform>
         <website>http://www.mewho.com/system47/</website>
         <forum>https://forum.kodi.tv/showthread.php?tid=323285</forum>
         <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/screensaver.system47</source>
-        <disclaimer lang="en_GB" >Streaming not recommend for metered Internet, choose download option under settings.</disclaimer>  
         <news>v.3.0 added random video cycling and holiday bonuses (11-23 Dr. Who, 12-25 X-Mas).[CR]v.2.5 Updated for Kodi Nexus/Omega[CR]v.2.3[CR}- PY3 .[CR]v.2.2h[CR}- Added Mute sounds (Enabled by default).</news>
         <assets>
             <icon>resources/images/icon.png</icon>
@@ -27,5 +24,7 @@
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
+        <summary lang="en_GB">System 47 - Star Trek LCARS ScreenSaver</summary>
+        <description lang="en_GB">What is LCARS? LCARS is an acronym for Library Computer Access and Retrieval System, which is the primary computer system in the universe of Star Trek&apos;s Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There&apos;s actually another name for this type of graphical displays. It&apos;s Okudagram. It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation.</description>
     </extension>
 </addon>

@@ -16,6 +16,14 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "Addon Summary"
+msgid "iSpot.tv internet's most comprehensive database of nationally airing TV Commercials."
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "Welcome to the Internet's most comprehensive database of nationally airing TV Commercials. Explore the actors, songs and offers in the spots you see on TV."
+msgstr ""
+
 msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr ""
@@ -39,4 +47,3 @@ msgstr ""
 msgctxt "#30010"
 msgid "Enable Download"
 msgstr ""
-

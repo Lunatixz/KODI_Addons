@@ -1,0 +1,113 @@
+# XBMC Media Center language file
+# Addon Name: OnIdle Service
+# Addon id: service.onidle
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2024-04-23 06:27+0000\n"
+"Last-Translator: Minho Park <parkmino@gmail.com>\n"
+"Language-Team: Korean <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-pvr-channels-cleaner/ko_kr/>\n"
+"Language: ko_kr\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.4.3\n"
+
+msgctxt "Addon Summary"
+msgid "Clean ChannelsDVR PVR Buffer"
+msgstr "ChannelsDVR PVR 버퍼 정리"
+
+msgctxt "Addon Description"
+msgid "Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!"
+msgstr "선택하지 않으면 ChannelsPVR 백엔드가 남은 라이브 TV 버퍼로 인해 저장 공간을 차지할 수 있습니다. 이 서비스는 사용하지 않는 버퍼를 정리합니다!"
+
+msgctxt "Addon Disclaimer"
+msgid "For Personal use; not meant for general use"
+msgstr "일반적인 용도가 아닌 개인용"
+
+msgctxt "#32001"
+msgid "Enable Debugging"
+msgstr "디버깅 사용"
+
+msgctxt "#32002"
+msgid "Idle Action"
+msgstr "유휴 작업"
+
+msgctxt "#32003"
+msgid "Idle Timer (Minutes)"
+msgstr "유휴 타이머 (분)"
+
+msgctxt "#32004"
+msgid "Idle Countdown (Seconds)"
+msgstr "유휴 카운트다운 (초)"
+
+msgctxt "#32005"
+msgid "Ignore When Playing Music"
+msgstr "음악 재생 시 무시"
+
+msgctxt "#32006"
+msgid "User Defined"
+msgstr "사용자 정의"
+
+msgctxt "#32007"
+msgid "CEC Shutdown"
+msgstr "CEC 종료"
+
+msgctxt "#32008"
+msgid "CEC Standby"
+msgstr "CEC 대기"
+
+msgctxt "#32009"
+msgid "Hibernate"
+msgstr "최대 절전 모드"
+
+msgctxt "#32010"
+msgid "Suspend"
+msgstr "대기 모드"
+
+msgctxt "#32011"
+msgid "Shutdown"
+msgstr "종료"
+
+msgctxt "#32012"
+msgid "Quit"
+msgstr "취소"
+
+msgctxt "#32013"
+msgid "Activate Screensaver"
+msgstr "화면 보호기 사용"
+
+msgctxt "#32014"
+msgid "Visit 'https://kodi.wiki/view/List_of_built-in_functions' for details"
+msgstr "자세한 내용은 'https://kodi.wiki/view/List_of_built-in_functions'를 참조하세요"
+
+msgctxt "#32015"
+msgid "Enter built-in function"
+msgstr "내장 함수 입력"
+
+msgctxt "#32016"
+msgid "Enable Soft Mute"
+msgstr "소프트 음소거 사용"
+
+msgctxt "#32017"
+msgid "Idle Countdown"
+msgstr "유휴 카운트다운"
+
+msgctxt "#32018"
+msgid "Cancel to continue watching"
+msgstr "계속 시청하려면 취소하세요"
+
+msgctxt "#32019"
+msgid "Sleeping in %s seconds"
+msgstr "%s초 후에 잠자기"
+
+msgctxt "#32020"
+msgid "Run Manually"
+msgstr "수동으로 실행"
+
+msgctxt "#32021"
+msgid "Test Action"
+msgstr "테스트 동작"

@@ -1,0 +1,75 @@
+# XBMC Media Center language file
+# Addon Name: System 47 - Star Trek LCARS ScreenSaver
+# Addon id: screensaver.system47
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2024-04-22 15:04+0000\n"
+"Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
+"Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-look-and-feel/screensaver-system47/es_es/>\n"
+"Language: es_es\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.4.3\n"
+
+msgctxt "Addon Summary"
+msgid "System 47 - Star Trek LCARS ScreenSaver"
+msgstr "System 47 - Salvapantallas Star Trek LCARS"
+
+msgctxt "Addon Description"
+msgid "What is LCARS? LCARS is an acronym for Library Computer Access and Retrieval System, which is the primary computer system in the universe of Star Trek's Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There's actually another name for this type of graphical displays. It's Okudagram. It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation."
+msgstr "¿Qué es LCARS? LCARS es el acrónimo de Library Computer Access and Retrieval Syste, que es el sistema de computación primordial en el universo de la Federación y la Flota Estelar de Star Trek. En muchas escenas de las series y películas de Star Trek se puede ver la palabra, LCARS, en muchos monitores. Para los fans, LCARS tambien se usa para referirse al aspecto de la interfaz. Hay otro nombre para este aspecto, Okudagram, Se llamó así en honor a su inventor, Michael Okuda, que creó esta imageniría como supervisor de arte para la serie Star Trek: La Nueva Generación."
+
+msgctxt "#32000"
+msgid "Random Start Position"
+msgstr "Posición de Inicio Aleatoria"
+
+msgctxt "#32001"
+msgid "Download video (2.71GB)"
+msgstr "Descargar vídeo (2.71GB)"
+
+msgctxt "#30001"
+msgid "Something went wrong, Try again..."
+msgstr "Algo salió mal, Inténtalo de nuevo..."
+
+msgctxt "#30002"
+msgid "Downloading..."
+msgstr "Descargando..."
+
+msgctxt "#30003"
+msgid "Mute ScreenSaver"
+msgstr "Silenciar Salvapantallas"
+
+msgctxt "#30004"
+msgid "Youtube/Tubed Plugins not installed!\nOpen Settings to download locally."
+msgstr ""
+"Addons Youtube/Tubed no instalados.\n"
+"Abre Ajustes para descargar los vídeos localmente."
+
+msgctxt "#30005"
+msgid "Copying..."
+msgstr "Copiando..."
+
+msgctxt "#30006"
+msgid "Select Playlist"
+msgstr "Elegir Lista de reproducción"
+
+msgctxt "#30007"
+msgid "Random Youtube"
+msgstr "Youtube Aleatorio"
+
+msgctxt "#30008"
+msgid "Singe Local File"
+msgstr "Único Archivo Local"
+
+msgctxt "#30009"
+msgid "Open Settings to download the video file."
+msgstr "Abre Ajustes para descargar el vídeo."
+
+msgctxt "#30010"
+msgid "General"
+msgstr "General"

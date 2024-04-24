@@ -1,0 +1,72 @@
+# XBMC Media Center language file
+# Addon Name: System 47 - Star Trek LCARS ScreenSaver
+# Addon id: screensaver.system47
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: fi_fi\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgctxt "Addon Summary"
+msgid "System 47 - Star Trek LCARS ScreenSaver"
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "What is LCARS? LCARS is an acronym for Library Computer Access and Retrieval System, which is the primary computer system in the universe of Star Trek's Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There's actually another name for this type of graphical displays. It's Okudagram. It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation."
+msgstr ""
+
+msgctxt "#32000"
+msgid "Random Start Position"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Download video (2.71GB)"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Something went wrong, Try again..."
+msgstr ""
+
+msgctxt "#30002"
+msgid "Downloading..."
+msgstr ""
+
+msgctxt "#30003"
+msgid "Mute ScreenSaver"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Youtube/Tubed Plugins not installed!\nOpen Settings to download locally."
+msgstr ""
+
+msgctxt "#30005"
+msgid "Copying..."
+msgstr ""
+
+msgctxt "#30006"
+msgid "Select Playlist"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Random Youtube"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Singe Local File"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Open Settings to download the video file."
+msgstr ""
+
+msgctxt "#30010"
+msgid "General"
+msgstr ""

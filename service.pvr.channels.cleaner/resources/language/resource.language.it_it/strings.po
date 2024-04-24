@@ -1,0 +1,113 @@
+# XBMC Media Center language file
+# Addon Name: OnIdle Service
+# Addon id: service.onidle
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2024-04-24 17:47+0000\n"
+"Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
+"Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-pvr-channels-cleaner/it_it/>\n"
+"Language: it_it\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.4.3\n"
+
+msgctxt "Addon Summary"
+msgid "Clean ChannelsDVR PVR Buffer"
+msgstr "Pulizia buffer PVR ChanelsDVR"
+
+msgctxt "Addon Description"
+msgid "Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!"
+msgstr "Il backend ChannelsPVR lasciato deselezionato può consumare spazio di archiviazione con buffer rimasti dalla Live TV in diretta. Questo servizio pulisce tutti i buffer inattivi!"
+
+msgctxt "Addon Disclaimer"
+msgid "For Personal use; not meant for general use"
+msgstr "Per uso personale; non destinato all'uso generale"
+
+msgctxt "#32001"
+msgid "Enable Debugging"
+msgstr "Abilita debug"
+
+msgctxt "#32002"
+msgid "Idle Action"
+msgstr "Azione inattività"
+
+msgctxt "#32003"
+msgid "Idle Timer (Minutes)"
+msgstr "Timer inattività (minuti)"
+
+msgctxt "#32004"
+msgid "Idle Countdown (Seconds)"
+msgstr "Conto alla rovescia inattività (secondi)"
+
+msgctxt "#32005"
+msgid "Ignore When Playing Music"
+msgstr "Ignora durante riproduzione musicale"
+
+msgctxt "#32006"
+msgid "User Defined"
+msgstr "Definito dall'utente"
+
+msgctxt "#32007"
+msgid "CEC Shutdown"
+msgstr "Spegnimento CEC"
+
+msgctxt "#32008"
+msgid "CEC Standby"
+msgstr "Standby CEC"
+
+msgctxt "#32009"
+msgid "Hibernate"
+msgstr "Ibernazione"
+
+msgctxt "#32010"
+msgid "Suspend"
+msgstr "Sospensione"
+
+msgctxt "#32011"
+msgid "Shutdown"
+msgstr "Spegnimento"
+
+msgctxt "#32012"
+msgid "Quit"
+msgstr "Uscita"
+
+msgctxt "#32013"
+msgid "Activate Screensaver"
+msgstr "Attiva salvaschermo"
+
+msgctxt "#32014"
+msgid "Visit 'https://kodi.wiki/view/List_of_built-in_functions' for details"
+msgstr "Visita \"https://kodi.wiki/view/List_of_built-in_functions\" per i dettagli"
+
+msgctxt "#32015"
+msgid "Enter built-in function"
+msgstr "Inserisci funzione integrata"
+
+msgctxt "#32016"
+msgid "Enable Soft Mute"
+msgstr "Abilita soft mute"
+
+msgctxt "#32017"
+msgid "Idle Countdown"
+msgstr "Conto alla rovescia inattività"
+
+msgctxt "#32018"
+msgid "Cancel to continue watching"
+msgstr "Annulla per continuare a guardare"
+
+msgctxt "#32019"
+msgid "Sleeping in %s seconds"
+msgstr "A dormire tra %s secondi"
+
+msgctxt "#32020"
+msgid "Run Manually"
+msgstr "Esegui manualmente"
+
+msgctxt "#32021"
+msgid "Test Action"
+msgstr "Prova azione"

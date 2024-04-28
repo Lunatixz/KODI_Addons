@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.ispot.tv" version="2.0.3" name="iSpot.tv Adverts" provider-name="Lunatixz">
+<addon id="plugin.video.ispot.tv" version="2.0.4" name="iSpot.tv Adverts" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -31,7 +31,7 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
-       	<summary lang="en_GB">iSpot.tv internet&apos;s most comprehensive database of nationally airing TV Commercials.</summary>
-       	<description lang="en_GB">Welcome to the Internet&apos;s most comprehensive database of nationally airing TV Commercials. Explore the actors, songs and offers in the spots you see on TV.</description>
+        <summary lang="en_GB">iSpot.tv internet's most comprehensive database of nationally airing TV Commercials.</summary>
+       	<description lang="en_GB">Welcome to the Internet's most comprehensive database of nationally airing TV Commercials. Explore the actors, songs and offers in the spots you see on TV.</description>
     </extension>
 </addon>

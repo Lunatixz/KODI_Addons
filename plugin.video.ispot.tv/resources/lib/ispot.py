@@ -44,7 +44,7 @@ CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
 DEBUG_ENABLED = REAL_SETTINGS.getSetting('Enable_Debugging').lower() == 'true'
 ENABLE_DOWNLOAD = REAL_SETTINGS.getSetting('Enable_Download').lower() == 'true'
-DOWNLOAD_PATH = os.path.join(REAL_SETTINGS.getSetting('Download_Folder'),'resources').replace('/resources/resources','/resources')
+DOWNLOAD_PATH = os.path.join(REAL_SETTINGS.getSetting('Download_Folder'),'resources','').replace('/resources/resources','/resources')
 DEFAULT_ENCODING = "utf-8"
 ENABLE_SAP    = False
 HEADER        = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
@@ -225,7 +225,7 @@ class iSpotTV(object):
         
         
     def getFile(self, uri, que=False):
-        file   = xbmcvfs.translatePath(os.path.join(DOWNLOAD_PATH,'%s.mp4'%(slugify(uri))))
+        file   = xbmcvfs.translatePath(os.path.join(DOWNLOAD_PATH,'%s.mp4'%(slugify(uri)))).replace('\\','/')
         exists = xbmcvfs.exists(file)
         if que and not exists and ENABLE_DOWNLOAD: self.queDownload([uri])
         log('getFile, uri = %s, file = %s'%(uri,file))
@@ -242,27 +242,28 @@ class iSpotTV(object):
 
     def getDownloads(self):
         if ENABLE_DOWNLOAD:
+            if not xbmcvfs.exists(DOWNLOAD_PATH):
+                xbmcvfs.mkdir(DOWNLOAD_PATH)
+                
             queuePool = (self.cache.get('queuePool', json_data=True) or {})
             uris      = queuePool.get('uri',[])
             dia       = self.progressBGDialog(message='Preparing to download %s'%(ADDON_NAME))
             dluris    = (list(chunkLst(uris,5)) or [[]])[0]
+            
             for idx, uri in enumerate(dluris):
-                try: 
-                    diact = int(idx*100//len(dluris))
-                    dia   = self.progressBGDialog(diact, dia, message='Downloading Adverts (%s%%)'%(diact))
-                    video = self.getVideo('%s%s'%(BASE_URL,uri))
-                    if not video: continue
-                    url  = video['url']
-                    if not xbmcvfs.exists(DOWNLOAD_PATH): xbmcvfs.mkdir(DOWNLOAD_PATH)
-                    dest, exists = self.getFile(uri)
+                diact = int(idx*100//len(dluris))
+                dia   = self.progressBGDialog(diact, dia, message='Downloading Adverts (%s%%)'%(diact))
+                dest, exists = self.getFile(uri)
+                try:
                     if not exists:
-                        urllib.request.urlretrieve(url, dest)
-                        log('getDownloads, url = %s, dest = %s'%(url,dest))
-                    uris.pop(uris.index(uri))
-                    if self.myMonitor.waitForAbort(10): break
+                        video = self.getVideo('%s%s'%(BASE_URL,uri))
+                        if video:
+                            urllib.request.urlretrieve(video['url'], dest)
+                            log('getDownloads, url = %s, dest = %s'%(video['url'],dest))
+                            if self.myMonitor.waitForAbort(10): break
                 except Exception as e:
                     log('getDownloads Failed! %s'%(e))
-                    self.progressBGDialog(100, dia, message='Downloading (Canceled!)')
+                if xbmcvfs.exists(dest): uris.pop(uris.index(uri))
             self.progressBGDialog(100, dia, message='Downloading (Finished!)')
             queuePool['uri'] = uris
             log('getDownloads, remaining urls = %s'%(len(uris)))
@@ -282,7 +283,22 @@ class iSpotTV(object):
             if wait: self.myMonitor.waitForAbort(wait/1000)
         return control
         
-
+      
+    def walkPlugin(self):
+        path = 'plugin://%s'%(ADDON_ID)
+        chks = list()
+        dirs = [path]
+        for idx, dir in enumerate(dirs):
+            if self.myMonitor.waitForAbort(0.001): break
+            else:
+                log('walkFileDirectory, walking %s/%s directory'%(idx,len(dirs)))
+                if len(dirs) > 0: dir = dirs.pop(dirs.index(dir))
+                if dir in chks: continue
+                else: chks.append(dir)
+                for item in json.loads(xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","id":ADDON_ID,"method":"Files.GetDirectory","params":{"directory":dir,"media":"files"}}))).get('result', {}).get('files',[]):
+                    if item.get('filetype') == 'directory': dirs.append(item.get('file'))
+    
+    
     def run(self): 
         ROUTER.run()
         xbmcplugin.setContent(ROUTER.handle     ,CONTENT_TYPE)

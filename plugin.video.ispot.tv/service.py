@@ -18,7 +18,7 @@
 
 # -*- coding: utf-8 -*-
 
-import sys
+import sys, time
 
 from resources.lib import ispot
 from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
@@ -33,13 +33,25 @@ class Service(object):
         self.running   = False
         self._start()
         
+        
+    def _check(self, key, runEvery=900):
+        epoch = int(time.time())
+        next  = int(xbmcgui.Window(10000).getProperty(key) or '0')
+        if (epoch >= next):
+            xbmcgui.Window(10000).setProperty(key,str(epoch+runEvery))
+            return True
+        return False
+
     
     def _start(self):
         while not self.myMonitor.abortRequested():
-            if self.myMonitor.waitForAbort(900): break
+            if self.myMonitor.waitForAbort(5): break
             elif not self.running:
                 self.running = True
-                ispot.iSpotTV(sys.argv).getDownloads()
+                iservice = ispot.iSpotTV(sys.argv)
+                if   self._check('queue',86400):  iservice.walkPlugin()
+                elif self._check('download',900): iservice.getDownloads()
+                del iservice
                 self.running = False
             
 if __name__ == '__main__': Service()

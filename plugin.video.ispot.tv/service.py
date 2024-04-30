@@ -49,7 +49,7 @@ class Service(object):
             elif not self.running:
                 self.running = True
                 iservice = ispot.iSpotTV(sys.argv)
-                if   self._check('queue',86400):  iservice.walkPlugin()
+                if   self._check('queue',86400):  iservice.queDownloads()
                 elif self._check('download',900): iservice.getDownloads()
                 del iservice
                 self.running = False

@@ -28,6 +28,12 @@ from simplecache         import SimpleCache, use_cache
 from kodi_six            import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 from infotagger.listitem import ListItemInfoTag
 
+try:
+    from multiprocessing.pool import ThreadPool
+    SUPPORTS_POOL = True
+except Exception:
+    SUPPORTS_POOL = False
+    
 # Plugin Info
 ADDON_ID      = 'plugin.video.ispot.tv'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
@@ -44,7 +50,7 @@ CONTENT_TYPE  = 'episodes'
 DISC_CACHE    = False
 DEBUG_ENABLED = REAL_SETTINGS.getSetting('Enable_Debugging').lower() == 'true'
 ENABLE_DOWNLOAD = REAL_SETTINGS.getSetting('Enable_Download').lower() == 'true'
-DOWNLOAD_PATH = os.path.join(REAL_SETTINGS.getSetting('Download_Folder'),'resources','').replace('/resources/resources','/resources')
+DOWNLOAD_PATH = os.path.join(REAL_SETTINGS.getSetting('Download_Folder'),'resources','').replace('/resources/resources','/resources').replace('\\','/')
 DEFAULT_ENCODING = "utf-8"
 ENABLE_SAP    = False
 HEADER        = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
@@ -100,6 +106,19 @@ def decodeString(base64_bytes):
         return message_bytes.decode(DEFAULT_ENCODING)
     except: pass
 
+def poolit(func, items):
+    results = []
+    if SUPPORTS_POOL:
+        pool = ThreadPool()
+        try: results = pool.map(func, items)
+        except Exception: pass
+        pool.close()
+        pool.join()
+    else:
+        results = [func(item) for item in items]
+    results = filter(None, results)
+    return results
+
 @ROUTER.route('/')
 def buildMenu():
     iSpotTV().buildMenu()
@@ -120,7 +139,7 @@ class iSpotTV(object):
         self.myMonitor = xbmc.Monitor()
         
         
-    @use_cache(3)
+    @use_cache(1)
     def getURL(self, url):
         log('getURL, url = %s'%(url))
         try:    return requests.get(url, headers=HEADER).content
@@ -143,22 +162,25 @@ class iSpotTV(object):
         < a adname = "FootJoy Pro/SLX TV Spot, 'Joy Ride' Featuring Max Homa, Danielle Kang, Song by 10cc - 16 airings" href = "/ad/6K6T/footjoy-pro-slx-joy-ride" >
         < img alt = "FootJoy Pro/SLX TV Spot, 'Joy Ride' Featuring Max Homa, Danielle Kang, Song by 10cc" class ="img-16x9" loading="lazy" src="https://images-cdn.ispot.tv/ad/6K6T/default-large.jpg" width="100%" / >< / a >
         < / div >"""
+        def _buildDir(sub):
+            try:
+                if not sub.a['href'].startswith(('/brands/','/products/')):
+                    self.addDir('- %s'%(sub.string),uri=(getCategory,encodeString(sub.a['href'])))
+            except: pass
+        def _buildFile(row):
+            try:
+                label, label2 = row.a['adname'].split(' - ')
+                if label.lower().endswith('[spanish]') and not ENABLE_SAP: return
+                uris.append(row.a['href'])
+                self.addLink(label,(playVideo,'%s|%s'%(row.a['adname'],encodeString(row.a['href']))),info={'label':label,'label2':label2,'title':label},art={"thumb":row.img['src'],"poster":row.img['src'],"fanart":FANART,"icon":LOGO,"logo":LOGO})
+            except: pass
+        
         try:
             uris = []
             log('buildCategory, url = %s'%(url))
             soup = self.getSoup('%s%s'%(BASE_URL,url))
-            for sub in soup.find_all('div', {'class': 'list-grid__item'}):
-                try:
-                    if not sub.a['href'].startswith(('/brands/','/products/')):
-                        self.addDir('- %s'%(sub.string),uri=(getCategory,encodeString(sub.a['href'])))
-                except: pass
-            for row in soup.find_all('div', {'class': 'mb-0'}):
-                try:
-                    label, label2 = row.a['adname'].split(' - ')
-                    if label.lower().endswith('[spanish]') and not ENABLE_SAP: continue
-                    uris.append(row.a['href'])
-                    self.addLink(label,(playVideo,'%s|%s'%(row.a['adname'],encodeString(row.a['href']))),info={'label':label,'label2':label2,'title':label},art={"thumb":row.img['src'],"poster":row.img['src'],"fanart":FANART,"icon":LOGO,"logo":LOGO})
-                except: pass
+            poolit(_buildDir,soup.find_all('div', {'class': 'list-grid__item'}))
+            poolit(_buildFile,soup.find_all('div', {'class': 'mb-0'}))
             if ENABLE_DOWNLOAD: self.queDownload(uris)
         except Exception as e: log('buildCategory Failed! %s'%(e))
 
@@ -207,10 +229,8 @@ class iSpotTV(object):
         ydl = YoutubeDL({'no_color': True, 'format': 'best', 'outtmpl': '%(id)s.%(ext)s', 'no-mtime': True, 'add-header': HEADER})
         with ydl:
             result = ydl.extract_info(url, download=False)
-            if 'entries' in result:
-                return result['entries'][0] #playlist
-            else:
-                return result
+            if 'entries' in result: return result['entries'][0] #playlist
+            else:                   return result
 
         
     def playVideo(self, name, uri):
@@ -240,11 +260,26 @@ class iSpotTV(object):
         self.cache.set('queuePool', queuePool, json_data=True, expiration=datetime.timedelta(days=28))
         
 
+    def queDownloads(self):
+        if ENABLE_DOWNLOAD:
+            path = 'plugin://%s'%(ADDON_ID)
+            chks = list()
+            dirs = [path]
+            for idx, dir in enumerate(dirs):
+                if self.myMonitor.waitForAbort(0.001): break
+                else:
+                    log('walkFileDirectory, walking %s/%s directory'%(idx,len(dirs)))
+                    if len(dirs) > 0: dir = dirs.pop(dirs.index(dir))
+                    if dir in chks: continue
+                    else: chks.append(dir)
+                    for item in json.loads(xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","id":ADDON_ID,"method":"Files.GetDirectory","params":{"directory":dir,"media":"files"}}))).get('result', {}).get('files',[]):
+                        if self.myMonitor.waitForAbort(0.001): break
+                        if item.get('filetype') == 'directory': dirs.append(item.get('file'))
+    
+    
     def getDownloads(self):
         if ENABLE_DOWNLOAD:
-            if not xbmcvfs.exists(DOWNLOAD_PATH):
-                xbmcvfs.mkdir(DOWNLOAD_PATH)
-                
+            if not xbmcvfs.exists(DOWNLOAD_PATH): xbmcvfs.mkdir(DOWNLOAD_PATH)
             queuePool = (self.cache.get('queuePool', json_data=True) or {})
             uris      = queuePool.get('uri',[])
             dia       = self.progressBGDialog(message='Preparing to download %s'%(ADDON_NAME))
@@ -283,22 +318,7 @@ class iSpotTV(object):
             if wait: self.myMonitor.waitForAbort(wait/1000)
         return control
         
-      
-    def walkPlugin(self):
-        path = 'plugin://%s'%(ADDON_ID)
-        chks = list()
-        dirs = [path]
-        for idx, dir in enumerate(dirs):
-            if self.myMonitor.waitForAbort(0.001): break
-            else:
-                log('walkFileDirectory, walking %s/%s directory'%(idx,len(dirs)))
-                if len(dirs) > 0: dir = dirs.pop(dirs.index(dir))
-                if dir in chks: continue
-                else: chks.append(dir)
-                for item in json.loads(xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","id":ADDON_ID,"method":"Files.GetDirectory","params":{"directory":dir,"media":"files"}}))).get('result', {}).get('files',[]):
-                    if item.get('filetype') == 'directory': dirs.append(item.get('file'))
-    
-    
+        
     def run(self): 
         ROUTER.run()
         xbmcplugin.setContent(ROUTER.handle     ,CONTENT_TYPE)

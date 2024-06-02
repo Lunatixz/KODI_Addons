@@ -13,6 +13,14 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
+msgctxt "Addon Summary"
+msgid "Module providing access to youtube-dl video stream extraction"
+msgstr "Módulo que proporciona acceso a YouTube-dl para la extracción de flujos de video"
+
+msgctxt "Addon Description"
+msgid "Module providing access to youtube-dl video stream extraction for hundreds of sites. Version is based on youtube-dl date version: YY.MDD.V where V is the addon specific sub-version. Also provides downloading with the option for background downloading with a queue and queue manager."
+msgstr "Módulo que proporciona acceso a YouTube-dl para la extracción de flujos de video de cientos de sitios. La versión está basada en la versión de fecha youtube-dl: YY.MDD.V donde V es la subversión específica del complemento. También permite descargas con la opción de descarga en segundo plano con una cola y un administrador de colas."
+
 msgctxt "#32001"
 msgid "ETA"
 msgstr ""

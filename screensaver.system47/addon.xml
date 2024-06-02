@@ -25,6 +25,8 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
         <summary lang="en_GB">System 47 - Star Trek LCARS ScreenSaver</summary>
+        <summary lang="es_ES">System 47 - Salvapantallas Star Trek LCARS</summary>
         <description lang="en_GB">What is LCARS? LCARS is an acronym for Library Computer Access and Retrieval System, which is the primary computer system in the universe of Star Trek&apos;s Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There&apos;s actually another name for this type of graphical displays. It&apos;s Okudagram. It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation.</description>
+        <description lang="es_ES">¿Qué es LCARS? LCARS es el acrónimo de Library Computer Access and Retrieval Syste, que es el sistema de computación primordial en el universo de la Federación y la Flota Estelar de Star Trek. En muchas escenas de las series y películas de Star Trek se puede ver la palabra, LCARS, en muchos monitores. Para los fans, LCARS tambien se usa para referirse al aspecto de la interfaz. Hay otro nombre para este aspecto, Okudagram, Se llamó así en honor a su inventor, Michael Okuda, que creó esta imageniría como supervisor de arte para la serie Star Trek: La Nueva Generación.</description>
     </extension>
 </addon>

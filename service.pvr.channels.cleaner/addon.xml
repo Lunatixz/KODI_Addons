@@ -15,7 +15,17 @@
             <icon>icon.png</icon>
         </assets>
         <summary lang="en_GB">Clean ChannelsDVR PVR Buffer</summary>
+        <summary lang="es_ES">Limpiar Buffer del PVR ChannelsDVR</summary>
+        <summary lang="it_IT">Pulizia buffer PVR ChanelsDVR</summary>
+        <summary lang="ko_KR">ChannelsDVR PVR 버퍼 정리</summary>
+        <summary lang="pt_BR">Limpar Buffer de PVR de CanaisDVR</summary>
         <description lang="en_GB">Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!</description>
+        <description lang="es_ES">Dejar servicios de ChannelsPVR sin seleccionar puede comerse el almacenamiento con los buffers. ¡Este servicio limpia todos los buffers inactivos!</description>
+        <description lang="it_IT">Il backend ChannelsPVR lasciato deselezionato può consumare spazio di archiviazione con buffer rimasti dalla Live TV in diretta. Questo servizio pulisce tutti i buffer inattivi!</description>
+        <description lang="ko_KR">선택하지 않으면 ChannelsPVR 백엔드가 남은 라이브 TV 버퍼로 인해 저장 공간을 차지할 수 있습니다. 이 서비스는 사용하지 않는 버퍼를 정리합니다!</description>
         <disclaimer lang="en_GB">For Personal use; not meant for general use</disclaimer>
+        <disclaimer lang="es_ES">Para uso Personal; no está concebido para uso general</disclaimer>
+        <disclaimer lang="it_IT">Per uso personale; non destinato all&apos;uso generale</disclaimer>
+        <disclaimer lang="ko_KR">일반적인 용도가 아닌 개인용</disclaimer>
     </extension>
 </addon>

@@ -18,6 +18,7 @@
         <summary lang="es_ES">Limpiar Buffer del PVR ChannelsDVR</summary>
         <summary lang="it_IT">Pulizia buffer PVR ChanelsDVR</summary>
         <summary lang="ko_KR">ChannelsDVR PVR 버퍼 정리</summary>
+        <summary lang="pt_BR">Limpar Buffer de PVR de CanaisDVR</summary>
         <description lang="en_GB">Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!</description>
         <description lang="es_ES">Dejar servicios de ChannelsPVR sin seleccionar puede comerse el almacenamiento con los buffers. ¡Este servicio limpia todos los buffers inactivos!</description>
         <description lang="it_IT">Il backend ChannelsPVR lasciato deselezionato può consumare spazio di archiviazione con buffer rimasti dalla Live TV in diretta. Questo servizio pulisce tutti i buffer inattivi!</description>

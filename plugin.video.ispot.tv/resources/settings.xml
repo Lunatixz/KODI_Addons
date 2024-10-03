@@ -3,6 +3,11 @@
 	<section id="plugin.video.ispot.tv">
         <category id="general" label="30001" help="">
 			<group id="1" label="">
+				<setting id="Enable_SAP" type="boolean" label="30030">
+					<level>1</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
 				<setting id="Enable_Debugging" type="boolean" label="30000">
 					<level>1</level>
 					<default>false</default>

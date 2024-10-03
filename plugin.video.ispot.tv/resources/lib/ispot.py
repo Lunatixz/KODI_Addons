@@ -19,7 +19,7 @@
 # -*- coding: utf-8 -*-
 
 import os, re, sys, routing, traceback, datetime
-import json, requests, base64
+import json, requests, base64, time
 
 from six.moves           import urllib
 from youtube_dl          import YoutubeDL
@@ -35,42 +35,42 @@ except Exception:
     SUPPORTS_POOL = False
     
 # Plugin Info
-ADDON_ID      = 'plugin.video.ispot.tv'
-REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
-ADDON_NAME    = REAL_SETTINGS.getAddonInfo('name')
-SETTINGS_LOC  = REAL_SETTINGS.getAddonInfo('profile')
-ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path')
-ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
-ICON          = REAL_SETTINGS.getAddonInfo('icon')
-LOGO          = os.path.join('special://home/addons/%s/'%(ADDON_ID),'resources','images','logo.png')
-FANART        = REAL_SETTINGS.getAddonInfo('fanart')
-LANGUAGE      = REAL_SETTINGS.getLocalizedString
-ROUTER        = routing.Plugin()
-CONTENT_TYPE  = 'episodes'
-DISC_CACHE    = False
-DEBUG_ENABLED = REAL_SETTINGS.getSetting('Enable_Debugging').lower() == 'true'
-ENABLE_DOWNLOAD = REAL_SETTINGS.getSetting('Enable_Download').lower() == 'true'
-DOWNLOAD_PATH = os.path.join(REAL_SETTINGS.getSetting('Download_Folder'),'resources','').replace('/resources/resources','/resources').replace('\\','/')
+ADDON_ID         = 'plugin.video.ispot.tv'
+REAL_SETTINGS    = xbmcaddon.Addon(id=ADDON_ID)
+ADDON_NAME       = REAL_SETTINGS.getAddonInfo('name')
+SETTINGS_LOC     = REAL_SETTINGS.getAddonInfo('profile')
+ADDON_PATH       = REAL_SETTINGS.getAddonInfo('path')
+ADDON_VERSION    = REAL_SETTINGS.getAddonInfo('version')
+ICON             = REAL_SETTINGS.getAddonInfo('icon')
+LOGO             = os.path.join('special://home/addons/%s/'%(ADDON_ID),'resources','images','logo.png')
+FANART           = REAL_SETTINGS.getAddonInfo('fanart')
+LANGUAGE         = REAL_SETTINGS.getLocalizedString
+ROUTER           = routing.Plugin()
+CONTENT_TYPE     = 'episodes'
+DISC_CACHE       = False
+DEBUG_ENABLED    = REAL_SETTINGS.getSetting('Enable_Debugging').lower() == 'true'
+ENABLE_DOWNLOAD  = REAL_SETTINGS.getSetting('Enable_Download').lower() == 'true'
+ENABLE_SAP       = REAL_SETTINGS.getSetting('Enable_SAP').lower() == 'true'
+DOWNLOAD_PATH    = os.path.join(REAL_SETTINGS.getSetting('Download_Folder'),'resources','').replace('/resources/resources','/resources').replace('\\','/')
 DEFAULT_ENCODING = "utf-8"
-ENABLE_SAP    = False
-HEADER        = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
-BASE_URL      = 'https://www.ispot.tv'
+HEADER           = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
+BASE_URL         = 'https://www.ispot.tv'
 
-MENU = {"Apparel, Footwear & Accessories"     :"/browse/k/apparel-footwear-and-accessories",
-        "Business & Legal"                    :"/browse/Y/business-and-legal",
-        "Education"                           :"/browse/7/education",
-        "Electronics & Communication"         :"/browse/A/electronics-and-communication",
-        "Food & Beverage"                     :"/browse/d/food-and-beverage",
-        "Health & Beauty"                     :"/browse/I/health-and-beauty",
-        "Home & Real Estate"                  :"/browse/o/home-and-real-estate",
-        "Insurance"                           :"/browse/Z/insurance",
-        "Life & Entertainment"                :"/browse/w/life-and-entertainment",
-        "Pharmaceutical & Medical"            :"/browse/7k/pharmaceutical-and-medical",
-        "Politics, Government & Organizations":"/browse/q/politics-government-and-organizations",
-        "Restaurants"                         :"/browse/b/restaurants",
-        "Retail Stores"                       :"/browse/2/retail-stores",
-        "Travel"                              :"/browse/5/travel",
-        "Vehicles"                            :"/browse/L/vehicles"}
+MENU = {LANGUAGE(30015) : "/browse/k/apparel-footwear-and-accessories",
+        LANGUAGE(30016) : "/browse/Y/business-and-legal",
+        LANGUAGE(30017) : "/browse/7/education",
+        LANGUAGE(30018) : "/browse/A/electronics-and-communication",
+        LANGUAGE(30019) : "/browse/d/food-and-beverage",
+        LANGUAGE(30020) : "/browse/I/health-and-beauty",
+        LANGUAGE(30021) : "/browse/o/home-and-real-estate",
+        LANGUAGE(30022) : "/browse/Z/insurance",
+        LANGUAGE(30023) : "/browse/w/life-and-entertainment",
+        LANGUAGE(30024) : "/browse/7k/pharmaceutical-and-medical",
+        LANGUAGE(30025) : "/browse/q/politics-government-and-organizations",
+        LANGUAGE(30026) : "/browse/b/restaurants",
+        LANGUAGE(30027) : "/browse/2/retail-stores",
+        LANGUAGE(30028) : "/browse/5/travel",
+        LANGUAGE(30029) : "/browse/L/vehicles"}
 
 #https://www.ispot.tv/events
 def log(msg, level=xbmc.LOGDEBUG):
@@ -123,6 +123,10 @@ def poolit(func, items):
 def buildMenu():
     iSpotTV().buildMenu()
 
+@ROUTER.route('/downloads')
+def getDownloaded():
+    iSpotTV().buildDownloaded()
+    
 @ROUTER.route('/browse/<url>')
 def getCategory(url):
     iSpotTV().buildCategory(decodeString(url))
@@ -153,7 +157,15 @@ class iSpotTV(object):
 
     def buildMenu(self):
         log('buildMenu')
+        if ENABLE_DOWNLOAD: self.addDir('- %s'%(LANGUAGE(30011)),uri=(getDownloaded,))
         for name, url in list(MENU.items()): self.addDir(name,uri=(getCategory,encodeString(url)))
+
+
+    def buildDownloaded(self):
+        def _buildFile(item):
+            try: self.addLink(item.get('label'),(playVideo,'%s|%s'%(item.get('label'),encodeString(item.get('file')))),info={'label':item.get('label'),'label2':os.path.join(DOWNLOAD_PATH,item.get('label')),'title':item.get('title')},art={"thumb":ICON,"poster":ICON,"fanart":FANART,"icon":LOGO,"logo":LOGO})
+            except: pass
+        poolit(_buildFile,self.getDirectory(DOWNLOAD_PATH))
 
 
     def buildCategory(self, url):
@@ -167,6 +179,7 @@ class iSpotTV(object):
                 if not sub.a['href'].startswith(('/brands/','/products/')):
                     self.addDir('- %s'%(sub.string),uri=(getCategory,encodeString(sub.a['href'])))
             except: pass
+            
         def _buildFile(row):
             try:
                 label, label2 = row.a['adname'].split(' - ')
@@ -234,12 +247,15 @@ class iSpotTV(object):
 
         
     def playVideo(self, name, uri):
-        found = True
-        file, exists = self.getFile(uri,que=True)
-        if not exists:
-            video = self.getVideo('%s%s'%(BASE_URL,uri))
-            if not video: found = False
-            else: file = video['url']
+        file   = uri
+        exists = True
+        found  = True
+        if uri.startswith('/'):
+            file, exists = self.getFile(uri,que=True)
+            if not exists:
+                video = self.getVideo('%s%s'%(BASE_URL,uri))
+                if video: file = video['url'].replace('https://','http://')
+                else: found = False
         log('playVideo, file = %s, found = %s'%(file,found))
         xbmcplugin.setResolvedUrl(ROUTER.handle, found, self.getListItem(name, path=file))
         
@@ -251,6 +267,25 @@ class iSpotTV(object):
         log('getFile, uri = %s, file = %s'%(uri,file))
         return file, exists
     
+
+    def getDirectory(self, path):
+        items = list()
+        chks  = list()
+        dirs  = [path]
+        for idx, dir in enumerate(dirs):
+            if self.myMonitor.waitForAbort(0.001): break
+            else:
+                log('getDirectory, walking %s/%s directory'%(idx,len(dirs)))
+                if len(dirs) > 0: dir = dirs.pop(dirs.index(dir))
+                if dir in chks: continue
+                else: chks.append(dir)
+                for item in json.loads(xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","id":ADDON_ID,"method":"Files.GetDirectory","params":{"directory":dir,"media":"files"}}))).get('result', {}).get('files',[]):
+                    if self.myMonitor.waitForAbort(0.001): break
+                    if item.get('filetype') == 'directory': dirs.append(item.get('file'))
+                    else: items.append(item)
+        log('getDirectory, returning %s items'%(len(items)))
+        return items
+        
         
     def queDownload(self, uris):
         log('queDownload, uris = %s'%(len(uris)))
@@ -261,20 +296,7 @@ class iSpotTV(object):
         
 
     def queDownloads(self):
-        if ENABLE_DOWNLOAD:
-            path = 'plugin://%s'%(ADDON_ID)
-            chks = list()
-            dirs = [path]
-            for idx, dir in enumerate(dirs):
-                if self.myMonitor.waitForAbort(0.001): break
-                else:
-                    log('walkFileDirectory, walking %s/%s directory'%(idx,len(dirs)))
-                    if len(dirs) > 0: dir = dirs.pop(dirs.index(dir))
-                    if dir in chks: continue
-                    else: chks.append(dir)
-                    for item in json.loads(xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","id":ADDON_ID,"method":"Files.GetDirectory","params":{"directory":dir,"media":"files"}}))).get('result', {}).get('files',[]):
-                        if self.myMonitor.waitForAbort(0.001): break
-                        if item.get('filetype') == 'directory': dirs.append(item.get('file'))
+        if ENABLE_DOWNLOAD: [self.addDir(name,uri=(getCategory,encodeString(url))) for name, url in list(MENU.items())]
     
     
     def getDownloads(self):
@@ -282,24 +304,27 @@ class iSpotTV(object):
             if not xbmcvfs.exists(DOWNLOAD_PATH): xbmcvfs.mkdir(DOWNLOAD_PATH)
             queuePool = (self.cache.get('queuePool', json_data=True) or {})
             uris      = queuePool.get('uri',[])
-            dia       = self.progressBGDialog(message='Preparing to download %s'%(ADDON_NAME))
+            dia       = self.progressBGDialog(message=LANGUAGE(30014))
             dluris    = (list(chunkLst(uris,5)) or [[]])[0]
             
             for idx, uri in enumerate(dluris):
+                video = None
                 diact = int(idx*100//len(dluris))
-                dia   = self.progressBGDialog(diact, dia, message='Downloading Adverts (%s%%)'%(diact))
+                dia   = self.progressBGDialog(diact, dia, message=LANGUAGE(30013)%(diact))
                 dest, exists = self.getFile(uri)
-                try:
-                    if not exists:
+                if not exists:
+                    try:
                         video = self.getVideo('%s%s'%(BASE_URL,uri))
                         if video:
-                            urllib.request.urlretrieve(video['url'], dest)
                             log('getDownloads, url = %s, dest = %s'%(video['url'],dest))
-                            if self.myMonitor.waitForAbort(10): break
-                except Exception as e:
-                    log('getDownloads Failed! %s'%(e))
-                if xbmcvfs.exists(dest): uris.pop(uris.index(uri))
-            self.progressBGDialog(100, dia, message='Downloading (Finished!)')
+                            req = urllib.request.Request(video['url'], headers=HEADER)
+                            response = urllib.request.urlopen(req)
+                            with xbmcvfs.File(dest,'wb') as fle:
+                                fle.write(response.read())
+                            if self.myMonitor.waitForAbort(5): break #avoid DDoS 
+                        uris.pop(uris.index(uri))
+                    except Exception as e: log('getDownloads Failed! %s\nurl = %s\nvideo = %s'%(e,'%s%s'%(BASE_URL,uri),video))
+            self.progressBGDialog(100, dia, message=LANGUAGE(30012))
             queuePool['uri'] = uris
             log('getDownloads, remaining urls = %s'%(len(uris)))
             self.cache.set('queuePool', queuePool, json_data=True, expiration=datetime.timedelta(days=28))

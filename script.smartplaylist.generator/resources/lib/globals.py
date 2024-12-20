@@ -27,14 +27,15 @@ import xml.etree.ElementTree as ET
 
 
 from functools                       import wraps
-try:    from simplecache             import SimpleCache
-except: from simplecache.simplecache import SimpleCache #pycharm stub
 from contextlib                      import contextmanager, closing
 from infotagger.listitem             import ListItemInfoTag
 from kodi_six                        import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
 from concurrent.futures              import ThreadPoolExecutor, TimeoutError
 from itertools                       import repeat, count
 from functools                       import partial, wraps, reduce, update_wrapper
+
+try:    from simplecache             import SimpleCache
+except: from simplecache.simplecache import SimpleCache #pycharm stub
 
 #info
 ADDON_ID            = 'script.smartplaylist.generator'

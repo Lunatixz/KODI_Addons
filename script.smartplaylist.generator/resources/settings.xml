@@ -147,7 +147,7 @@
                     </dependencies>
                     <control type="button" format="action">
                         <data>RunScript(special://home/addons/script.smartplaylist.generator/resources/lib/default.py, Select_Trakt)</data>
-                        <close>false</close>
+                        <close>true</close>
                     </control>
                 </setting>
                 <setting id="Build_Trakt" type="string" label="32106" help="32110" parent="Enable_Trakt">

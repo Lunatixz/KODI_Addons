@@ -19,14 +19,17 @@
 # -*- coding: utf-8 -*-
 from globals import *
 
+try:    from simplecache             import SimpleCache
+except: from simplecache.simplecache import SimpleCache #pycharm stub
+
 class SPGenerator:
     def __init__(self, sysARG=sys.argv):
         self.log('__init__, sysARG = %s'%(sysARG))
-        self.dia    = None
-        self.pct    = 0
         self.cache  = SimpleCache()
         self.cache.enable_mem_cache = False
         
+        self.dia    = None
+        self.pct    = 0
         self.sysARG = sysARG
         self.kodi   = Kodi(self.cache)
         self.lists  = [LANGUAGE(32100),]

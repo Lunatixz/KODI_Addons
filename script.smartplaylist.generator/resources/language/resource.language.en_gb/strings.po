@@ -1,0 +1,141 @@
+# XBMC Media Center language file
+# Addon Name: Smartplaylist Generator
+# Addon id: script.smartplaylist.generator
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To:  \n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: XBMC Translation Team\n"
+"Language-Team: English"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#32000"
+msgid "General"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Enable Debugging"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Include Missing Titles"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Smartplaylist Field Type"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Title"
+msgstr ""
+
+msgctxt "#32005"
+msgid "File"
+msgstr ""
+
+msgctxt "#32006"
+msgid "Last Update"
+msgstr ""
+
+msgctxt "#32007"
+msgid "Smartplaylist match content based on Title or File."
+msgstr ""
+
+msgctxt "#32008"
+msgid "Run every"
+msgstr ""
+
+msgctxt "#32009"
+msgid "6 hours"
+msgstr ""
+
+msgctxt "#32010"
+msgid "12 hours"
+msgstr ""
+
+msgctxt "#32011"
+msgid "24 hours"
+msgstr ""
+
+msgctxt "#32012"
+msgid "48 hours"
+msgstr ""
+
+msgctxt "#32013"
+msgid "Disabled"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Service"
+msgstr ""
+
+msgctxt "#32015"
+msgid "Finished!"
+msgstr ""
+
+msgctxt "#32016"
+msgid "SmartPlaylst Video Folder"
+msgstr ""
+
+msgctxt "#32017"
+msgid "Manually Start SmartPlaylist Service?"
+msgstr ""
+
+msgctxt "#32018"
+msgid "Notifications"
+msgstr ""
+
+msgctxt "#32019"
+msgid "Path"
+msgstr ""
+
+msgctxt "#32100"
+msgid "Trakt"
+msgstr ""
+
+msgctxt "#32101"
+msgid "Username"
+msgstr ""
+
+msgctxt "#32102"
+msgid "Enter Trakt Username"
+msgstr ""
+
+msgctxt "#32103"
+msgid "Client ID"
+msgstr ""
+
+msgctxt "#32104"
+msgid "Enter Client ID found on the Trakt Website under API Settings."
+msgstr ""
+
+msgctxt "#32105"
+msgid "Select User Lists"
+msgstr ""
+
+msgctxt "#32106"
+msgid "Build SmartPlaylst"
+msgstr ""
+
+msgctxt "#32107"
+msgid "Enable Trakt"
+msgstr ""
+
+msgctxt "#32108"
+msgid "SmartPlaylst included Titles not found in your collection."
+msgstr ""
+
+msgctxt "#32109"
+msgid "Select User Lists convert into SmartPlaylst"
+msgstr ""
+
+msgctxt "#32110"
+msgid "Manually trigger smartPlaylists building"
+msgstr ""

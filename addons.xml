@@ -129,8 +129,8 @@
             <screenshot>resources/images/screenshot01.png</screenshot>
             <screenshot>resources/images/screenshot02.png</screenshot>
         </assets>
-        <summary lang="en_GB">iSpot.tv internet's most comprehensive database of nationally airing TV Commercials.</summary>
-       	<description lang="en_GB">Welcome to the Internet's most comprehensive database of nationally airing TV Commercials. Explore the actors, songs and offers in the spots you see on TV.</description>
+       	<summary lang="en_GB">iSpot.tv internet&apos;s most comprehensive database of nationally airing TV Commercials.</summary>
+       	<description lang="en_GB">Welcome to the Internet&apos;s most comprehensive database of nationally airing TV Commercials. Explore the actors, songs and offers in the spots you see on TV.</description>
     </extension>
 </addon>
 
@@ -496,7 +496,7 @@
         <description lang="da_DK">Download og installer Windows eksekverbare filer til Kodi; vælg fra Nightlies, Udgivelser, Snapshots og Test-builds.</description>
         <description lang="de_DE">Kodi für Windows herunterladen und installieren. Auswählen zwischen Nightlies, Releases, Snapshopts und Test-Builds.</description>
         <description lang="en_GB">Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
-        <description lang="es_ES">Descargar e instalar los ejecutables para Windows de Kodi; seleccionar entre  Nightlies, Releases, Snapshots y Test-builds.</description>
+        <description lang="es_ES">Descargar e instalar los ejecutables de kodi para Windows; seleccionar entre  Nightlies, Releases, Snapshots y Test-builds.</description>
         <description lang="es_MX">Descarga e instala ejecutables de Kodi para Windows; selecciona entre  Nightlies, Releases, Snapshots y Test-builds.</description>
         <description lang="fi_FI">Lataa ja asenna Kodin Windows-asennuksia kehityshaaroista Release, Nightly, Snapshot ja Test.</description>
         <description lang="fr_FR">Télécharger et installer les exécutables dans la fenêtre Kodi ; sélectionner parmi Nightlies, Releases, Snapshots et Test-builds.</description>
@@ -511,7 +511,7 @@
         <disclaimer lang="da_DK">UWP understøttes ikke! Ikke beregnet til Kodi-installation gennem Windows Store.</disclaimer>
         <disclaimer lang="de_DE">UWP wird nicht unterstützt! Nicht vorgesehen für Kodi-Installation über den Windows Store.</disclaimer>
         <disclaimer lang="en_GB">UWP not supported! Not intended for Kodi installation through the Windows Store.</disclaimer>
-        <disclaimer lang="es_ES">¡No soporta UWP! No está diseñado para la instalación de Kodi a través de la tienda de Windows.</disclaimer>
+        <disclaimer lang="es_ES">¡UWP no soportado! No está diseñado para la instalación de Kodi a través de la tienda de Windows.</disclaimer>
         <disclaimer lang="es_MX">¡No se soporta UWP! No se pretende utilizara para la instalación de Kodi desde la tienda de Windows.</disclaimer>
         <disclaimer lang="fi_FI">UWP-versiota ei tueta! Lisäosaa ei ole tarkoitettu Microsoft Storesta asennetuille Kodi-asennuksille.</disclaimer>
         <disclaimer lang="fr_FR">UWP non pris en charge ! Non destiné à l&apos;installation de Kodi via le Windows Store.</disclaimer>
@@ -572,6 +572,35 @@
     </extension>
 </addon>
 
+<addon id="script.smartplaylist.generator" version="0.0.2" name="Smartplaylist Generator" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="3.0.1"/>
+        <import addon="script.module.six" version="1.0.0"/>
+        <import addon="script.module.kodi-six" version="0.1.3.1"/>
+        <import addon="script.module.infotagger" version="0.0.5"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+        <import addon="script.module.requests" version="0.0.1"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="resources/lib/default.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.service" library="resources/lib/service.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Generate Smartplaylists from third-party lists.</summary>
+        <description lang="en_GB">Generate Smartplaylists from third-party lists.</description>
+        <platform>all</platform>
+        <license>GPL-3.0-or-later</license>
+        <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.smartplaylist.generator</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=379825</forum>
+        <disclaimer lang="en_GB">BETA PROJECT; SUBJECT TO BUGS</disclaimer>
+        <reuselanguageinvoker>false</reuselanguageinvoker>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="service.iptv.manager" name="IPTV Manager" version="0.2.3a+matrix.1" provider-name="Michaël Arnauts">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
@@ -613,7 +642,7 @@
         <summary lang="de_DE">IPTV-Sender aus anderen Addons in Kodis TV- und Radiomenüs integrieren</summary>
         <summary lang="el_GR">Ενσωμάτωση καναλιών IPTV από άλλα πρόσθετα στο PVR του Kodi</summary>
         <summary lang="en_GB">Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus</summary>
-        <summary lang="es_ES">Integrar los canales IPTV de otros complementos en los menús TV y Radio de Kodi</summary>
+        <summary lang="es_ES">Integrar los canales IPTV de otros complementos en los menús de TV y Radio de Kodi</summary>
         <summary lang="es_MX">Integra canales IPTV de otros complementos en los menús de TV y Radio de Kodi</summary>
         <summary lang="fi_FI">Lisää muiden lisäosien IPTV-kanavat Kodin televisio- ja radiovalikoihin</summary>
         <summary lang="fr_FR">Intégrer les chaines IPTV d&apos;autres extensions dans les menus Radio et TV de Kodi</summary>
@@ -663,18 +692,23 @@
             <icon>icon.png</icon>
         </assets>
         <summary lang="en_GB">Clean ChannelsDVR PVR Buffer</summary>
-        <summary lang="es_ES">Limpiar Buffer del PVR ChannelsDVR</summary>
+        <summary lang="es_ES">Limpiar buffer de PVR ChannelsDVR</summary>
         <summary lang="it_IT">Pulizia buffer PVR ChanelsDVR</summary>
         <summary lang="ko_KR">ChannelsDVR PVR 버퍼 정리</summary>
+        <summary lang="pl_PL">Czyszczenie bufora PVR ChanelsDVR</summary>
         <summary lang="pt_BR">Limpar Buffer de PVR de CanaisDVR</summary>
         <description lang="en_GB">Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!</description>
-        <description lang="es_ES">Dejar servicios de ChannelsPVR sin seleccionar puede comerse el almacenamiento con los buffers. ¡Este servicio limpia todos los buffers inactivos!</description>
+        <description lang="es_ES">Si no se controla el backend de ChannelsPVR, puede consumir espacio de almacenamiento con los búferes de TV en directo restantes. ¡Este servicio limpia todos los búferes inactivos!</description>
         <description lang="it_IT">Il backend ChannelsPVR lasciato deselezionato può consumare spazio di archiviazione con buffer rimasti dalla Live TV in diretta. Questo servizio pulisce tutti i buffer inattivi!</description>
         <description lang="ko_KR">선택하지 않으면 ChannelsPVR 백엔드가 남은 라이브 TV 버퍼로 인해 저장 공간을 차지할 수 있습니다. 이 서비스는 사용하지 않는 버퍼를 정리합니다!</description>
+        <description lang="pl_PL">Pozostawiony bez sprawdzenia backend ChannelsPVR może zjadać pamięć masową z resztkami buforów TV. Ta usługa czyści wszystkie nieaktywne bufory!</description>
+        <description lang="pt_BR">Se não for verificado, o back-end do ChannelsPVR pode consumir armazenamento com buffers de TV ao vivo restantes. Este serviço limpa todos os buffers inativos!</description>
         <disclaimer lang="en_GB">For Personal use; not meant for general use</disclaimer>
-        <disclaimer lang="es_ES">Para uso Personal; no está concebido para uso general</disclaimer>
+        <disclaimer lang="es_ES">Para uso personal; no destinado al uso general</disclaimer>
         <disclaimer lang="it_IT">Per uso personale; non destinato all&apos;uso generale</disclaimer>
         <disclaimer lang="ko_KR">일반적인 용도가 아닌 개인용</disclaimer>
+        <disclaimer lang="pl_PL">Do użytku osobistego; nie jest przeznaczony do użytku ogólnego</disclaimer>
+        <disclaimer lang="pt_BR">Para uso pessoal; não destinado ao uso geral</disclaimer>
     </extension>
 </addon>
 </addons>

@@ -19,7 +19,6 @@
 # -*- coding: utf-8 -*-
 from globals  import *
 from parsers  import trakt
-from parsers  import imdb
 
 class SPGenerator:
     def __init__(self, sysARG=sys.argv):
@@ -64,7 +63,7 @@ class SPGenerator:
                         matches.setdefault(type,[]).append(match)
                         break
                 if match is None and incl_missing: matches.setdefault(type,[]).append(list_item)
-                                                                                  
+                
         for type, list_items in list(source_items.items()):
             self.log('match_items, Type: %s, INCL_MISSING: %s'%(type,incl_missing))
             if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, 'Matching %s'%(type.title()))
@@ -92,20 +91,20 @@ class SPGenerator:
                     elem.tail = i
                     
         # incl_missing = REAL_SETTINGS.getSetting('Incl_Missing') == 'true'
-        # for type, items in (list(match_items.items())):
-            # if incl_missing:
-                # match_field = 'title'
-                # match_key   = 'title'
-            # else: 
-                # match_field = {'0':'title','1':'filename'}[str(match_val)].lower()
-                # if type == 'tvshows' and match_field == 'filename':
-                    # match_field = 'path'
-                    # match_key   = 'file'
-                # elif match_field == 'title':
-                    # match_key = 'title'
-                # else:
-                    # match_key = 'file'
-                
+        # if incl_missing:
+            # match_field = 'title'
+            # match_key   = 'title'
+        # else: 
+            # match_field = {'0':'title','1':'filename'}[str(match_val)].lower()
+            # if type == 'tvshows' and match_field == 'filename':
+                # match_field = 'path'
+                # match_key   = 'file'
+            # elif match_field == 'title':
+                # match_key = 'title'
+            # else:
+                # match_key = 'file'
+            
+        for type, items in (list(match_items.items())):
             if  type == 'movies':
                 match_field = 'title'
                 match_key   = 'title'
@@ -154,6 +153,7 @@ class SPGenerator:
             if 'Select_' in param and not self.kodi.isRunning(param):
                 with self.kodi.busy_dialog(), self.kodi.setRunning(param):
                     self.build_lists(source,module.get_lists())
+                REAL_SETTINGS.openSettings()
                     
             elif 'Build_' in param and not self.kodi.isRunning(param):
                 with self.kodi.setRunning(param):

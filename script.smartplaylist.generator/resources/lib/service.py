@@ -37,7 +37,7 @@ class Service():
         
         
     def _run(self):
-        run_every = int(REAL_SETTINGS.getSetting('Run_Every'))
+        run_every = int(REAL_SETTINGS.getSetting('Run_Every').replace(LANGUAGE(32013),'0'))
         if run_every > 0:
             last_update = strpTime(REAL_SETTINGS.getSetting('Last_Update'))
             run_seconds = ((run_every * 3600) + 1800) #service run time in seconds with 30min padding to allow cache time to clear before run

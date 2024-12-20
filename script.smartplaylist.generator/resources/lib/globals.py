@@ -112,7 +112,7 @@ def strpTime(datestring, format=DTFORMAT):
     try:              return datetime.datetime.strptime(datestring, format)
     except TypeError: return datetime.datetime.fromtimestamp(time.mktime(time.strptime(datestring, format)))
     except:           return datetime.datetime.now()
-       
+           
 class ThreadPool:
     CPUCount    = 4
     ThreadCount = CPUCount*8

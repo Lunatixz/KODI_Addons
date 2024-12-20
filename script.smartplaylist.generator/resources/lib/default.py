@@ -17,10 +17,9 @@
 # along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
 #
 # -*- coding: utf-8 -*-
-from globals import *
-
-try:    from simplecache             import SimpleCache
-except: from simplecache.simplecache import SimpleCache #pycharm stub
+from globals  import *
+from parsers  import trakt
+from parsers  import imdb
 
 class SPGenerator:
     def __init__(self, sysARG=sys.argv):
@@ -58,10 +57,14 @@ class SPGenerator:
 
         def __match(kodi_item, type, list_items):
             for list_item in list_items:
-                if   list_item.get('uniqueid',{}).get('imdb') == kodi_item.get('uniqueid',{}).get('imdb',random.random()): matches.setdefault(type,[]).append(kodi_item)
-                elif list_item.get('uniqueid',{}).get('tmdb') == kodi_item.get('uniqueid',{}).get('tmdb',random.random()): matches.setdefault(type,[]).append(kodi_item)
-                elif incl_missing:                                                                                         matches.setdefault(type,[]).append(list_item)
-        
+                match = None
+                for key in (list_item.get('uniqueid',{}).keys()):
+                    if list_item.get('uniqueid',{}).get(key) == kodi_item.get('uniqueid',{}).get(key,random.random()): match = kodi_item
+                    if match: 
+                        matches.setdefault(type,[]).append(match)
+                        break
+                if match is None and incl_missing: matches.setdefault(type,[]).append(list_item)
+                                                                                  
         for type, list_items in list(source_items.items()):
             self.log('match_items, Type: %s, INCL_MISSING: %s'%(type,incl_missing))
             if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, 'Matching %s'%(type.title()))
@@ -144,14 +147,13 @@ class SPGenerator:
         except: param = None
         if param.startswith(('Build_','Select_')):
             source = param.split('_')[1]
-            sys.path.insert(0, os.path.join(ADDON_PATH,'resources','lib','parsers'))
-            module = __import__(source.lower())
-            object = getattr(module,source)
-            self.log('run, %s source = %s, module = %s, object = %s'%(param.split('_')[0], source,module.__name__,object.__name__))
+            if source == LANGUAGE(32100): module = trakt.Trakt(self.cache)
+            else: return
+            self.log('run, %s source = %s, module = %s'%(param.split('_')[0], source,module.__class__.__name__))
                 
             if 'Select_' in param and not self.kodi.isRunning(param):
                 with self.kodi.busy_dialog(), self.kodi.setRunning(param):
-                    self.build_lists(source,object(self.cache).get_lists())
+                    self.build_lists(source,module.get_lists())
                     
             elif 'Build_' in param and not self.kodi.isRunning(param):
                 with self.kodi.setRunning(param):
@@ -159,7 +161,7 @@ class SPGenerator:
                     for idx, list_item in enumerate(list_items):
                         self.pct = int(idx*100//len(list_items))
                         self.dia = self.kodi.progressBGDialog(self.pct, message='Building Smartplaylist:\n%s'%(list_item.get('name')))
-                        self.create_xsp(list_item.get('name'),self.match_items(object(self.cache).get_list_items(list_item.get('id'))))
+                        self.create_xsp(list_item.get('name'),self.match_items(module.get_list_items(list_item.get('id'))))
                         REAL_SETTINGS.setSetting('%s_Update'%(source),datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
                         self.dia = self.kodi.progressBGDialog(100, message=LANGUAGE(32015))
                         if REAL_SETTINGS.getSetting('Notify_Enable') == "true":

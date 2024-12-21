@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.smartplaylist.generator" version="0.0.9" name="Smartplaylist Generator" provider-name="Lunatixz">
+<addon id="script.smartplaylist.generator" version="0.1.2" name="Smartplaylist Generator" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.six" version="1.0.0"/>

@@ -61,7 +61,7 @@ class Trakt:
         
 
 
-    @cacheit(expiration=datetime.timedelta(hours=int(REAL_SETTINGS.getSetting('Run_Every').replace(LANGUAGE(32013),'0')), minutes=15))
+    @cacheit(expiration=datetime.timedelta(hours=6, minutes=15))
     def get_list_items(self, list_id, client_id=REAL_SETTINGS.getSetting('Trakt_ClientID')):
         self.log('get_list_items, list_id = %s'%(list_id))
         tmp = {}

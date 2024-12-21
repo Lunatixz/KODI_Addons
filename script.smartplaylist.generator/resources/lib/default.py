@@ -19,6 +19,10 @@
 # -*- coding: utf-8 -*-
 from globals  import *
 from parsers  import trakt
+from kodi     import Kodi
+
+try:    from simplecache             import SimpleCache
+except: from simplecache.simplecache import SimpleCache #pycharm stub
 
 class SPGenerator:
     def __init__(self, sysARG=sys.argv):

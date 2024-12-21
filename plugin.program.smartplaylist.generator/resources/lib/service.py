@@ -17,12 +17,14 @@
 # along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
 #
 # -*- coding: utf-8 -*-
-from globals    import *
+from globals import *
+from kodi    import Kodi
 
 class Service():
     def __init__(self):
         self.log('__init__')
         self.monitor = MONITOR()
+        self.kodi    = Kodi()
         
             
     def log(self, msg, level=xbmc.LOGDEBUG):

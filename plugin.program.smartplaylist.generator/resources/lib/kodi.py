@@ -245,11 +245,21 @@ class Kodi:
 
 
     @cacheit()
-    def get_kodi_shows(self):
-        return json.loads(xbmc.executeJSONRPC(json.dumps({"jsonrpc": "2.0", "id": "test", "method": "VideoLibrary.GetTVShows", "params": {"properties": ["title", "genre", "year", "season", "episode", "playcount", "studio", "file", "thumbnail","uniqueid", "imdbnumber", "runtime", "mpaa"]}}))).get('result', {}).get('tvshows', [])
+    def get_kodi_tvshows(self):
+        return json.loads(xbmc.executeJSONRPC(json.dumps({"jsonrpc": "2.0", "id": "test", "method": "VideoLibrary.GetTVShows", "params": {"properties": ["title", "genre", "year", "playcount", "studio", "file", "thumbnail","uniqueid", "imdbnumber", "mpaa"]}}))).get('result', {}).get('tvshows', [])
 
 
     @cacheit()
-    def get_kodi_episodes(self):
-        return json.loads(xbmc.executeJSONRPC(json.dumps({"jsonrpc": "2.0", "id": "test", "method": "VideoLibrary.GetEpisodes", "params": {"properties": ["title", "genre", "firstaired", "season", "episode", "showtitle", "studio", "file", "thumbnail","uniqueid", "tvshowid", "runtime", "rating"]}}))).get('result', {}).get('episodes', [])
+    def get_kodi_episodes(self, tvshowid=None, season=None):
+        if tvshowid is None: return json.loads(xbmc.executeJSONRPC(json.dumps({"jsonrpc": "2.0", "id": "test", "method": "VideoLibrary.GetEpisodes", "params": {"properties": ["title", "genre", "firstaired", "season", "episode", "showtitle", "studio", "file", "thumbnail","uniqueid", "tvshowid", "runtime", "rating"]}}))).get('result', {}).get('episodes', [])
+        return json.loads(xbmc.executeJSONRPC(json.dumps({"jsonrpc": "2.0", "id": "test", "method": "VideoLibrary.GetEpisodes", "params": {"tvshowid": tvshowid, "season":season, "properties": ["title", "genre", "firstaired", "season", "episode", "showtitle", "studio", "file", "thumbnail","uniqueid", "tvshowid", "runtime", "rating"], "sort":{"ignorearticle":True,"method":"episode","order":"ascending","useartistsortname":True}}}))).get('result', {}).get('episodes', [])
 
+
+    @cacheit()
+    def get_kodi_seasons(self, kodi_item, list_item):
+        def __match(kodi_item, list_item):
+            for key in (list_item.get('uniqueid',{}).keys()):
+                if list_item.get('uniqueid',{}).get(key) == kodi_item.get('uniqueid',{}).get(key,random.random()): return kodi_item
+        if not __match(kodi_item, list_item): return {}
+        return self.get_kodi_episodes(kodi_item.get('tvshowid'),list_item.get('season'))
+        

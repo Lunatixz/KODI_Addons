@@ -31,7 +31,11 @@ class SPGenerator:
         self.cache.enable_mem_cache = False
         
         self.dia    = None
+        self.msg    = ''
         self.pct    = 0
+        self.tot    = 0
+        self.cnt    = 0
+        self.cntpct = 0
         self.sysARG = sysARG
         self.kodi   = Kodi(self.cache)
         self.lists  = [LANGUAGE(32100),]
@@ -55,27 +59,34 @@ class SPGenerator:
 
     def match_items(self, source_items):
         matches      = {}
-        func_list    = {'movies':self.kodi.get_kodi_movies,'tvshows':self.kodi.get_kodi_shows,'episodes':self.kodi.get_kodi_episodes}
-        incl_missing = REAL_SETTINGS.getSetting('Incl_Missing') == 'true'
+        func_list    = {'movies':self.kodi.get_kodi_movies,'tvshows':self.kodi.get_kodi_tvshows,'seasons':self.kodi.get_kodi_tvshows,'episodes':self.kodi.get_kodi_episodes,'persons':log}
 
         def __match(kodi_item, type, list_items):
+            self.cntpct = round(self.cnt*100//self.tot)
             for list_item in list_items:
                 match = None
+                if self.dia and len(list_items) > 0: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, '%s (%s%%)'%(self.msg, self.cntpct))
                 for key in (list_item.get('uniqueid',{}).keys()):
                     if list_item.get('uniqueid',{}).get(key) == kodi_item.get('uniqueid',{}).get(key,random.random()): match = kodi_item
                     if match: 
-                        matches.setdefault(type,[]).append(match)
+                        self.log('match_items, __match found! type %s | %s -> %s'%(type,kodi_item.get('uniqueid'),list_item.get('uniqueid')))
+                        if type == "seasons": matches.setdefault(type,[]).extend(self.kodi.get_kodi_seasons(kodi_item, list_item))
+                        else:                 matches.setdefault(type,[]).append(match)
                         break
-                if match is None and incl_missing: matches.setdefault(type,[]).append(list_item)
+            self.cnt += 1
                 
         for type, list_items in list(source_items.items()):
-            self.log('match_items, Type: %s, INCL_MISSING: %s'%(type,incl_missing))
-            if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, 'Matching %s'%(type.title()))
-            poolit(__match)(func_list.get(type)(), **{'type':type,'list_items':list_items})
+            self.log('match_items, type %s | list_items = %s'%(type, len(list_items)))
+            kodi_items = func_list.get(type)()
+            self.msg    = '%s %s'%(LANGUAGE(32022),type.title())
+            self.cntpct = 0
+            self.cnt    = 0
+            self.tot    = len(list(kodi_items))
+            poolit(__match)(kodi_items, **{'type':type,'list_items':list_items})
         return matches
 
 
-    def create_xsp(self, list_name, match_items, match_val=REAL_SETTINGS.getSetting('Field_Type'), pretty_print=True):    
+    def create_xsp(self, list_name, match_items, pretty_print=True):    
         def __indent(elem, level=0):
             """
             Indent XML for pretty printing
@@ -93,56 +104,66 @@ class SPGenerator:
             else:
                 if level and (not elem.tail or not elem.tail.strip()):
                     elem.tail = i
-                    
-        # incl_missing = REAL_SETTINGS.getSetting('Incl_Missing') == 'true'
-        # if incl_missing:
-            # match_field = 'title'
-            # match_key   = 'title'
-        # else: 
-            # match_field = {'0':'title','1':'filename'}[str(match_val)].lower()
-            # if type == 'tvshows' and match_field == 'filename':
-                # match_field = 'path'
-                # match_key   = 'file'
-            # elif match_field == 'title':
-                # match_key = 'title'
-            # else:
-                # match_key = 'file'
-            
+
         for type, items in (list(match_items.items())):
-            if  type == 'movies':
+            if len(items) == 0: continue
+            elif  type == 'movies':
+                match_type  = type
                 match_field = 'title'
                 match_key   = 'title'
+                match_opt   = 'is'
             elif type == 'tvshows':
-                match_field = 'title'
-                match_key   = 'showtitle'
-            elif type == 'episodes':
+                match_type  = type
                 match_field = 'title'
                 match_key   = 'title'
+                match_opt   = 'is'
+            elif type == 'seasons':
+                match_type  = 'episodes'
+                match_field = 'path'
+                match_key   = 'file'
+                match_opt   = 'contains'
+            elif type == 'episodes':
+                match_type  = type
+                match_field = 'filename'
+                match_key   = 'file'
+                match_opt   = 'contains'
                 
-            self.log('create_xsp, Type: %s, Name: %s, Items: %s, Key: %s, Field: %s'%(type,list_name,len(items),match_key,match_field))
+            self.log('create_xsp, type = %s, name = %s, items = %s, key = %s, field = %s'%(type,list_name,len(items),match_key,match_field))
             root = ET.Element("smartplaylist")
-            root.set("type",type)
+            root.set("type",match_type)
             name = ET.SubElement(root, "name")
             name.text = "%s - %s"%(list_name,type.title())
             match = ET.SubElement(root, "match")
             match.text = "all"
             rule = ET.SubElement(root, "rule")
             rule.set("field", match_field)
-            rule.set("operator", "is")
+            rule.set("operator", match_opt)
             
+            matches = []
             for idx, item in enumerate(items):
-                if not item.get(match_key): continue
-                value = ET.SubElement(rule, "value")
-                value.text = item.get(match_key)
+                if item.get(match_key):
+                    matches.append(item)
+                    value = ET.SubElement(rule, "value")
+                    match_value = item.get(match_key)
+                    if match_field == "filename": match_value = os.path.split(match_value)[1]
+                    elif match_field == "path":   match_value = os.path.split(match_value)[0]
+                    value.text = match_value
+                    
+            if len(matches) > 0:
+                self.log('create_xsp, Out: %s'%(ET.tostring(root, encoding='unicode'))) 
+                if pretty_print: __indent(root)
+                tree = ET.ElementTree(root)
+                path = os.path.join(xbmcvfs.translatePath(REAL_SETTINGS.getSetting('XSP_LOC')),'%s.xsp'%("%s - %s"%(validString(list_name),type.title())))
+                self.log('create_xsp, File: %s'%(path))
+                fle = xbmcvfs.File(path, 'w')
+                tree.write(fle, encoding='utf-8', xml_declaration=True)
+                fle.close()
                 
-            self.log('create_xsp, Out: %s'%(ET.tostring(root, encoding='unicode')))
-            if pretty_print: __indent(root)
-            tree = ET.ElementTree(root)
-            path = os.path.join(xbmcvfs.translatePath(REAL_SETTINGS.getSetting('XSP_LOC')),'%s.xsp'%(validString(list_name)))
-            self.log('create_xsp, File: %s'%(path))
-            fle = xbmcvfs.File(path, 'w')
-            tree.write(fle, encoding='utf-8', xml_declaration=True)
-            fle.close()
+                if REAL_SETTINGS.getSetting('Notify_Enable') == "true":
+                    if xbmcvfs.exists(path): msg = LANGUAGE(32020)
+                    else:                    msg = LANGUAGE(32021)
+                    self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),msg,list_name))
+            else: self.kodi.notificationDialog(LANGUAGE(32024)%(validString(list_name)))
 
 
     def run(self):
@@ -162,21 +183,21 @@ class SPGenerator:
             elif 'Build_' in param and not self.kodi.isRunning(param):
                 with self.kodi.setRunning(param):
                     list_items = self.kodi.getCacheSetting('%s.%s'%(ADDON_ID,source))
-                    for idx, list_item in enumerate(list_items):
-                        self.pct = int(idx*100//len(list_items))
-                        self.dia = self.kodi.progressBGDialog(self.pct, message='Building Smartplaylist:\n%s'%(list_item.get('name')))
-                        self.create_xsp(list_item.get('name'),self.match_items(module.get_list_items(list_item.get('id'))))
-                        REAL_SETTINGS.setSetting('%s_Update'%(source),datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
-                        self.dia = self.kodi.progressBGDialog(100, message=LANGUAGE(32015))
-                        if REAL_SETTINGS.getSetting('Notify_Enable') == "true":
-                            self.kodi.notificationDialog('SmartPlaylists Updated:\n%s'%(list_item.get('name')))
+                    if len(list_items) > 0:
+                        for idx, list_item in enumerate(list_items):
+                            self.pct = int(idx*100//len(list_items))
+                            self.dia = self.kodi.progressBGDialog(self.pct, message='%s:\n%s'%(ADDON_NAME,list_item.get('name')))
+                            self.create_xsp(list_item.get('name'),self.match_items(module.get_list_items(list_item.get('id'))))
+                            REAL_SETTINGS.setSetting('Build_%s'%(source),datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
+                            self.dia = self.kodi.progressBGDialog(100, message=LANGUAGE(32015))
+                    else: self.kodi.notificationDialog(LANGUAGE(32023)%(source))
 
         elif param == 'Run_All':
             for list in self.lists:
                 self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Build_%s)'%(ADDON_ID,list))
             REAL_SETTINGS.setSetting('Last_Update',datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
                     
-        elif self.kodi.yesnoDialog(LANGUAGE(32017)):
+        elif self.kodi.yesnoDialog('%s?'%(LANGUAGE(32110))):
             self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Run_All)'%(ADDON_ID))
       
         else: REAL_SETTINGS.openSettings()

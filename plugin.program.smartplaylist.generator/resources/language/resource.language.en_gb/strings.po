@@ -1,6 +1,6 @@
 # XBMC Media Center language file
 # Addon Name: Smartplaylist Generator
-# Addon id: script.smartplaylist.generator
+# Addon id: plugin.program.smartplaylist.generator
 # Addon Provider: Lunatixz
 msgid ""
 msgstr ""
@@ -85,7 +85,7 @@ msgid "SmartPlaylst Video Folder"
 msgstr ""
 
 msgctxt "#32017"
-msgid "Manually Start SmartPlaylist Service?"
+msgid "SmartPlaylists"
 msgstr ""
 
 msgctxt "#32018"
@@ -94,6 +94,26 @@ msgstr ""
 
 msgctxt "#32019"
 msgid "Path"
+msgstr ""
+
+msgctxt "#32020"
+msgid "Updated"
+msgstr ""
+
+msgctxt "#32021"
+msgid "Created"
+msgstr ""
+
+msgctxt "#32022"
+msgid "Matching"
+msgstr ""
+
+msgctxt "#32023"
+msgid "No %s User Lists Selected!"
+msgstr ""
+
+msgctxt "#32024"
+msgid "%s: No Matches Found!"
 msgstr ""
 
 msgctxt "#32100"
@@ -137,5 +157,5 @@ msgid "Select User Lists convert into SmartPlaylst"
 msgstr ""
 
 msgctxt "#32110"
-msgid "Manually trigger smartPlaylists building"
+msgid "Manually Start SmartPlaylists Service"
 msgstr ""

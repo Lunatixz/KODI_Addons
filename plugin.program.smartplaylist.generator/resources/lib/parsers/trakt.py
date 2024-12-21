@@ -36,7 +36,7 @@ class Trakt:
         
         
     def convert_type(self, list_type):
-        return {'movie':'movies','show':'tvshows','episode':'episodes'}[list_type]
+        return {'movie':'movies','show':'tvshows','season':'seasons','episode':'episodes','person':None}[list_type]
 
 
     def clean_string(self, string):
@@ -45,9 +45,9 @@ class Trakt:
         
     @cacheit(expiration=datetime.timedelta(minutes=15))
     def get_lists(self, trakt_user=REAL_SETTINGS.getSetting('Trakt_Username'), client_id=REAL_SETTINGS.getSetting('Trakt_ClientID')):
-        self.log('get_lists, trakt_user = %s'%(trakt_user))
         tmp = []
         url = f"https://api.trakt.tv/users/{trakt_user}/lists"
+        self.log('get_lists, trakt_user = %s, url = %s'%(trakt_user,url))
         headers = { 'Content-Type': 'application/json',
                     'trakt-api-version': '2',
                     'trakt-api-key': client_id}
@@ -60,20 +60,21 @@ class Trakt:
         else:            return None
         
 
-
-    @cacheit(expiration=datetime.timedelta(hours=6, minutes=15))
+    @cacheit()
     def get_list_items(self, list_id, client_id=REAL_SETTINGS.getSetting('Trakt_ClientID')):
-        self.log('get_list_items, list_id = %s'%(list_id))
         tmp = {}
-        for list_type in ['movie','show','episode']:
+        for list_type in ['movie','show','season','episode','person']:
             url = f"https://api.trakt.tv/lists/{list_id}/items/{list_type}"
+            self.log('get_list_items, list_id = %s, url = %s'%(list_id,url))
             headers = { 'Content-Type': 'application/json',
                         'trakt-api-version': '2',
                         'trakt-api-key': client_id}
             response = requests.get(url, headers=headers)
+            print('get_list_items response',list_type,response.json())
             if response.status_code == 200:
                 for item in response.json():
-                    tmp.setdefault(self.convert_type(list_type),[]).append({'type':item.get('type'),'title':item.get(list_type,{}).get('title'),'year':item.get(list_type,{}).get('title'),'uniqueid':item.get(list_type,{}).get('ids'),'data':item})
+                    if list_type == 'season' and 'show' in item: item[list_type].update(item.pop('show'))
+                    tmp.setdefault(self.convert_type(list_type),[]).append({'type':item.get('type'),'title':item.get(list_type,{}).get('title'),'year':item.get(list_type,{}).get('year'),'season':item.get(list_type,{}).get('number'),'uniqueid':item.get(list_type,{}).get('ids'),'data':item})
             else: self.log("get_list_items, failed! to fetch data from Trakt:", response.status_code)
         if len(tmp) > 0: return tmp
         else:            return None

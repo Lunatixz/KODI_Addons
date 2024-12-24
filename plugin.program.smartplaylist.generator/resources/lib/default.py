@@ -62,9 +62,9 @@ class SPGenerator:
                         'episodes': self.kodi.get_kodi_episodes,
                         'persons' : log}
 
-        def __match(kodi_item, type, list_items):
+        def __match(list_item, type, kodi_items):
             self.cntpct = round(self.cnt*100//self.tot)
-            for list_item in list_items:
+            for kodi_item in kodi_items:
                 match = None
                 if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, '%s (%s%%)'%(self.msg, self.cntpct))
                 for key in (list_item.get('uniqueid',{}).keys()):
@@ -82,8 +82,8 @@ class SPGenerator:
             self.msg    = '%s %s'%(LANGUAGE(32022),type.title().replace('Tvshows','TV Shows'))
             self.cntpct = 0
             self.cnt    = 0
-            self.tot    = len(list(kodi_items))
-            poolit(__match)(kodi_items, **{'type':type,'list_items':list_items})
+            self.tot    = len(list(list_items))
+            poolit(__match)(list_items, **{'type':type,'kodi_items':kodi_items})
         return matches
 
 

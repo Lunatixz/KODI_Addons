@@ -141,10 +141,14 @@ class ThreadPool:
 
     def executors(self, func, items=[], *args, **kwargs):
         self.log("executors, func = %s, items = %s"%(func.__name__,len(items)))
+        results = []
         with ThreadPoolExecutor(self.ThreadCount) as executor:
-            try: return executor.map(self.wrapped_partial(func, *args, **kwargs), items)
+            try: 
+                for result in executor.map(self.wrapped_partial(func, *args, **kwargs), items):
+                    results.append(result)
             except Exception as e: self.log("executors, func = %s, items = %s failed! %s\nargs = %s, kwargs = %s"%(func.__name__,len(items),e,args,kwargs), xbmc.LOGERROR)
-
+        return results
+        
 
     def generator(self, func, items=[], *args, **kwargs):
         self.log("generator, items = %s"%(len(items)))

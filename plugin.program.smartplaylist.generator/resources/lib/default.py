@@ -30,15 +30,15 @@ class SPGenerator:
         self.cache  = SimpleCache()
         self.cache.enable_mem_cache = False
         
-        self.dia    = None
-        self.msg    = ''
-        self.pct    = 0
-        self.tot    = 0
-        self.cnt    = 0
-        self.cntpct = 0
-        self.sysARG = sysARG
-        self.kodi   = Kodi(self.cache)
-        self.lists  = [LANGUAGE(32100),]
+        self.dia     = None
+        self.msg     = ''
+        self.pct     = 0
+        self.tot     = 0
+        self.cnt     = 0
+        self.cntpct  = 0
+        self.sysARG  = sysARG
+        self.kodi    = Kodi(self.cache)
+        self.modules = {LANGUAGE(32100):trakt.Trakt(self.cache)}
         
 
     def log(self, msg, level=xbmc.LOGDEBUG):
@@ -46,12 +46,9 @@ class SPGenerator:
         
         
     def build_lists(self, source, lists):
-        def __buildMenu(item):
-            return self.kodi.buildMenuListItem(item.get('name'),item.get('description'),item.get('icon',ICON),url=item.get('id'))
-        
+        def __buildMenu(item): return self.kodi.buildMenuListItem(item.get('name'),item.get('description'),item.get('icon',ICON),url=item.get('id'))
         with self.kodi.busy_dialog():
             listitems = poolit(__buildMenu)(lists)
-            
         selects = self.kodi.selectDialog(listitems,header='%s %s'%(source,ADDON_NAME),preselect=self.kodi.findItemsInLST(listitems, self.kodi.getCacheSetting('%s.%s'%(ADDON_ID,source)), item_key='getPath', val_key='id'),)
         if not selects is None: 
             self.log('build_lists, source = %s, saving = %s'%(source,self.kodi.setCacheSetting('%s.%s'%(ADDON_ID,source),[{'name':listitems[select].getLabel(),'id':listitems[select].getPath(),'icon':listitems[select].getArt('icon')} for select in selects])))
@@ -59,13 +56,17 @@ class SPGenerator:
 
     def match_items(self, source_items):
         matches      = {}
-        func_list    = {'movies':self.kodi.get_kodi_movies,'tvshows':self.kodi.get_kodi_tvshows,'seasons':self.kodi.get_kodi_tvshows,'episodes':self.kodi.get_kodi_episodes,'persons':log}
+        func_list    = {'movies'  : self.kodi.get_kodi_movies,
+                        'tvshows' : self.kodi.get_kodi_tvshows,
+                        'seasons' : self.kodi.get_kodi_tvshows,
+                        'episodes': self.kodi.get_kodi_episodes,
+                        'persons' : log}
 
         def __match(kodi_item, type, list_items):
             self.cntpct = round(self.cnt*100//self.tot)
             for list_item in list_items:
                 match = None
-                if self.dia and len(list_items) > 0: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, '%s (%s%%)'%(self.msg, self.cntpct))
+                if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, '%s (%s%%)'%(self.msg, self.cntpct))
                 for key in (list_item.get('uniqueid',{}).keys()):
                     if list_item.get('uniqueid',{}).get(key) == kodi_item.get('uniqueid',{}).get(key,random.random()): match = kodi_item
                     if match: 
@@ -77,8 +78,8 @@ class SPGenerator:
                 
         for type, list_items in list(source_items.items()):
             self.log('match_items, type %s | list_items = %s'%(type, len(list_items)))
-            kodi_items = func_list.get(type)()
-            self.msg    = '%s %s'%(LANGUAGE(32022),type.title())
+            kodi_items  = func_list.get(type)()
+            self.msg    = '%s %s'%(LANGUAGE(32022),type.title().replace('Tvshows','TV Shows'))
             self.cntpct = 0
             self.cnt    = 0
             self.tot    = len(list(kodi_items))
@@ -107,62 +108,44 @@ class SPGenerator:
 
         for type, items in (list(match_items.items())):
             if len(items) == 0: continue
-            elif  type == 'movies':
-                match_type  = type
-                match_field = 'title'
-                match_key   = 'title'
-                match_opt   = 'is'
-            elif type == 'tvshows':
-                match_type  = type
-                match_field = 'title'
-                match_key   = 'title'
-                match_opt   = 'is'
-            elif type == 'seasons':
-                match_type  = 'episodes'
-                match_field = 'path'
-                match_key   = 'file'
-                match_opt   = 'contains'
-            elif type == 'episodes':
-                match_type  = type
-                match_field = 'filename'
-                match_key   = 'file'
-                match_opt   = 'contains'
+            match_item = {'movies'  :{'match_type':type      , 'match_field':'title'   ,'match_key':'title','match_opr':'is'},
+                          'tvshows' :{'match_type':type      , 'match_field':'title'   ,'match_key':'title','match_opr':'is'},
+                          'seasons' :{'match_type':'episodes', 'match_field':'path'    ,'match_key':'file' ,'match_opr':'contains'},
+                          'episodes':{'match_type':type      , 'match_field':'filename','match_key':'file' ,'match_opr':'contains'}}[type]
                 
-            self.log('create_xsp, type = %s, name = %s, items = %s, key = %s, field = %s'%(type,list_name,len(items),match_key,match_field))
+            self.log('create_xsp, type = %s, name = %s, items = %s, key = %s, field = %s'%(type,list_name,len(items),match_item.get('match_key'),match_item.get('match_field')))
             root = ET.Element("smartplaylist")
-            root.set("type",match_type)
+            root.set("type",match_item.get('match_type'))
             name = ET.SubElement(root, "name")
-            name.text = "%s - %s"%(list_name,type.title())
+            name.text = "%s - %s"%(list_name,type.title().replace('Tvshows','TV Shows'))
             match = ET.SubElement(root, "match")
             match.text = "all"
             rule = ET.SubElement(root, "rule")
-            rule.set("field", match_field)
-            rule.set("operator", match_opt)
+            rule.set("field", match_item.get('match_field'))
+            rule.set("operator", match_item.get('match_opr'))
             
-            matches = []
+            values = []
             for idx, item in enumerate(items):
-                if item.get(match_key):
-                    matches.append(item)
+                if item.get(match_item.get('match_key')):
+                    values.append(item)
                     value = ET.SubElement(rule, "value")
-                    match_value = item.get(match_key)
-                    if match_field == "filename": match_value = os.path.split(match_value)[1]
-                    elif match_field == "path":   match_value = os.path.split(match_value)[0]
+                    match_value = item.get(match_item.get('match_key'))
+                    if match_item.get('match_field') == "filename": match_value = os.path.split(match_value)[1]
+                    elif match_item.get('match_field') == "path":   match_value = os.path.split(match_value)[0]
                     value.text = match_value
                     
-            if len(matches) > 0:
+            if len(values) > 0:
                 self.log('create_xsp, Out: %s'%(ET.tostring(root, encoding='unicode'))) 
                 if pretty_print: __indent(root)
                 tree = ET.ElementTree(root)
-                path = os.path.join(xbmcvfs.translatePath(REAL_SETTINGS.getSetting('XSP_LOC')),'%s.xsp'%("%s - %s"%(validString(list_name),type.title())))
+                path = os.path.join(xbmcvfs.translatePath(REAL_SETTINGS.getSetting('XSP_LOC')),'%s.xsp'%("%s - %s"%(validString(list_name),type.title().replace('Tvshows','TV Shows'))))
                 self.log('create_xsp, File: %s'%(path))
                 fle = xbmcvfs.File(path, 'w')
                 tree.write(fle, encoding='utf-8', xml_declaration=True)
                 fle.close()
                 
                 if REAL_SETTINGS.getSetting('Notify_Enable') == "true":
-                    if xbmcvfs.exists(path): msg = LANGUAGE(32020)
-                    else:                    msg = LANGUAGE(32021)
-                    self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),msg,list_name))
+                    self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),{True:LANGUAGE(32020),False:LANGUAGE(32021)}[xbmcvfs.exists(path)],list_name))
             else: self.kodi.notificationDialog(LANGUAGE(32024)%(validString(list_name)))
 
 
@@ -171,8 +154,8 @@ class SPGenerator:
         except: param = None
         if param.startswith(('Build_','Select_')):
             source = param.split('_')[1]
-            if source == LANGUAGE(32100): module = trakt.Trakt(self.cache)
-            else: return
+            module = self.modules.get(source) 
+            if not module: return
             self.log('run, %s source = %s, module = %s'%(param.split('_')[0], source,module.__class__.__name__))
                 
             if 'Select_' in param and not self.kodi.isRunning(param):
@@ -185,21 +168,18 @@ class SPGenerator:
                     list_items = self.kodi.getCacheSetting('%s.%s'%(ADDON_ID,source))
                     if len(list_items) > 0:
                         for idx, list_item in enumerate(list_items):
-                            self.pct = int(idx*100//len(list_items))
+                            self.pct = int((idx+1)*100//len(list_items))
                             self.dia = self.kodi.progressBGDialog(self.pct, message='%s:\n%s'%(ADDON_NAME,list_item.get('name')))
                             self.create_xsp(list_item.get('name'),self.match_items(module.get_list_items(list_item.get('id'))))
                             REAL_SETTINGS.setSetting('Build_%s'%(source),datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
-                            self.dia = self.kodi.progressBGDialog(100, message=LANGUAGE(32015))
                     else: self.kodi.notificationDialog(LANGUAGE(32023)%(source))
 
         elif param == 'Run_All':
-            for list in self.lists:
-                self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Build_%s)'%(ADDON_ID,list))
+            for source in list(self.modules.keys()):
+                self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Build_%s)'%(ADDON_ID,source))
             REAL_SETTINGS.setSetting('Last_Update',datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
-                    
-        elif self.kodi.yesnoDialog('%s?'%(LANGUAGE(32110))):
-            self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Run_All)'%(ADDON_ID))
-      
+        elif self.kodi.yesnoDialog('%s?'%(LANGUAGE(32110))): self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Run_All)'%(ADDON_ID))
         else: REAL_SETTINGS.openSettings()
+        
 if __name__ == '__main__': SPGenerator(sys.argv).run()
 

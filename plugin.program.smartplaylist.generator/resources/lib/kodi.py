@@ -120,15 +120,7 @@ class Kodi:
         return True
              
 
-    def progressBGDialog(self, percent=0, control=None, message='', header=ADDON_NAME, silent=None):
-        # if silent is None and self.settings.getSettingBool('Silent_OnPlayback'): 
-            # silent = (self.properties.getPropertyBool('OVERLAY') | self.builtin.getInfoBool('Playing','Player'))
-        
-        # if silent:
-            # if hasattr(control, 'close'): control.close()
-            # self.log('progressBGDialog, silent = %s; closing dialog'%(silent))
-            # return 
-            
+    def progressBGDialog(self, percent=0, control=None, message='', header=ADDON_NAME):
         if control is None and int(percent) == 0:
             control = xbmcgui.DialogProgressBG()
             control.create(header, message)

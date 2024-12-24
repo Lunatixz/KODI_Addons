@@ -158,21 +158,24 @@ class SPGenerator:
             if not module: return
             self.log('run, %s source = %s, module = %s'%(param.split('_')[0], source,module.__class__.__name__))
                 
-            if 'Select_' in param and not self.kodi.isRunning(param):
-                with self.kodi.busy_dialog(), self.kodi.setRunning(param):
+            if 'Select_' in param and not self.kodi.isRunning(source):
+                with self.kodi.busy_dialog(), self.kodi.setRunning(source):
                     self.build_lists(source,module.get_lists())
                 REAL_SETTINGS.openSettings()
                     
-            elif 'Build_' in param and not self.kodi.isRunning(param):
-                with self.kodi.setRunning(param):
+            elif 'Build_' in param and not self.kodi.isRunning(source):
+                with self.kodi.setRunning(source):
                     list_items = self.kodi.getCacheSetting('%s.%s'%(ADDON_ID,source))
                     if len(list_items) > 0:
+                        self.dia = self.kodi.progressBGDialog(self.pct)
                         for idx, list_item in enumerate(list_items):
                             self.pct = int((idx+1)*100//len(list_items))
-                            self.dia = self.kodi.progressBGDialog(self.pct, message='%s:\n%s'%(ADDON_NAME,list_item.get('name')))
+                            self.dia = self.kodi.progressBGDialog(self.pct, self.dia, message='%s:\n%s'%(ADDON_NAME,list_item.get('name')))
                             self.create_xsp(list_item.get('name'),self.match_items(module.get_list_items(list_item.get('id'))))
                             REAL_SETTINGS.setSetting('Build_%s'%(source),datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
                     else: self.kodi.notificationDialog(LANGUAGE(32023)%(source))
+                    
+            else: self.kodi.notificationDialog(LANGUAGE(32025)%(ADDON_NAME))
 
         elif param == 'Run_All':
             for source in list(self.modules.keys()):

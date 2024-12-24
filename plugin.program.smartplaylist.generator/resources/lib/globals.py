@@ -26,6 +26,7 @@ import time, datetime
 import xml.etree.ElementTree as ET
 
 
+from operator                        import itemgetter
 from functools                       import wraps
 from contextlib                      import contextmanager, closing
 from infotagger.listitem             import ListItemInfoTag

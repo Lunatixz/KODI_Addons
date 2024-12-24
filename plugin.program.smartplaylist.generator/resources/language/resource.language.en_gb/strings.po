@@ -116,6 +116,10 @@ msgctxt "#32024"
 msgid "%s: No Matches Found!"
 msgstr ""
 
+msgctxt "#32025"
+msgid "%s Currently Running..."
+msgstr ""
+
 msgctxt "#32100"
 msgid "Trakt"
 msgstr ""

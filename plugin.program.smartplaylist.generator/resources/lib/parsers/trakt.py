@@ -40,7 +40,7 @@ class Trakt:
 
 
     def clean_string(self, string):
-        return string.replace('copy','').replace('\r\n\t','')
+        return string.replace('copy','').replace('\r\n\t','').rstrip()
         
         
     @cacheit(expiration=datetime.timedelta(minutes=15))

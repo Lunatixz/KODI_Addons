@@ -143,9 +143,7 @@ class ThreadPool:
         self.log("executors, func = %s, items = %s"%(func.__name__,len(items)))
         results = []
         with ThreadPoolExecutor(self.ThreadCount) as executor:
-            try: 
-                for result in executor.map(self.wrapped_partial(func, *args, **kwargs), items):
-                    results.append(result)
+            try: [results.append(result) for result in executor.map(self.wrapped_partial(func, *args, **kwargs), items)]
             except Exception as e: self.log("executors, func = %s, items = %s failed! %s\nargs = %s, kwargs = %s"%(func.__name__,len(items),e,args,kwargs), xbmc.LOGERROR)
         return results
         

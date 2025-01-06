@@ -35,18 +35,15 @@ class Service():
         self.log('_start')
         while not self.monitor.abortRequested():
             if    self.monitor.waitForAbort(300): break
-            else: self._run()
+            else: self._run(int(REAL_SETTINGS.getSetting('Run_Every')),strpTime(REAL_SETTINGS.getSetting('Last_Update')))
         
         
-    def _run(self):
-        run_every = int(REAL_SETTINGS.getSetting('Run_Every'))
+    def _run(self, run_every, last_update):
         if run_every > 0:
-            last_update = strpTime(REAL_SETTINGS.getSetting('Last_Update'))
             run_seconds = ((run_every * 3600) + 1800) #service run time in seconds with 30min padding to allow cache time to clear before run
-            now_time    = datetime.datetime.now()
             run_time    = (last_update + datetime.timedelta(seconds=run_seconds))
-            if now_time >= run_time:
-                self.log('_run, now = %s, run = %s, running = %s'%(now_time,run_time,now_time >= run_time))
+            if datetime.datetime.now() >= run_time:
+                self.log('_run, Starting %s Service'%(ADDON_NAME))
                 self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Run_All)'%(ADDON_ID))
         
 if __name__ == '__main__': Service()._start()

@@ -30,15 +30,16 @@ class SPGenerator:
         self.cache  = SimpleCache()
         self.cache.enable_mem_cache = False
         
-        self.dia     = None
-        self.msg     = ''
-        self.pct     = 0
-        self.tot     = 0
-        self.cnt     = 0
-        self.cntpct  = 0
-        self.sysARG  = sysARG
-        self.kodi    = Kodi(self.cache)
-        self.modules = {LANGUAGE(32100):trakt.Trakt(self.cache)}
+        self.dia       = None
+        self.msg       = ''
+        self.pct       = 0
+        self.tot       = 0
+        self.cnt       = 0
+        self.cntpct    = 0
+        self.sysARG    = sysARG
+        self.kodi      = Kodi(self.cache)
+        self.modules   = {LANGUAGE(32100):trakt.Trakt(self.cache)}
+        self.hasPseudo = xbmc.getCondVisibility('System.HasAddon(plugin.video.pseudotv.live)')
         
 
     def log(self, msg, level=xbmc.LOGDEBUG):
@@ -47,11 +48,9 @@ class SPGenerator:
         
     def build_lists(self, source, lists):
         def __buildMenu(item): return self.kodi.buildMenuListItem(item.get('name'),item.get('description'),item.get('icon',ICON),url=item.get('id'))
-        with self.kodi.busy_dialog():
-            listitems = poolit(__buildMenu)(lists)
+        with self.kodi.busy_dialog(): listitems = poolit(__buildMenu)(lists)
         selects = self.kodi.selectDialog(listitems,header='%s %s'%(source,ADDON_NAME),preselect=self.kodi.findItemsInLST(listitems, self.kodi.getCacheSetting('%s.%s'%(ADDON_ID,source)), item_key='getPath', val_key='id'),)
-        if not selects is None: 
-            self.log('build_lists, source = %s, saving = %s'%(source,self.kodi.setCacheSetting('%s.%s'%(ADDON_ID,source),[{'name':listitems[select].getLabel(),'id':listitems[select].getPath(),'icon':listitems[select].getArt('icon')} for select in selects])))
+        if not selects is None: self.log('build_lists, source = %s, saving = %s'%(source,self.kodi.setCacheSetting('%s.%s'%(ADDON_ID,source),[{'name':listitems[select].getLabel(),'id':listitems[select].getPath(),'icon':listitems[select].getArt('icon')} for select in selects])))
         
 
     def match_items(self, source_items):
@@ -87,7 +86,7 @@ class SPGenerator:
         return matches
 
 
-    def create_xsp(self, list_name, match_items, pretty_print=True):    
+    def create_xsp(self, list_name, match_items, pretty_print=True):
         def __indent(elem, level=0):
             """
             Indent XML for pretty printing
@@ -106,6 +105,8 @@ class SPGenerator:
                 if level and (not elem.tail or not elem.tail.strip()):
                     elem.tail = i
 
+        
+        mixed_names = []
         for type, items in (list(match_items.items())):
             if len(items) == 0: continue
             match_item = {'movies'  :{'match_type':type      , 'match_field':'title'   ,'match_key':'title','match_opr':'is'},
@@ -118,6 +119,7 @@ class SPGenerator:
             root.set("type",match_item.get('match_type'))
             name = ET.SubElement(root, "name")
             name.text = "%s - %s"%(list_name,type.title().replace('Tvshows','TV Shows'))
+            mixed_names.append("%s - %s"%(list_name,type.title().replace('Tvshows','TV Shows')))
             match = ET.SubElement(root, "match")
             match.text = "all"
             rule = ET.SubElement(root, "rule")
@@ -144,8 +146,38 @@ class SPGenerator:
                 tree.write(fle, encoding='utf-8', xml_declaration=True)
                 fle.close()
                 
-                if REAL_SETTINGS.getSetting('Notify_Enable') == "true":
-                    self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),{True:LANGUAGE(32020),False:LANGUAGE(32021)}[xbmcvfs.exists(path)],list_name))
+                if REAL_SETTINGS.getSetting('Notify_Enable') == "true": self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),{True:LANGUAGE(32020),False:LANGUAGE(32021)}[xbmcvfs.exists(path)],list_name))
+            else: self.kodi.notificationDialog(LANGUAGE(32024)%(validString(list_name)))
+        
+        if self.hasPseudo and len(mixed_names) > 1:
+            root = ET.Element("smartplaylist")
+            root.set("type","mixed")
+            name = ET.SubElement(root, "name")
+            name.text = "%s - Mixed (PseudoTV)"%(list_name)
+            match = ET.SubElement(root, "match")
+            match.text = "all"
+            
+            values = []
+            for idx, name in enumerate(mixed_names):
+                rule = ET.SubElement(root, "rule")
+                rule.set("field", "playlist")
+                rule.set("operator", "is")
+                values.append(name)
+                value = ET.SubElement(rule, "value")
+                value.text = name
+                    
+            if len(values) > 0:
+                self.log('create_xsp, Out: %s'%(ET.tostring(root, encoding='unicode'))) 
+                if pretty_print: __indent(root)
+                tree = ET.ElementTree(root)
+                path = REAL_SETTINGS.getSetting('XSP_LOC').replace(os.path.basename(os.path.normpath(REAL_SETTINGS.getSetting('XSP_LOC'))),"Mixed")
+                path = os.path.join(xbmcvfs.translatePath(path),'%s.xsp'%("%s - %s"%(validString(list_name),"Mixed")))
+                self.log('create_xsp, File: %s'%(path))
+                fle = xbmcvfs.File(path, 'w')
+                tree.write(fle, encoding='utf-8', xml_declaration=True)
+                fle.close()
+                
+                if REAL_SETTINGS.getSetting('Notify_Enable') == "true": self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),{True:LANGUAGE(32020),False:LANGUAGE(32021)}[xbmcvfs.exists(path)],list_name))
             else: self.kodi.notificationDialog(LANGUAGE(32024)%(validString(list_name)))
 
 

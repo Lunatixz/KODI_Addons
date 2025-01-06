@@ -16,18 +16,6 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgctxt "Addon Summary"
-msgid "Generate Smartplaylists from third-party lists."
-msgstr ""
-
-msgctxt "Addon Description"
-msgid "Generate Smartplaylists from third-party lists."
-msgstr ""
-
-msgctxt "Addon Disclaimer"
-msgid "BETA PROJECT; SUBJECT TO BUGS"
-msgstr ""
-
 msgctxt "#32000"
 msgid "General"
 msgstr ""

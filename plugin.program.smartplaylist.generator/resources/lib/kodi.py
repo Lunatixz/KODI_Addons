@@ -250,7 +250,7 @@ class Kodi:
     @cacheit()
     def get_kodi_seasons(self, kodi_item, list_item):
         def __match(kodi_item, list_item):
-            for key in (list_item.get('uniqueid',{}).keys()):
+            for key in (list(list_item.get('uniqueid',{}).keys())):
                 if list_item.get('uniqueid',{}).get(key) == kodi_item.get('uniqueid',{}).get(key,random.random()): return kodi_item
         if not __match(kodi_item, list_item): return {}
         return self.get_kodi_episodes(kodi_item.get('tvshowid'),list_item.get('season'))

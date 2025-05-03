@@ -46,9 +46,15 @@ class SPGenerator:
         return log('%s: %s'%(self.__class__.__name__,msg),level)
         
         
+    def auto_lists(self):
+        for source, module in list(self.modules.items()):
+            self.log('auto_lists, source = %s, saving = %s'%(source,self.kodi.setCacheSetting('%s.%s'%(ADDON_ID,source),[{'name':item.get('name'),'id':item.get('id'),'icon':item.get('icon',ICON)} for item in module.get_lists()])))
+        
+        
     def build_lists(self, source, lists):
         def __buildMenu(item): return self.kodi.buildMenuListItem(item.get('name'),item.get('description'),item.get('icon',ICON),url=item.get('id'))
-        with self.kodi.busy_dialog(): listitems = poolit(__buildMenu)(lists)
+        with self.kodi.busy_dialog():
+            listitems = poolit(__buildMenu)(lists)
         selects = self.kodi.selectDialog(listitems,header='%s %s'%(source,ADDON_NAME),preselect=self.kodi.findItemsInLST(listitems, self.kodi.getCacheSetting('%s.%s'%(ADDON_ID,source)), item_key='getPath', val_key='id'),)
         if not selects is None: self.log('build_lists, source = %s, saving = %s'%(source,self.kodi.setCacheSetting('%s.%s'%(ADDON_ID,source),[{'name':listitems[select].getLabel(),'id':listitems[select].getPath(),'icon':listitems[select].getArt('icon')} for select in selects])))
         
@@ -66,7 +72,7 @@ class SPGenerator:
             for kodi_item in kodi_items:
                 match = None
                 if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, '%s (%s%%)'%(self.msg, self.cntpct))
-                for key in (list_item.get('uniqueid',{}).keys()):
+                for key in (list(list_item.get('uniqueid',{}).keys())):
                     if list_item.get('uniqueid',{}).get(key) == kodi_item.get('uniqueid',{}).get(key,random.random()): match = kodi_item
                     if match: 
                         self.log('match_items, __match found! type %s | %s -> %s'%(type,kodi_item.get('uniqueid'),list_item.get('uniqueid')))
@@ -210,6 +216,7 @@ class SPGenerator:
             else: self.kodi.notificationDialog(LANGUAGE(32025)%(ADDON_NAME))
 
         elif param == 'Run_All':
+            if REAL_SETTINGS.getSetting('Auto_Enable') == 'true': self.auto_lists()
             for source in list(self.modules.keys()):
                 self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Build_%s)'%(ADDON_ID,source))
             REAL_SETTINGS.setSetting('Last_Update',datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))

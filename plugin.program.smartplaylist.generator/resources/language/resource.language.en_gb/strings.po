@@ -175,3 +175,8 @@ msgstr ""
 msgctxt "#32110"
 msgid "Manually Start SmartPlaylists Service"
 msgstr ""
+
+msgctxt "#32111"
+msgid "Auto Enable all lists"
+msgstr ""
+

@@ -3,6 +3,11 @@
     <section id="plugin.program.smartplaylist.generator">
         <category id="General" label="32000" help="">
             <group id="0" label="32000">
+                <setting id="Auto_Enable" type="boolean" label="32111" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="XSP_LOC" type="path" label="32016" help="">
                     <level>0</level>
                     <default>special://profile/playlists/video/</default>

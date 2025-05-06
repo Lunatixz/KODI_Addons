@@ -625,10 +625,11 @@
     </extension>
 </addon>
 
-<addon id="script.pystone.benchmark" name="CPU Benchmark" version="1.1.7" provider-name="Lunatixz">
+<addon id="script.pystone.benchmark" name="CPU Benchmark" version="1.1.8" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.kodi-six" version="0.1.3.1"/>
+        <import addon="script.module.requests" version="0.0.1"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>executable</provides>

@@ -52,8 +52,8 @@ python_implementation = platform.python_implementation()# Get the Python impleme
 python_version        = platform.python_version()# Get the Python version
 machine_arch          = platform.machine()# Get the machine architecture
 architecture          = platform.architecture()
-kodi_info             = xbmc.getInfoLabel('System.BuildVersion')
 is_raspberrypi        = platform.machine().startswith('arm')
+kodi_info             = xbmc.getInfoLabel('System.BuildVersion')
 
 try:
     system_info   = platform.uname()
@@ -97,20 +97,20 @@ def score_bar(stones, pyseed, pydur, avg, length=50):
         return '| %s | %s in %ss'%(''.join([LANGUAGE(30004)%(colors.pop(0),chunk) for chunk in chunks if len(colors) > 0 ]),replace_with_k(pyseed),"{0:.2f}".format(pydur))
     return _insert(avg, f'| {stones} |')
 
-def get_rpi():
-    try: # Attempt to retrieve CPU frequency (Pi only, from /proc/device-tree/model)
-        with open("/proc/device-tree/model", "r") as f:
-            return f.read().strip()  # Remove leading/trailing whitespace
-    except: return 'Unknown'
-
-def get_info():    
+def get_info():   
+    def __rpi():
+        try: # Attempt to retrieve CPU frequency (Pi only, from /proc/device-tree/model)
+            with open("/proc/device-tree/model", "r") as f:
+                return f.read().strip()  # Remove leading/trailing whitespace
+        except: return 'Unknown'
+ 
     def __cpu():
         try:
             if is_raspberrypi or system_info.system == "Linux":# Attempt to retrieve CPU frequency (Linux only, from /proc/cpuinfo)
                 try:
                     with open("/proc/cpuinfo", "r") as f:
                         cpu_info = re.search(r'model name\s*:\s*(.+)', f.read()).group(1).strip()
-                        if is_raspberrypi: return '%s (%s)'%(cpu_info, get_rpi())
+                        if is_raspberrypi: return '%s (%s)'%(cpu_info, __rpi())
                         else:              return cpu_info
                 except: pass
             elif system_info.system == "Darwin":
@@ -131,7 +131,7 @@ def get_info():
                       (f"Machine Architecture: [B]{(sys_machine or machine_arch)} {' '.join(architecture)}[/B]"),
                       (f"Logical CPU Cores (including Hyperthreading if applicable): [B]{cpu_count}[/B]"),
                       (_repeat(80,'_')),
-                      (f"Python: [B]{python_implementation} v.{python_version}[/B][CR]Benchmark: [B]pystone v.{pystone.__version__}[/B]"),
+                      (f"Python: [B]{python_implementation} v.{python_version}[/B][CR]Benchmark: [B]pystone v.{pystone.__version__}[/B] n={LOOP}"),
                       (_repeat(80,'_'))
                       ])
 
@@ -157,11 +157,9 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
         self._run([LOOP for i in range(cpu_count)])
 
     def onClick(self, control_id):
-        print('onClick',control_id)
         pass
 
     def onFocus(self, control_id):
-        print('onFocus',control_id)
         pass
 
     def onAction(self, action):

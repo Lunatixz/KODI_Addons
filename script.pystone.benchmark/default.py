@@ -19,7 +19,14 @@
 # -*- coding: utf-8 -*-
 
 #entrypoint
-import os
+import os, json
 from resources.lib import cpubenchmark
 
-if __name__ == '__main__': cpubenchmark.TEXTVIEW("DialogTextViewer.xml", os.getcwd(), "Default")
+if __name__ == '__main__': 
+    xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","id":"script.pystone.benchmark","method":"Settings.SetSettingValue","params":{"setting":"debug.showloginfo","value":True}}))
+    try: cpubenchmark.TEXTVIEW("DialogTextViewer.xml", os.getcwd(), "Default")
+    except: pass
+    xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","id":"script.pystone.benchmark","method":"Settings.SetSettingValue","params":{"setting":"debug.showloginfo","value":False}}))
+    
+    
+    

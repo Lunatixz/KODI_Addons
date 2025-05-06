@@ -1,4 +1,4 @@
-#   Copyright (C) 2020 Lunatixz
+#   Copyright (C) 2025 Lunatixz
 #
 #
 # This file is part of CPU Benchmark.
@@ -44,7 +44,6 @@ FANART         = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE       = REAL_SETTINGS.getLocalizedString
 
 # System Info
-cpu_count             = os.cpu_count()
 cpu_name              = platform.processor()
 os_name               = platform.system() # Get the OS name
 os_version            = platform.release()# Get the OS version
@@ -52,9 +51,19 @@ platform_info         = platform.platform()# Get a general platform identifier
 python_implementation = platform.python_implementation()# Get the Python implementation
 python_version        = platform.python_version()# Get the Python version
 machine_arch          = platform.machine()# Get the machine architecture
-system_info           = platform.uname()
 architecture          = platform.architecture()
 kodi_info             = xbmc.getInfoLabel('System.BuildVersion')
+
+try:
+    system_info   = platform.uname()
+    sys_processor = system_info.processor 
+    sys_machine   = system_info.machine
+    sys_system    = system_info.system
+except:
+    system_info   = None
+    sys_processor = None
+    sys_machine   = None
+    sys_system    = None
 
 def log(msg, level=xbmc.LOGDEBUG):
     xbmc.log('%s-%s-%s'%(ADDON_ID,ADDON_VERSION,msg),level)
@@ -93,30 +102,28 @@ def get_info():
             if system_info.system == "Linux":
                 try: # Attempt to retrieve CPU frequency (Pi only, from /proc/device-tree/model)
                     with open("/proc/device-tree/model", "r") as f:
-                        return f.read().strip()  # Remove leading/trailing whitespace
+                        return '%s MHz'%(f.read().strip())  # Remove leading/trailing whitespace
                 except:  # Attempt to retrieve CPU frequency (Linux only, from /proc/cpuinfo)
                     try:
                         with open("/proc/cpuinfo", "r") as f:
-                            return re.search(r'model name\s*:\s*(.+)', f.read()).group(1).strip()
+                            return '%s MHz'%(re.search(r'model name\s*:\s*(.+)', f.read()).group(1).strip())
                     except: pass
             elif system_info.system == "Darwin":
-                return subprocess.check_output(["sysctl", "-n", "machdep.cpu.brand_string"]).strip()
+                return '%s MHz'%(subprocess.check_output(["sysctl", "-n", "machdep.cpu.brand_string"]).strip())
             elif system_info.system == "Windows":
                 import winreg
                 key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"Hardware\Description\System\CentralProcessor\0")
                 cpu_info = winreg.QueryValueEx(key, "ProcessorNameString")[0]
                 winreg.CloseKey(key)
-                return cpu_info
-        except Exception as e: 
-            log("__cpu, failed! %s"%(e), xbmc.LOGERROR)
-            return "Unknown"
+                return '%s MHz'%(cpu_info)
+        except Exception as e: log("__cpu, failed! %s"%(e), xbmc.LOGERROR)
 
     return '[CR]'.join([
-                      (f"Processor: [B]{__cpu() or system_info.processor or cpu_name} MHz[/B]"),
-                      (f"Machine Architecture: [B]{(system_info.machine or machine_arch)} {' '.join(architecture)}[/B]"),
+                      (f"Processor: [B]{__cpu() or sys_processor or cpu_name}[/B]"),
+                      (f"Machine Architecture: [B]{(sys_machine or machine_arch)} {' '.join(architecture)}[/B]"),
                       (f"Logical CPU Cores (including Hyperthreading if applicable): [B]{cpu_count}[/B]"),
                       ('%s')%('_'*75),
-                      (f"Operating System: [B]{(system_info.system or os_name)} v.{os_version} ({platform_info})[/B]"),
+                      (f"Operating System: [B]{(sys_system or os_name)} v.{os_version} ({platform_info})[/B]"),
                       (f"Kodi Build: [B]{kodi_info}[/B]"),
                       (f"Python Implementation: [B]{python_implementation} v.{python_version}[/B]"),
                       ('%s')%('_'*75),

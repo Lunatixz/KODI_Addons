@@ -19,5 +19,7 @@
 # -*- coding: utf-8 -*-
 
 #entrypoint
+import os
 from resources.lib import cpubenchmark
-if __name__ == '__main__': cpubenchmark.CPU().run()
+
+if __name__ == '__main__': cpubenchmark.TEXTVIEW("DialogTextViewer.xml", os.getcwd(), "Default")

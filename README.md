@@ -1,5 +1,14 @@
 # Lunatixz Beta Repository 
-### Stable code submitted to [Kodi repository](https://kodi.tv/addons/omega/author/lunatixz/); Please do not add my beta repository and/or plugins to any "Wizards", "Builds", "APKs" or website indexers. Thank You!
+### Stable code submitted to [Kodi repository](https://kodi.tv/addons/omega/author/lunatixz/)
+#### Please do not add my beta repository and/or plugins to any "Wizards", "Builds", "APKs" or website indexers. Thank You!
+
+How to install repo:
+1.  **Open the Kodi's File Manager:** Go to "Settings" in Kodi and then select "File manager".
+2.  **Add a Source:** Select "Add source".
+3.  **Enter the URL:** You can either browse for the file source or directly enter the URL of the repository. Click on the input field (where it says "") and enter [https://tinyurl.com/32tjnut4](https://tinyurl.com/32tjnut4).
+4.  **Give the Source a Name:** In the next input field, enter the name “Lunatixz Beta Repository”.
+5.  **Confirm and Add:** Click "OK" to confirm and add the source. The source will now be accessible within Kodi's File Manager.
+6.  **Install repositories:** Open the "Lunatixz Beta Repository" in Kodi's file manager and install "repository.lunatixz" and "repository.pseudotv".
 
 [![Kodi_Addons](https://opengraph.githubassets.com/7450386dc22ea354bbc4e0f311ec3757e2c520f02cc46deccaba3354e9b50d87/Lunatixz/KODI_Addons)](https://opengraph.githubassets.com/7450386dc22ea354bbc4e0f311ec3757e2c520f02cc46deccaba3354e9b50d87/Lunatixz/KODI_Addons)
 

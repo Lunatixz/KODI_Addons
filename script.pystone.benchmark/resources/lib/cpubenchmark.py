@@ -141,7 +141,7 @@ def get_info():
                       (f"Machine Architecture: [B]{machine_arch} {architecture}[/B]"),
                       (f"Logical CPU Cores (including Hyperthreading if applicable): [B]{cpu_count}[/B]"),
                       (_repeat(LINE,'_')),
-                      (f"Python: [B]{python_implementation} v.{python_version}[/B][CR]Benchmark: [B]pystone v.{pystone.__version__}[/B] n={LOOP} [COLOR=dimgrey]took x seconds @ CPU load of x%[/COLOR] "),
+                      (f"Python: [B]{python_implementation} v.{python_version}[/B][CR]Benchmark: [B]pystone v.{pystone.__version__}[/B] n={LOOP} [COLOR=dimgrey]completed in x second with a CPU utilization of x%.[/COLOR]"),
                       (_repeat(LINE,'_'))
                       ])
 

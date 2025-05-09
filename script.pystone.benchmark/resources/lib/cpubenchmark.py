@@ -31,7 +31,7 @@ from resources.lib import pystone
 from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 
 LIMIT = 45
-LINE  = 64
+LINE  = 73
 LOOP  = 50000
 
 # Plugin Info
@@ -46,27 +46,29 @@ FANART         = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE       = REAL_SETTINGS.getLocalizedString
 
 # System Info
-cpu_name              = platform.processor()
-os_name               = platform.system() # Get the OS name
-os_version            = platform.release()# Get the OS version
-platform_info         = platform.platform()# Get a general platform identifier
-python_implementation = platform.python_implementation()# Get the Python implementation
-python_version        = platform.python_version()# Get the Python version
-machine_arch          = platform.machine()# Get the machine architecture
-architecture          = platform.architecture()
-is_arm                = platform.machine().startswith('arm')
-kodi_info             = xbmc.getInfoLabel('System.BuildVersion')
-
 try:
     system_info   = platform.uname()
     sys_processor = system_info.processor 
     sys_machine   = system_info.machine
     sys_system    = system_info.system
+    sys_release   = system_info.release
 except:
     system_info   = None
     sys_processor = None
     sys_machine   = None
     sys_system    = None
+    sys_release   = None
+
+cpu_name              = (sys_processor or platform.processor())
+os_name               = (sys_system    or platform.system()) # Get the OS name
+machine_arch          = (sys_machine   or platform.machine())# Get the machine architecture
+os_version            = (sys_release   or platform.release())# Get the OS version
+platform_info         = platform.platform()
+python_implementation = platform.python_implementation()# Get the Python implementation
+python_version        = platform.python_version()# Get the Python version
+architecture          = ' '.join(platform.architecture()) if isinstance(platform.architecture(),(list,tuple)) else platform.architecture()
+kodi_info             = xbmc.getInfoLabel('System.BuildVersion')
+is_arm                = True if 'arm' in machine_arch.lower() else False
 
 def log(msg, level=xbmc.LOGDEBUG):
     xbmc.log('%s-%s-%s'%(ADDON_ID,ADDON_VERSION,msg),level)
@@ -97,8 +99,12 @@ def score_bar(stones, pyseed, pydur, avg, length=LIMIT):
         colors = ['green','yellow','orange','red','dimgrey','dimgrey']
         chunks = textwrap.wrap(fill[:sindex - len(score)//2] + score + fill[sindex + len(score)//2:], length//4)
         bars   = ''.join([LANGUAGE(30004)%(colors.pop(0),chunk) for chunk in chunks if len(colors) > 0 ])
-        return f'| {bars} | {replace_with_k(pyseed)} in %ss'%("{0:.2f}".format(pydur))
+        return f'|{bars}| {replace_with_k(pyseed)} in %ss'%("{0:.2f}".format(pydur))
     return _insert(avg, f'| {stones} |')
+
+def get_load(core):
+    if ENABLE_POOL: return float(xbmc.getInfoLabel('System.CoreUsage(%i)'%(core)))
+    else:           return float(xbmc.getInfoLabel('System.CpuUsage').replace('%',''))
 
 def get_info():   
     def __rpi():
@@ -109,32 +115,33 @@ def get_info():
  
     def __cpu():
         try:
-            if is_arm or system_info.system == "Linux":# Attempt to retrieve CPU frequency (Linux only, from /proc/cpuinfo)
+            if is_arm or "linux" in os_name.lower():# Attempt to retrieve CPU frequency (Linux only, from /proc/cpuinfo)
                 try:
                     with open("/proc/cpuinfo", "r") as f:
                         cpu_info = re.search(r'model name\s*:\s*(.+)', f.read()).group(1).strip()
                         if is_arm: return f'{cpu_info}{__rpi()}'
                         else:      return cpu_info
                 except: pass
-            elif system_info.system == "Darwin":
+            elif "darwin" in os_name.lower():
                 return subprocess.check_output(["sysctl", "-n", "machdep.cpu.brand_string"]).strip()
-            elif system_info.system == "Windows":
+            elif "windows" in os_name.lower():
                 import winreg
                 key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"Hardware\Description\System\CentralProcessor\0")
                 cpu_info = winreg.QueryValueEx(key, "ProcessorNameString")[0]
                 winreg.CloseKey(key)
                 return cpu_info
         except Exception as e: log("__cpu, failed! %s"%(e), xbmc.LOGERROR)
-
+        return cpu_name
+        
     return '[CR]'.join([
                       (f"Kodi Build: [B]{kodi_info}[/B]"),
-                      (f"Operating System: [B]{(sys_system or os_name)} v.{os_version} ({platform_info})[/B]"),
+                      (f"Operating System: [B]{os_name} v.{os_version} ({platform_info})[/B]"),
                       (_repeat(LINE,'_')),
-                      (f"Processor: [B]{__cpu() or sys_processor or cpu_name}[/B]"),
-                      (f"Machine Architecture: [B]{(sys_machine or machine_arch)} {' '.join(architecture)}[/B]"),
+                      (f"Processor: [B]{__cpu()}[/B]"),
+                      (f"Machine Architecture: [B]{machine_arch} {architecture}[/B]"),
                       (f"Logical CPU Cores (including Hyperthreading if applicable): [B]{cpu_count}[/B]"),
                       (_repeat(LINE,'_')),
-                      (f"Python: [B]{python_implementation} v.{python_version}[/B][CR]Benchmark: [B]pystone v.{pystone.__version__}[/B] n={LOOP}"),
+                      (f"Python: [B]{python_implementation} v.{python_version}[/B][CR]Benchmark: [B]pystone v.{pystone.__version__}[/B] n={LOOP} [COLOR=dimgrey]took x seconds @ CPU load of x%[/COLOR] "),
                       (_repeat(LINE,'_'))
                       ])
 
@@ -158,7 +165,7 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
         self.getControl(1).setLabel(self.head)
         self.textbox = self.getControl(5)
         self._updateText(self.text)
-        self._run([LOOP for i in range(cpu_count)]) #todo multiprocessing?
+        self._run([LOOP for i in range(cpu_count)]) #todo multiprocessing? each pass to induvial core.
 
     def onClick(self, control_id):
         pass
@@ -175,26 +182,29 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
         for i, pyseed in enumerate(seeds):
             prog = progress_bar(i, len(seeds))
             self._updateText(f"{self.text}[CR]{prog}")
+            load = int(round(get_load(i)))
             pydur, pystonefloat = pystone.pystones(pyseed)
-            ranks.append({'core':i,'seed':pyseed,'duration':pydur,'score':pystonefloat})
+            ranks.append({'core':i,'seed':pyseed,'duration':pydur,'score':pystonefloat,'load':load})
             if len(seeds) > 1:
-                self.text = f'{self.text}[CR]Pass {i+1}{self._rank(int(pystonefloat),pyseed,pydur)}'
+                self.text = f'{self.text}[CR]Pass {i+1}{self._rank(int(pystonefloat),pyseed,pydur)} @ {load}%'
                 self._updateText(self.text)
-        self._updateText(self._total(ranks))
+        self._updateText(self._score(ranks))
 
     def _rank(self, stones, pyseed, pydur, maxseed=200000):
         return score_bar(stones,pyseed, pydur,((stones) * 100) // maxseed)
 
-    def _total(self, ranks):
+    def _score(self, ranks):
         seeds     = []
         scores    = []
         durations = []
+        loads     = []
         for i, rank in enumerate(ranks):
+            if "load"     in rank: loads.append(rank["load"])
             if "seed"     in rank: seeds.append(rank["seed"])
             if "score"    in rank: scores.append(rank["score"])
             if "duration" in rank: durations.append(rank["duration"])
         rank = self._rank(int(sum(scores) / len(scores)), int(sum(seeds) / len(seeds)), (sum(durations) / len(durations)))
-        text = f"{self.text}[CR]{LANGUAGE(30002)} {rank}[CR]{_repeat(LINE,'_')}"
+        text = f"{self.text}[CR]{LANGUAGE(30002)} {rank} @ {int(sum(loads) / len(loads))}%[CR]{_repeat(LINE,'_')}"
         exit = LANGUAGE(30004)%('dimgrey',LANGUAGE(30005))
         post, link = self._post(text)
         if post: text = f'{text}[CR]{LANGUAGE(30003)}: [B]{link}[/B]'
@@ -210,7 +220,7 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
             return text
         try:
             session = requests.Session()
-            response = session.post('https://paste.kodi.tv/' + 'documents', data=__clean(data).encode('utf-8'), headers={'User-Agent':'%s: %s'%(ADDON_ID, ADDON_VERSION)})
+            response = session.post('https://paste.kodi.tv/' + 'documents', data=__clean('%s[CR]%s'%(self.head,data)).encode('utf-8'), headers={'User-Agent':'%s: %s'%(ADDON_ID, ADDON_VERSION)})
             if 'key' in response.json(): 
                 url = 'https://paste.kodi.tv/' + response.json()['key']
                 log('_post, successful url = %s'%(url))

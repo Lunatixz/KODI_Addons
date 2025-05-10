@@ -445,6 +445,30 @@
     </extension>
 </addon>
 
+<addon id="script.io.benchmark" name="I/O Benchmark" version="1.1.2" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.six" version="1.0.0"/>
+        <import addon="script.module.kodi-six" version="0.1.3.1"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Test your devices read/write performance.</summary>
+        <description lang="en_GB">How fast does your device read and write?</description>
+        <license>MIT</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/script.io.benchmark</source>
+        <news></news>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot01.jpg</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="script.kodi.android.update" name="Kodi Android Installer" version="1.3.7" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
@@ -625,7 +649,7 @@
     </extension>
 </addon>
 
-<addon id="script.pystone.benchmark" name="CPU Benchmark" version="1.2.0" provider-name="Lunatixz">
+<addon id="script.pystone.benchmark" name="CPU Benchmark" version="1.2.1" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.kodi-six" version="0.1.3.1"/>

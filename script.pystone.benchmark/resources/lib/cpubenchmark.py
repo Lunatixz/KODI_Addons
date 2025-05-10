@@ -52,17 +52,20 @@ try:
     sys_machine   = system_info.machine
     sys_system    = system_info.system
     sys_release   = system_info.release
+    sys_version   = system_info.version
 except:
     system_info   = None
     sys_processor = None
     sys_machine   = None
     sys_system    = None
     sys_release   = None
+    sys_version   = None
 
 cpu_name              = (sys_processor or platform.processor())
 os_name               = (sys_system    or platform.system()) # Get the OS name
 machine_arch          = (sys_machine   or platform.machine())# Get the machine architecture
 os_version            = (sys_release   or platform.release())# Get the OS version
+platform_version      = (sys_version   or platform.version())
 platform_info         = platform.platform()
 python_implementation = platform.python_implementation()# Get the Python implementation
 python_version        = platform.python_version()# Get the Python version
@@ -111,17 +114,16 @@ def get_info():
         try: # Attempt to retrieve CPU frequency (Pi only, from /proc/device-tree/model)
             with open("/proc/device-tree/model", "r") as f:
                 return f' {f.read().strip()}' # Remove leading/trailing whitespace
-        except: return ''
+        except Exception as e: log("__rpi, failed! %s"%(e), xbmc.LOGERROR)
+        return ''
  
     def __cpu():
         try:
             if is_arm or "linux" in os_name.lower():# Attempt to retrieve CPU frequency (Linux only, from /proc/cpuinfo)
-                try:
-                    with open("/proc/cpuinfo", "r") as f:
-                        cpu_info = re.search(r'model name\s*:\s*(.+)', f.read()).group(1).strip()
-                        if is_arm: return f'{cpu_info}{__rpi()}'
-                        else:      return cpu_info
-                except: pass
+                with open("/proc/cpuinfo", "r") as f:
+                    cpu_info = re.search(r'model name\s*:\s*(.+)', f.read()).group(1).strip()
+                    if is_arm: return f'{cpu_info}{__rpi()}'
+                    else:      return cpu_info
             elif "darwin" in os_name.lower():
                 return subprocess.check_output(["sysctl", "-n", "machdep.cpu.brand_string"]).strip()
             elif "windows" in os_name.lower():

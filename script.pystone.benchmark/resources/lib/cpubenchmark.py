@@ -106,8 +106,10 @@ def score_bar(stones, pyseed, pydur, avg, length=LIMIT):
     return _insert(avg, f'| {stones} |')
 
 def get_load(core):
-    if ENABLE_POOL: return float(xbmc.getInfoLabel('System.CoreUsage(%i)'%(core)))
-    else:           return float(xbmc.getInfoLabel('System.CpuUsage').replace('%',''))
+    if ENABLE_POOL:
+        load = float(xbmc.getInfoLabel('System.CoreUsage(%i)'%(core)))
+        if int(load) > 0: return load#arm doesn't return core %?
+    return float(xbmc.getInfoLabel('System.CpuUsage').replace('%',''))
 
 def get_info():   
     def __rpi():
@@ -153,21 +155,27 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         self.head = f'{ADDON_NAME} v.{ADDON_VERSION}'
         self.text = get_info()
+        self.url  = None
         self.doModal()
             
     def _updateText(self, txt):
         try:
             self.textbox.setText(txt)
-            xbmc.executebuiltin('SetFocus(3000)')
+            xbmc.executebuiltin('ActivateWindowAndFocus(WINDOW_DIALOG_TEXT_VIEWER, 3000)')
             xbmc.executebuiltin('AlarmClock(down,Action(down),.5,true,false)')
             xbmc.executebuiltin('AlarmClock(down,Action(down),.5,true,false)')
         except: pass
 
     def onInit(self):
-        self.getControl(1).setLabel(self.head)
-        self.textbox = self.getControl(5)
-        self._updateText(self.text)
-        self._run([LOOP for i in range(cpu_count)]) #todo multiprocessing? each pass to induvial core.
+        try:
+            self.getControl(1).setLabel(self.head)
+            self.textbox = self.getControl(5)
+            self._updateText(self.text)
+            self._run([LOOP for i in range(cpu_count)]) #todo multiprocessing? each pass to induvial core.
+        except Exception as e:
+            log("onInit, failed! %s"%(e), xbmc.LOGERROR)
+            if self.url: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (self.head, self.url, 8000, ICON))
+            self.close()
 
     def onClick(self, control_id):
         pass
@@ -209,7 +217,9 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
         text = f"{self.text}[CR]{LANGUAGE(30002)} {rank} @ {int(sum(loads) / len(loads))}%[CR]{_repeat(LINE,'_')}"
         exit = LANGUAGE(30004)%('dimgrey',LANGUAGE(30005))
         post, link = self._post(text)
-        if post: text = f'{text}[CR]{LANGUAGE(30003)}: [B]{link}[/B]'
+        if post:
+            self.url = f'{LANGUAGE(30003)}: [B]{link}[/B]'
+            text = f'{text}[CR] {self.url}'
         return f"{text}[CR]{exit}"
              
     def _post(self, data):

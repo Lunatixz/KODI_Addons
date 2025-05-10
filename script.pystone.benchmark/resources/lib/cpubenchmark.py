@@ -17,7 +17,8 @@
 # along with CPU Benchmark.  If not, see <http://www.gnu.org/licenses/>.
 # https://pybenchmarks.org/u64q/performance.php?test=pystone
 
-import re, os, sys, time, platform, subprocess, textwrap, requests
+import re, os, sys, time, json
+import platform, subprocess, textwrap, requests
 
 try:
     import multiprocessing
@@ -31,7 +32,7 @@ from resources.lib import pystone
 from kodi_six      import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs, py2_encode, py2_decode
 
 LIMIT = 45
-LINE  = 73
+LINE  = 90
 LOOP  = 50000
 
 # Plugin Info
@@ -71,11 +72,16 @@ python_implementation = platform.python_implementation()# Get the Python impleme
 python_version        = platform.python_version()# Get the Python version
 architecture          = ' '.join(platform.architecture()) if isinstance(platform.architecture(),(list,tuple)) else platform.architecture()
 kodi_info             = xbmc.getInfoLabel('System.BuildVersion')
+kodi_mem_free         = xbmc.getInfoLabel('System.FreeMemory')
+kodi_mem_total        = xbmc.getInfoLabel('System.Memory(total)')
 is_arm                = True if 'arm' in machine_arch.lower() else False
 
 def log(msg, level=xbmc.LOGDEBUG):
     xbmc.log('%s-%s-%s'%(ADDON_ID,ADDON_VERSION,msg),level)
-
+        
+def isScanning():
+    return (xbmc.getCondVisibility('Library.IsScanningVideo') & xbmc.getCondVisibility('Library.IsScanningMusic'))
+       
 def _repeat(length=LIMIT, fill='█'):
    length = int(round(length))
    return (fill * int((length/len(fill))+1))[:length]
@@ -91,7 +97,7 @@ def progress_bar(iteration, total, length=LIMIT, fill='█'):
     bar = fill * filled_length + '-' * (length - filled_length)
     if filled_length > 10: bar_with_percent = f"{bar[:length//2 - len(percent)//2]}{percent}%{bar[length//2 - len(percent)//2 + len(percent):]}"
     else:                  bar_with_percent = bar
-    return f'|{bar_with_percent}|'
+    return f'|{bar_with_percent[:length]}|'
 
 def score_bar(stones, pyseed, pydur, avg, length=LIMIT):
     def _insert(value, score):
@@ -102,7 +108,7 @@ def score_bar(stones, pyseed, pydur, avg, length=LIMIT):
         colors = ['green','yellow','orange','red','dimgrey','dimgrey']
         chunks = textwrap.wrap(fill[:sindex - len(score)//2] + score + fill[sindex + len(score)//2:], length//4)
         bars   = ''.join([LANGUAGE(30004)%(colors.pop(0),chunk) for chunk in chunks if len(colors) > 0 ])
-        return f'|{bars}| {replace_with_k(pyseed)} in %ss'%("{0:.2f}".format(pydur))
+        return f'|{bars}| %s secs'%("{0:.2f}".format(pydur))
     return _insert(avg, f'| {stones} |')
 
 def get_load(core):
@@ -112,6 +118,9 @@ def get_load(core):
     return float(xbmc.getInfoLabel('System.CpuUsage').replace('%',''))
 
 def get_info():   
+    def __running():
+        return json.loads(xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"addons://running/"},"id":ADDON_ID}))).get("result",{}).get("limits",{}).get("total",0)
+    
     def __rpi():
         try: # Attempt to retrieve CPU frequency (Pi only, from /proc/device-tree/model)
             with open("/proc/device-tree/model", "r") as f:
@@ -136,17 +145,20 @@ def get_info():
                 return cpu_info
         except Exception as e: log("__cpu, failed! %s"%(e), xbmc.LOGERROR)
         return cpu_name
-        
     return '[CR]'.join([
-                      (f"Kodi Build: [B]{kodi_info}[/B]"),
-                      (f"Operating System: [B]{os_name} v.{os_version} ({platform_info})[/B]"),
-                      (_repeat(LINE,'_')),
                       (f"Processor: [B]{__cpu()}[/B]"),
                       (f"Machine Architecture: [B]{machine_arch} {architecture}[/B]"),
                       (f"Logical CPU Cores (including Hyperthreading if applicable): [B]{cpu_count}[/B]"),
                       (_repeat(LINE,'_')),
-                      (f"Python: [B]{python_implementation} v.{python_version}[/B][CR]Benchmark: [B]pystone v.{pystone.__version__}[/B] n={LOOP} [COLOR=dimgrey]completed in x second with a CPU utilization of x%.[/COLOR]"),
-                      (_repeat(LINE,'_'))
+                      (f"Operating System: [B]{os_name} v.{os_version} ({platform_info})[/B]"),
+                      (f"Free Memory: [B]{kodi_mem_free} / {kodi_mem_total}[/B]"),
+                      (_repeat(LINE,'_')),
+                      (f"Kodi Build: [B]{kodi_info}[/B]"),
+                      (f"Running Services: [B]{__running()}[/B]"),
+                      (_repeat(LINE,'_')),
+                      (f"Python: [B]{python_implementation} v.{python_version}[/B]"),
+                      (f"Benchmark: [B]pystone v.{pystone.__version__}[/B] n={LOOP} | Multiprocessing: [B]Disabled[/B]"),#{{True:"Enabled",False:"Disabled"}[ENABLE_POOL]}
+                      (_repeat(LINE,'_')),
                       ])
                       
 def OKAY(msg, heading=ADDON_NAME,):
@@ -159,7 +171,9 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
         self.head = f'{ADDON_NAME} v.{ADDON_VERSION}'
         self.text = get_info()
         self.url  = None
-        self.doModal()
+        
+        if not isScanning(): self.doModal()
+        else: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (self.head, LANGUAGE(30006), 4000, ICON))
             
     def _updateText(self, txt):
         try:
@@ -187,6 +201,7 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
         pass
 
     def onAction(self, action):
+        xbmc.executebuiltin('ActivateWindowAndFocus(WINDOW_DIALOG_TEXT_VIEWER, 3000)')
         if action in [xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]:
             self.close()
 
@@ -217,7 +232,10 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
             if "score"    in rank: scores.append(rank["score"])
             if "duration" in rank: durations.append(rank["duration"])
         rank = self._rank(int(sum(scores) / len(scores)), int(sum(seeds) / len(seeds)), (sum(durations) / len(durations)))
-        text = f"{self.text}[CR]{LANGUAGE(30002)} {rank} @ {int(sum(loads) / len(loads))}%[CR]{_repeat(LINE,'_')}"
+        text = '[CR]'.join([
+                           (f"{self.text}[CR]Score {rank} @ {int(sum(loads) / len(loads))}%[CR]{_repeat(LINE,'_')}"),
+                           (LANGUAGE(30004)%('dimgrey',LANGUAGE(30007).format(loop=replace_with_k(str(LOOP)),duration="{0:.2f}".format(sum(durations) / len(durations)),load=int(sum(loads) / len(loads))))),
+                           ])
         exit = LANGUAGE(30004)%('dimgrey',LANGUAGE(30005))
         post, link = self._post(text)
         if post:

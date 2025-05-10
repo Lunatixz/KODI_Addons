@@ -37,15 +37,15 @@ msgid "[COLOR=%s]%s[/COLOR]"
 msgstr ""
 
 msgctxt "#30005"
-msgid "[I]Back [/I] or [I]Select [/I] to exit!"
+msgid "[I]Back [/I] or [I]Enter [/I] to exit!"
 msgstr ""
 
 msgctxt "#30006"
-msgid "Python (v.%s) | pyStone (v.%s) benchmark [%s][CR]"
+msgid "Library scanning in progress\nTry again later..."
 msgstr ""
 
 msgctxt "#30007"
-msgid "Platform (%s)[CR]Architecture (%s)[CR]Processor (%s) | Cores [%s][CR]"
+msgid "{loop} loops completed in {duration} seconds with an average CPU utilization of {load}%."
 msgstr ""
 
 msgctxt "#30008"

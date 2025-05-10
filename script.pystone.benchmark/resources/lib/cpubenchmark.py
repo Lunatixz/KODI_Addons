@@ -115,7 +115,7 @@ def get_load(core):
     if ENABLE_POOL:
         load = float(xbmc.getInfoLabel('System.CoreUsage(%i)'%(core)).replace('Not available','0'))
         if int(load) > 0: return load#arm doesn't return core %?
-    return float(xbmc.getInfoLabel('System.CpuUsage').replace('%',''))
+    return float(xbmc.getInfoLabel('System.CpuUsage').replace('Not available','0').replace('%',''))
 
 def get_info():   
     def __running():
@@ -124,7 +124,7 @@ def get_info():
     def __rpi():
         try: # Attempt to retrieve CPU frequency (Pi only, from /proc/device-tree/model)
             with open("/proc/device-tree/model", "r") as f:
-                return f.read().strip() # Remove leading/trailing whitespace
+                return f.read().strip()
         except Exception as e: log("__rpi, failed! %s"%(e), xbmc.LOGERROR)
         return ''
  

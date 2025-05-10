@@ -124,7 +124,7 @@ def get_info():
     def __rpi():
         try: # Attempt to retrieve CPU frequency (Pi only, from /proc/device-tree/model)
             with open("/proc/device-tree/model", "r") as f:
-                return f' {f.read().strip()}' # Remove leading/trailing whitespace
+                return f.read().strip() # Remove leading/trailing whitespace
         except Exception as e: log("__rpi, failed! %s"%(e), xbmc.LOGERROR)
         return ''
  
@@ -133,7 +133,7 @@ def get_info():
             if is_arm or "linux" in os_name.lower():# Attempt to retrieve CPU frequency (Linux only, from /proc/cpuinfo)
                 with open("/proc/cpuinfo", "r") as f:
                     cpu_info = re.search(r'model name\s*:\s*(.+)', f.read()).group(1).strip()
-                    if is_arm: return f'{cpu_info}{__rpi()}'
+                    if is_arm: return '%s %s'%(cpu_info,__rpi())
                     else:      return cpu_info
             elif "darwin" in os_name.lower():
                 return subprocess.check_output(["sysctl", "-n", "machdep.cpu.brand_string"]).strip()

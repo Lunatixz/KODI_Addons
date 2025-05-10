@@ -107,7 +107,7 @@ def score_bar(stones, pyseed, pydur, avg, length=LIMIT):
 
 def get_load(core):
     if ENABLE_POOL:
-        load = float(xbmc.getInfoLabel('System.CoreUsage(%i)'%(core)))
+        load = float(xbmc.getInfoLabel('System.CoreUsage(%i)'%(core)).replace('Not available','0'))
         if int(load) > 0: return load#arm doesn't return core %?
     return float(xbmc.getInfoLabel('System.CpuUsage').replace('%',''))
 
@@ -148,7 +148,10 @@ def get_info():
                       (f"Python: [B]{python_implementation} v.{python_version}[/B][CR]Benchmark: [B]pystone v.{pystone.__version__}[/B] n={LOOP} [COLOR=dimgrey]completed in x second with a CPU utilization of x%.[/COLOR]"),
                       (_repeat(LINE,'_'))
                       ])
-
+                      
+def OKAY(msg, heading=ADDON_NAME,):
+    return xbmcgui.Dialog().ok(heading, msg)
+        
 class TEXTVIEW(xbmcgui.WindowXMLDialog):
     textbox = None
     

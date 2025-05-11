@@ -82,6 +82,9 @@ def log(msg, level=xbmc.LOGDEBUG):
 def isScanning():
     return (xbmc.getCondVisibility('Library.IsScanningVideo') & xbmc.getCondVisibility('Library.IsScanningMusic'))
        
+def isPlaying():
+    return xbmc.getCondVisibility('Player.Playing')
+       
 def _repeat(length=LIMIT, fill='█'):
    length = int(round(length))
    return (fill * int((length/len(fill))+1))[:length]
@@ -105,7 +108,7 @@ def score_bar(stones, pyseed, pydur, avg, length=LIMIT):
         if value >= 100: value = 90
         value  = (100-value)
         sindex = int(length * ((length / 100) * value / length))
-        colors = ['green','yellow','orange','red','dimgrey','dimgrey']
+        colors = ['green','yellow','orange','red','dimgrey']
         chunks = textwrap.wrap(fill[:sindex - len(score)//2] + score + fill[sindex + len(score)//2:], length//4)
         bars   = ''.join([LANGUAGE(30004)%(colors.pop(0),chunk) for chunk in chunks if len(colors) > 0 ])
         return f'|{bars}| %s secs'%("{0:.2f}".format(pydur))
@@ -145,20 +148,21 @@ def get_info():
                 return cpu_info
         except Exception as e: log("__cpu, failed! %s"%(e), xbmc.LOGERROR)
         return cpu_name
+        
     return '[CR]'.join([
                       (f"Processor: [B]{__cpu()}[/B]"),
                       (f"Machine Architecture: [B]{machine_arch} {architecture}[/B]"),
                       (f"Logical CPU Cores (including Hyperthreading if applicable): [B]{cpu_count}[/B]"),
-                      (_repeat(LINE,'_')),
+                      (LANGUAGE(30004)%('dimgrey',_repeat(LINE,'_'))),
                       (f"Operating System: [B]{os_name} v.{os_version} ({platform_info})[/B]"),
                       (f"Free Memory: [B]{kodi_mem_free} / {kodi_mem_total}[/B]"),
-                      (_repeat(LINE,'_')),
+                      (LANGUAGE(30004)%('dimgrey',_repeat(LINE,'_'))),
                       (f"Kodi Build: [B]{kodi_info}[/B]"),
                       (f"Running Services: [B]{__running()}[/B]"),
-                      (_repeat(LINE,'_')),
+                      (LANGUAGE(30004)%('dimgrey',_repeat(LINE,'_'))),
                       (f"Python: [B]{python_implementation} v.{python_version}[/B]"),
                       (f"Benchmark: [B]pystone v.{pystone.__version__}[/B] n={LOOP} | Multiprocessing: [B]Disabled[/B]"),#{{True:"Enabled",False:"Disabled"}[ENABLE_POOL]}
-                      (_repeat(LINE,'_')),
+                      (LANGUAGE(30004)%('dimgrey',_repeat(LINE,'_'))),
                       ])
                       
 def OKAY(msg, heading=ADDON_NAME,):
@@ -171,8 +175,7 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
         self.head = f'{ADDON_NAME} v.{ADDON_VERSION}'
         self.text = get_info()
         self.url  = None
-        
-        if not isScanning(): self.doModal()
+        if not isScanning() and not isPlaying(): self.doModal()
         else: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (self.head, LANGUAGE(30006), 4000, ICON))
             
     def _updateText(self, txt):
@@ -181,7 +184,7 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
             xbmc.executebuiltin('ActivateWindowAndFocus(WINDOW_DIALOG_TEXT_VIEWER, 3000)')
             xbmc.executebuiltin('AlarmClock(down,Action(down),.5,true,false)')
             xbmc.executebuiltin('AlarmClock(down,Action(down),.5,true,false)')
-        except: pass
+        except Exception as e: log("_updateText, failed! %s"%(e), xbmc.LOGERROR)
 
     def onInit(self):
         try:
@@ -201,7 +204,6 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
         pass
 
     def onAction(self, action):
-        xbmc.executebuiltin('ActivateWindowAndFocus(WINDOW_DIALOG_TEXT_VIEWER, 3000)')
         if action in [xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]:
             self.close()
 
@@ -231,16 +233,20 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
             if "seed"     in rank: seeds.append(rank["seed"])
             if "score"    in rank: scores.append(rank["score"])
             if "duration" in rank: durations.append(rank["duration"])
+            
         rank = self._rank(int(sum(scores) / len(scores)), int(sum(seeds) / len(seeds)), (sum(durations) / len(durations)))
         text = '[CR]'.join([
-                           (f"{self.text}[CR]Score {rank} @ {int(sum(loads) / len(loads))}%[CR]{_repeat(LINE,'_')}"),
-                           (LANGUAGE(30004)%('dimgrey',LANGUAGE(30007).format(loop=replace_with_k(str(LOOP)),duration="{0:.2f}".format(sum(durations) / len(durations)),load=int(sum(loads) / len(loads))))),
-                           ])
-        exit = LANGUAGE(30004)%('dimgrey',LANGUAGE(30005))
+                          (f"{self.text}[CR]Score {rank} @ {int(sum(loads) / len(loads))}%"),
+                          (LANGUAGE(30004)%('dimgrey',_repeat(LINE,'_'))),
+                          ])
+                          
         post, link = self._post(text)
-        if post:
-            self.url = f'{LANGUAGE(30003)}: [B]{link}[/B]'
-            text = f'{text}[CR] {self.url}'
+        exit = '[CR]'.join([
+                          (LANGUAGE(30004)%('white',LANGUAGE(30007).format(loop=replace_with_k(str(LOOP)),duration="{0:.2f}".format(sum(durations) / len(durations)),load=int(sum(loads) / len(loads))))),
+                          (LANGUAGE(30004)%('white',f"{LANGUAGE(30003)}: [B]{link}[/B]")),
+                          (LANGUAGE(30004)%('dimgrey',LANGUAGE(30005))),
+                          ])
+                          
         return f"{text}[CR]{exit}"
              
     def _post(self, data):
@@ -263,8 +269,8 @@ class TEXTVIEW(xbmcgui.WindowXMLDialog):
                 return False, response.json()['message']
             else:
                 log('_post failed! %s'%response.text)
-                return False, "Error making post"
+                return False, LANGUAGE(30009)
         except:
             log('_post, unable to retrieve the paste url')
-            return False, "Failed to retrieve the paste url"
+            return False, LANGUAGE(30010)
               

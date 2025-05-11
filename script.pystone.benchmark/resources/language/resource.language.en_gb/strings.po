@@ -29,7 +29,7 @@ msgid "Score"
 msgstr ""
 
 msgctxt "#30003"
-msgid "View your results here"
+msgid "View your results"
 msgstr ""
 
 msgctxt "#30004"
@@ -41,7 +41,7 @@ msgid "[I]Back [/I] or [I]Enter [/I] to exit!"
 msgstr ""
 
 msgctxt "#30006"
-msgid "Library scanning in progress\nTry again later..."
+msgid "Kodi Playback or Library scanning in progress\nTry again later..."
 msgstr ""
 
 msgctxt "#30007"
@@ -50,4 +50,12 @@ msgstr ""
 
 msgctxt "#30008"
 msgid "Kodi v.%s [%s][CR]"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Error making post"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Failed to retrieve paste url"
 msgstr ""

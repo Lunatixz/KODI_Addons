@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
 	<category label="30002">
+    <setting id="APIKey"      type="text"   label="API Key (Custom Unsplash Application)" default=""/>
     <setting id="RotateTime"  type="enum"   label="32002" default="0"                values="30s|60s|120s|240s"/>
     <setting id="Animate"     type="bool"   label="32003" default="true"/>
     <setting id="Time"        type="bool"   label="32004" default="true"/>

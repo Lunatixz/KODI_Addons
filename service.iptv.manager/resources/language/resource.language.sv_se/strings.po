@@ -4,22 +4,22 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
-"PO-Revision-Date: 2022-01-15 02:13+0000\n"
-"Last-Translator: Luna Jernberg <droidbittin@gmail.com>\n"
+"PO-Revision-Date: 2025-07-28 10:54+0000\n"
+"Last-Translator: Daniel Nylander <daniel@danielnylander.se>\n"
 "Language-Team: Swedish <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/sv_se/>\n"
 "Language: sv_se\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.10.1\n"
+"X-Generator: Weblate 5.12.2\n"
 
 msgctxt "Addon Summary"
 msgid "Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus"
-msgstr ""
+msgstr "Integrera IPTV-kanaler från andra tillägg i Kodi TV- och radiomenyerna"
 
 msgctxt "Addon Description"
 msgid "IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus."
-msgstr ""
+msgstr "IPTV Manager integrerar IPTV-kanaler från andra tillägg i Kodi TV- och radiomenyerna."
 
 # CONTEXT MENU
 msgctxt "#30600"
@@ -29,15 +29,15 @@ msgstr "Spela med IPTV Hanterare"
 # MESSAGES
 msgctxt "#30700"
 msgid "Are you sure you want to setup IPTV Simple for the use with IPTV Manager? Any existing configuration of IPTV Simple will be overwritten."
-msgstr ""
+msgstr "Är du säker på att du vill konfigurera IPTV Simple för användning med IPTV Manager? Alla befintliga konfigurationer av IPTV Simple kommer att skrivas över."
 
 msgctxt "#30701"
 msgid "IPTV Simple is configured for use with IPTV Manager!"
-msgstr ""
+msgstr "IPTV Simple är konfigurerad för användning med IPTV Manager!"
 
 msgctxt "#30702"
 msgid "The configuration of IPTV Simple has failed. Please check the log files for more information."
-msgstr ""
+msgstr "Konfigurationen för IPTV Simple har misslyckats. Kontrollera loggfilerna för mer information."
 
 msgctxt "#30703"
 msgid "Detecting IPTV add-ons..."
@@ -62,7 +62,7 @@ msgstr "Kanaler"
 
 msgctxt "#30801"
 msgid "Refreshing"
-msgstr ""
+msgstr "Uppdaterar"
 
 msgctxt "#30802"
 msgid "Refresh interval [I](in hours)[/I]"
@@ -90,7 +90,7 @@ msgstr "Öppna IPTV Simpel inställningar…"
 
 msgctxt "#30824"
 msgid "Automatically restart IPTV Simple to refresh the data"
-msgstr ""
+msgstr "Starta automatiskt om IPTV Simple för att uppdatera data"
 
 msgctxt "#30880"
 msgid "Expert"
@@ -106,8 +106,8 @@ msgstr "Aktivera debug loggning"
 
 msgctxt "#30883"
 msgid "Install Kodi Logfile Uploader…"
-msgstr ""
+msgstr "Installera Kodi Logfile Uploader…"
 
 msgctxt "#30884"
 msgid "Open Kodi Logfile Uploader…"
-msgstr ""
+msgstr "Öppna Kodi Logfile Uploader…"

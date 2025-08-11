@@ -3,19 +3,16 @@
 # Addon id: service.iptv.manager
 msgid ""
 msgstr ""
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
-"PO-Revision-Date: 2025-08-11 07:29+0000\n"
-"Last-Translator: rimasx <riks_12@hot.ee>\n"
-"Language-Team: Estonian <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/et_ee/>\n"
-"Language: et_ee\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: prs\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
 
 msgctxt "Addon Summary"
 msgid "Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus"
-msgstr "Integreeri IPTV kanaleid teistest lisamoodulitest Kodi TV ja raadio menüüdesse"
+msgstr ""
 
 msgctxt "Addon Description"
 msgid "IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus."

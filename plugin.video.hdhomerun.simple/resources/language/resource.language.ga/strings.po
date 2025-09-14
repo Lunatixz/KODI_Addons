@@ -1,0 +1,174 @@
+# Kodi Media Center language file
+# Addon Name: HDHomerun Simple
+# Addon id: plugin.video.hdhomerun.simple
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: plugin.video.hdhomerun.simple\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2025-09-14 09:29+0000\n"
+"Last-Translator: Aindriú Mac Giolla Eoin <aindriu80@gmail.com>\n"
+"Language-Team: Irish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-hdhomerun-simple/ga/>\n"
+"Language: ga\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4;\n"
+"X-Generator: Weblate 5.13.3\n"
+
+msgctxt "Addon Summary"
+msgid "Simple HDHomeRun Interface."
+msgstr "Comhéadan simplí HDHomeRun."
+
+msgctxt "Addon Description"
+msgid "Automatically find all the compatible HDHomeRun devices on your network, Simple and Easy HDHomeRun Interface."
+msgstr "Aimsigh go huathoibríoch na gléasanna HDHomeRun comhoiriúnacha go léir ar do líonra, Comhéadan HDHomeRun Simplí agus Éasca."
+
+msgctxt "Addon Disclaimer"
+msgid "Requires a compatible HDHomeRun device"
+msgstr "Teastaíonn gléas HDHomeRun comhoiriúnach"
+
+msgctxt "#30000"
+msgid "Enable Debugging [Log errors]"
+msgstr "Cumasaigh Dífhabhtú [Earráidí Logála]"
+
+msgctxt "#30002"
+msgid "Preferred Transcoding"
+msgstr "Traschódú is Fearr"
+
+msgctxt "#30020"
+msgid "Enable Timeshift"
+msgstr "Cumasaigh Aistriú Ama"
+
+msgctxt "#30101"
+msgid "Available Devices"
+msgstr "Gléasanna atá ar Fáil"
+
+msgctxt "#30103"
+msgid "Tuner Details"
+msgstr "Sonraí an Tiúnóra"
+
+msgctxt "#30104"
+msgid "Name:"
+msgstr "Ainm:"
+
+msgctxt "#30105"
+msgid "Tuner Count:"
+msgstr "Líon na dTiúnóirí:"
+
+msgctxt "#30106"
+msgid "IP Address:"
+msgstr "Seoladh IP:"
+
+msgctxt "#30107"
+msgid "Default Transcoding:"
+msgstr "Traschódú Réamhshocraithe:"
+
+msgctxt "#30108"
+msgid "Firmware:"
+msgstr "Dochtearraí:"
+
+msgctxt "#30109"
+msgid "%s - Enter Search Term"
+msgstr "%s - Cuir isteach Téarma Cuardaigh"
+
+msgctxt "#30110"
+msgid "Live"
+msgstr "Beo"
+
+msgctxt "#30111"
+msgid "Recordings"
+msgstr "Taifeadtaí"
+
+msgctxt "#30112"
+msgid "Lineup"
+msgstr "Líneáil"
+
+msgctxt "#30113"
+msgid "Search"
+msgstr "Cuardaigh"
+
+msgctxt "#30114"
+msgid "Guide"
+msgstr "Treoir"
+
+msgctxt "#30115"
+msgid "%s - Enter Search Term"
+msgstr "%s - Cuir isteach Téarma Cuardaigh"
+
+msgctxt "#30116"
+msgid "Recorded"
+msgstr "Taifeadta"
+
+msgctxt "#30117"
+msgid "On Now"
+msgstr "Ar siúl anois"
+
+msgctxt "#30118"
+msgid "Coming Up"
+msgstr "Ag Teacht Aníos"
+
+msgctxt "#30119"
+msgid "No Search Results found for %s"
+msgstr "Níor aimsíodh aon Torthaí Cuardaigh do %s"
+
+msgctxt "#30029"
+msgid "Coming Up Later..."
+msgstr "Ag Teacht Aníos Níos Déanaí..."
+
+msgctxt "#49000"
+msgid "Integration"
+msgstr "Comhtháthú"
+
+msgctxt "#49001"
+msgid "Install PseudoTV Live add-on"
+msgstr "Suiteáil breiseán PseudoTV Live"
+
+msgctxt "#49002"
+msgid "Install IPTV Manager add-on"
+msgstr "Suiteáil breiseán Bainisteoir IPTV"
+
+msgctxt "#49003"
+msgid "Enable IPTV Manager integration"
+msgstr "Cumasaigh comhtháthú Bainisteoir IPTV"
+
+msgctxt "#49004"
+msgid "IPTV Manager settings…"
+msgstr "Socruithe Bainisteoir IPTV…"
+
+msgctxt "#49005"
+msgid "PseudoTV Live settings…"
+msgstr "Socruithe PseudoTV Live…"
+
+msgctxt "#49006"
+msgid "Only add Favorites"
+msgstr "Cuir Rogha amháin leis"
+
+msgctxt "#49007"
+msgid "%s added to Favorites"
+msgstr "%s curtha le Ceanáin"
+
+msgctxt "#49008"
+msgid "%s removed from Favorites"
+msgstr "%s bainte as na Ceanáin"
+
+msgctxt "#49009"
+msgid "Add Channel to Favorites"
+msgstr "Cuir Cainéal le Ceanáin"
+
+msgctxt "#49010"
+msgid "Remove Channel from Favorites"
+msgstr "Bain Cainéal ó na Rogha is Fearr liom"
+
+msgctxt "#49011"
+msgid "Live (Favorites)"
+msgstr "Beo (Ceanáin)"
+
+msgctxt "#49012"
+msgid "Favorites"
+msgstr "Ceanáin"
+
+msgctxt "#49013"
+msgid "General"
+msgstr "Ginearálta"

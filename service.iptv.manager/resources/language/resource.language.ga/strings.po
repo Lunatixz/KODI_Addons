@@ -1,0 +1,113 @@
+# Kodi Media Center language file
+# Addon Name: IPTV Manager
+# Addon id: service.iptv.manager
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"PO-Revision-Date: 2025-09-14 09:29+0000\n"
+"Last-Translator: Aindriú Mac Giolla Eoin <aindriu80@gmail.com>\n"
+"Language-Team: Irish <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/ga/>\n"
+"Language: ga\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4;\n"
+"X-Generator: Weblate 5.13.3\n"
+
+msgctxt "Addon Summary"
+msgid "Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus"
+msgstr "Comhtháthaigh bealaí IPTV ó bhreiseáin eile i roghchláir Kodi TV agus Radio"
+
+msgctxt "Addon Description"
+msgid "IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus."
+msgstr "Comhtháthaíonn Bainisteoir IPTV bealaí IPTV ó bhreiseáin eile i roghchláir Teilifíse agus Raidió Kodi."
+
+# CONTEXT MENU
+msgctxt "#30600"
+msgid "Play with IPTV Manager"
+msgstr "Imir le Bainisteoir IPTV"
+
+# MESSAGES
+msgctxt "#30700"
+msgid "Are you sure you want to setup IPTV Simple for the use with IPTV Manager? Any existing configuration of IPTV Simple will be overwritten."
+msgstr "An bhfuil tú cinnte gur mhaith leat IPTV Simple a chur ar bun lena úsáid le Bainisteoir IPTV? Scríobhfar aon chumraíocht atá ann cheana féin de IPTV Simple."
+
+msgctxt "#30701"
+msgid "IPTV Simple is configured for use with IPTV Manager!"
+msgstr "Tá IPTV Simple cumraithe lena úsáid le Bainisteoir IPTV!"
+
+msgctxt "#30702"
+msgid "The configuration of IPTV Simple has failed. Please check the log files for more information."
+msgstr "Theip ar chumraíocht IPTV Simple. Seiceáil na comhaid loga le haghaidh tuilleadh eolais."
+
+msgctxt "#30703"
+msgid "Detecting IPTV add-ons..."
+msgstr "Ag brath breiseáin IPTV..."
+
+msgctxt "#30704"
+msgid "Fetching channels and guide of {addon}..."
+msgstr "Ag fáil bealaí agus treoir do {addon}..."
+
+msgctxt "#30705"
+msgid "Updating channels and guide..."
+msgstr "Ag nuashonrú na gcainéal agus an treoir..."
+
+msgctxt "#30706"
+msgid "This program isn't available to play."
+msgstr "Níl an clár seo ar fáil le himirt."
+
+# SETTINGS
+msgctxt "#30800"
+msgid "Channels"
+msgstr "Cainéil"
+
+msgctxt "#30801"
+msgid "Refreshing"
+msgstr "Athnuachan"
+
+msgctxt "#30802"
+msgid "Refresh interval [I](in hours)[/I]"
+msgstr "Eatramh athnuachana [I](in uaireanta)[/I]"
+
+msgctxt "#30803"
+msgid "Refresh channels and guide now…"
+msgstr "Athnuaigh na cainéil agus an treoir anois…"
+
+msgctxt "#30820"
+msgid "IPTV Simple"
+msgstr "IPTV Simplí"
+
+msgctxt "#30821"
+msgid "Configuration"
+msgstr "Cumraíocht"
+
+msgctxt "#30822"
+msgid "Configure IPTV Simple automatically…"
+msgstr "Cumraigh IPTV Simple go huathoibríoch…"
+
+msgctxt "#30823"
+msgid "Open IPTV Simple settings…"
+msgstr "Oscail socruithe simplí IPTV…"
+
+msgctxt "#30824"
+msgid "Automatically restart IPTV Simple to refresh the data"
+msgstr "Atosaigh IPTV go huathoibríoch Simplí chun na sonraí a athnuachan"
+
+msgctxt "#30880"
+msgid "Expert"
+msgstr "Saineolaí"
+
+msgctxt "#30881"
+msgid "Logging"
+msgstr "Logáil"
+
+msgctxt "#30882"
+msgid "Enable debug logging"
+msgstr "Cumasaigh logáil dífhabhtaithe"
+
+msgctxt "#30883"
+msgid "Install Kodi Logfile Uploader…"
+msgstr "Suiteáil Uaslódálaí Logchomhaid Kodi…"
+
+msgctxt "#30884"
+msgid "Open Kodi Logfile Uploader…"
+msgstr "Oscail Uaslódálaí Logchomhaid Kodi…"

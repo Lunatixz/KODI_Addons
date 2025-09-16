@@ -1,0 +1,70 @@
+# XBMC Media Center language file
+# Addon Name: Kodi PowerToys
+# Addon id: service.kodi.powertoys
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To:  \n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: XBMC Translation Team\n"
+"Language-Team: English"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "Addon Summary"
+msgid ""
+msgstr ""
+
+msgctxt "Addon Description"
+msgid ""
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid ""
+msgstr ""
+
+msgctxt "#32000"
+msgid "Enable Debugging"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Meta Scraper/Updater"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Delay Startup"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Run Interval"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Show Dialog"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Force Silent TV Updates"
+msgstr ""
+
+msgctxt "#32006"
+msgid "Force Silent Movie Updates"
+msgstr ""
+
+msgctxt "#32007"
+msgid "TV Source Path"
+msgstr ""
+
+msgctxt "#32008"
+msgid "Movie Source Path"
+msgstr ""
+
+msgctxt "#32009"
+msgid "Please Configure TV/Movie Source Paths in Settings"
+msgstr ""
+

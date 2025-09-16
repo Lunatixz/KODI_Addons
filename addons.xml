@@ -659,8 +659,6 @@
         <provides>executable</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Test your devices python performance.</summary>
-        <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
         <license>MIT</license>
         <platform>all</platform>
         <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/script.pystone.benchmark</source>
@@ -671,6 +669,8 @@
             <fanart>resources/images/fanart.jpg</fanart>
             <screenshot>resources/images/screenshot01.jpg</screenshot>
         </assets>
+        <summary lang="en_GB">Test your devices python performance.</summary>
+        <description lang="en_GB">How fast does your device run python code? Pystone evaluates CPU performance running in a python environment.</description>
     </extension>
 </addon>
 
@@ -746,6 +746,26 @@
         <description lang="pt_BR">O IPTV Manager integra canais de IPTV de outros complementos nos menus Kodi TV e Radio.</description>
         <description lang="ru_RU">Это дополнение интегрирует IPTV каналы из других дополнений в Kodi PVR.</description>
         <description lang="zh_CN">IPTV管理器可以在KODI电视和电台菜单中集成来自其他插件的IPTV频道。</description>
+    </extension>
+</addon>
+
+<addon id="service.kodi.powertoys" version="1.0.0" name="Kodi PowerToys" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.kodi-six" version="0.1.3.1"/>
+        <import addon="script.module.simplecache" version="1.0.0"/>
+    </requires>
+    <extension point="xbmc.service" library="service.py"/>
+    <extension point="xbmc.python.script" library="settings.py"/>
+    <extension point="xbmc.addon.metadata">
+        <license>GPL-3.0-or-later</license>
+        <platform>all</platform>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/service.kodi.powertoys</source>
+        <forum>https://forum.kodi.tv/showthread.php</forum>
+        <assets>
+            <icon>resources/images/icon.jpg</icon>
+        </assets>
+        <summary lang="en_GB"></summary>
     </extension>
 </addon>
 

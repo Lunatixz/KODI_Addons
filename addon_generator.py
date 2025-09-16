@@ -28,8 +28,8 @@ import xml.etree.ElementTree
 from zipfile import ZipFile
 from shutil import copyfile
 
-CHKPATH    = 'C:/GitHub/addon-check/'
-GITPATH    = 'C:/GitHub/KODI_Addons'
+CHKPATH    = 'Z:/GitHub/addon-check/'
+GITPATH    = 'Z:/GitHub/KODI_Addons'
 ZIPPATH    = os.path.join(GITPATH,'zips','')
 DELETE_EXT = ('.pyc', '.pyo', '.db', '.bak')
 DELETE_FOLDERS = ['__pycache__','.idea','Corel Auto-Preserve']

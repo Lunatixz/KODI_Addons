@@ -68,3 +68,11 @@ msgctxt "#32009"
 msgid "Please Configure TV/Movie Source Paths in Settings"
 msgstr ""
 
+msgctxt "#32010"
+msgid "Enable Scraper"
+msgstr ""
+
+msgctxt "#32011"
+msgid "Run while Playing"
+msgstr ""
+

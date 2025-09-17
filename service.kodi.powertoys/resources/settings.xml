@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
     <setting id="Enable_Debugging" type="bool" label="32000" default="false" />
+    <setting id="Run_Playing" type="bool" label="32011" default="false" />
+    <setting id="Start_Delay" type="number" label="32002" default="30" />
 	<setting label="32001" type="lsep"/>
-    <setting id="Start_Delay_Seconds" type="number" label="32002" default="30" />
-    <setting id="Run_Interval_Seconds" type="number" label="32003" default="3600" />
-    <setting id="Show_Dialog" type="bool" label="32004" default="true" />
-    <setting id="Force_Scrape_TV" type="bool" label="32005" default="false" />
-    <setting id="Force_Scrape_Movies" type="bool" label="32006" default="false" />
-    <setting id="TV_Source_Folder" type="folder" label="32007"  source="video" option="writeable" default="" />
-    <setting id="Movie_Source_Folder" type="folder" label="32008"  source="video" option="writeable" default=""/>
+    <setting id="Scraper_Enabled" type="bool" label="32010" default="false" />
+    <setting id="Scraper_Show_Dialog" type="bool" label="32004" default="true" />
+    <setting id="Scraper_Interval" type="number" label="32003" default="3600" />
+    <setting id="Scraper_TV_Folder" type="folder" label="32007"  source="video" option="writeable" default="" />
+    <setting id="Scraper_Force_TV" type="bool" label="32005" default="false" />
+    <setting id="Scraper_Movie_Folder" type="folder" label="32008"  source="video" option="writeable" default=""/>
+    <setting id="Scraper_Force_Movies" type="bool" label="32006" default="false" />
 </settings>

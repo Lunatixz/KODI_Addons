@@ -80,6 +80,12 @@ def chkUpdate(key, runevery=900, nextrun=None):
         xbmcgui.Window(10000).setProperty(key, str(epoch + runevery))
         return True
 
+def isScanning():
+    return (xbmc.getCondVisibility('Library.IsScanningVideo') or False)
+
+def isPlaying():
+    return (xbmc.getCondVisibility('Player.Playing') or False)
+
 class Monitor(xbmc.Monitor):
     def __init__(self):
         xbmc.Monitor.__init__(self)
@@ -106,50 +112,25 @@ class Service(object):
         return True
              
 
-    def _start(self):
-        self.log('_start')
-        self.monitor.waitForAbort(REAL_SETTINGS.getSettingInt('Start_Delay_Seconds'))
+    def _start(self, wait=REAL_SETTINGS.getSettingInt('Start_Delay')):
+        self.log('_start, wait = %s'%(wait))
+        self.monitor.waitForAbort(wait)
         while not self.monitor.abortRequested():
-            if self.monitor.waitForAbort(self._run()): break
+            if isPlaying() and not REAL_SETTINGS.getSettingBool('Run_Playing'): pass
+            elif self.monitor.waitForAbort(self._run()): break
             
             
-    def _run(self):
+    def _run(self, wait=REAL_SETTINGS.getSettingInt('Start_Delay')):
         if not self.running:
-            if not self.isScanning():
-                self.log('_run, started')
-                self.running = True
-                try:
-                    self.scanTV(REAL_SETTINGS.getSetting('TV_Source_Folder'), self.getTVshows())
-                    self.scanMovies(REAL_SETTINGS.getSetting('Movie_Source_Folder'), self.getMovies())
-                except Exception as e:
-                    self.log('_run, Scan failed! %s'%(e), xbmc.LOGERROR)
-                    self.notification(LANGUAGE(32009))
-                self.running = False
-                self.log('_run, ended')
-            else: return REAL_SETTINGS.getSettingInt('Start_Delay_Seconds')
-        return REAL_SETTINGS.getSettingInt('Run_Interval_Seconds')
+            self.log('_run, started')
+            self.running = True
+            ## Start ##
+            if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not isScanning():
+                if chkUpdate('Scraper',REAL_SETTINGS.getSettingInt('Scraper_Interval')): self.runScraper()
 
-
-    def scanTV(self, path, shows=[], force=REAL_SETTINGS.getSettingBool('Force_Scrape_TV')):
-        paths = [item['file'] for item in shows if item.get('file')]
-        for item in self.getDirectory(path):
-            if self.monitor.waitForAbort(0.1): break
-            elif not item.get('file') in paths  or force:
-                self.log('scanTV, [%s] missing from library!'%(item['label']))
-                self.scrapeDirectory(item.get('file'))
-
-
-    def scanMovies(self, path, movies=[], force=REAL_SETTINGS.getSettingBool('Force_Scrape_Movies')):
-        paths = [os.path.split(item['file'])[0] for item in movies if item.get('file')]
-        for item in self.getDirectory(path):
-            if self.monitor.waitForAbort(0.1): break
-            elif not item.get('file') in paths or force:
-                self.log('scanMovies, [%s] missing from library!'%(item['label']))
-                self.scrapeDirectory(item.get('file'))
-
-
-    def isScanning(self):
-        return (xbmc.getCondVisibility('Library.IsScanningVideo') or False)
+            ## END ##
+            self.running = False
+        return wait
 
       
     def sendJSON(self, param):
@@ -161,17 +142,7 @@ class Service(object):
         if response.get('error'): self.log('sendJSON, failed! error = %s\n%s'%(dumpJSON(response.get('error')),command), xbmc.LOGWARNING)
         return response
 
-
-    def scrapeDirectory(self, path, show=REAL_SETTINGS.getSettingBool('Show_Dialog')):
-        self.log('scrapeDirectory, scraping [%s]'%(path))
-        if self.sendJSON({"method":"VideoLibrary.Scan","params":{"directory":path,"showdialogs":show}}).get('result') == "OK":
-            while not self.monitor.abortRequested():
-                if self.monitor.waitForAbort(REAL_SETTINGS.getSettingInt('Start_Delay_Seconds')): break
-                elif self.isScanning(): self.log('scrapeDirectory, waiting for scraper to finish...')
-                else: break
-            self.log('scrapeDirectory, finished!')
         
- 
     # @cacheit()
     def getDirectory(self, path):
         return self.sendJSON({"method":"Files.GetDirectory","params":{"directory":path,"media":"files"}}).get('result',{}).get('files', [])
@@ -187,8 +158,46 @@ class Service(object):
         return self.sendJSON({"method":"VideoLibrary.GetMovies","params":{"properties":["file"]}}).get('result',{}).get('movies', [])
 
 
-    def getSources(self): #todo user drop down list with multi select source paths to check.
+    # @cacheit()
+    def getSources(self): #todo verify user TV/Movie path in sources?
         return self.sendJSON({"method":"Files.GetSources","params":{"media":"video"}}).get('result',{}).get('sources', [])
+
+
+    def runScraper(self):
+        try:
+            self.scanTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder'), self.getTVshows())
+            self.scanMovies(REAL_SETTINGS.getSetting('Scraper_Movie_Folder'), self.getMovies())
+        except Exception as e:
+            self.log('runScraper, Scan failed! %s'%(e), xbmc.LOGERROR)
+            self.notification(LANGUAGE(32009))
+
+
+    def scanTV(self, path, shows=[], force=REAL_SETTINGS.getSettingBool('Scraper_Force_TV')):
+        paths = [item['file'] for item in shows if item.get('file')]
+        for item in self.getDirectory(path):
+            if self.monitor.waitForAbort(0.1): break
+            elif not item.get('file') in paths  or force:
+                self.log('scanTV, [%s] missing from library!'%(item['label']))
+                self.scrapeDirectory(item.get('file'))
+
+
+    def scanMovies(self, path, movies=[], force=REAL_SETTINGS.getSettingBool('Scraper_Force_Movies')):
+        paths = [os.path.split(item['file'])[0] for item in movies if item.get('file')]
+        for item in self.getDirectory(path):
+            if self.monitor.waitForAbort(0.1): break
+            elif not item.get('file') in paths or force:
+                self.log('scanMovies, [%s] missing from library!'%(item['label']))
+                self.scrapeDirectory(item.get('file'))
+
+
+    def scrapeDirectory(self, path, show=REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')):
+        self.log('scrapeDirectory, scraping [%s]'%(path))
+        if self.sendJSON({"method":"VideoLibrary.Scan","params":{"directory":path,"showdialogs":show}}).get('result') == "OK":
+            while not self.monitor.abortRequested():
+                if self.monitor.waitForAbort(REAL_SETTINGS.getSettingInt('Start_Delay')): break
+                elif self.isScanning(): self.log('scrapeDirectory, waiting for scraper to finish...')
+                else: break
+            self.log('scrapeDirectory, finished!')
 
 
 if __name__ == '__main__': Service()._start()

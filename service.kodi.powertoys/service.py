@@ -71,14 +71,6 @@ def cacheit(expiration=datetime.timedelta(minutes=15), checksum=ADDON_VERSION, j
             return method_class.cache.set(cacheName.lower(), method(*args, **kwargs), checksum, expiration, json_data)
         return wrapper
     return internal
-    
-def chkUpdate(key, runevery=900, nextrun=None):
-    if nextrun is None: nextrun = int(xbmcgui.Window(10000).getProperty(key) or "0") # nextrun == 0 => force que
-    epoch = int(time.time())
-    if epoch >= nextrun:
-        self.log('chkUpdate, key = %s, last run %s' % (key, epoch - nextrun))
-        xbmcgui.Window(10000).setProperty(key, str(epoch + runevery))
-        return True
 
 def isScanning():
     return (xbmc.getCondVisibility('Library.IsScanningVideo') or False)
@@ -126,13 +118,22 @@ class Service(object):
             self.running = True
             ## Start ##
             if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not isScanning():
-                if chkUpdate('Scraper',REAL_SETTINGS.getSettingInt('Scraper_Interval')): self.runScraper()
+                if self._update('Scraper',REAL_SETTINGS.getSettingInt('Scraper_Interval')): self.runScraper()
 
             ## END ##
             self.running = False
         return wait
 
-      
+              
+    def _update(self, key, runevery=900, nextrun=None):
+        if nextrun is None: nextrun = int(xbmcgui.Window(10000).getProperty(key) or "0") # nextrun == 0 => force que
+        epoch = int(time.time())
+        if epoch >= nextrun:
+            self.log('_update, key = %s, last run %s' % (key, epoch - nextrun))
+            xbmcgui.Window(10000).setProperty(key, str(epoch + runevery))
+            return True
+
+
     def sendJSON(self, param):
         command = param
         command["jsonrpc"] = "2.0"

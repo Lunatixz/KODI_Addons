@@ -21,7 +21,10 @@ from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
 
 try:    from simplecache             import SimpleCache
 except: from simplecache.simplecache import SimpleCache #pycharm stub
-        
+
+from functools  import wraps
+from contextlib import contextmanager, closing
+
 # Plugin Info
 ADDON_ID            = 'service.kodi.powertoys'
 REAL_SETTINGS       = xbmcaddon.Addon(id=ADDON_ID)
@@ -58,7 +61,7 @@ def loadJSON(item):
     except Exception as e: log("loadJSON, failed! %s\n%s"%(e,item), xbmc.LOGERROR)
     return {}
     
-def cacheit(expiration=datetime.timedelta(minutes=15), checksum=ADDON_VERSION, json_data=False):
+def cacheit(expiration=datetime.timedelta(seconds=REAL_SETTINGS.getSettingInt('Start_Delay')), checksum=ADDON_VERSION, json_data=False):
     def internal(method):
         @wraps(method)
         def wrapper(*args, **kwargs):
@@ -108,30 +111,34 @@ class Service(object):
         self.log('_start, wait = %s'%(wait))
         self.monitor.waitForAbort(wait)
         while not self.monitor.abortRequested():
-            if isPlaying() and not REAL_SETTINGS.getSettingBool('Run_Playing'): pass
-            elif self.monitor.waitForAbort(self._run()): break
-            
-            
-    def _run(self, wait=REAL_SETTINGS.getSettingInt('Start_Delay')):
-        if not self.running:
-            self.log('_run, started')
-            self.running = True
-            ## Start ##
-            if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not isScanning():
-                if self._update('Scraper',REAL_SETTINGS.getSettingInt('Scraper_Interval')): self.runScraper()
+            if self.monitor.waitForAbort(wait): break
+            elif self.chkPlaying(): pass
+            elif not self.running:
+                self.running = True
+                ## Start ##
+                if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not isScanning():
+                    with self._run(self.runScraper,REAL_SETTINGS.getSettingInt('Scraper_Interval')): pass
+                        
+                ## END ##
+                self.running = False
+            return wait
 
-            ## END ##
-            self.running = False
-        return wait
-
-              
-    def _update(self, key, runevery=900, nextrun=None):
-        if nextrun is None: nextrun = int(xbmcgui.Window(10000).getProperty(key) or "0") # nextrun == 0 => force que
+    
+    @contextmanager
+    def _run(self, func, runevery=900, nextrun=None):
+        if nextrun is None: nextrun = int(xbmcgui.Window(10000).getProperty(func.__name__) or "0") # nextrun == 0 => force run
         epoch = int(time.time())
         if epoch >= nextrun:
-            self.log('_update, key = %s, last run %s' % (key, epoch - nextrun))
-            xbmcgui.Window(10000).setProperty(key, str(epoch + runevery))
-            return True
+            finished = func()
+            self.log('_run, func = %s, last run %s, finished = %s' % (func.__name__, epoch - nextrun, finished))
+            try: yield
+            finally:
+                if finished: xbmcgui.Window(10000).setProperty(func.__name__, str(epoch + runevery))
+        else: yield
+         
+
+    def chkPlaying(self):
+        return isPlaying() and not REAL_SETTINGS.getSettingBool('Run_Playing')
 
 
     def sendJSON(self, param):
@@ -144,30 +151,30 @@ class Service(object):
         return response
 
         
-    # @cacheit()
+    @cacheit()
     def getDirectory(self, path):
         return self.sendJSON({"method":"Files.GetDirectory","params":{"directory":path,"media":"files"}}).get('result',{}).get('files', [])
 
 
-    # @cacheit()
+    @cacheit()
     def getTVshows(self):
         return self.sendJSON({"method":"VideoLibrary.GetTVShows","params":{"properties":["file"]}}).get('result',{}).get('tvshows', [])
            
            
-    # @cacheit()
+    @cacheit()
     def getMovies(self):
         return self.sendJSON({"method":"VideoLibrary.GetMovies","params":{"properties":["file"]}}).get('result',{}).get('movies', [])
 
 
-    # @cacheit()
+    @cacheit()
     def getSources(self): #todo verify user TV/Movie path in sources?
         return self.sendJSON({"method":"Files.GetSources","params":{"media":"video"}}).get('result',{}).get('sources', [])
 
 
     def runScraper(self):
         try:
-            self.scanTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder'), self.getTVshows())
-            self.scanMovies(REAL_SETTINGS.getSetting('Scraper_Movie_Folder'), self.getMovies())
+            return (self.scanTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder'), self.getTVshows()) & 
+            self.scanMovies(REAL_SETTINGS.getSetting('Scraper_Movie_Folder'), self.getMovies()))
         except Exception as e:
             self.log('runScraper, Scan failed! %s'%(e), xbmc.LOGERROR)
             self.notification(LANGUAGE(32009))
@@ -176,29 +183,32 @@ class Service(object):
     def scanTV(self, path, shows=[], force=REAL_SETTINGS.getSettingBool('Scraper_Force_TV')):
         paths = [item['file'] for item in shows if item.get('file')]
         for item in self.getDirectory(path):
-            if self.monitor.waitForAbort(0.1): break
-            elif not item.get('file') in paths  or force:
-                self.log('scanTV, [%s] missing from library!'%(item['label']))
+            if   self.monitor.waitForAbort(0.1): break
+            elif self.chkPlaying(): return False
+            elif not item.get('file') in paths or force:
+                self.log('scanTV, [%s] %s'%(item['label'],'Updating Meta...' if force else 'Scraping Meta!'))
                 self.scrapeDirectory(item.get('file'))
+            return True
 
 
     def scanMovies(self, path, movies=[], force=REAL_SETTINGS.getSettingBool('Scraper_Force_Movies')):
         paths = [os.path.split(item['file'])[0] for item in movies if item.get('file')]
         for item in self.getDirectory(path):
-            if self.monitor.waitForAbort(0.1): break
+            if   self.monitor.waitForAbort(0.1): break
+            elif self.chkPlaying(): return False
             elif not item.get('file') in paths or force:
-                self.log('scanMovies, [%s] missing from library!'%(item['label']))
+                self.log('scanMovies, [%s] %s'%(item['label'],'Updating Meta...' if force else 'Scraping Meta!'))
                 self.scrapeDirectory(item.get('file'))
-
+            return True
 
     def scrapeDirectory(self, path, show=REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')):
         self.log('scrapeDirectory, scraping [%s]'%(path))
         if self.sendJSON({"method":"VideoLibrary.Scan","params":{"directory":path,"showdialogs":show}}).get('result') == "OK":
             while not self.monitor.abortRequested():
-                if self.monitor.waitForAbort(REAL_SETTINGS.getSettingInt('Start_Delay')): break
-                elif self.isScanning(): self.log('scrapeDirectory, waiting for scraper to finish...')
+                if   self.monitor.waitForAbort(REAL_SETTINGS.getSettingInt('Start_Delay')): break
+                elif isScanning(): self.log('scrapeDirectory, waiting for scraper to finish...')
                 else: break
             self.log('scrapeDirectory, finished!')
-
+            
 
 if __name__ == '__main__': Service()._start()

@@ -37,7 +37,7 @@ msgid "Meta Scraper/Updater"
 msgstr ""
 
 msgctxt "#32002"
-msgid "Delay Startup"
+msgid "Start Delay/Service Interval"
 msgstr ""
 
 msgctxt "#32003"

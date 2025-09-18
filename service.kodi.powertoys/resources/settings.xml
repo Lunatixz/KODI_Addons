@@ -11,4 +11,7 @@
     <setting id="Scraper_Force_TV" type="bool" label="32005" default="false" />
     <setting id="Scraper_Movie_Folder" type="folder" label="32008"  source="video" option="writeable" default=""/>
     <setting id="Scraper_Force_Movies" type="bool" label="32006" default="false" />
+	<setting label="32012" type="lsep"/>
+    <setting id="Duplicate_Enabled" type="bool" label="32013" default="false" />
+    <setting id="Duplicate_Interval" type="number" label="32003" default="3600" />
 </settings>

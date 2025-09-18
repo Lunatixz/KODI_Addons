@@ -33,7 +33,7 @@ msgid "Enable Debugging"
 msgstr ""
 
 msgctxt "#32001"
-msgid "Meta Scraper/Updater"
+msgid "Scrape/Update Meta Library"
 msgstr ""
 
 msgctxt "#32002"
@@ -75,4 +75,14 @@ msgstr ""
 msgctxt "#32011"
 msgid "Run while Playing"
 msgstr ""
+
+msgctxt "#32012"
+msgid "Clean Duplicates"
+msgstr ""
+
+msgctxt "#32013"
+msgid "Enable Duplicates"
+msgstr ""
+
+
 

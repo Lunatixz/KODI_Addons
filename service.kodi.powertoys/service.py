@@ -118,7 +118,8 @@ class Service(object):
                 ## Start ##
                 if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not isScanning():
                     with self._run(self.runScraper,REAL_SETTINGS.getSettingInt('Scraper_Interval')): pass
-                        
+                if REAL_SETTINGS.getSettingBool('Duplicate_Enabled') and not isScanning():
+                    with self._run(self.runDuplicate,REAL_SETTINGS.getSettingInt('Duplicate_Interval')): pass
                 ## END ##
                 self.running = False
             return wait
@@ -129,9 +130,10 @@ class Service(object):
         if nextrun is None: nextrun = int(xbmcgui.Window(10000).getProperty(func.__name__) or "0") # nextrun == 0 => force run
         epoch = int(time.time())
         if epoch >= nextrun:
-            finished = func()
-            self.log('_run, func = %s, last run %s, finished = %s' % (func.__name__, epoch - nextrun, finished))
-            try: yield
+            try: 
+                finished = func()
+                self.log('_run, func = %s, last run %s, finished = %s' % (func.__name__, epoch - nextrun, finished))
+                yield
             finally:
                 if finished: xbmcgui.Window(10000).setProperty(func.__name__, str(epoch + runevery))
         else: yield
@@ -151,22 +153,22 @@ class Service(object):
         return response
 
         
-    @cacheit()
+    # @cacheit()
     def getDirectory(self, path):
         return self.sendJSON({"method":"Files.GetDirectory","params":{"directory":path,"media":"files"}}).get('result',{}).get('files', [])
 
 
-    @cacheit()
+    # @cacheit()
     def getTVshows(self):
         return self.sendJSON({"method":"VideoLibrary.GetTVShows","params":{"properties":["file"]}}).get('result',{}).get('tvshows', [])
            
            
-    @cacheit()
+    # @cacheit()
     def getMovies(self):
         return self.sendJSON({"method":"VideoLibrary.GetMovies","params":{"properties":["file"]}}).get('result',{}).get('movies', [])
 
 
-    @cacheit()
+    # @cacheit()
     def getSources(self): #todo verify user TV/Movie path in sources?
         return self.sendJSON({"method":"Files.GetSources","params":{"media":"video"}}).get('result',{}).get('sources', [])
 
@@ -180,26 +182,34 @@ class Service(object):
             self.notification(LANGUAGE(32009))
 
 
+    def runDuplicate(self):
+        try: return True
+        except Exception as e:
+            self.log('runDuplicate, Scan failed! %s'%(e), xbmc.LOGERROR)
+            self.notification(LANGUAGE(32009))
+
+
     def scanTV(self, path, shows=[], force=REAL_SETTINGS.getSettingBool('Scraper_Force_TV')):
         paths = [item['file'] for item in shows if item.get('file')]
+        print('scanTV',paths)
         for item in self.getDirectory(path):
-            if   self.monitor.waitForAbort(0.1): break
-            elif self.chkPlaying(): return False
+            if self.monitor.waitForAbort(0.1) or self.chkPlaying(): return False
             elif not item.get('file') in paths or force:
                 self.log('scanTV, [%s] %s'%(item['label'],'Updating Meta...' if force else 'Scraping Meta!'))
                 self.scrapeDirectory(item.get('file'))
-            return True
+        return True
 
 
     def scanMovies(self, path, movies=[], force=REAL_SETTINGS.getSettingBool('Scraper_Force_Movies')):
         paths = [os.path.split(item['file'])[0] for item in movies if item.get('file')]
+        print('scanMovies',paths)
         for item in self.getDirectory(path):
-            if   self.monitor.waitForAbort(0.1): break
-            elif self.chkPlaying(): return False
+            if self.monitor.waitForAbort(0.1) or self.chkPlaying(): return False
             elif not item.get('file') in paths or force:
                 self.log('scanMovies, [%s] %s'%(item['label'],'Updating Meta...' if force else 'Scraping Meta!'))
                 self.scrapeDirectory(item.get('file'))
-            return True
+        return True
+
 
     def scrapeDirectory(self, path, show=REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')):
         self.log('scrapeDirectory, scraping [%s]'%(path))

@@ -1,0 +1,130 @@
+# Kodi Media Center language file
+# Addon Name: Kodi Android Installer
+# Addon id: script.kodi.android.update
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: script.kodi.android.update\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2025-09-14 09:29+0000\n"
+"Last-Translator: Aindriú Mac Giolla Eoin <aindriu80@gmail.com>\n"
+"Language-Team: Irish <https://kodi.weblate.cloud/projects/kodi-add-ons-scripts/script-kodi-android-update/ga/>\n"
+"Language: ga\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4;\n"
+"X-Generator: Weblate 5.13.3\n"
+
+msgctxt "Addon Summary"
+msgid "Download and Install Kodi packages."
+msgstr "Íoslódáil agus Suiteáil pacáistí Kodi."
+
+msgctxt "Addon Description"
+msgid "Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds."
+msgstr "Íoslódáil agus Suiteáil pacáistí Kodi do Android; roghnaigh ó  Nightlies, Releases, Snapshots agus Test-builds."
+
+msgctxt "#30000"
+msgid "Enable Debugging [Log errors]"
+msgstr "Cumasaigh Dífhabhtú [Earráidí Logála]"
+
+msgctxt "#30001"
+msgid "Something went wrong, Try again later..."
+msgstr "Chuaigh rud éigin mícheart, déan iarracht arís ar ball..."
+
+msgctxt "#30002"
+msgid "Preparing to download: %s"
+msgstr "Ag ullmhú le híoslódáil: %s"
+
+msgctxt "#30003"
+msgid "Keep all downloads?"
+msgstr "Coinnigh gach íoslódáil?"
+
+msgctxt "#30004"
+msgid "File already exists"
+msgstr "Tá an comhad ann cheana féin"
+
+msgctxt "#30005"
+msgid "Install"
+msgstr "Suiteáil"
+
+msgctxt "#30006"
+msgid "Redownload"
+msgstr "Ath-íoslódáil"
+
+msgctxt "#30007"
+msgid "Installation complete, file removed"
+msgstr "Suiteáil críochnaithe, comhad bainte"
+
+msgctxt "#30008"
+msgid "Cleanup download after installation"
+msgstr "Íoslódáil glanadh tar éis a shuiteáil"
+
+msgctxt "#30009"
+msgid "Plugin disabled"
+msgstr "Breiseán díchumasaithe"
+
+msgctxt "#30010"
+msgid "Unknown Android version"
+msgstr "Leagan anaithnid Android"
+
+msgctxt "#30011"
+msgid "Android v.%s.0.0 is incompatible with new Kodi versions,"
+msgstr "Níl Android v.%s.0.0 comhoiriúnach le leaganacha nua Kodi,"
+
+msgctxt "#30012"
+msgid "Would you like to disable this plugin?"
+msgstr "Ar mhaith leat an breiseán seo a dhíchumasú?"
+
+msgctxt "#30013"
+msgid "Detecting Android version..."
+msgstr "Ag braith leagan Android..."
+
+msgctxt "#30014"
+msgid "Current Android platform (%s)"
+msgstr "Ardán reatha Android (%s)"
+
+msgctxt "#30015"
+msgid "Semi-stable (Monthly builds)."
+msgstr "Leathchobhsaí (Tógálacha míosúla)."
+
+msgctxt "#30016"
+msgid "Stable (Final releases)."
+msgstr "Cobhsaí (Eisiúintí deiridh)."
+
+msgctxt "#30017"
+msgid "Unstable (Daily builds)."
+msgstr "Éagobhsaí (Tógálacha laethúla)."
+
+msgctxt "#30018"
+msgid "Experimental (Debugging builds)."
+msgstr "Turgnamhach (Tógálacha dífhabhtaithe)."
+
+msgctxt "#30019"
+msgid "Incompatible platform"
+msgstr "Ardán neamh-chomhoiriúnach"
+
+msgctxt "#30020"
+msgid "Select File Explorer"
+msgstr "Roghnaigh Taiscéalaí Comhad"
+
+msgctxt "#30021"
+msgid "File Explorer"
+msgstr "Taiscéalaí Comhad"
+
+msgctxt "#30022"
+msgid "Current Kodi Branch (%s.%s-%s)"
+msgstr "Brainse reatha Kodi (%s.%s-%s)"
+
+msgctxt "#30023"
+msgid "[B]Downloading:[/B]"
+msgstr "[B]Ag íoslódáil:[/B]"
+
+msgctxt "#30024"
+msgid " | [B]Speed:[/B]"
+msgstr " | [B]Luas:[/B]"
+
+msgctxt "#30025"
+msgid " | [B]ETA:[/B]"
+msgstr " | [B]EAST:[/B]"

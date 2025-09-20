@@ -1,0 +1,178 @@
+# Kodi Media Center language file
+# Addon Name: Channels DVR
+# Addon id: plugin.video.channelsdvr
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: plugin.video.channelsdvr\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2025-09-14 09:29+0000\n"
+"Last-Translator: Aindriú Mac Giolla Eoin <aindriu80@gmail.com>\n"
+"Language-Team: Irish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-channelsdvr/ga/>\n"
+"Language: ga\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4;\n"
+"X-Generator: Weblate 5.13.3\n"
+
+msgctxt "Addon Summary"
+msgid "Live TV, everywhere"
+msgstr "Teilifís bheo, i ngach áit"
+
+msgctxt "Addon Description"
+msgid "Watch your favorite programs on Kodi. Channels delivers a unified experience across all your TVs, devices, and streaming platforms."
+msgstr "Féach ar do chláir is fearr leat ar Kodi. Soláthraíonn Channels eispéireas aontaithe ar fud do theilifíseáin, do ghléasanna agus d’ardáin sruthú go léir."
+
+msgctxt "#30000"
+msgid "Enable Debugging [Log errors]"
+msgstr "Cumasaigh Dífhabhtú [Earráidí Logála]"
+
+msgctxt "#30001"
+msgid "Something went wrong, Please check settings and try again..."
+msgstr "Chuaigh rud éigin mícheart, seiceáil na socruithe agus déan iarracht arís..."
+
+msgctxt "#30002"
+msgid "Live"
+msgstr "Beo"
+
+msgctxt "#30003"
+msgid "Lineup"
+msgstr "Sceideal"
+
+msgctxt "#30004"
+msgid "Enable M3U/XMLTV Generator Service"
+msgstr "Cumasaigh Seirbhís Gineadóra M3U/XMLTV"
+
+msgctxt "#30005"
+msgid "M3U/XMLTV Path"
+msgstr "Cosán M3U/XMLTV"
+
+msgctxt "#30006"
+msgid "Use MPEG Video Streams"
+msgstr "Úsáid Sruthanna Físe MPEG"
+
+msgctxt "#30007"
+msgid "%s Updating..."
+msgstr "%s Ag Nuashonrú..."
+
+msgctxt "#30008"
+msgid "General"
+msgstr "Ginearálta"
+
+msgctxt "#30009"
+msgid "Enter Channels DVR Server IP"
+msgstr "Cuir isteach IP Freastalaí DVR na gCainéal"
+
+msgctxt "#30010"
+msgid "Enter Channels DVR Server Port"
+msgstr "Cuir isteach Port Freastalaí DVR Cainéil"
+
+msgctxt "#30011"
+msgid "Allow this plugin to automatically configure IPTV Simple PVR Backend?"
+msgstr "An bhfuil cead agat an breiseán seo a úsáid chun Backend Simple PVR IPTV a chumrú go huathoibríoch?"
+
+msgctxt "#30012"
+msgid "Coming Up Later..."
+msgstr "Ag Teacht Aníos Níos Déanaí..."
+
+msgctxt "#30013"
+msgid "Search"
+msgstr "Cuardaigh"
+
+msgctxt "#30014"
+msgid "Enter Search Term"
+msgstr "Cuir isteach Téarma Cuardaigh"
+
+msgctxt "#30015"
+msgid "Recordings"
+msgstr "Taifeadtaí"
+
+msgctxt "#30016"
+msgid "Build Only Favorites"
+msgstr "Tógáil Amháin Rogha"
+
+msgctxt "#30017"
+msgid "Live (Favorites)"
+msgstr "Beo (Ceanáin)"
+
+msgctxt "#30018"
+msgid "Use Direct stream"
+msgstr "Úsáid sruth díreach"
+
+msgctxt "#30019"
+msgid "PseudoTV Live Supported through Recommended Services"
+msgstr "Tacaítear le PseudoTV Beo trí Sheirbhísí Molta"
+
+msgctxt "#30020"
+msgid "Enable Timeshift"
+msgstr "Cumasaigh Aistriú Ama"
+
+msgctxt "#30021"
+msgid "Reconfigure %s for use with %s"
+msgstr "Athchumraigh %s le húsáid le %s"
+
+msgctxt "#30022"
+msgid "Complete"
+msgstr "Críochnaithe"
+
+msgctxt "#30023"
+msgid "%s not found, Please Install"
+msgstr "%s gan aimsiú, Suiteáil le do thoil"
+
+msgctxt "#30024"
+msgid "Sources"
+msgstr "Foinsí"
+
+msgctxt "#49000"
+msgid "Integration"
+msgstr "Comhtháthú"
+
+msgctxt "#49001"
+msgid "Install PseudoTV Live add-on"
+msgstr "Suiteáil breiseán PseudoTV Live"
+
+msgctxt "#49002"
+msgid "Install IPTV Manager add-on"
+msgstr "Suiteáil breiseán Bainisteoir IPTV"
+
+msgctxt "#49003"
+msgid "Enable IPTV Manager integration"
+msgstr "Cumasaigh comhtháthú Bainisteoir IPTV"
+
+msgctxt "#49004"
+msgid "IPTV Manager settings…"
+msgstr "Socruithe Bainisteoir IPTV…"
+
+msgctxt "#49005"
+msgid "PseudoTV Live settings…"
+msgstr "Socruithe PseudoTV Live…"
+
+msgctxt "#49006"
+msgid "Only add Favorites"
+msgstr "Cuir Rogha amháin leis"
+
+msgctxt "#49007"
+msgid "%s added to Favorites"
+msgstr "%s curtha le Ceanáin"
+
+msgctxt "#49008"
+msgid "%s removed from Favorites"
+msgstr "%s bainte as na Ceanáin"
+
+msgctxt "#49009"
+msgid "Add Channel to Favorites"
+msgstr "Cuir Cainéal le Ceanáin"
+
+msgctxt "#49010"
+msgid "Remove Channel from Favorites"
+msgstr "Bain Cainéal ó na Rogha is Fearr liom"
+
+msgctxt "#49011"
+msgid "Live (Favorites)"
+msgstr "Beo (Ceanáin)"
+
+msgctxt "#49012"
+msgid "Favorites"
+msgstr "Ceanáin"

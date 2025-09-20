@@ -1,0 +1,90 @@
+# Playon Browser Media Center language file
+# Addon Name: Playon Browser
+# Addon id: plugin.video.playonbrowser
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: plugin.video.playonbrowser Addons\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2025-09-14 09:29+0000\n"
+"Last-Translator: Aindriú Mac Giolla Eoin <aindriu80@gmail.com>\n"
+"Language-Team: Irish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-playonbrowser/ga/>\n"
+"Language: ga\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4;\n"
+"X-Generator: Weblate 5.13.3\n"
+
+msgctxt "Addon Summary"
+msgid "Browse PlayOn from Kodi."
+msgstr "Brabhsáil PlayOn ó Kodi."
+
+msgctxt "Addon Description"
+msgid "PlayOn is a streaming media brand and software suite that enables users to view and record videos from numerous online content providers."
+msgstr "Is branda meán sruthú agus sraith bogearraí é PlayOn a chuireann ar chumas úsáideoirí físeáin a fheiceáil agus a thaifeadadh ó go leor soláthraithe ábhair ar líne."
+
+msgctxt "Addon Disclaimer"
+msgid "Requires Playon Server Software"
+msgstr "Éilíonn Bogearraí Freastalaí Playon"
+
+msgctxt "#30000"
+msgid "Enable Debugging [Log errors]"
+msgstr "Cumasaigh Dífhabhtú [Earráidí Logála]"
+
+msgctxt "#30001"
+msgid "Navigate to m.playon.tv in a browser to get the resolved IP."
+msgstr "Téigh chuig m.playon.tv i mbrabhsálaí chun an seoladh IP réitithe a fháil."
+
+msgctxt "#30002"
+msgid "Playon IP:Port"
+msgstr "Playon IP:Port"
+
+msgctxt "#30003"
+msgid "Preferred Playback Method"
+msgstr "Modh Athsheinm is Fearr"
+
+msgctxt "#30004"
+msgid "UPNP Server"
+msgstr "Freastalaí UPNP"
+
+msgctxt "#30005"
+msgid ""
+msgstr " "
+
+msgctxt "#30010"
+msgid "Something went wrong, Try again..."
+msgstr "Chuaigh rud éigin mícheart, déan iarracht arís..."
+
+msgctxt "#30011"
+msgid "Connect to PlayOn: %s"
+msgstr "Ceangail le PlayOn: %s"
+
+msgctxt "#30012"
+msgid "Please Check Playon Server and IP:Port settings."
+msgstr "Seiceáil socruithe Freastalaí Playon agus IP:Port le do thoil."
+
+msgctxt "#30013"
+msgid "Found Playon UPNP Server"
+msgstr "Aimsíodh Freastalaí UPNP Playon"
+
+msgctxt "#30014"
+msgid "Navigate to UPNP, locate Playon Server"
+msgstr "Téigh go UPNP, aimsigh Freastalaí Playon"
+
+msgctxt "#30015"
+msgid "Kodi UPNP Enabled"
+msgstr "Cumasaithe UPNP Kodi"
+
+msgctxt "#30016"
+msgid "Enter Search Term"
+msgstr "Cuir isteach Téarma Cuardaigh"
+
+msgctxt "#30017"
+msgid "Add to PlayLater"
+msgstr "Cuir le Seinn Níos Déanaí"
+
+msgctxt "#30018"
+msgid "General"
+msgstr "Ginearálta"

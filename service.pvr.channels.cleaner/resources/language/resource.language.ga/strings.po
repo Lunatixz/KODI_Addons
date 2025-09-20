@@ -1,0 +1,113 @@
+# XBMC Media Center language file
+# Addon Name: OnIdle Service
+# Addon id: service.onidle
+# Addon Provider: Lunatixz
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2025-09-14 09:29+0000\n"
+"Last-Translator: Aindriú Mac Giolla Eoin <aindriu80@gmail.com>\n"
+"Language-Team: Irish <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-pvr-channels-cleaner/ga/>\n"
+"Language: ga\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4;\n"
+"X-Generator: Weblate 5.13.3\n"
+
+msgctxt "Addon Summary"
+msgid "Clean ChannelsDVR PVR Buffer"
+msgstr "Maolán Glan-Chainéal DVR PVR"
+
+msgctxt "Addon Description"
+msgid "Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!"
+msgstr "Mura ndéantar seiceáil ar an tseirbhís, is féidir le cúltaca ChannelsPVR stóras a úsáid le maoláin teilifíse beo atá fágtha. Glanann an tseirbhís seo na maoláin neamhghníomhacha go léir!"
+
+msgctxt "Addon Disclaimer"
+msgid "For Personal use; not meant for general use"
+msgstr "Le húsáid phearsanta; níl sé beartaithe le haghaidh úsáide ginearálta"
+
+msgctxt "#32001"
+msgid "Enable Debugging"
+msgstr "Cumasaigh Dífhabhtú"
+
+msgctxt "#32002"
+msgid "Idle Action"
+msgstr "Gníomh Díomhaoin"
+
+msgctxt "#32003"
+msgid "Idle Timer (Minutes)"
+msgstr "Amaire Díomhaoin (Nóiméid)"
+
+msgctxt "#32004"
+msgid "Idle Countdown (Seconds)"
+msgstr "Comhaireamh Síos Díomhaoin (Soicindí)"
+
+msgctxt "#32005"
+msgid "Ignore When Playing Music"
+msgstr "Déan neamhaird de nuair a bhíonn ceol á sheinm agat"
+
+msgctxt "#32006"
+msgid "User Defined"
+msgstr "Sainmhínithe ag an Úsáideoir"
+
+msgctxt "#32007"
+msgid "CEC Shutdown"
+msgstr "Dúnadh CEC"
+
+msgctxt "#32008"
+msgid "CEC Standby"
+msgstr "CEC Fuireachas"
+
+msgctxt "#32009"
+msgid "Hibernate"
+msgstr "Suanaigh"
+
+msgctxt "#32010"
+msgid "Suspend"
+msgstr "Cuir ar fionraí"
+
+msgctxt "#32011"
+msgid "Shutdown"
+msgstr "Múchadh"
+
+msgctxt "#32012"
+msgid "Quit"
+msgstr "Scoir"
+
+msgctxt "#32013"
+msgid "Activate Screensaver"
+msgstr "Gníomhachtaigh an Sábhálaí Scáileáin"
+
+msgctxt "#32014"
+msgid "Visit 'https://kodi.wiki/view/List_of_built-in_functions' for details"
+msgstr "Tabhair cuairt ar 'https://kodi.wiki/view/List_of_built-in_functions' le haghaidh sonraí"
+
+msgctxt "#32015"
+msgid "Enter built-in function"
+msgstr "Cuir isteach feidhm ionsuite"
+
+msgctxt "#32016"
+msgid "Enable Soft Mute"
+msgstr "Cumasaigh Tost Bog"
+
+msgctxt "#32017"
+msgid "Idle Countdown"
+msgstr "Comhaireamh Síos Díomhaoin"
+
+msgctxt "#32018"
+msgid "Cancel to continue watching"
+msgstr "Cealaigh le leanúint ar aghaidh ag breathnú"
+
+msgctxt "#32019"
+msgid "Sleeping in %s seconds"
+msgstr "Codladh i %s soicind"
+
+msgctxt "#32020"
+msgid "Run Manually"
+msgstr "Rith de Láimh"
+
+msgctxt "#32021"
+msgid "Test Action"
+msgstr "Gníomh Tástála"

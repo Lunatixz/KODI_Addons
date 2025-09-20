@@ -25,6 +25,7 @@
         <summary lang="fr_FR">Créer un économiseur d&apos;écran à partir de n&apos;importe quelle source vidéo Kodi.</summary>
         <summary lang="hr_HR">Stvori čuvara zaslona iz Kodi video izvora.</summary>
         <summary lang="it_IT">Crea un salvaschermo da qualsiasi sorgente video Kodi.</summary>
+        <summary lang="sv_SE">Skapa en skärmsläckare från valfri Kodi-videokälla.</summary>
         <summary lang="zh_CN">从任意 Kodi 视频源创建屏幕保护程序。</summary>
         <description lang="da_DK">Dynamisk pauseskærm der benytter lokalt indhold, smarte playlister, plugins og UPNP-servere.</description>
         <description lang="de_DE">Dynamischer Bildschirmschoner mit lokalen Inhalten, SmartPlaylists, Plugins und UPnP-Servern.</description>
@@ -33,6 +34,7 @@
         <description lang="fi_FI">Dynaaminen näytönsäästäjä, joka hyödyntää paikallista sisältöä, älytoistolistoja, lisäosia sekä UPnP-palvelimia.</description>
         <description lang="fr_FR">Économiseur d&apos;écran dynamique utilisant le contenu local, les SmartPlaylists, les plugins et les serveurs UPNP.</description>
         <description lang="hr_HR">Promjenjivi čuvar zaslona koji koristi lokalni sadržaj, pametne popise izvođrnja, dodatke i UPNP poslužitelje.</description>
+        <description lang="sv_SE">Dynamisk skärmsläckare med hjälp av lokalt innehåll, smarta spellistor, tillägg och UPNP-servrar.</description>
         <description lang="uk_UA">Динамічна заставка з локальних файлів, списків SmartPlaylists, плагінів чи серверів UPNP.</description>
         <description lang="zh_CN">使用本地内容、智能播放列表、插件和 UPNP 服务器的动态屏幕保护程序。</description>
         <disclaimer lang="da_DK">Streamingkilder anbefales ikke til forbrugsbetalt internet.</disclaimer>
@@ -42,6 +44,7 @@
         <disclaimer lang="fi_FI">Suoratoistolähteitä ei suositella tiedonsiirtomäärän mukaan veloitettavilla yhteyksillä.</disclaimer>
         <disclaimer lang="fr_FR">Les sources de streaming ne sont pas recommandées pour Internet contrôlé.</disclaimer>
         <disclaimer lang="hr_HR">Izvori strujanja nisu preporučeni s mrežama ograničenim podacima.</disclaimer>
+        <disclaimer lang="sv_SE">Strömningskällor rekommenderas inte för internetanslutning med kostnad.</disclaimer>
         <disclaimer lang="zh_CN">流媒体源不建议通过互联网。</disclaimer>
     </extension>
 </addon>

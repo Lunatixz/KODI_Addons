@@ -22,8 +22,9 @@ from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
 try:    from simplecache             import SimpleCache
 except: from simplecache.simplecache import SimpleCache #pycharm stub
 
-from functools  import wraps
-from contextlib import contextmanager, closing
+from functools   import wraps
+from contextlib  import contextmanager, closing
+from collections import defaultdict
 
 # Plugin Info
 ADDON_ID            = 'service.kodi.powertoys'
@@ -81,6 +82,13 @@ def isScanning():
 def isPlaying():
     return (xbmc.getCondVisibility('Player.Playing') or False)
 
+def matchItems(items, key='label', matches=defaultdict(list)):
+    [matches[item[key]].append(item) for item in items if key in item]
+    return [match for match in matches.values() if len(match) > 1]
+    
+def matchItem(match, items=[], key='file'):
+    return [item for item in items if item.get(key) == match]
+    
 class Monitor(xbmc.Monitor):
     def __init__(self):
         xbmc.Monitor.__init__(self)
@@ -118,20 +126,18 @@ class Service(object):
                 ## Start ##
                 if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not isScanning():
                     with self._run(self.runScraper,REAL_SETTINGS.getSettingInt('Scraper_Interval')): pass
-                if REAL_SETTINGS.getSettingBool('Duplicate_Enabled') and not isScanning():
-                    with self._run(self.runDuplicate,REAL_SETTINGS.getSettingInt('Duplicate_Interval')): pass
                 ## END ##
                 self.running = False
             return wait
 
     
     @contextmanager
-    def _run(self, func, runevery=900, nextrun=None):
+    def _run(self, func, runevery=900, nextrun=None, *args, **kwargs):
         if nextrun is None: nextrun = int(xbmcgui.Window(10000).getProperty(func.__name__) or "0") # nextrun == 0 => force run
         epoch = int(time.time())
         if epoch >= nextrun:
             try: 
-                finished = func()
+                finished = func(*args, **kwargs)
                 self.log('_run, func = %s, last run %s, finished = %s' % (func.__name__, epoch - nextrun, finished))
                 yield
             finally:
@@ -164,6 +170,11 @@ class Service(object):
            
            
     # @cacheit()
+    def getEpisodes(self, tvshowid):
+        return self.sendJSON({"method":"VideoLibrary.GetEpisodes","params":{"tvshowid":tvshowid,"properties":["file"]}}).get('result',{}).get('episodes', [])
+        
+        
+    # @cacheit()
     def getMovies(self):
         return self.sendJSON({"method":"VideoLibrary.GetMovies","params":{"properties":["file"]}}).get('result',{}).get('movies', [])
 
@@ -182,30 +193,74 @@ class Service(object):
             self.notification(LANGUAGE(32009))
 
 
-    def runDuplicate(self):
-        try: return True
+    def _cleanEpisodes(self, matches, master=None):
+        print('_cleanEpisodes',matches)
+        try:
+            def __clean(episodes):
+                print('__clean',episodes)
+                for idx, ep in enumerate(episodes):
+                    if xbmcvfs.exists(ep.get('file')):
+                        master = episodes.pop(idx)
+                        break
+                        
+                if master is None: return self.log('__clean, all duplicate files do not exist!')#all episodes found don't exist? todo user prompt to remove?
+                for episode in episodes:
+                    if master.get('label') == episode.get('label') and master.get('episodeid',-1) != episode.get('episodeid'):
+                        if not xbmcvfs.exists(episode.get('file')) or master.get('file','-1') == episode.get('file'): #duplicate library entry
+                            if self.sendJSON({"method":"VideoLibrary.RemoveEpisode","params":{"episodeid":episode.get('episodeid')}}).get('result') == "OK":
+                                self.log('_cleanEpisodes, removed duplicate %s'%(episode.get('file')))
+                                if self.monitor.waitForAbort(REAL_SETTINGS.getSettingInt('Start_Delay')): break
+                        elif master.get('file','-1') != episode.get('file'): #duplicate file found
+                            self.log('__clean, found duplicate physical file [%s] exists [%s]'%(episode.get('file'),xbmcvfs.exists(episode.get('file')))) #todo prompt user to delete? for now cache values
+                                
+            [__clean(match) for match in matches if len(match) > 1]
+            self.log('_cleanEpisodes, finished!')
+            return True
         except Exception as e:
-            self.log('runDuplicate, Scan failed! %s'%(e), xbmc.LOGERROR)
+            self.log('_cleanEpisodes, failed! %s'%(e), xbmc.LOGERROR)
             self.notification(LANGUAGE(32009))
 
 
     def scanTV(self, path, shows=[], force=REAL_SETTINGS.getSettingBool('Scraper_Force_TV')):
-        paths = [item['file'] for item in shows if item.get('file')]
-        print('scanTV',paths)
+        paths = dict([(item['file'],item) for item in shows if item.get('file')])
         for item in self.getDirectory(path):
             if self.monitor.waitForAbort(0.1) or self.chkPlaying(): return False
             elif not item.get('file') in paths or force:
+                if REAL_SETTINGS.getSettingBool('Duplicate_Enabled'): self._cleanEpisodes(matchItems(self.getEpisodes(paths[item.get('file')].get('tvshowid',-1))))
                 self.log('scanTV, [%s] %s'%(item['label'],'Updating Meta...' if force else 'Scraping Meta!'))
                 self.scrapeDirectory(item.get('file'))
         return True
 
 
+    def _cleanMovies(self, movies, master=None):
+        print('__clean',movies)
+        try:
+            for idx, mv in enumerate(movies):
+                if xbmcvfs.exists(mv.get('file')):
+                    master = movies.pop(idx)
+                    break
+            if master is None: return self.log('__clean, all duplicate files do not exist!')#all episodes found don't exist? todo user prompt to remove?
+            for movie in movies:
+                if master.get('label') == movie.get('label') and master.get('movieid',-1) != movie.get('movieid'):
+                    if not xbmcvfs.exists(movie.get('file')) or master.get('file','-1') == movie.get('file'):
+                        if self.sendJSON({"method":"VideoLibrary.RemoveMovie","params":{"movieid":movie.get('movieid')}}).get('result') == "OK":
+                            self.log('_cleanMovies, removed duplicate %s'%(movie.get('file')))
+                            if self.monitor.waitForAbort(REAL_SETTINGS.getSettingInt('Start_Delay')): break
+                    elif master.get('file','-1') != movie.get('file'): #duplicate file found
+                        self.log('__clean, found duplicate physical file [%s] exists [%s]'%(movie.get('file'),xbmcvfs.exists(movie.get('file')))) #todo prompt user to delete? for now cache values
+            self.log('_cleanMovies, finished!')
+            return True
+        except Exception as e:
+            self.log('_cleanMovies, failed! %s'%(e), xbmc.LOGERROR)
+            self.notification(LANGUAGE(32009))
+
+
     def scanMovies(self, path, movies=[], force=REAL_SETTINGS.getSettingBool('Scraper_Force_Movies')):
-        paths = [os.path.split(item['file'])[0] for item in movies if item.get('file')]
-        print('scanMovies',paths)
+        paths = dict([(os.path.split(item['file'])[0],item) for item in movies if item.get('file')])
         for item in self.getDirectory(path):
             if self.monitor.waitForAbort(0.1) or self.chkPlaying(): return False
-            elif not item.get('file') in paths or force:
+            elif not item.get('file') in list(paths.keys()) or force: 
+                if REAL_SETTINGS.getSettingBool('Duplicate_Enabled'): self._cleanMovies(matchItem(item.get('file'),movies,'file'))
                 self.log('scanMovies, [%s] %s'%(item['label'],'Updating Meta...' if force else 'Scraping Meta!'))
                 self.scrapeDirectory(item.get('file'))
         return True

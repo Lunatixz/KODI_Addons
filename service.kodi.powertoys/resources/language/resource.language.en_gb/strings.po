@@ -79,6 +79,3 @@ msgstr ""
 msgctxt "#32012"
 msgid "Remove duplicate library entries"
 msgstr ""
-
-
-

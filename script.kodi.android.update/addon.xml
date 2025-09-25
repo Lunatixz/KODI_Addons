@@ -39,6 +39,7 @@
         <summary lang="pl_PL">Pobieraj i instaluj pakiety Kodi.</summary>
         <summary lang="pt_BR">Baixe e instale pacotes Kodi.</summary>
         <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
+        <summary lang="sv_SE">Hämta och installera Kodi-paket.</summary>
         <summary lang="zh_CN">下载并安装 Kodi 软件包。</summary>
         <description lang="cs_CZ">Stáhnout a nainstalovat Kodi android balíčky; vyberte z  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="da_DK">Download og installer Android eksekverbare filer til Kodi; vælg fra Nightlies, Udgivelser, Snapshots og Test-builds.</description>
@@ -55,6 +56,7 @@
         <description lang="pl_PL">Pobieraj i instaluj pliki wykonywalne Kodi: kompilacje nocne, testowe, wydania finalne, migawki.</description>
         <description lang="pt_BR">Baixe e instale pacotes Android Kodi; selecione entre · · Nightlies, Releases, Snapshots e Test-builds.</description>
         <description lang="ru_RU">Скачивание и установка Kodi пакетов для Android; выбор из  Ночных, Релизных, Тестовых сборок и Снапшотов.</description>
+        <description lang="sv_SE">Hämta och installera Kodi-paket för Android; välj från  Nightlies, Releases, Snapshots och Test-byggen.</description>
         <description lang="zh_CN">下载并安装 Kodi android 软件包。从 Nightlies、Releases、Snapshots 和 Test-builds 中选择。</description>
     </extension>
 </addon>

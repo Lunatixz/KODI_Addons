@@ -42,6 +42,7 @@
         <summary lang="en_GB">Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus</summary>
         <summary lang="es_ES">Integrar los canales IPTV de otros complementos en los menús de TV y Radio de Kodi</summary>
         <summary lang="es_MX">Integra canales IPTV de otros complementos en los menús de TV y Radio de Kodi</summary>
+        <summary lang="et_EE">Integreeri IPTV kanaleid teistest lisamoodulitest Kodi TV ja raadio menüüdesse</summary>
         <summary lang="fi_FI">Lisää muiden lisäosien IPTV-kanavat Kodin televisio- ja radiovalikoihin</summary>
         <summary lang="fr_FR">Intégrer les chaines IPTV d&apos;autres extensions dans les menus Radio et TV de Kodi</summary>
         <summary lang="hr_HR">Integriraj IPTV programe s drugih dodataka u Kodi TV i Radio izbornicima</summary>
@@ -52,6 +53,7 @@
         <summary lang="pl_PL">Zintegruj kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio</summary>
         <summary lang="pt_BR">Integre canais de IPTV de outros complementos nos menus Kodi TV e Radio</summary>
         <summary lang="ru_RU">Интеграция IPTV каналов из других дополнений в Kodi PVR</summary>
+        <summary lang="sv_SE">Integrera IPTV-kanaler från andra tillägg i Kodi TV- och radiomenyerna</summary>
         <summary lang="zh_CN">在KODI电视和电台菜单中集成来自其他插件的IPTV频道</summary>
         <description lang="cs_CZ">IPTV Manager integruje IPTV kanály z jiných doplňků do nabídky Kodi TV a Rádio.</description>
         <description lang="da_DK">IPTV Manager integrerer IPTV-kanaler fra andre add-ons i Kodi tv- og radio-menuerne.</description>
@@ -70,6 +72,7 @@
         <description lang="pl_PL">IPTV Manager integruje kanały IPTV z innych dodatków w menu Kodi Telewizja i Radio.</description>
         <description lang="pt_BR">O IPTV Manager integra canais de IPTV de outros complementos nos menus Kodi TV e Radio.</description>
         <description lang="ru_RU">Это дополнение интегрирует IPTV каналы из других дополнений в Kodi PVR.</description>
+        <description lang="sv_SE">IPTV Manager integrerar IPTV-kanaler från andra tillägg i Kodi TV- och radiomenyerna.</description>
         <description lang="zh_CN">IPTV管理器可以在KODI电视和电台菜单中集成来自其他插件的IPTV频道。</description>
     </extension>
 </addon>

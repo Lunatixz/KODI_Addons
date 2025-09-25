@@ -37,11 +37,11 @@ msgid "Scrape/Update Meta Library"
 msgstr ""
 
 msgctxt "#32002"
-msgid "Start Delay/Service Interval"
+msgid "Start Delay/Service Interval (Seconds)"
 msgstr ""
 
 msgctxt "#32003"
-msgid "Run Interval"
+msgid "Run Interval (Hours)"
 msgstr ""
 
 msgctxt "#32004"

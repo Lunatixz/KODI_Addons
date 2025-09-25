@@ -7,7 +7,7 @@
     <setting id="Scraper_Enabled" type="bool" label="32010" default="false" />
     <setting id="Duplicate_Enabled" type="bool" label="32012" default="false" />
     <setting id="Scraper_Show_Dialog" type="bool" label="32004" default="true" />
-    <setting id="Scraper_Interval" type="number" label="32003" default="3600" />
+    <setting id="Scraper_Interval_HRS" type="number" label="32003" default="12" />
     <setting id="Scraper_TV_Folder" type="folder" label="32007"  source="video" option="writeable" default="" />
     <setting id="Scraper_Force_TV" type="bool" label="32005" default="false" />
     <setting id="Scraper_Movie_Folder" type="folder" label="32008"  source="video" option="writeable" default=""/>

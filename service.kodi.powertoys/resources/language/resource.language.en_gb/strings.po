@@ -87,6 +87,3 @@ msgstr ""
 msgctxt "#32014"
 msgid "Only Run when Idle"
 msgstr ""
-
-
-

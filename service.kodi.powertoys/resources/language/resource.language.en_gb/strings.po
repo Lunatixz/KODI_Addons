@@ -33,7 +33,7 @@ msgid "Enable Debugging"
 msgstr ""
 
 msgctxt "#32001"
-msgid "Scrape/Update Meta Library"
+msgid "Kodi Library"
 msgstr ""
 
 msgctxt "#32002"
@@ -41,7 +41,7 @@ msgid "Start Delay/Service Interval (Seconds)"
 msgstr ""
 
 msgctxt "#32003"
-msgid "Run Interval (Hours)"
+msgid "Scraper Interval (Hours)"
 msgstr ""
 
 msgctxt "#32004"
@@ -49,11 +49,11 @@ msgid "Show Dialog"
 msgstr ""
 
 msgctxt "#32005"
-msgid "Force Silent TV Updates"
+msgid "Enable Refresh"
 msgstr ""
 
 msgctxt "#32006"
-msgid "Force Silent Movie Updates"
+msgid "Refresh Interval (Hours)"
 msgstr ""
 
 msgctxt "#32007"
@@ -79,3 +79,14 @@ msgstr ""
 msgctxt "#32012"
 msgid "Remove duplicate library entries"
 msgstr ""
+
+msgctxt "#32013"
+msgid "Include NFO Meta"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Only Run when Idle"
+msgstr ""
+
+
+

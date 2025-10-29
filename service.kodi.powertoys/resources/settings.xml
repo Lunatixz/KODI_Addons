@@ -2,14 +2,16 @@
 <settings>
     <setting id="Enable_Debugging" type="bool" label="32000" default="false" />
     <setting id="Run_Playing" type="bool" label="32011" default="false" />
-    <setting id="Start_Delay" type="number" label="32002" default="30" />
+    <setting id="Run_Idling" type="bool" label="32014" default="true" />
+    <setting id="Start_Delay" type="number" label="32002" default="15" />
 	<setting label="32001" type="lsep"/>
     <setting id="Scraper_Enabled" type="bool" label="32010" default="false" />
-    <setting id="Duplicate_Enabled" type="bool" label="32012" default="false" />
-    <setting id="Scraper_Show_Dialog" type="bool" label="32004" default="true" />
-    <setting id="Scraper_Interval_HRS" type="number" label="32003" default="12" />
-    <setting id="Scraper_TV_Folder" type="folder" label="32007"  source="video" option="writeable" default="" />
-    <setting id="Scraper_Force_TV" type="bool" label="32005" default="false" />
-    <setting id="Scraper_Movie_Folder" type="folder" label="32008"  source="video" option="writeable" default=""/>
-    <setting id="Scraper_Force_Movies" type="bool" label="32006" default="false" />
+    <setting id="Scraper_Show_Dialog" type="bool" label="32004" default="true" subsetting="true" />
+    <setting id="Scraper_Interval_DAYS" type="number" label="32003" default="1" subsetting="true" />
+    <setting id="Scraper_TV_Folder" type="folder" label="32007"  source="video" option="writeable" default="" subsetting="true" />
+    <setting id="Scraper_Movie_Folder" type="folder" label="32008"  source="video" option="writeable" default="" subsetting="true" />
+    <setting id="Refresh_Enabled" type="bool" label="32005" default="false" />
+    <setting id="Refresh_Interval_DAYS" type="number" label="32006" default="7" subsetting="true" />
+    <setting id="Refresh_Ignore_NFO" type="bool" label="32013" default="true" subsetting="true" />
+    <setting id="Refresh_Clean" type="bool" label="32012" default="false" />
 </settings>

@@ -16,111 +16,176 @@
 # You should have received a copy of the GNU General Public License
 # along with Kodi PowerToys.  If not, see <http://www.gnu.org/licenses/>.
 # -*- coding: utf-8 -*-
-from globals     import *
-from collections import defaultdict
+from globals            import *
+from collections        import defaultdict
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, TimeoutError
+
+try:
+    import multiprocessing
+    cpu_count   = multiprocessing.cpu_count()
+    ENABLE_POOL = False #True force disable multiproc. until monkeypatch/wrapper to fix pickling error. 
+except:
+    ENABLE_POOL = False
+    cpu_count   = os.cpu_count()
+
+class ExecutorPool:
+    def __init__(self):
+        self.CPUCount = cpu_count
+        if ENABLE_POOL: self.pool = ProcessPoolExecutor
+        else:           self.pool = ThreadPoolExecutor
+        self.log(f"__init__, multiprocessing = {ENABLE_POOL}, CORES = {self.CPUCount}, THREADS = {self._calculate_thread_count()}")
+
+
+    def _calculate_thread_count(self):
+        if ENABLE_POOL: return self.CPUCount
+        else:           return int(os.getenv('THREAD_COUNT', self.CPUCount * 2))
+            
+            
+    def log(self, msg, level=xbmc.LOGDEBUG):
+        return log('%s: %s'%(self.__class__.__name__,msg),level)
+
+
+    def executor(self, func, timeout=None, *args, **kwargs):
+        self.log("executor, func = %s, timeout = %s"%(func.__name__,timeout))
+        with self.pool(self._calculate_thread_count()) as executor:
+            try: return executor.submit(func, *args, **kwargs).result(timeout)
+            except Exception as e: self.log("executor, func = %s failed! %s\nargs = %s, kwargs = %s"%(func.__name__,e,args,kwargs), xbmc.LOGERROR)
+
+
+    def executors(self, func, items=[], *args, **kwargs):
+        self.log("executors, func = %s, items = %s"%(func.__name__,len(items)))
+        with self.pool(self._calculate_thread_count()) as executor:
+            try: return list(executor.map(wrapped_partial(func, *args, **kwargs), items))
+            except Exception as e: self.log("executors, func = %s, items = %s failed! %s\nargs = %s, kwargs = %s"%(func.__name__,len(items),e,args,kwargs), xbmc.LOGERROR)
+
+
+    def generator(self, func, items=[], *args, **kwargs):
+        self.log("generator, items = %s"%(len(items)))
+        try: return [wrapped_partial(func, *args, **kwargs)(i) for i in items]
+        except Exception as e: self.log("generator, func = %s, items = %s failed! %s\nargs = %s, kwargs = %s"%(func.__name__,len(items),e,args,kwargs), xbmc.LOGERROR)
+
 
 class LlNode:
-    def __init__(self, package: tuple, priority: int=0, delay: int=0):
+    def __init__(self, package: tuple, priority: int=0, timer: int=0):
         self.prev      = None
         self.next      = None
         self.package   = package
         self.priority  = priority
-        self.wait      = delay
+        self.time      = timer
 
 
 class CustomQueue:
-    isRunning = False
+    pool = ExecutorPool()
     
-    def __init__(self, fifo: bool=False, lifo: bool=False, priority: bool=False, delay: bool=False, service=None):
-        self.log("__init__, fifo = %s, lifo = %s, priority = %s, delay = %s"%(fifo, lifo, priority, delay))
+    def __init__(self, fifo: bool=False, lifo: bool=False, priority: bool=False, delay: bool=False, timer: bool=False, service=None):
+        self.log("__init__, fifo = %s, lifo = %s, priority = %s, delay = %s, timer = %s"%(fifo, lifo, priority, delay, timer))
+        self.isRunning = False
         self.service   = service
         self.fifo      = fifo
         self.lifo      = lifo
         self.priority  = priority
         self.delay     = delay
+        self.timer     = timer
         self.head      = None
         self.tail      = None
-        self.qsize     = 0
         self.min_heap  = []
+        self.qsize     = 0
+        self.nodes     = set()
         self.itemCount = defaultdict(int)
-        self.popThread = Thread(target=self.__pop)
-
+        self.popThread = Thread(target=self._start)
+        self.executor  = True
+ 
  
     def log(self, msg, level=xbmc.LOGDEBUG):
         return log('%s: %s'%(self.__class__.__name__,msg),level)
 
 
-    def __manage(self, thread, target_function, name, daemon=True):
-        if thread.is_alive():
-            if hasattr(thread, 'cancel'): thread.cancel()
-            try: thread.join()
-            except Exception: pass
+    def _clear(self):
+        self.nodes     = set()
+        self.head      = None
+        self.tail      = None
+        self.min_heap  = []
+        self.itemCount = defaultdict(int)
+
         
-        new_thread = Thread(target=target_function)
-        new_thread.name = name
-        new_thread.daemon = daemon
-        new_thread.start()
-        return new_thread
-        
-        
-    def __start(self):
-        self.log("__starting popThread")
-        self.popThread = self.__manage(self.popThread, self.__pop, "popThread")
+    def _run(self):
+        self.log("_run")
+        if self.popThread.is_alive():
+            if hasattr(self.popThread, 'cancel'): self.popThread.cancel()
+            try: self.popThread.join()
+            except: pass
+        self.popThread = Thread(target=self._start)
+        self.popThread.daemon = True
+        self.popThread.start()
 
 
-    def __run(self, func, *args, **kwargs):
-        self.log(f"__run, func = {func.__name__}")
+    def _wait(self, package):
+        self.log(f"_wait, func = {package[0].__name__}")
+        self._exe(package[0],*package[1],**package[2])
+           
+
+    def _exe(self, func, *args, **kwargs):
+        self.log(f"_exe, func = {func.__name__}, executor = {self.executor}")
         try:
-            thread = Thread(target=func, args=args, kwargs=kwargs)
-            thread.start()
+            if    self.executor: self.pool.executor(func, None, *args, **kwargs)
+            else: Thread(target=func, args=args, kwargs=kwargs).start()
         except Exception as e:
-            self.log(f"__run, func = {func.__name__} failed! {e}\nargs = {args}, kwargs = {kwargs}", xbmc.LOGERROR)
+            self.log(f"_exe, func = {func.__name__} failed! {e}\nargs = {args}, kwargs = {kwargs}", xbmc.LOGERROR)
                
                
-    def __exists(self, priority, package):
-        for idx, item in enumerate(self.min_heap):
-            epriority,_,epackage = item
-            if package == epackage:
-                if priority < epriority:
-                    try:
-                        self.min_heap.pop(idx)
-                        heapq.heapify(self.min_heap)  # Ensure heap property is maintained
-                        self.log("__exists, replacing queue: func = %s, priority %s => %s"%(epackage[0].__name__,epriority,priority))
-                    except: self.log("__exists, replacing queue: func = %s, idx = %s failed!"%(epackage[0].__name__,idx))
-                else: return True
+    def _exists(self, package: tuple, priority: int = 0, timer: int = 0):
+        if priority:
+            for idx, item in enumerate(self.min_heap):
+                epriority,_,epackage = item
+                if package == epackage:
+                    if priority < epriority:
+                        try:
+                            self.min_heap.pop(idx)
+                            heapq.heapify(self.min_heap)  # Ensure heap property is maintained
+                            self.log("_exists, replacing queue: func = %s, priority %s => %s"%(epackage[0].__name__,epriority,priority))
+                        except: self.log("_exists, replacing queue: func = %s, idx = %s failed!"%(epackage[0].__name__,idx))
+                    else: return True
+        elif timer:
+            for idx, func in enumerate(self.nodes):
+                if func == package[0].__name__: return True
+            self.nodes.add(package[0].__name__)
         return False
         
              
-    def _push(self, package: tuple, priority: int = 0, delay: int = 0):
-        node = LlNode(package, priority, delay)
+    def _push(self, package: tuple, priority: int = 0, delay: int = 0, timer: int = 0):
+        if   priority == -1: priority = self.qsize + 1 #lazy FIFO
+        elif delay: #lazy timer
+            if not timer: timer = time.time()
+            timer += delay
+        
         if self.priority:
-            if not self.__exists(priority, package):
+            if not self._exists(package, priority, timer):
                 try:
                     self.qsize += 1
                     self.itemCount[priority] += 1
                     self.log(f"_push, func = {package[0].__name__}, priority = {priority}")
                     heapq.heappush(self.min_heap, (priority, self.itemCount[priority], package))
+                    if not self.isRunning: self._run()
                 except Exception as e:
                     self.log(f"_push, func = {package[0].__name__} failed! {e}", xbmc.LOGFATAL)
         else:
-            if self.head:
-                self.tail.next = node
-                node.prev = self.tail
-                self.tail = node
+            if timer and self._exists(package, priority, timer): print('%s exists'%(package[0].__name__))
             else:
-                self.head = node
-                self.tail = node
-            self.log(f"_push, func = {package[0].__name__}")
+                node = LlNode(package, priority, timer)
+                if self.head:
+                    self.tail.next = node
+                    node.prev = self.tail
+                    self.tail = node
+                else:
+                    self.head = node
+                    self.tail = node
+                self.log(f"_push, func = {package[0].__name__}, timer = {timer}")
+                if not self.isRunning: self._run()
+                
 
-        if not self.isRunning:
-            self.log("_push, starting __pop")
-            self.__start()
-                 
-                 
-    def __process(self, node, fifo=True):
+    def _process(self, node, fifo=True):
         package = node.package
-        self.log(f"process_node, package = {package}")
-        next_node = node.__next__ if fifo else node.prev
+        next_node = node.next if fifo else node.prev
         if next_node: next_node.prev = None if fifo else next_node.prev
         if node.prev: node.prev.next = None if fifo else node.prev
         if fifo: self.head = next_node
@@ -128,68 +193,41 @@ class CustomQueue:
         return package
         
         
-    def __pop(self):
+    def _start(self):
         self.isRunning = True
-        self.log("__pop, starting")
         while not self.service.monitor.abortRequested():
-            if self.service.monitor.waitForAbort(0.0001): 
-                self.log("__pop, waitForAbort")
+            if not self.head and not self.priority:
+                self.log("_start, The queue is empty!")
                 break
-            elif self.service._chkPlaying():
-                self.log("__pop, _chkPlaying")
-                self.service.monitor.waitForAbort(30)
-                continue
-            elif not self.head and not self.priority:
-                self.log("__pop, The queue is empty!")
+            elif self.service.monitor.waitForAbort(0.0001):
+                self.log("_start, waitForAbort!")
                 break
             elif self.priority:
                 if not self.min_heap:
-                    self.log("__pop, The priority queue is empty!")
+                    self.log("_start, The priority queue is empty!")
                     break
                 else:
-                    try: priority, _, package = heapq.heappop(self.min_heap)
-                    except Exception as e: continue
-                    self.qsize -= 1
-                    self.__run(package[0],*package[1],**package[2])
+                    try:
+                        priority, _, package = heapq.heappop(self.min_heap)
+                        self.qsize -= 1
+                        self._exe(package[0],*package[1],**package[2])
+                    except Exception as e: self.log("_start, failed! %s"%(e), xbmc.LOGERROR)
             elif self.fifo or self.lifo:
                 curr_node = self.head if self.fifo else self.tail
-                if curr_node is None:
-                    break
+                if curr_node is None: break
                 else:
-                    package = self.__process(curr_node, fifo=self.fifo)
-                    if not self.delay: self.__run(*package)
-                    else: timerit(curr_node.wait, [*package])
+                    try:
+                        package = self._process(curr_node, fifo=self.fifo)
+                        if self.timer or curr_node.time:
+                            if time.time() < curr_node.time: self._push(package, timer=curr_node.time)
+                            else:
+                                self.nodes.remove((package[0].__name__))
+                                self._exe(package[0],*package[1],**package[2])
+                        else: self._exe(package[0],*package[1],**package[2])
+                    except Exception as e: self.log("_start, failed! %s"%(e), xbmc.LOGERROR)
             else:
-                self.log("__pop, queue undefined!")
+                self.log("_start, queue undefined!")
                 break
                 
         self.isRunning = False
-        self.log("__pop, finished: shutting down!")
-                
-                
-# def quePriority(package: tuple, priority: int=0):
-    # q_priority = CustomQueue(priority=True)
-    # q_priority.log("quePriority")
-    # q_priority._push(package, priority)
-    
-# def queFIFO(package: tuple, delay: int=0):
-    # q_fifo = CustomQueue(fifo=True, delay=bool(delay))
-    # q_fifo.log("queFIFO")
-    # q_fifo._push(package, delay)
-    
-# def queLIFO(package: tuple, delay: int=0):
-    # q_lifo = CustomQueue(lifo=True, delay=bool(delay))
-    # q_lifo.log("queLIFO")
-    # q_lifo._push(package, delay)
-    
-# def queThread(packages, delay=0):
-    # q_fifo = CustomQueue(fifo=True)
-    # q_fifo.log("queThread")
-
-    # def thread_function(*package):
-        # q_fifo._push(package)
-
-    # for package in packages:
-        # t = Thread(target=thread_function, args=(package))
-        # t.daemon = True
-        # t.start()
+        self.log("_start, finished: shutting down...")

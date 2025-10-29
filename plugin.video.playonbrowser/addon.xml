@@ -26,6 +26,7 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="bs_BA">Pregledajte PlayOn sa Kodija.</summary>
         <summary lang="da_DK">Gennemse PlayOn fra Kodi.</summary>
         <summary lang="de_DE">PlayOn über Kodi durchblättern.</summary>
         <summary lang="en_GB">Browse PlayOn from Kodi.</summary>
@@ -36,6 +37,7 @@
         <summary lang="pt_BR">Navegarpelo PlayOn do Kodi.</summary>
         <summary lang="ru_RU">Просматривайте PlayOn из Kodi.</summary>
         <summary lang="sv_SE">Bläddra i PlayOn från Kodi.</summary>
+        <description lang="bs_BA">PlayOn je marka i softverski paket za prijenos medija koji korisnicima omogućava gledanje i snimanje videa s brojnih mrežnih pružatelja sadržaja.</description>
         <description lang="da_DK">PlayOn er et streaming mediemærke og softwaresuite, der gør det muligt for brugere at se og optage videoer fra adskillige online indholdsudbydere.</description>
         <description lang="de_DE">PlayOn ist eine Medienstreaming-Marke und eine Software-Suite, die es Nutzern ermöglicht, Videos von zahlreichen Online-Anbietern anzusehen und aufzunehmen.</description>
         <description lang="en_GB">PlayOn is a streaming media brand and software suite that enables users to view and record videos from numerous online content providers.</description>
@@ -46,6 +48,7 @@
         <description lang="pt_BR">O PlayOn é uma marca de mídia de streaming e pacote de software que permite aos usuários visualizar e gravar vídeos de vários provedores de conteúdo online.</description>
         <description lang="ru_RU">PlayOn - это бренд потокового мультимедиа и программный пакет, который позволяет пользователям просматривать и записывать видео от многочисленных поставщиков онлайн контента.</description>
         <description lang="sv_SE">PlayOn är ett varumärke för strömmande media och en programvarusvit som gör det möjligt för användare att visa och spela in videor från ett stort antal leverantörer av onlineinnehåll.</description>
+        <disclaimer lang="bs_BA">Zahtijeva Playon serverski softver</disclaimer>
         <disclaimer lang="da_DK">Kræver Playon server software</disclaimer>
         <disclaimer lang="de_DE">Erfordert Playon-Serversoftware</disclaimer>
         <disclaimer lang="en_GB">Requires Playon Server Software</disclaimer>

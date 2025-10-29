@@ -32,6 +32,7 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="bs_BA">TV uživo, svukuda</summary>
         <summary lang="da_DK">Direkte tv overalt</summary>
         <summary lang="en_GB">Live TV, everywhere</summary>
         <summary lang="es_ES">TV en directo en cualquier sitio</summary>
@@ -40,6 +41,7 @@
         <summary lang="it_IT">TV in diretta, ovunque</summary>
         <summary lang="pt_BR">TV ao vivo, em qualquer lugar</summary>
         <summary lang="sv_SE">Direktsänd tv, överallt</summary>
+        <description lang="bs_BA">Gledajte svoje omiljene programe na Kodiju. Kanali pružaju objedinjeno iskustvo na svim vašim televizorima, uređajima i toking platformama.</description>
         <description lang="da_DK">Se dine yndlingsprogrammer i Kodi. Kanaler leverer en samlet oplevelse på tværs af alle dine tv, enheder og streamingplatforme.</description>
         <description lang="en_GB">Watch your favorite programs on Kodi. Channels delivers a unified experience across all your TVs, devices, and streaming platforms.</description>
         <description lang="es_ES">Vea sus programas favoritos en Kodi. Channels ofrece una experiencia unificada en todos sus dispositivos, TVs y plataformas de emisión.</description>

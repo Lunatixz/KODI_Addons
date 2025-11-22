@@ -136,42 +136,42 @@ class GUI(xbmcgui.WindowXMLDialog):
 
     
     def openURL(self, url, page=1):
-    try:
-        # Detect random endpoint
-        if "photos/random" in url:
-            # Use count instead of per_page
-            paginated_url = f'{url}&count=20'
-        else:
-            # Normal list endpoints still use page + per_page
-            paginated_url = f'{url}&page={page}&per_page=20'
+        try:
+            # Detect random endpoint
+            if "photos/random" in url:
+                # Use count instead of per_page
+                paginated_url = f'{url}&count=20'
+            else:
+                # Normal list endpoints still use page + per_page
+                paginated_url = f'{url}&page={page}&per_page=20'
 
-        self.log(f"Fetching URL: {paginated_url}")
-        request = urllib.request.Request(paginated_url)
-        request.add_header('Authorization', f'Client-ID {API_KEY}')
-        request.add_header('User-Agent', 'Mozilla/5.0')
+            self.log(f"Fetching URL: {paginated_url}")
+            request = urllib.request.Request(paginated_url)
+            request.add_header('Authorization', f'Client-ID {API_KEY}')
+            request.add_header('User-Agent', 'Mozilla/5.0')
 
-        response = urllib.request.urlopen(request, timeout=15)
-        data = json.load(response)
+            response = urllib.request.urlopen(request, timeout=15)
+            data = json.load(response)
 
-        # Handle different response shapes
-        if isinstance(data, dict) and 'urls' in data:
-            # Single photo object
-            image_urls = [data['urls']['full']]
-        elif isinstance(data, list):
-            # Array of photo objects (random with count, or list endpoints)
-            image_urls = [item['urls']['full'] for item in data if 'urls' in item]
-        elif 'results' in data:
-            # Search endpoint
-            image_urls = [item['urls']['full'] for item in data['results'] if 'urls' in item]
-        else:
-            image_urls = []
+            # Handle different response shapes
+            if isinstance(data, dict) and 'urls' in data:
+                # Single photo object
+                image_urls = [data['urls']['full']]
+            elif isinstance(data, list):
+                # Array of photo objects (random with count, or list endpoints)
+                image_urls = [item['urls']['full'] for item in data if 'urls' in item]
+            elif 'results' in data:
+                # Search endpoint
+                image_urls = [item['urls']['full'] for item in data['results'] if 'urls' in item]
+            else:
+                image_urls = []
 
-        self.log(f"Retrieved {len(image_urls)} images")
-        return image_urls
+            self.log(f"Retrieved {len(image_urls)} images")
+            return image_urls
 
-    except Exception as e:
-        self.log(f"openURL Failed on page {page}! Error: {str(e)}", xbmc.LOGERROR)
-        return []
+        except Exception as e:
+            self.log(f"openURL Failed on page {page}! Error: {str(e)}", xbmc.LOGERROR)
+            return []
 
 
 

@@ -4,48 +4,48 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
-"PO-Revision-Date: 2021-11-01 03:42+0000\n"
-"Last-Translator: 撷星芒 <mofa2020@qq.com>\n"
-"Language-Team: Chinese (China) <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/zh_cn/>\n"
+"PO-Revision-Date: 2025-11-10 06:13+0000\n"
+"Last-Translator: wabisabi926 <liwenliang926@163.com>\n"
+"Language-Team: Chinese (Simplified Han script) <https://kodi.weblate.cloud/projects/kodi-add-ons-services/service-iptv-manager/zh_Hans/>\n"
 "Language: zh_cn\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.8\n"
+"X-Generator: Weblate 5.14.3\n"
 
 msgctxt "Addon Summary"
 msgid "Integrate IPTV channels from other add-ons in the Kodi TV and Radio menus"
-msgstr "在KODI电视和电台菜单中集成来自其他插件的IPTV频道"
+msgstr "在 KODI电视和电台菜单中集成来自其他插件的 IPTV 频道"
 
 msgctxt "Addon Description"
 msgid "IPTV Manager integrates IPTV channels from other add-ons in the Kodi TV and Radio menus."
-msgstr "IPTV管理器可以在KODI电视和电台菜单中集成来自其他插件的IPTV频道。"
+msgstr "IPTV 管理器可以在 KODI 电视和电台菜单中集成来自其他插件的 IPTV 频道。"
 
 # CONTEXT MENU
 msgctxt "#30600"
 msgid "Play with IPTV Manager"
-msgstr "由IPTV管理器播放"
+msgstr "由 IPTV 管理器播放"
 
 # MESSAGES
 msgctxt "#30700"
 msgid "Are you sure you want to setup IPTV Simple for the use with IPTV Manager? Any existing configuration of IPTV Simple will be overwritten."
-msgstr "您确定要为IPTV管理器设置为简单模式吗？将覆盖任何现有IPTV的配置。"
+msgstr "您确定要为 IPTV 管理器设置为简单模式吗？将覆盖任何现有 IPTV 的配置。"
 
 msgctxt "#30701"
 msgid "IPTV Simple is configured for use with IPTV Manager!"
-msgstr "IPTV简单模式已用于IPTV管理器！"
+msgstr "IPTV 简单模式已用于 IPTV 管理器！"
 
 msgctxt "#30702"
 msgid "The configuration of IPTV Simple has failed. Please check the log files for more information."
-msgstr "为IPTV管理器设置为简单模式失败。请查看日志以获取更多信息。"
+msgstr "为 IPTV 管理器设置为简单模式失败。请查看日志以获取更多信息。"
 
 msgctxt "#30703"
 msgid "Detecting IPTV add-ons..."
-msgstr "正在检测IPTV插件……"
+msgstr "正在检测 IPTV 插件……"
 
 msgctxt "#30704"
 msgid "Fetching channels and guide of {addon}..."
-msgstr "正在获取{addon}的频道和指南……"
+msgstr "正在获取 {addon} 的频道和指南……"
 
 msgctxt "#30705"
 msgid "Updating channels and guide..."
@@ -74,7 +74,7 @@ msgstr "立即刷新频道和指南…"
 
 msgctxt "#30820"
 msgid "IPTV Simple"
-msgstr "IPTV简单模式"
+msgstr "IPTV 简单模式"
 
 msgctxt "#30821"
 msgid "Configuration"
@@ -82,15 +82,15 @@ msgstr "配置"
 
 msgctxt "#30822"
 msgid "Configure IPTV Simple automatically…"
-msgstr "自动配置IPTV简单模式……"
+msgstr "自动配置 IPTV 简单模式……"
 
 msgctxt "#30823"
 msgid "Open IPTV Simple settings…"
-msgstr "打开IPTV简单模式……"
+msgstr "打开 IPTV 简单模式……"
 
 msgctxt "#30824"
 msgid "Automatically restart IPTV Simple to refresh the data"
-msgstr "自动重载IPTV简单模式以刷新数据"
+msgstr "自动重载 IPTV 简单模式以刷新数据"
 
 msgctxt "#30880"
 msgid "Expert"
@@ -106,8 +106,8 @@ msgstr "启用调试日志"
 
 msgctxt "#30883"
 msgid "Install Kodi Logfile Uploader…"
-msgstr "安装KODI日志上传器……"
+msgstr "安装 KODI 日志上传器……"
 
 msgctxt "#30884"
 msgid "Open Kodi Logfile Uploader…"
-msgstr "打开KODI日志上传器……"
+msgstr "打开 KODI 日志上传器……"

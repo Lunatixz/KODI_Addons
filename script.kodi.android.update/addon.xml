@@ -23,6 +23,7 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="bs_BA">Preuzmite i instalirajte Kodi pakete.</summary>
         <summary lang="cs_CZ">Stáhnout a nainstalovat Kodi balíčky.</summary>
         <summary lang="da_DK">Hent og installer Kodi-installationspakker.</summary>
         <summary lang="de_DE">Kodi-Pakete herunterladen und installieren.</summary>
@@ -41,6 +42,7 @@
         <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
         <summary lang="sv_SE">Hämta och installera Kodi-paket.</summary>
         <summary lang="zh_CN">下载并安装 Kodi 软件包。</summary>
+        <description lang="bs_BA">Preuzmite i instalirajte Kodi android pakete; odaberite između Nightlies, Releases, Snapshots i Test-builds.</description>
         <description lang="cs_CZ">Stáhnout a nainstalovat Kodi android balíčky; vyberte z  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="da_DK">Download og installer Android eksekverbare filer til Kodi; vælg fra Nightlies, Udgivelser, Snapshots og Test-builds.</description>
         <description lang="de_DE">Kodi-Pakete für Android herunterladen und installieren. Auswählen zwischen Nightlies, Releases, Snapshopts und Test-Builds.</description>

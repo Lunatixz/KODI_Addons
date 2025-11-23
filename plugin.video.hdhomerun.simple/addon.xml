@@ -32,13 +32,16 @@
             <screenshot>resources/images/screenshot04.jpg</screenshot>
             <screenshot>resources/images/screenshot05.jpg</screenshot>
         </assets>
+        <summary lang="bs_BA">Jednostavan HDHomeRun interfejs.</summary>
         <summary lang="da_DK">Simpel HDHomeRun brugerflade.</summary>
         <summary lang="en_GB">Simple HDHomeRun Interface.</summary>
         <summary lang="es_ES">Interfaz sencilla HDHomeRun.</summary>
         <summary lang="fi_FI">Yksinkertainen HDHomeRun-käyttöliittymä.</summary>
         <summary lang="it_IT">Interfaccia semplice HDHomeRun.</summary>
         <summary lang="pt_BR">Interface HDHomeRun Simples.</summary>
+        <summary lang="ru_RU">Простой интерфейс HDHomeRun.</summary>
         <summary lang="sv_SE">Enkelt HDHomeRun-gränssnitt.</summary>
+        <description lang="bs_BA">Automatski pronađite sve kompatibilne HDHomeRun uređaje na vašoj mreži, jednostavno i lako HDHomeRun sučelje.</description>
         <description lang="da_DK">Find automatisk alle de kompatible HDHomeRun-enheder på dit netværk, enkel og nem HDHomeRun-brugerflade.</description>
         <description lang="en_GB">Automatically find all the compatible HDHomeRun devices on your network, Simple and Easy HDHomeRun Interface.</description>
         <description lang="es_ES">Encuentra automáticamente todos los dispositivos HDHomeRun compatibles en tu red, Interfaz HDHomeRun simple y fácil.</description>
@@ -46,6 +49,7 @@
         <description lang="it_IT">Trova automaticamente tutti i dispositivi HDHomeRun compatibili sulla tua rete, interfaccia HDHomeRun semplice e facile.</description>
         <description lang="pt_BR">Encontre automaticamente todos os dispositivos HDHomeRun compatíveis em sua rede, interface HDHomeRun simples e fácil.</description>
         <description lang="sv_SE">Hitta automatiskt alla kompatibla HDHomeRun-enheter i ditt nätverk, enkelt och smidigt HDHomeRun-gränssnitt.</description>
+        <disclaimer lang="bs_BA">Zahtijeva kompatibilan HDHomeRun uređaj</disclaimer>
         <disclaimer lang="da_DK">Kræver en kompatibel HDHomeRun-enhed</disclaimer>
         <disclaimer lang="en_GB">Requires a compatible HDHomeRun device</disclaimer>
         <disclaimer lang="es_ES">Se necesita un dispositivo HDHomeRun compatible</disclaimer>

@@ -17,6 +17,7 @@
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
+        <summary lang="bs_BA">Napravite čuvar ekrana iz bilo kojeg Kodi video izvora.</summary>
         <summary lang="da_DK">Opret en pauseskærm fra enhver Kodi-videokilde.</summary>
         <summary lang="de_DE">Einen Bildschirmschoner aus einer beliebigen Kodi-Videoquelle erstellen.</summary>
         <summary lang="en_GB">Create a screensaver from any Kodi video source.</summary>
@@ -27,6 +28,7 @@
         <summary lang="it_IT">Crea un salvaschermo da qualsiasi sorgente video Kodi.</summary>
         <summary lang="sv_SE">Skapa en skärmsläckare från valfri Kodi-videokälla.</summary>
         <summary lang="zh_CN">从任意 Kodi 视频源创建屏幕保护程序。</summary>
+        <description lang="bs_BA">Dinamički čuvar ekrana koji koristi lokalni sadržaj, SmartPlayliste, dodatke i UPNP servere.</description>
         <description lang="da_DK">Dynamisk pauseskærm der benytter lokalt indhold, smarte playlister, plugins og UPNP-servere.</description>
         <description lang="de_DE">Dynamischer Bildschirmschoner mit lokalen Inhalten, SmartPlaylists, Plugins und UPnP-Servern.</description>
         <description lang="en_GB">Dynamic screensaver using Local content, SmartPlaylists, Plugins and UPNP Servers.</description>
@@ -37,6 +39,7 @@
         <description lang="sv_SE">Dynamisk skärmsläckare med hjälp av lokalt innehåll, smarta spellistor, tillägg och UPNP-servrar.</description>
         <description lang="uk_UA">Динамічна заставка з локальних файлів, списків SmartPlaylists, плагінів чи серверів UPNP.</description>
         <description lang="zh_CN">使用本地内容、智能播放列表、插件和 UPNP 服务器的动态屏幕保护程序。</description>
+        <disclaimer lang="bs_BA">Izvori za streaming se ne preporučuju za ograničeni internet.</disclaimer>
         <disclaimer lang="da_DK">Streamingkilder anbefales ikke til forbrugsbetalt internet.</disclaimer>
         <disclaimer lang="de_DE">Streamingquellen werden bei kostenpflichtigen Internet nicht empfohlen.</disclaimer>
         <disclaimer lang="en_GB">Streaming sources not recommend for metered Internet.</disclaimer>

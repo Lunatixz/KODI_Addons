@@ -62,6 +62,7 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="bs_BA">TV uživo, svukuda</summary>
         <summary lang="da_DK">Direkte tv overalt</summary>
         <summary lang="en_GB">Live TV, everywhere</summary>
         <summary lang="es_ES">TV en directo en cualquier sitio</summary>
@@ -70,6 +71,7 @@
         <summary lang="it_IT">TV in diretta, ovunque</summary>
         <summary lang="pt_BR">TV ao vivo, em qualquer lugar</summary>
         <summary lang="sv_SE">Direktsänd tv, överallt</summary>
+        <description lang="bs_BA">Gledajte svoje omiljene programe na Kodiju. Kanali pružaju objedinjeno iskustvo na svim vašim televizorima, uređajima i toking platformama.</description>
         <description lang="da_DK">Se dine yndlingsprogrammer i Kodi. Kanaler leverer en samlet oplevelse på tværs af alle dine tv, enheder og streamingplatforme.</description>
         <description lang="en_GB">Watch your favorite programs on Kodi. Channels delivers a unified experience across all your TVs, devices, and streaming platforms.</description>
         <description lang="es_ES">Vea sus programas favoritos en Kodi. Channels ofrece una experiencia unificada en todos sus dispositivos, TVs y plataformas de emisión.</description>
@@ -114,13 +116,16 @@
             <screenshot>resources/images/screenshot04.jpg</screenshot>
             <screenshot>resources/images/screenshot05.jpg</screenshot>
         </assets>
+        <summary lang="bs_BA">Jednostavan HDHomeRun interfejs.</summary>
         <summary lang="da_DK">Simpel HDHomeRun brugerflade.</summary>
         <summary lang="en_GB">Simple HDHomeRun Interface.</summary>
         <summary lang="es_ES">Interfaz sencilla HDHomeRun.</summary>
         <summary lang="fi_FI">Yksinkertainen HDHomeRun-käyttöliittymä.</summary>
         <summary lang="it_IT">Interfaccia semplice HDHomeRun.</summary>
         <summary lang="pt_BR">Interface HDHomeRun Simples.</summary>
+        <summary lang="ru_RU">Простой интерфейс HDHomeRun.</summary>
         <summary lang="sv_SE">Enkelt HDHomeRun-gränssnitt.</summary>
+        <description lang="bs_BA">Automatski pronađite sve kompatibilne HDHomeRun uređaje na vašoj mreži, jednostavno i lako HDHomeRun sučelje.</description>
         <description lang="da_DK">Find automatisk alle de kompatible HDHomeRun-enheder på dit netværk, enkel og nem HDHomeRun-brugerflade.</description>
         <description lang="en_GB">Automatically find all the compatible HDHomeRun devices on your network, Simple and Easy HDHomeRun Interface.</description>
         <description lang="es_ES">Encuentra automáticamente todos los dispositivos HDHomeRun compatibles en tu red, Interfaz HDHomeRun simple y fácil.</description>
@@ -128,6 +133,7 @@
         <description lang="it_IT">Trova automaticamente tutti i dispositivi HDHomeRun compatibili sulla tua rete, interfaccia HDHomeRun semplice e facile.</description>
         <description lang="pt_BR">Encontre automaticamente todos os dispositivos HDHomeRun compatíveis em sua rede, interface HDHomeRun simples e fácil.</description>
         <description lang="sv_SE">Hitta automatiskt alla kompatibla HDHomeRun-enheter i ditt nätverk, enkelt och smidigt HDHomeRun-gränssnitt.</description>
+        <disclaimer lang="bs_BA">Zahtijeva kompatibilan HDHomeRun uređaj</disclaimer>
         <disclaimer lang="da_DK">Kræver en kompatibel HDHomeRun-enhed</disclaimer>
         <disclaimer lang="en_GB">Requires a compatible HDHomeRun device</disclaimer>
         <disclaimer lang="es_ES">Se necesita un dispositivo HDHomeRun compatible</disclaimer>
@@ -200,6 +206,7 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="bs_BA">Pregledajte PlayOn sa Kodija.</summary>
         <summary lang="da_DK">Gennemse PlayOn fra Kodi.</summary>
         <summary lang="de_DE">PlayOn über Kodi durchblättern.</summary>
         <summary lang="en_GB">Browse PlayOn from Kodi.</summary>
@@ -210,6 +217,7 @@
         <summary lang="pt_BR">Navegarpelo PlayOn do Kodi.</summary>
         <summary lang="ru_RU">Просматривайте PlayOn из Kodi.</summary>
         <summary lang="sv_SE">Bläddra i PlayOn från Kodi.</summary>
+        <description lang="bs_BA">PlayOn je marka i softverski paket za prijenos medija koji korisnicima omogućava gledanje i snimanje videa s brojnih mrežnih pružatelja sadržaja.</description>
         <description lang="da_DK">PlayOn er et streaming mediemærke og softwaresuite, der gør det muligt for brugere at se og optage videoer fra adskillige online indholdsudbydere.</description>
         <description lang="de_DE">PlayOn ist eine Medienstreaming-Marke und eine Software-Suite, die es Nutzern ermöglicht, Videos von zahlreichen Online-Anbietern anzusehen und aufzunehmen.</description>
         <description lang="en_GB">PlayOn is a streaming media brand and software suite that enables users to view and record videos from numerous online content providers.</description>
@@ -220,6 +228,7 @@
         <description lang="pt_BR">O PlayOn é uma marca de mídia de streaming e pacote de software que permite aos usuários visualizar e gravar vídeos de vários provedores de conteúdo online.</description>
         <description lang="ru_RU">PlayOn - это бренд потокового мультимедиа и программный пакет, который позволяет пользователям просматривать и записывать видео от многочисленных поставщиков онлайн контента.</description>
         <description lang="sv_SE">PlayOn är ett varumärke för strömmande media och en programvarusvit som gör det möjligt för användare att visa och spela in videor från ett stort antal leverantörer av onlineinnehåll.</description>
+        <disclaimer lang="bs_BA">Zahtijeva Playon serverski softver</disclaimer>
         <disclaimer lang="da_DK">Kræver Playon server software</disclaimer>
         <disclaimer lang="de_DE">Erfordert Playon-Serversoftware</disclaimer>
         <disclaimer lang="en_GB">Requires Playon Server Software</disclaimer>
@@ -286,7 +295,7 @@
     </extension>
 </addon>
 
-<addon id="screensaver.bing" name="Bing: Photos of the Week" version="1.0.6" provider-name="Lunatixz">
+<addon id="screensaver.bing" name="Bing: Photos of the Week" version="1.0.7" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -298,9 +307,9 @@
     <extension point="xbmc.addon.metadata">
         <license>GPL-3.0-or-later</license>
         <platform>all</platform>
-        <source>https://github.com/Lunatixz/XBMC_Addons/tree/master/screensaver.bing</source>
+        <source>https://github.com/Lunatixz/Kodi_Addons/tree/master/screensaver.bing</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=319728</forum>
-        <news>v.1.0.5[CR]- Matrix compatibility.</news>
+        <news>v.1.0.7[CR]- Piers compatibility.</news>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
@@ -309,6 +318,7 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="bs_BA">Istražite prekrasne slike s početne stranice Bing-a... </summary>
         <summary lang="da_DK">Udforsk betagende billeder fra Bing-hjemmesiden... </summary>
         <summary lang="de_DE">Atemberaubende Bilder von der Bing-Homepage entdecken ... </summary>
         <summary lang="en_GB">Explore breathtaking images from the Bing homepage... </summary>
@@ -323,6 +333,7 @@
         <summary lang="sv_SE">Utforska hisnande bilder från Bings webbsida... </summary>
         <summary lang="uk_UA">Досліджуйте захоплювальні зображення з домашньої сторінки Bing... </summary>
         <summary lang="zh_CN">浏览必应主页上令人叹为观止的图片... </summary>
+        <description lang="bs_BA">Istražite prekrasne slike s početne stranice Bing-a... </description>
         <description lang="da_DK">Udforsk betagende billeder fra Bing-hjemmesiden... </description>
         <description lang="de_DE">Atemberaubende Bilder von der Bing-Homepage entdecken ... </description>
         <description lang="en_GB">Explore breathtaking images from the Bing homepage... </description>
@@ -365,13 +376,16 @@
             <screenshot>resources/images/screenshot02.png</screenshot>
             <screenshot>resources/images/screenshot03.png</screenshot>
         </assets>
+        <summary lang="bs_BA">Sistem 47 - Zvjezdane staze LCARS čuvar ekrana</summary>
         <summary lang="en_GB">System 47 - Star Trek LCARS ScreenSaver</summary>
         <summary lang="es_ES">System 47 - Salvapantallas Star Trek LCARS</summary>
         <summary lang="sv_SE">System 47 - Star Trek LCARS skärmsläckare</summary>
         <summary lang="zh_CN">47 号系统 - 星际迷航 LCARS 屏幕保护程序</summary>
+        <description lang="bs_BA">Šta je LCARS? LCARS je akronim za Library Computer Access and Retrieval System (Sistem za pristup i pronalaženje bibliotečkih računara), što je primarni računarski sistem u univerzumu Zvjezdane flote i Federacije iz Zvjezdanih staza. Na mnogim krupnim planovima iz TV serija i filmova Zvjezdane staze, riječ LCARS se zapravo može vidjeti na nekim monitorima računara. Za fanove, LCARS se također često koristi za grafički interfejs za prikaz. Postoji još jedan naziv za ovu vrstu grafičkih prikaza. To je Okudagram. Nazvan je po izumitelju, Michaelu Okudi. Michael ga je stvorio kada je bio nadzornik scenografije za TV seriju Zvjezdane staze: Sljedeća generacija.</description>
         <description lang="en_GB">What is LCARS? LCARS is an acronym for Library Computer Access and Retrieval System, which is the primary computer system in the universe of Star Trek&apos;s Starfleet and Federation. On many close-up shots from the Star Trek TV shows and movies, you can actually see the word, LCARS, on some computer monitor displays. For the fans, LCARS is also often used to refer the graphical displaying interface. There&apos;s actually another name for this type of graphical displays. It&apos;s Okudagram. It is named after the inventor, Michael Okuda. Michael created it when he was the scenic art supervisor for the TV show, Star Trek: The Next Generation.</description>
         <description lang="es_ES">¿Qué es LCARS? LCARS es el acrónimo de Library Computer Access and Retrieval Syste, que es el sistema de computación primordial en el universo de la Federación y la Flota Estelar de Star Trek. En muchas escenas de las series y películas de Star Trek se puede ver la palabra, LCARS, en muchos monitores. Para los fans, LCARS tambien se usa para referirse al aspecto de la interfaz. Hay otro nombre para este aspecto, Okudagram, Se llamó así en honor a su inventor, Michael Okuda, que creó esta imageniría como supervisor de arte para la serie Star Trek: La Nueva Generación.</description>
         <description lang="sv_SE">Vad är LCARS? LCARS är en akronym för Library Computer Access and Retrieval System, som är det primära datorsystemet i Star Treks universum med Stjärnflottan och Federationen. På många närbilder från Star Treks TV-program och filmer kan man faktiskt se ordet LCARS på vissa datorskärmar. För fansen används LCARS också ofta för att hänvisa till det grafiska visningsgränssnittet. Det finns faktiskt ett annat namn för denna typ av grafiska skärmar. Det är Okudagram. Det är uppkallat efter uppfinnaren, Michael Okuda. Michael skapade det när han var scenkonstansvarig för TV-serien Star Trek: The Next Generation.</description>
+        <description lang="zh_CN">什么是 LCARS？？LCARS 是 Library Computer Access and Retrieval System（图书馆计算机存取和检索系统）的首字母缩写，是《星星迷航》的星际舰队和联邦宇宙中的主要计算机系统。在《星星迷航》电视节目和电影的许多特写镜头中，你实际上可以在一些计算机显示器上看到 “LCARS” 这个词。对于影迷来说，LCARS 也常用来指图形显示界面，其实这种图形显示还有另外一个名字，叫 Okudagram，是以发明者的名字命名的，迈克尔·奥田。迈克尔在担任电视节目《星星迷航：下一代》的风景艺术主管时创造了它。</description>
     </extension>
 </addon>
 
@@ -398,6 +412,7 @@
             <screenshot>resources/images/screenshot03.jpg</screenshot>
             <screenshot>resources/images/screenshot04.jpg</screenshot>
         </assets>
+        <summary lang="bs_BA">Prekrasne, besplatne fotografije. Poklon od najdarežljivije zajednice fotografa na svijetu.</summary>
         <summary lang="da_DK">Smukke, gratis billeder. Begavet af verdens mest generøse fællesskab af fotografer.</summary>
         <summary lang="de_DE">Schöne, kostenlose Fotos. Zur Verfügung gestellt von der großzügigsten Fotografengemeinschaft der Welt.</summary>
         <summary lang="en_GB">Beautiful, free photos. Gifted by the world&apos;s most generous community of photographers.</summary>
@@ -408,6 +423,7 @@
         <summary lang="nl_NL">Mooie, vrij verkrijgbare foto&apos;s. Geschonken door de meeste gulle gemeenschap van fotografen.</summary>
         <summary lang="sv_SE">Vackra, fria foton. Skänkta av världens mest generösa gemenskap av fotografer.</summary>
         <summary lang="zh_CN">美丽，免费的照片。世界上最慷慨的摄影师社区。</summary>
+        <description lang="bs_BA">Prekrasne, besplatne fotografije. Poklon od najdarežljivije zajednice fotografa na svijetu.</description>
         <description lang="da_DK">Smukke, gratis billeder. Begavet af verdens mest generøse fællesskab af fotografer.</description>
         <description lang="de_DE">Schöne, kostenlose Fotos. Zur Verfügung gestellt von der großzügigsten Fotografengemeinschaft der Welt.</description>
         <description lang="en_GB">Beautiful, free photos. Gifted by the world&apos;s most generous community of photographers.</description>
@@ -439,6 +455,7 @@
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
+        <summary lang="bs_BA">Napravite čuvar ekrana iz bilo kojeg Kodi video izvora.</summary>
         <summary lang="da_DK">Opret en pauseskærm fra enhver Kodi-videokilde.</summary>
         <summary lang="de_DE">Einen Bildschirmschoner aus einer beliebigen Kodi-Videoquelle erstellen.</summary>
         <summary lang="en_GB">Create a screensaver from any Kodi video source.</summary>
@@ -449,6 +466,7 @@
         <summary lang="it_IT">Crea un salvaschermo da qualsiasi sorgente video Kodi.</summary>
         <summary lang="sv_SE">Skapa en skärmsläckare från valfri Kodi-videokälla.</summary>
         <summary lang="zh_CN">从任意 Kodi 视频源创建屏幕保护程序。</summary>
+        <description lang="bs_BA">Dinamički čuvar ekrana koji koristi lokalni sadržaj, SmartPlayliste, dodatke i UPNP servere.</description>
         <description lang="da_DK">Dynamisk pauseskærm der benytter lokalt indhold, smarte playlister, plugins og UPNP-servere.</description>
         <description lang="de_DE">Dynamischer Bildschirmschoner mit lokalen Inhalten, SmartPlaylists, Plugins und UPnP-Servern.</description>
         <description lang="en_GB">Dynamic screensaver using Local content, SmartPlaylists, Plugins and UPNP Servers.</description>
@@ -459,6 +477,7 @@
         <description lang="sv_SE">Dynamisk skärmsläckare med hjälp av lokalt innehåll, smarta spellistor, tillägg och UPNP-servrar.</description>
         <description lang="uk_UA">Динамічна заставка з локальних файлів, списків SmartPlaylists, плагінів чи серверів UPNP.</description>
         <description lang="zh_CN">使用本地内容、智能播放列表、插件和 UPNP 服务器的动态屏幕保护程序。</description>
+        <disclaimer lang="bs_BA">Izvori za streaming se ne preporučuju za ograničeni internet.</disclaimer>
         <disclaimer lang="da_DK">Streamingkilder anbefales ikke til forbrugsbetalt internet.</disclaimer>
         <disclaimer lang="de_DE">Streamingquellen werden bei kostenpflichtigen Internet nicht empfohlen.</disclaimer>
         <disclaimer lang="en_GB">Streaming sources not recommend for metered Internet.</disclaimer>
@@ -519,6 +538,7 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="bs_BA">Preuzmite i instalirajte Kodi pakete.</summary>
         <summary lang="cs_CZ">Stáhnout a nainstalovat Kodi balíčky.</summary>
         <summary lang="da_DK">Hent og installer Kodi-installationspakker.</summary>
         <summary lang="de_DE">Kodi-Pakete herunterladen und installieren.</summary>
@@ -537,6 +557,7 @@
         <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
         <summary lang="sv_SE">Hämta och installera Kodi-paket.</summary>
         <summary lang="zh_CN">下载并安装 Kodi 软件包。</summary>
+        <description lang="bs_BA">Preuzmite i instalirajte Kodi android pakete; odaberite između Nightlies, Releases, Snapshots i Test-builds.</description>
         <description lang="cs_CZ">Stáhnout a nainstalovat Kodi android balíčky; vyberte z  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="da_DK">Download og installer Android eksekverbare filer til Kodi; vælg fra Nightlies, Udgivelser, Snapshots og Test-builds.</description>
         <description lang="de_DE">Kodi-Pakete für Android herunterladen und installieren. Auswählen zwischen Nightlies, Releases, Snapshopts und Test-Builds.</description>
@@ -581,6 +602,7 @@
             <screenshot>resources/images/screenshot03.png</screenshot>
             <screenshot>resources/images/screenshot04.png</screenshot>
         </assets>
+        <summary lang="bs_BA">Preuzmite i instalirajte Kodi pakete.</summary>
         <summary lang="cs_CZ">Stáhnout a nainstalovat Kodi balíčky.</summary>
         <summary lang="da_DK">Hent og installer Kodi-installationspakker.</summary>
         <summary lang="de_DE">Kodi-Pakete herunterladen und installieren.</summary>
@@ -599,6 +621,7 @@
         <summary lang="ru_RU">Скачиваете и устанавливайте пакеты Kodi.</summary>
         <summary lang="sv_SE">Hämta och installera Kodi-paket.</summary>
         <summary lang="zh_CN">下载并安装 Kodi 软件包。</summary>
+        <description lang="bs_BA">Preuzmite i instalirajte Kodi izvršne datoteke za Windows; odaberite između Nightlies, Releases, Snapshots i Test-builds.</description>
         <description lang="da_DK">Download og installer Windows eksekverbare filer til Kodi; vælg fra Nightlies, Udgivelser, Snapshots og Test-builds.</description>
         <description lang="de_DE">Kodi für Windows herunterladen und installieren. Auswählen zwischen Nightlies, Releases, Snapshopts und Test-Builds.</description>
         <description lang="en_GB">Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
@@ -614,6 +637,7 @@
         <description lang="ru_RU">Загрузка и установка исполняемых файлов Kodi: ночные и тестовые сборки, релизы, снапшоты.</description>
         <description lang="sv_SE">Hämta och installera körbara Kodi-filer för Windows; välj från  Nightlies, Releases, Snapshots och Test-byggen.</description>
         <description lang="zh_CN">下载并安装 Kodi windows 可执行文件。从 Nightlies、Releases、Snapshots 和 Test-builds 中选择。</description>
+        <disclaimer lang="bs_BA">UWP nije podržan! Nije namijenjeno za instalaciju Kodija putem Windows trgovine.</disclaimer>
         <disclaimer lang="cs_CZ">UWP není podporováno! Není určeno pro instalaci Kodi přes Microsoft Store.</disclaimer>
         <disclaimer lang="da_DK">UWP understøttes ikke! Ikke beregnet til Kodi-installation gennem Windows Store.</disclaimer>
         <disclaimer lang="de_DE">UWP wird nicht unterstützt! Nicht vorgesehen für Kodi-Installation über den Windows Store.</disclaimer>
@@ -741,6 +765,7 @@
             <screenshot>resources/screenshot06.png</screenshot>
         </assets>
         <reuselanguageinvoker>true</reuselanguageinvoker>
+        <summary lang="bs_BA">Integrirajte IPTV kanale iz drugih dodataka u Kodi TV i Radio menije</summary>
         <summary lang="cs_CZ">Integruje IPTV kanály z jiných doplňků do nabídky Kodi TV a Rádio</summary>
         <summary lang="da_DK">Integrer IPTV-kanaler fra andre add-ons i Kodi tv- og radio-menuerne</summary>
         <summary lang="de_DE">IPTV-Sender aus anderen Addons in Kodis TV- und Radiomenüs integrieren</summary>
@@ -761,6 +786,7 @@
         <summary lang="ru_RU">Интеграция IPTV каналов из других дополнений в Kodi PVR</summary>
         <summary lang="sv_SE">Integrera IPTV-kanaler från andra tillägg i Kodi TV- och radiomenyerna</summary>
         <summary lang="zh_CN">在KODI电视和电台菜单中集成来自其他插件的IPTV频道</summary>
+        <description lang="bs_BA">IPTV Menadžer integrira IPTV kanale iz drugih dodataka u Kodi TV i Radio menije.</description>
         <description lang="cs_CZ">IPTV Manager integruje IPTV kanály z jiných doplňků do nabídky Kodi TV a Rádio.</description>
         <description lang="da_DK">IPTV Manager integrerer IPTV-kanaler fra andre add-ons i Kodi tv- og radio-menuerne.</description>
         <description lang="de_DE">IPTV-Mananger integriert IPTV-Sender aus anderen Addons in die TV- und Radiomenüs von Kodi.</description>
@@ -819,28 +845,34 @@
         <assets>
             <icon>icon.png</icon>
         </assets>
+        <summary lang="bs_BA">Očisti ChannelsDVR PVR međumemoriju</summary>
         <summary lang="en_GB">Clean ChannelsDVR PVR Buffer</summary>
         <summary lang="es_ES">Limpiar buffer de PVR ChannelsDVR</summary>
         <summary lang="it_IT">Pulizia buffer PVR ChanelsDVR</summary>
         <summary lang="ko_KR">ChannelsDVR PVR 버퍼 정리</summary>
         <summary lang="pl_PL">Czyszczenie bufora PVR ChanelsDVR</summary>
         <summary lang="pt_BR">Limpar Buffer de PVR de CanaisDVR</summary>
+        <summary lang="ru_RU">Очистить буфер ChannelsDVR PVR</summary>
         <summary lang="sv_SE">Rensa ChannelsDVR PVR-buffert</summary>
         <summary lang="zh_CN">清理 ChannelsDVR 个人录像机缓冲区</summary>
+        <description lang="bs_BA">Ako se ne označi opcija, ChannelsPVR backend može potrošiti prostor za pohranu preostalim baferima za TV uživo. Ova usluga čisti sve neaktivne bafere!</description>
         <description lang="en_GB">Left unchecked ChannelsPVR backend can eat up storage with leftover live tv buffers. This service cleans all inactive buffers!</description>
         <description lang="es_ES">Si no se controla el backend de ChannelsPVR, puede consumir espacio de almacenamiento con los búferes de TV en directo restantes. ¡Este servicio limpia todos los búferes inactivos!</description>
         <description lang="it_IT">Il backend ChannelsPVR lasciato deselezionato può consumare spazio di archiviazione con buffer rimasti dalla Live TV in diretta. Questo servizio pulisce tutti i buffer inattivi!</description>
         <description lang="ko_KR">선택하지 않으면 ChannelsPVR 백엔드가 남은 라이브 TV 버퍼로 인해 저장 공간을 차지할 수 있습니다. 이 서비스는 사용하지 않는 버퍼를 정리합니다!</description>
         <description lang="pl_PL">Pozostawiony bez sprawdzenia backend ChannelsPVR może zjadać pamięć masową z resztkami buforów TV. Ta usługa czyści wszystkie nieaktywne bufory!</description>
         <description lang="pt_BR">Se não for verificado, o back-end do ChannelsPVR pode consumir armazenamento com buffers de TV ao vivo restantes. Este serviço limpa todos os buffers inativos!</description>
+        <description lang="ru_RU">Если не отключать серверную часть ChannelsPVR, оставшиеся буферы прямых трансляций могут занимать место в хранилище . Эта служба очищает все неактивные буферы!</description>
         <description lang="sv_SE">Om ChannelsPVR-backend inte kontrolleras kan den ta upp lagringsutrymme med kvarvarande buffertar från direktsänd tv. Denna tjänst rensar alla inaktiva buffertar!</description>
         <description lang="zh_CN">若不加以处理，ChannelsPVR 后端会因遗留的电视直播缓冲区而占用大量存储空间。本服务可清理所有未活跃的缓冲区！</description>
+        <disclaimer lang="bs_BA">Za ličnu upotrebu; nije namijenjeno za opštu upotrebu</disclaimer>
         <disclaimer lang="en_GB">For Personal use; not meant for general use</disclaimer>
         <disclaimer lang="es_ES">Para uso personal; no destinado al uso general</disclaimer>
         <disclaimer lang="it_IT">Per uso personale; non destinato all&apos;uso generale</disclaimer>
         <disclaimer lang="ko_KR">일반적인 용도가 아닌 개인용</disclaimer>
         <disclaimer lang="pl_PL">Do użytku osobistego; nie jest przeznaczony do użytku ogólnego</disclaimer>
         <disclaimer lang="pt_BR">Para uso pessoal; não destinado ao uso geral</disclaimer>
+        <disclaimer lang="ru_RU">Для личного использования; не предназначено для общего пользования</disclaimer>
         <disclaimer lang="sv_SE">För personlig användning; inte tänkt för allmän användning</disclaimer>
         <disclaimer lang="zh_CN">仅供个人使用；不用于一般用途</disclaimer>
     </extension>

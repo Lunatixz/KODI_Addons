@@ -17,12 +17,16 @@
             <texture>black.png</texture>
         </control>
         <control type="panel" id="101">
+			<animation type="Conditional" condition="Slideshow.IsActive">
+				<effect type="fade" start="100" end="0" time="1000"/>
+			</animation>
             <posx>0</posx> 
             <posy>0</posy> 
             <width>auto</width> 
             <height>auto</height> 
             <scrolltime tween="sine" easing="out">200</scrolltime>
             <autoscroll>true</autoscroll>
+            <!-- <include>contentpanelslide</include> -->
             <itemlayout height="auto" width="auto">
                 <control type="image">
                     <posx>0</posx> 
@@ -36,7 +40,13 @@
                     <width>auto</width> 
                     <height>auto</height> 
                     <aspectratio scalediffuse="false">scale</aspectratio>
-                    <animation effect="fade" time="1000">VisibleChange</animation>
+					<fadetime>0</fadetime>
+					<animation type="Conditional" condition="Slideshow.IsActive" reversible="false">
+						<effect type="slide" tween="cubic" easing="inout" start="1280,0" end="0,0" time="500"/>
+					</animation>
+					<animation type="Conditional" condition="Slideshow.IsActive" reversible="false">
+						<effect type="slide" tween="cubic" easing="inout" start="0,0" end="-1280,0" time="500"/>
+					</animation>
                     <animation effect="zoom" start="110" end="130" center="auto" time="25000" tween="cubic" easing="inout" condition="String.IsEqual(Window.Property(bing_animation),okay)" pulse="true">Conditional</animation>
                     <animation effect="slide" start="-10,-10" end="20,20" time="9000" tween="cubic" easing="inout" condition="String.IsEqual(Window.Property(bing_animation),okay)" pulse="true">Conditional</animation>
                     <info>ListItem.Thumb</info>
@@ -78,24 +88,26 @@
                   <description>Time</description>
                   <align>left</align>
                   <font>font_clock</font>
+				  <textcolor>dimgray</textcolor>
                   <shadowcolor>text_shadow</shadowcolor>
                   <height>80</height>
                   <width>auto</width>
                   <label>[B]$INFO[System.Time][/B]</label>
-                  <animation effect="fade" start="50" end="50" condition="True">Conditional</animation>
+                  <animation effect="fade" start="25" end="25" condition="True">Conditional</animation>
                   <visible>String.isEqual(Window.Property(bing_time),okay)</visible>
               </control>
               <control type="label">
                   <posx>1755</posx>
                   <posy>930</posy>
-                  <description>Time</description>
+                  <description>Weather</description>
                   <align>left</align>
                   <font>font10</font>
+				  <textcolor>dimgray</textcolor>
                   <shadowcolor>text_shadow</shadowcolor>
                   <height>200</height>
                   <width>auto</width>
                   <label>$INFO[Weather.Temperature]</label>
-                  <animation effect="fade" start="50" end="50" condition="True">Conditional</animation>
+                  <animation effect="fade" start="25" end="25" condition="True">Conditional</animation>
                   <visible>[Weather.IsFetched + String.isEqual(Window.Property(bing_time),okay)]</visible>
               </control>
             </focusedlayout >

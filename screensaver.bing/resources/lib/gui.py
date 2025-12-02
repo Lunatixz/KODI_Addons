@@ -1,4 +1,4 @@
-#   Copyright (C) 2021 Lunatixz
+#   Copyright (C) 2026 Lunatixz
 #
 #
 # This file is part of Bing ScreenSaver.
@@ -42,9 +42,20 @@ RANDOM         = REAL_SETTINGS.getSetting("Randomize") == 'true'
 IDX_LST        = [1,2,3,4,5,6,7,0]
 CYC_INTER      = cycle(IDX_LST).__next__
 
+class Player(xbmc.Player):
+    def __init__(self, inherited=None):
+        self.gui = inherited
+        
+        
+    def onPlayBackStarted(self):
+        self.gui.log('onPlayBackStarted')
+        self.gui.onAction()
+    
+    
 class GUI(xbmcgui.WindowXMLDialog):
     def __init__( self, *args, **kwargs ):
         self.cache     = SimpleCache()
+        self.player    = Player(self)
         self.isExiting = False
         
         
@@ -60,7 +71,7 @@ class GUI(xbmcgui.WindowXMLDialog):
         return True
          
          
-    def onInit( self ):
+    def onInit(self):
         self.winid = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
         self.winid.setProperty('bing_time'     , 'okay' if REAL_SETTINGS.getSetting("Time")    == 'true' else 'nope')
         self.winid.setProperty('bing_animation', 'okay' if REAL_SETTINGS.getSetting("Animate") == 'true' else 'nope')
@@ -77,7 +88,7 @@ class GUI(xbmcgui.WindowXMLDialog):
             if KODI_MONITOR.waitForAbort(TIMER): break
 
         
-    def onAction(self, action ):
+    def onAction(self, action=None):
         self.isExiting = True
         self.close()
         

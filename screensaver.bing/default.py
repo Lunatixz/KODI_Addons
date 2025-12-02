@@ -1,4 +1,4 @@
-#   Copyright (C) 2021 Lunatixz
+#   Copyright (C) 2026 Lunatixz
 #
 #
 # This file is part of Bing ScreenSaver.

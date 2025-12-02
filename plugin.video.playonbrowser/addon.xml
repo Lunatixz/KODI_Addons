@@ -37,6 +37,7 @@
         <summary lang="pt_BR">Navegarpelo PlayOn do Kodi.</summary>
         <summary lang="ru_RU">Просматривайте PlayOn из Kodi.</summary>
         <summary lang="sv_SE">Bläddra i PlayOn från Kodi.</summary>
+        <summary lang="zh_CN">从 Kodi 浏览 PlayOn。</summary>
         <description lang="bs_BA">PlayOn je marka i softverski paket za prijenos medija koji korisnicima omogućava gledanje i snimanje videa s brojnih mrežnih pružatelja sadržaja.</description>
         <description lang="da_DK">PlayOn er et streaming mediemærke og softwaresuite, der gør det muligt for brugere at se og optage videoer fra adskillige online indholdsudbydere.</description>
         <description lang="de_DE">PlayOn ist eine Medienstreaming-Marke und eine Software-Suite, die es Nutzern ermöglicht, Videos von zahlreichen Online-Anbietern anzusehen und aufzunehmen.</description>
@@ -48,6 +49,7 @@
         <description lang="pt_BR">O PlayOn é uma marca de mídia de streaming e pacote de software que permite aos usuários visualizar e gravar vídeos de vários provedores de conteúdo online.</description>
         <description lang="ru_RU">PlayOn - это бренд потокового мультимедиа и программный пакет, который позволяет пользователям просматривать и записывать видео от многочисленных поставщиков онлайн контента.</description>
         <description lang="sv_SE">PlayOn är ett varumärke för strömmande media och en programvarusvit som gör det möjligt för användare att visa och spela in videor från ett stort antal leverantörer av onlineinnehåll.</description>
+        <description lang="zh_CN">PlayOn 是一款流媒体品牌及软件套件，能让用户从众多在线内容提供商处观看并录制视频。</description>
         <disclaimer lang="bs_BA">Zahtijeva Playon serverski softver</disclaimer>
         <disclaimer lang="da_DK">Kræver Playon server software</disclaimer>
         <disclaimer lang="de_DE">Erfordert Playon-Serversoftware</disclaimer>
@@ -59,5 +61,6 @@
         <disclaimer lang="pt_BR">Requer o Software Servidor Playon</disclaimer>
         <disclaimer lang="ru_RU">Требуется серверное ПО Playon</disclaimer>
         <disclaimer lang="sv_SE">Kräver serverprogramvaran för PlayOn</disclaimer>
+        <disclaimer lang="zh_CN">需安装 PlayOn 服务器软件</disclaimer>
     </extension>
 </addon>

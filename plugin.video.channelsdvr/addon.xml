@@ -41,6 +41,7 @@
         <summary lang="it_IT">TV in diretta, ovunque</summary>
         <summary lang="pt_BR">TV ao vivo, em qualquer lugar</summary>
         <summary lang="sv_SE">Direktsänd tv, överallt</summary>
+        <summary lang="zh_CN">电视直播，无处不在</summary>
         <description lang="bs_BA">Gledajte svoje omiljene programe na Kodiju. Kanali pružaju objedinjeno iskustvo na svim vašim televizorima, uređajima i toking platformama.</description>
         <description lang="da_DK">Se dine yndlingsprogrammer i Kodi. Kanaler leverer en samlet oplevelse på tværs af alle dine tv, enheder og streamingplatforme.</description>
         <description lang="en_GB">Watch your favorite programs on Kodi. Channels delivers a unified experience across all your TVs, devices, and streaming platforms.</description>
@@ -50,5 +51,6 @@
         <description lang="it_IT">Guarda i tuoi programmi preferiti su Kodi. Channels ti offre un&apos;esperienza unificata su tutte le tue TV, dispositivi e piattaforme di streaming.</description>
         <description lang="pt_BR">Assista seus programas favoritos no Kodi. O Channels oferece uma experiência unificada em todas as suas TVs, dispositivos e plataformas de streaming.</description>
         <description lang="sv_SE">Titta på dina favoritprogram på Kodi. Channels erbjuder en enhetlig upplevelse på alla dina TV-apparater, enheter och streamingplattformar.</description>
+        <description lang="zh_CN">在 Kodi 上观看您喜爱的节目。频道可在您的所有电视、设备和流媒体平台上提供统一的体验。</description>
     </extension>
 </addon>

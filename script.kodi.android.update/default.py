@@ -15,6 +15,7 @@ from simplecache import SimpleCache
 from six.moves import urllib
 from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
 from contextlib import contextmanager
+from platform import system, architecture, machine, release, version
 
 # Plugin Info
 ADDON_ID      = 'script.kodi.android.update'
@@ -78,9 +79,40 @@ class Installer(object):
         self.myMonitor = xbmc.Monitor()
         self.cache = SimpleCache()
         if not self.chkVersion(): return
+        self.currentVersion = self.getCurrentVersion()
         self.lastURL  = (REAL_SETTINGS.getSetting("LastURL") or self.buildMain())
         self.lastPath = REAL_SETTINGS.getSetting("LastPath")
         self.selectPath(self.lastURL)
+
+
+    def getCurrentVersion(self):
+        """Get current Kodi version in format: Git Build Compiled"""
+        try:
+            # Get git hash from System.BuildVersionGit or System.BuildVersion
+            git_hash = xbmc.getInfoLabel('System.BuildVersionGit') or xbmc.getInfoLabel('System.BuildVersion').split('-')[0] if '-' in xbmc.getInfoLabel('System.BuildVersion') else ''
+
+            # Get version string from BUILD setting (major.minor-tag)
+            build_str = ''
+            if BUILD:
+                major = BUILD.get('major', '')
+                minor = BUILD.get('minor', '')
+                tag = BUILD.get('tag', '')
+                revision = BUILD.get('revision', '')
+                build_str = '%s.%s-%s %s (%s)' % (major, minor, tag, machine(), revision)
+
+            # Get build date from System.BuildDate
+            build_date = xbmc.getInfoLabel('System.BuildDate')
+
+            # Format: "Git Build Compiled"
+            version_parts = []
+            if git_hash: version_parts.append(git_hash)
+            if build_str: version_parts.append(build_str)
+            if build_date: version_parts.append(build_date)
+
+            return ' '.join(version_parts) if version_parts else ''
+        except Exception as e:
+            log('getCurrentVersion Failed! ' + str(e), xbmc.LOGERROR)
+            return ''
         
         
     def disable(self, build):
@@ -130,7 +162,10 @@ class Installer(object):
             liz = xbmcgui.ListItem(label.title(),BUILD_OPT[label],path=DROID_URL%(label,PLATFORM))
             liz.setArt({'icon':ICON,'thumb':ICON})
             tmpLST.append(liz)
-        select = selectDialog(ADDON_NAME, tmpLST)
+        dialog_label = ADDON_NAME
+        if self.currentVersion:
+            dialog_label = '%s[CR]$NUMBER[%s]' % (ADDON_NAME, self.currentVersion)
+        select = selectDialog(dialog_label, tmpLST)
         if select is None: return #return on cancel.
         return tmpLST[select].getPath()
         
@@ -169,7 +204,11 @@ class Installer(object):
             items  = list(self.buildItems(url))
             if   len(items) == 0: break
             elif len(items) == 2 and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().startswith('.apk'): select = 1 #If one folder bypass selection.
-            else: select = selectDialog(url.replace(BASE_URL,'./').replace('//','/'), items)
+            else:
+                dialog_label = url.replace(BASE_URL,'./').replace('//','/')
+                if self.currentVersion:
+                    dialog_label = '%s[CR]ver. $NUMBER[%s]' % (dialog_label, self.currentVersion)
+                select = selectDialog(dialog_label, items)
             if select is None: return #return on cancel.
             label  = items[select].getLabel()
             newURL = items[select].getPath()

@@ -163,7 +163,7 @@ class Installer(object):
             tmpLST.append(liz)
         dialog_label = ADDON_NAME
         if self.currentVersion:
-            dialog_label = '%s\n[B]Current:[/B] %s' % (ADDON_NAME, self.currentVersion)
+            dialog_label = '%s[CR]$NUMBER[%s]' % (ADDON_NAME, self.currentVersion)
         select = selectDialog(dialog_label, tmpLST)
         if select is None: return #return on cancel.
         return tmpLST[select].getPath()

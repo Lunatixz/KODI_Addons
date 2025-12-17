@@ -15,6 +15,7 @@ from simplecache import SimpleCache
 from six.moves import urllib
 from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
 from contextlib import contextmanager
+from platform import system, architecture, machine, release, version
 
 # Plugin Info
 ADDON_ID      = 'script.kodi.android.update'
@@ -97,7 +98,7 @@ class Installer(object):
                 minor = BUILD.get('minor', '')
                 tag = BUILD.get('tag', '')
                 revision = BUILD.get('revision', '')
-                build_str = '%s.%s-%s (%s.%s.%s)' % (major, minor, tag, major, minor, revision)
+                build_str = '%s.%s-%s %s (%s)' % (major, minor, tag, machine(), revision)
 
             # Get build date from System.BuildDate
             build_date = xbmc.getInfoLabel('System.BuildDate')
@@ -206,7 +207,7 @@ class Installer(object):
             else:
                 dialog_label = url.replace(BASE_URL,'./').replace('//','/')
                 if self.currentVersion:
-                    dialog_label = '%s\n[B]Current:[/B] %s' % (dialog_label, self.currentVersion)
+                    dialog_label = '%s[CR]ver. $NUMBER[%s]' % (dialog_label, self.currentVersion)
                 select = selectDialog(dialog_label, items)
             if select is None: return #return on cancel.
             label  = items[select].getLabel()

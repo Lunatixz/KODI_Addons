@@ -64,7 +64,7 @@ def loadPICKLE(item="", encoding=DEFAULT_ENCODING):
         if hasattr(item,'read'):  return pickle.load(item)
         if isinstance(item, str): item = item.encode('latin-1')
         return pickle.loads(item)
-    except pickle.UnpicklingError: pass
+    except pickle.UnpicklingError: return None
     except Exception as e:
         log('loadPICKLE failed! %s'%(e), xbmc.LOGERROR)
         return None
@@ -86,6 +86,7 @@ def loadJSON(item=""):
         if isinstance(item, (dict, list)): return item
         if hasattr(item, 'read'):          return json.load(item)
         if isinstance(item, (str, bytes)): return json.loads(item)
+    except json.JSONDecodeError: return {}
     except Exception as e:
         log('loadJSON failed! %s'%(e), xbmc.LOGERROR)
         return {}
@@ -148,7 +149,7 @@ def isScanning():
 def isPlaying():
     return (xbmc.getCondVisibility('Player.Playing') or False)
 
-def matchItems(items, key='label', matches=defaultdict(list)):
+def matchItems(items=[], key='label', matches=defaultdict(list)):
     [matches[item[key]].append(item) for item in items if key in item]
     return [match for match in matches.values() if len(match) > 1]
     
@@ -214,11 +215,14 @@ def removeEpisode(episodeid):
 def removeMovie(movieid):
     return sendJSON({"method":"VideoLibrary.RemoveMovie","params":{"movieid":movieid}}).get('result') == "OK"
 
-def refreshTVshow(tvshowid, ignorenfo=True):
-    return sendJSON({"method":"VideoLibrary.RefreshTVShow","params":{"tvshowid":tvshowid,"ignorenfo":ignorenfo,"refreshepisodes":True}}).get('result') == "OK"
+def refreshTVshow(tvshowid, ignorenfo=True, includeEpisodes=True):
+    return sendJSON({"method":"VideoLibrary.RefreshTVShow","params":{"tvshowid":tvshowid,"ignorenfo":ignorenfo,"refreshepisodes":includeEpisodes}}).get('result') == "OK"
+
+def RefreshEpisode(episodeid, ignorenfo=True):
+    return sendJSON({"method":"VideoLibrary.RefreshEpisode","params":{"episodeid":episodeid,"ignorenfo":ignorenfo}}).get('result') == "OK"
 
 def refreshMovie(movieid, ignorenfo=True):
-    return sendJSON({"method":"VideoLibrary.RefreshMovie","params":{"movieid":movieid,"ignorenfo":ignorenfo,"refreshepisodes":True}}).get('result') == "OK"
+    return sendJSON({"method":"VideoLibrary.RefreshMovie","params":{"movieid":movieid,"ignorenfo":ignorenfo}}).get('result') == "OK"
 
 def buildListItem(label="", label2="", icon=ICON, url="", info={}, art={}, props={}, media='video', playable=False, offscreen=False):
     if not art: art = {'thumb':icon,'logo':icon,'icon':icon,'fanart':FANART}
@@ -231,5 +235,4 @@ def buildListItem(label="", label2="", icon=ICON, url="", info={}, art={}, props
         infoTag.set_info(self.cleanInfo(info,media))
     [listitem.setProperty(key, self.cleanProp(pvalue)) for key, pvalue in list(props.items())]
     return listitem
-           
            

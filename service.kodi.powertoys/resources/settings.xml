@@ -9,6 +9,7 @@
     <setting id="Scraper_Show_Dialog" type="bool" label="32004" default="true" subsetting="true" />
     <setting id="Scraper_Interval_DAYS" type="number" label="32003" default="1" subsetting="true" />
     <setting id="Scraper_TV_Folder" type="folder" label="32007"  source="video" option="writeable" default="" subsetting="true" />
+    <setting id="Refresh_Include_Episodes" type="bool" label="32015" default="true" subsetting="true" />
     <setting id="Scraper_Movie_Folder" type="folder" label="32008"  source="video" option="writeable" default="" subsetting="true" />
     <setting id="Refresh_Enabled" type="bool" label="32005" default="false" />
     <setting id="Refresh_Interval_DAYS" type="number" label="32006" default="7" subsetting="true" />

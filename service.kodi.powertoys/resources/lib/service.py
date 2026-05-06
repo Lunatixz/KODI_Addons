@@ -19,12 +19,10 @@
 from globals     import *
 from cqueue      import CustomQueue
 
-
 class SetEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, set): return list(obj)
         return json.JSONEncoder.default(self, obj)
-
 
 class Player(xbmc.Player):
     def __init__(self, monitor=None):
@@ -114,7 +112,6 @@ class Player(xbmc.Player):
     def getTimeLabel(self, prop: str='TimeRemaining') -> int and float: #prop='EpgEventElapsedTime'
         if self.isPlaying(): return timeString2Seconds(BUILTIN.getInfoLabel('%s(hh:mm:ss)'%(prop),'Player'))
 
-       
 class Monitor(xbmc.Monitor):
     def __init__(self, service=None):
         xbmc.Monitor.__init__(self)
@@ -129,11 +126,10 @@ class Monitor(xbmc.Monitor):
     def onNotification(self, sender, method, data):
         self.log("onNotification, sender %s - method: %s  - data: %s" % (sender, method, data))
 
-
 class Service(object):
     running = False
     cache   = SimpleCache()
-    cache.enable_mem_cache = False
+    cache.enable_mem_cache = True
     
     def __init__(self):
         self.monitor  = Monitor(self)
@@ -165,7 +161,7 @@ class Service(object):
     def _run(self):
         if   self._chkPlaying() or isScanning():self.log('_run, waiting for scraper or player to finish...')
         elif self.tasks.get('scrapeDirectory'): self._que(self.scrapeDirectory, -1, self.tasks.get('scrapeDirectory').pop())
-        elif self.tasks.get('cleanTV'):         self._que(self.cleanTV        , -1, matchItems(getEpisodes(self.tasks.get('cleanTV').pop())))
+        elif self.tasks.get('cleanTV'):         self._que(self.cleanTV        , -1, matchItems((self.getEpisodes(self.tasks.get('cleanTV').pop()) or [])))
         elif self.tasks.get('refreshTVshow'):   self._que(refreshTVshow       , -1,*self.tasks.get('refreshTVshow').pop())
         elif self.tasks.get('cleanMovies'):     self._que(self.cleanMovies    , -1, self.tasks.get('cleanMovies').pop(0))
         elif self.tasks.get('refreshMovie'):    self._que(refreshMovie        , -1,*self.tasks.get('refreshMovie').pop())
@@ -174,7 +170,10 @@ class Service(object):
             if REAL_SETTINGS.getSettingBool('Scraper_Enabled'):
                 with self._chkUpdate(self.runScraper,(REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')*86400)): pass
             if REAL_SETTINGS.getSettingBool('Refresh_Enabled'):
-                with self._chkUpdate(self.runRefresh,(REAL_SETTINGS.getSettingInt('Refresh_Interval_DAYS')*86400),None,REAL_SETTINGS.getSettingBool('Refresh_Clean'),REAL_SETTINGS.getSettingBool('Refresh_Ignore_NFO')): pass
+                with self._chkUpdate(self.runRefresh,(REAL_SETTINGS.getSettingInt('Refresh_Interval_DAYS')*86400),None,
+                                                      REAL_SETTINGS.getSettingBool('Refresh_Clean'),
+                                                      REAL_SETTINGS.getSettingBool('Refresh_Ignore_NFO'),
+                                                      REAL_SETTINGS.getSettingBool('Refresh_Include_Episodes')): pass
             self.running = False
 
 
@@ -198,12 +197,31 @@ class Service(object):
                 # self.log("buildMenu, failed! %s"%(e), xbmc.LOGERROR)
                 # return DIALOG.notificationDialog(LANGUAGE(32000))
          
-              
                 
     def _exit(self):
         self.log('_exit tasks = %s'%(dict([(key,len(value)) for key, value in list(self.tasks.items())])))
         self.cache.set('tasks', json.dumps(self.tasks, cls=SetEncoder), checksum=ADDON_VERSION, expiration=datetime.timedelta(days=28), json_data=True)
 
+
+    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
+    def getDirectory(self, param):
+        return (getDirectory(param) or [])
+        
+    
+    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
+    def getTVshows(self):
+        return (getTVshows() or [])
+    
+    
+    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
+    def getMovies(self):
+        return (getMovies() or [])
+    
+    
+    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
+    def getEpisodes(self, param):
+        return (getEpisodes(param) or [])
+        
 
     @contextmanager
     def _chkUpdate(self, func, runevery=900, nextrun=None, *args, **kwargs):
@@ -231,25 +249,24 @@ class Service(object):
         
     def runScraper(self):
         try:
-            return (self.scrapeTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder'), getTVshows()) & 
-                    self.scrapeMovies(REAL_SETTINGS.getSetting('Scraper_Movie_Folder'), getMovies()))
+            return (self.scrapeTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder'), (self.getTVshows() or [])) & 
+                    self.scrapeMovies(REAL_SETTINGS.getSetting('Scraper_Movie_Folder'), (self.getMovies() or [])))
         except Exception as e:
             self.log('runScraper, Scan failed! %s'%(e), xbmc.LOGERROR)
             self.notification(LANGUAGE(32009))
 
 
-    def runRefresh(self, clean=False, ignore=True):
+    def runRefresh(self, clean=False, ignore=True, include=True):
         try:
-            return (self.refreshTV(getTVshows(),clean,ignore) & 
-                    self.refreshMovies(getMovies(),clean,ignore))
+            return (self.refreshTV((self.getTVshows() or []),clean,ignore,include) & 
+                    self.refreshMovies((self.getMovies() or []),clean,ignore))
         except Exception as e:
             self.log('runScraper, Scan failed! %s'%(e), xbmc.LOGERROR)
             self.notification(LANGUAGE(32009))
         
 
     def runDuplicate(self):
-        try:
-            return (self.cleanTV() & self.cleanMovies())
+        try: return (self.cleanTV() & self.cleanMovies())
         except Exception as e:
             self.log('runScraper, Scan failed! %s'%(e), xbmc.LOGERROR)
             self.notification(LANGUAGE(32009))
@@ -282,7 +299,8 @@ class Service(object):
                             self.log('cleanTV, Queuing removed duplicate %s'%(episode.get('file')))
                             removeEpisode(episode.get('episodeid'))
                         elif master.get('file','-1') != episode.get('file'): #duplicate file found
-                            self.log('cleanTV, found duplicate physical file [%s] exists [%s]'%(episode.get('file'),xbmcvfs.exists(episode.get('file')))) #todo prompt user to delete? for now cache values
+                             #todo prompt user to delete? for now cache values
+                            self.log('cleanTV, found duplicate physical file [%s] exists [%s]'%(episode.get('file'),xbmcvfs.exists(episode.get('file'))))
 
             [__clean(match) for match in matches if len(match) > 1]
             self.log('cleanTV, finished!')
@@ -294,25 +312,32 @@ class Service(object):
            
     def scrapeTV(self, path, shows=[]):
         self.log('scrapeTV path = %s'%(path))
-        paths = dict([(item['file'],item) for item in shows if item.get('file')])
-        items = getDirectory(path)
-        if len(items) > 0: random.shuffle(items)
-        for item in items:
+        items = dict([(show['file'],show) for show in shows if show.get('file')])
+        files = (self.getDirectory(path) or [])
+        if len(files) > 0: random.shuffle(files)
+        for file in files:
             if self.monitor.waitForAbort(0.1): return False
-            elif not item.get('file') in paths:
-                self.tasks.setdefault('scrapeDirectory',set()).add(item.get('file'))
+            elif not file.get('file'): continue
+            elif not file['file'] in items:
+                self.tasks.setdefault('scrapeDirectory',set()).add(file['file'])
+            elif REAL_SETTINGS.getSettingBool('Refresh_Include_Episodes'):
+                missing = self.parseEpisodes(items[file['file']],(self.getEpisodes(items[file['file']]['tvshowid']) or [])).get('missing',[])
+                if len(missing) > 0: random.shuffle(missing)
+                for episode in missing:
+                    if self.monitor.waitForAbort(0.1): return False
+                    self.tasks.setdefault('scrapeDirectory',set()).add(episode['file'])
         return True
 
-
-    def refreshTV(self, shows=[], clean=False, ignore=True):
+      
+    def refreshTV(self, shows=[], clean=False, ignore=True, include=True):
         self.log('refreshTV shows = %s, clean = %s, ignore = %s'%(len(shows),clean,ignore))
         if len(shows) > 0: random.shuffle(shows)
         for show in shows:
             if self.monitor.waitForAbort(0.1): return False
             if clean: self.tasks.setdefault('cleanTV',set()).add(show.get('tvshowid',-1))
-            self.tasks.setdefault('refreshTVshow',set()).add((show.get('tvshowid'),ignore))
+            self.tasks.setdefault('refreshTVshow',set()).add((show.get('tvshowid'),ignore,include))
         return True
-        
+      
 
     def cleanMovies(self, movies, master=None):
         def __findShadowCopy(movies):
@@ -341,11 +366,11 @@ class Service(object):
     def scrapeMovies(self, path, movies=[]):
         self.log('scrapeMovies, path = %s'%(path))
         paths = dict([(os.path.split(item['file'])[0],item) for item in movies if item.get('file')])
-        items = getDirectory(path)
+        items = (self.getDirectory(path) or [])
         if len(items) > 0: random.shuffle(items)
         for item in items:
             if self.monitor.waitForAbort(0.1): return False
-            elif not item.get('file') in list(paths.keys()):
+            elif not item.get('file') in paths:
                 self.tasks.setdefault('scrapeDirectory',set()).add(item.get('file'))
         return True
 
@@ -359,5 +384,26 @@ class Service(object):
             self.tasks.setdefault('refreshMovie',set()).add((movie.get('movieid'),ignore))
         return True
         
+           
+    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
+    def parseEpisodes(self, show={}, episodes=[]):
+        self.log('parseEpisodes show = %s'%(show.get('tvshowid')))
+        refresh   = set() #database entry w/file.
+        missing   = set() #file w/o database entry
+        abandoned = set() #database entry w/o file.
+        
+        if len(episodes) > 0: random.shuffle(episodes)
+        for episode in episodes:
+            if   self.monitor.waitForAbort(0.1): return False
+            elif not episode.get('file'): continue
+            items = (self.getDirectory(os.path.join(os.path.split(episode['file'])[0],'')) or [])
+            for item in items:
+                if   self.monitor.waitForAbort(0.1): return False
+                elif not item.get('file'): continue
+                elif item['file'] == episode['file']:       refresh.add(episode)
+                elif not xbmcvfs.exists(episode['file']): abandoned.add(episode)
+                else:                                       missing.add(item)
+        return {'refresh':refresh, 'missing':missing, 'abandoned':abandoned}
+
 
 if __name__ == '__main__': Service()._start()

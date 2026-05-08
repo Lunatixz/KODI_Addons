@@ -149,11 +149,11 @@ def isScanning():
 def isPlaying():
     return (xbmc.getCondVisibility('Player.Playing') or False)
 
-def matchItems(items=[], key='label', matches=defaultdict(list)):
+def findDupes(items=[], key='label', matches=defaultdict(list)):
     [matches[item[key]].append(item) for item in items if key in item]
     return [match for match in matches.values() if len(match) > 1]
     
-def matchItem(match, items=[], key='file'):
+def findMatch(match, items=[], key='file'):
     return [item for item in items if item.get(key) == match] 
     
 def decodeString(base64_bytes):

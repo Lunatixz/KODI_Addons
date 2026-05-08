@@ -161,7 +161,7 @@ class Service(object):
     def _run(self):
         if   self._chkPlaying() or isScanning():self.log('_run, waiting for scraper or player to finish...')
         elif self.tasks.get('scrapeDirectory'): self._que(self.scrapeDirectory, -1, self.tasks.get('scrapeDirectory').pop())
-        elif self.tasks.get('cleanTV'):         self._que(self.cleanTV        , -1, matchItems((self.getEpisodes(self.tasks.get('cleanTV').pop()) or [])))
+        elif self.tasks.get('cleanTV'):         self._que(self.cleanTV        , -1, findDupes((self.getEpisodes(self.tasks.get('cleanTV').pop()) or [])))
         elif self.tasks.get('refreshTVshow'):   self._que(refreshTVshow       , -1,*self.tasks.get('refreshTVshow').pop())
         elif self.tasks.get('cleanMovies'):     self._que(self.cleanMovies    , -1, self.tasks.get('cleanMovies').pop(0))
         elif self.tasks.get('refreshMovie'):    self._que(refreshMovie        , -1,*self.tasks.get('refreshMovie').pop())
@@ -249,17 +249,18 @@ class Service(object):
         
     def runScraper(self):
         try:
-            return (self.scrapeTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder'), (self.getTVshows() or [])) & 
+            return (self.scrapeTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder'), (self.getTVshows() or []), 
+                                  REAL_SETTINGS.getSettingBool('Refresh_Include_Episodes')) & 
                     self.scrapeMovies(REAL_SETTINGS.getSetting('Scraper_Movie_Folder'), (self.getMovies() or [])))
         except Exception as e:
             self.log('runScraper, Scan failed! %s'%(e), xbmc.LOGERROR)
             self.notification(LANGUAGE(32009))
 
 
-    def runRefresh(self, clean=False, ignore=True, include=True):
+    def runRefresh(self, clean=False, ignoreNFO=True, includeEpisodes=True):
         try:
-            return (self.refreshTV((self.getTVshows() or []),clean,ignore,include) & 
-                    self.refreshMovies((self.getMovies() or []),clean,ignore))
+            return (self.refreshTV((self.getTVshows() or []),clean,ignoreNFO,includeEpisodes) & 
+                    self.refreshMovies((self.getMovies() or []),clean,ignoreNFO))
         except Exception as e:
             self.log('runScraper, Scan failed! %s'%(e), xbmc.LOGERROR)
             self.notification(LANGUAGE(32009))
@@ -284,24 +285,31 @@ class Service(object):
             
     def cleanTV(self, matches, master=None):
         try:
-            def __clean(episodes):
-                for idx, ep in enumerate(episodes):
-                    if xbmcvfs.exists(ep.get('file')):
-                        try: master = episodes.pop(idx)
-                        except: pass
+            def __clean(duplicates):
+                for episode in duplicates:
+                    if xbmcvfs.exists(episode.get('file')):
+                        master = duplicates.pop(episode)
                         break
                         
-                if master is None: return self.log('cleanTV, duplicate files do not exist!') #all episodes found don't exist? todo user prompt to remove? check source?
-                for episode in episodes:
-                    if self.monitor.waitForAbort(0.1): return False
-                    elif master.get('label') == episode.get('label') and master.get('episodeid',-1) != episode.get('episodeid'):
-                        if not xbmcvfs.exists(episode.get('file')) or master.get('file','-1') == episode.get('file'): #duplicate library entry
-                            self.log('cleanTV, Queuing removed duplicate %s'%(episode.get('file')))
-                            removeEpisode(episode.get('episodeid'))
-                        elif master.get('file','-1') != episode.get('file'): #duplicate file found
-                             #todo prompt user to delete? for now cache values
-                            self.log('cleanTV, found duplicate physical file [%s] exists [%s]'%(episode.get('file'),xbmcvfs.exists(episode.get('file'))))
-
+                if master is None: 
+                    return self.log('cleanTV, duplicate files do not exist!') #all episodes found don't exist? todo user prompt to remove? check source?
+                else:
+                    for episode in duplicates:
+                        if   self.monitor.waitForAbort(0.1): return False
+                        elif master.get('label') == episode.get('label'):
+                            #missing file
+                            if not xbmcvfs.exists(episode.get('file')):
+                                self.log('cleanTV, removing entry, missing file %s'%(episode.get('file')))
+                                removeEpisode(episode.get('episodeid'))
+                            #shadow duplicate entry
+                            elif (master.get('file','-1') == episode.get('file') and master.get('episodeid',-1) != episode.get('episodeid')):
+                                self.log('cleanTV, removing shadow duplicate %s'%(episode.get('file')))
+                                removeEpisode(episode.get('episodeid'))
+                            #duplicate file found
+                            elif master.get('file','-1') != episode.get('file'):
+                                self.log('cleanTV, removing duplicate physical file [%s] exists [%s]'%(episode.get('file'),xbmcvfs.exists(episode.get('file'))))
+                                removeEpisode(episode.get('episodeid')) #todo prompt user to delete file?
+                                
             [__clean(match) for match in matches if len(match) > 1]
             self.log('cleanTV, finished!')
             return True
@@ -310,7 +318,7 @@ class Service(object):
             self.notification(LANGUAGE(32009))
            
            
-    def scrapeTV(self, path, shows=[]):
+    def scrapeTV(self, path, shows=[], includeEpisodes=False):
         self.log('scrapeTV path = %s'%(path))
         items = dict([(show['file'],show) for show in shows if show.get('file')])
         files = (self.getDirectory(path) or [])
@@ -320,22 +328,23 @@ class Service(object):
             elif not file.get('file'): continue
             elif not file['file'] in items:
                 self.tasks.setdefault('scrapeDirectory',set()).add(file['file'])
-            elif REAL_SETTINGS.getSettingBool('Refresh_Include_Episodes'):
+            elif includeEpisodes:
                 missing = self.parseEpisodes(items[file['file']],(self.getEpisodes(items[file['file']]['tvshowid']) or [])).get('missing',[])
-                if len(missing) > 0: random.shuffle(missing)
-                for episode in missing:
-                    if self.monitor.waitForAbort(0.1): return False
-                    self.tasks.setdefault('scrapeDirectory',set()).add(episode['file'])
+                if len(missing) > 0: 
+                    random.shuffle(missing)
+                    for episode in missing:
+                        if self.monitor.waitForAbort(0.1): return False
+                        self.tasks.setdefault('scrapeDirectory',set()).add(episode['file'])
         return True
 
       
-    def refreshTV(self, shows=[], clean=False, ignore=True, include=True):
-        self.log('refreshTV shows = %s, clean = %s, ignore = %s'%(len(shows),clean,ignore))
+    def refreshTV(self, shows=[], clean=False, ignoreNFO=True, includeEpisodes=True):
+        self.log('refreshTV shows = %s, clean = %s, ignoreNFO = %s, includeEpisodes = %s'%(len(shows),clean,ignoreNFO,includeEpisodes))
         if len(shows) > 0: random.shuffle(shows)
         for show in shows:
             if self.monitor.waitForAbort(0.1): return False
-            if clean: self.tasks.setdefault('cleanTV',set()).add(show.get('tvshowid',-1))
-            self.tasks.setdefault('refreshTVshow',set()).add((show.get('tvshowid'),ignore,include))
+            elif clean: self.tasks.setdefault('cleanTV',set()).add(show.get('tvshowid',-1))
+            self.tasks.setdefault('refreshTVshow',set()).add((show.get('tvshowid'),ignoreNFO,includeEpisodes))
         return True
       
 
@@ -380,7 +389,7 @@ class Service(object):
         if len(movies) > 0: random.shuffle(movies)
         for movie in movies:
             if self.monitor.waitForAbort(0.1): return False
-            if clean: self.tasks.setdefault('cleanMovies',list()).extend(matchItem(movie.get('file'),movies))
+            if clean: self.tasks.setdefault('cleanMovies',list()).extend(findMatch(movie.get('file'),movies))
             self.tasks.setdefault('refreshMovie',set()).add((movie.get('movieid'),ignore))
         return True
         

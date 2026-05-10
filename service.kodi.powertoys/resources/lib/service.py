@@ -249,8 +249,7 @@ class Service(object):
         
     def runScraper(self):
         try:
-            return (self.scrapeTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder'), (self.getTVshows() or []), 
-                                  REAL_SETTINGS.getSettingBool('Refresh_Include_Episodes')) & 
+            return (self.scrapeTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder'), (self.getTVshows() or []),REAL_SETTINGS.getSettingBool('Refresh_Include_Episodes')) & 
                     self.scrapeMovies(REAL_SETTINGS.getSetting('Scraper_Movie_Folder'), (self.getMovies() or [])))
         except Exception as e:
             self.log('runScraper, Scan failed! %s'%(e), xbmc.LOGERROR)
@@ -394,12 +393,12 @@ class Service(object):
         return True
         
            
-    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
+    #@cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
     def parseEpisodes(self, show={}, episodes=[]):
         self.log('parseEpisodes show = %s'%(show.get('tvshowid')))
-        refresh   = set() #database entry w/file.
-        missing   = set() #file w/o database entry
-        abandoned = set() #database entry w/o file.
+        refresh   = [] #database entry w/file.
+        missing   = [] #file w/o database entry
+        abandoned = [] #database entry w/o file.
         
         if len(episodes) > 0: random.shuffle(episodes)
         for episode in episodes:
@@ -409,10 +408,10 @@ class Service(object):
             for item in items:
                 if   self.monitor.waitForAbort(0.1): return False
                 elif not item.get('file'): continue
-                elif item['file'] == episode['file']:       refresh.add(episode)
-                elif not xbmcvfs.exists(episode['file']): abandoned.add(episode)
-                else:                                       missing.add(item)
-        return {'refresh':refresh, 'missing':missing, 'abandoned':abandoned}
+                elif item['file'] == episode['file']:       refresh.append(episode)
+                elif not xbmcvfs.exists(episode['file']): abandoned.append(episode)
+                else:                                       missing.append(item)
+        return {'refresh': refresh, 'missing': missing, 'abandoned': abandoned}
 
 
 if __name__ == '__main__': Service()._start()

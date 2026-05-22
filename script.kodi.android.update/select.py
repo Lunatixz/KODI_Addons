@@ -26,7 +26,7 @@ APP_ICON      = 'androidapp://sources/apps/%s.png'
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
     if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg.encode("utf-8")), level)
+    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + msg, level)
 
 def selectDialog(label, items, pselect=-1, uDetails=True):
     select = xbmcgui.Dialog().select(label, items, preselect=pselect, useDetails=uDetails)

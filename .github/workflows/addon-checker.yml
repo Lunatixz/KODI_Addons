@@ -17,14 +17,17 @@ jobs:
         pip install -q kodi-addon-checker
     - name: Check with addon-checker
       run: |
+        kodi-addon-checker --branch omega plugin.program.smartplaylist.generator
         kodi-addon-checker --branch omega plugin.video.channelsdvr
         kodi-addon-checker --branch omega plugin.video.hdhomerun.simple
         kodi-addon-checker --branch omega plugin.video.ispot.tv
         kodi-addon-checker --branch omega plugin.video.playonbrowser
         kodi-addon-checker --branch omega screensaver.bing
-        kodi-addon-checker --branch omega screensaver.unsplash
         kodi-addon-checker --branch omega screensaver.system47
+        kodi-addon-checker --branch omega screensaver.unsplash
         kodi-addon-checker --branch omega screensaver.videosaver
         kodi-addon-checker --branch omega script.kodi.android.update
         kodi-addon-checker --branch omega script.kodi.windows.update
         kodi-addon-checker --branch omega script.module.pyhdhr
+        kodi-addon-checker --branch omega script.pystone.benchmark
+        kodi-addon-checker --branch omega service.kodi.powertoys

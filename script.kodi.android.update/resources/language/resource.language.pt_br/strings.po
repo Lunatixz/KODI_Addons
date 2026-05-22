@@ -16,7 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Generator: Weblate 5.17.1\n"
-
 msgctxt "Addon Summary"
 msgid "Download and Install Kodi packages."
 msgstr "Baixe e instale pacotes Kodi."
@@ -125,6 +124,7 @@ msgctxt "#30024"
 msgid " | [B]Speed:[/B]"
 msgstr " | [B]Velocidade:[/B]"
 
+#, fuzzy
 msgctxt "#30025"
 msgid " | [B]ETA:[/B]"
 msgstr " | [B]ETA:[/B]"

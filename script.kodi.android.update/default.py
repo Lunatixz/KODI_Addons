@@ -20,7 +20,7 @@ from contextlib import contextmanager
 ADDON_ID      = 'script.kodi.android.update'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_NAME    = REAL_SETTINGS.getAddonInfo('name')
-SETTINGS_LOC  = '/storage/emulated/0/download'
+SETTINGS_LOC = '/storage/emulated/0/Download/'
 ADDON_PATH    = REAL_SETTINGS.getAddonInfo('path')
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 ICON          = REAL_SETTINGS.getAddonInfo('icon')
@@ -34,7 +34,8 @@ DEBUG     = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 CLEAN     = REAL_SETTINGS.getSetting('Disable_Maintenance') == 'false'
 VERSION   = REAL_SETTINGS.getSetting("Version") #VERSION = 'Android 4.0.0 API level 24, kernel: Linux ARM 64-bit version 3.10.96+' #Test
 BASE_URL  = 'http://mirrors.kodi.tv/'
-BRANCHS   =  {22:'piers',21:'omega',20:'nexus',19:'matrix',18:'leia',17:'krypton',16:'jarvis',15:'isengard',14:'helix',13:'gotham','':''}
+BRANCHS   =  {32:'z',31:'y',30:'x',29:'w',28:'v',27:'u',26:'t',25:'s',24:'r',23:'q',
+              22:'piers',21:'omega',20:'nexus',19:'matrix',18:'leia',17:'krypton',16:'jarvis',15:'isengard',14:'helix',13:'gotham','':''}
 BUILD_OPT = {'nightlies':LANGUAGE(30017),'releases':LANGUAGE(30016),'snapshots':LANGUAGE(30015),'test-builds':LANGUAGE(30018)}
 
 try:    
@@ -162,89 +163,150 @@ class Installer(object):
         
         
     def selectPath(self, url, bypass=False):
-        log('selectPath, url = ' + str(url))
-        newURL = url
+        log('selectPath, initial url = ' + str(url))
         while not self.myMonitor.abortRequested():
-            items  = list(self.buildItems(url))
-            if   len(items) == 0: break
-            elif len(items) == 2 and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().startswith('.apk'): select = 1 #If one folder bypass selection.
-            else: select = selectDialog(url.replace(BASE_URL,'./').replace('//','/'), items, [idx for idx, item in enumerate(items) if item.getLabel() in self.lastPATH])
-            if select is None: return #return on cancel.
-            label  = items[select].getLabel()
-            newURL = items[select].getPath()
-            preURL = url.rsplit('/', 2)[0] + '/'
-            if newURL.endswith('.apk'):
-                if not xbmcvfs.exists(SETTINGS_LOC): xbmcvfs.mkdir(SETTINGS_LOC)
-                dest = xbmcvfs.translatePath(os.path.join(SETTINGS_LOC,label))
-                self.setLastPath(url,dest)
-                return self.downloadAPK(newURL,dest)
-            elif label.lower() == 'parent directory' and "android" in preURL.lower():
-                return self.selectPath(preURL, True)
-            elif label.lower() == 'parent directory' and "android" not in preURL.lower():
-                return self.selectPath(self.buildMain(), False)
-            url = newURL + '/'
+            items = list(self.buildItems(url))
+            if len(items) == 0: 
+                break
                 
-
+            if len(items) == 2 and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().startswith('.apk'): 
+                select = 1 
+            else: 
+                dialog_title = url.replace(BASE_URL, './').replace('//', '/')
+                pre_selects = [idx for idx, item in enumerate(items) if item.getLabel() in self.lastPATH]
+                select = selectDialog(dialog_title, items, pre_selects)
+                
+            if select is None: return # User canceled
+            label = items[select].getLabel()
+            newURL = items[select].getPath()
+            
+            if label.endswith('.apk') or newURL.endswith('.apk'):
+                if not xbmcvfs.exists(SETTINGS_LOC): 
+                    xbmcvfs.mkdir(SETTINGS_LOC)
+                dest = xbmcvfs.translatePath(os.path.join(SETTINGS_LOC, label))
+                self.setLastPath(url, dest)
+                return self.downloadAPK(newURL, dest)
+                
+            elif label.lower() == 'parent directory':
+                preURL = url.rstrip('/').rsplit('/', 1)[0] + '/'
+                if "android" in preURL.lower() and preURL != url:
+                    url = preURL
+                    bypass = True
+                    continue
+                else:
+                    url = self.buildMain()
+                    bypass = False
+                    continue
+            
+            if not newURL.endswith('/'): url = newURL + '/'
+            else:                        url = newURL
+            bypass = False
+                
+                
+    def checkPermission(self, path):
+        dummy_file = os.path.join(xbmcvfs.translatePath(path), ".perm_test.tmp")
+        try:
+            with open(dummy_file, 'w') as f:
+                f.write('test')
+            if os.path.exists(dummy_file):
+                os.remove(dummy_file)
+            return True
+        except (IOError, OSError, PermissionError):
+            return False
+            
+            
+    def requestPermission(self):
+        xbmcgui.Dialog().ok(LANGUAGE(30026))
+        xbmc.executebuiltin('StartAndroidActivity("", "android.settings.APPLICATION_DETAILS_SETTINGS", "", "package:org.xbmc.kodi")')
+        
+        
     def fileExists(self, dest):
         if xbmcvfs.exists(dest):
-            if not xbmcgui.Dialog().yesno(ADDON_NAME, LANGUAGE(30004), dest.rsplit('/', 1)[-1], nolabel=LANGUAGE(30005), yeslabel=LANGUAGE(30006)): return True
+            if xbmcgui.Dialog().yesno(ADDON_NAME, LANGUAGE(30004), os.path.basename(dest), nolabel=LANGUAGE(30005), yeslabel=LANGUAGE(30006)): 
+                return False
+            return True
         return False
         
         
     def downloadAPK(self, url, dest):
+        if not self.checkPermission(os.path.dirname(dest)):
+            self.requestPermission()
+            return log("downloadAPK, Download aborted: Missing Android Storage Permissions.", xbmc.LOGERROR)
+
         if not self.fileExists(dest):
             start_time = time.time()
             dia = xbmcgui.DialogProgress()
             fle = dest.rsplit('/', 1)[1]
             dia.create(ADDON_NAME, LANGUAGE(30002)%fle)
-            try: urllib.request.urlretrieve(url.rstrip('/'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time, fle))
+            try: 
+                urllib.request.urlretrieve(url.rstrip('/'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time, fle))
+                self.installAPK(dest)
             except Exception as e:
-                dia.close()
                 xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
                 self.deleleAPK(dest)
-                return log("downloadAPK, Failed! (%s) %s"%(url,str(e)), xbmc.LOGERROR)
-        return self.installAPK(dest)
+                if "User canceled download" in str(e): log("downloadAPK, Download canceled by user.", xbmc.LOGINFO)
+                else: log("downloadAPK, Failed! (%s) %s"%(url,str(e)), xbmc.LOGERROR)
+            finally:
+                dia.close()
         
         
     def pbhook(self, numblocks, blocksize, filesize, dia, start_time, fle):
+        if dia.iscanceled(): raise RuntimeError("User canceled download")
         try: 
-            percent = min(numblocks * blocksize * 100 / filesize, 100) 
-            currently_downloaded = float(numblocks) * blocksize / (1024 * 1024) 
-            kbps_speed = numblocks * blocksize / (time.time() - start_time) 
-            if kbps_speed > 0: eta = (filesize - numblocks * blocksize) / kbps_speed 
-            else: eta = 0 
-            kbps_speed = kbps_speed / 1024 
-            if eta < 0: eta = divmod(0, 60)
-            else: eta = divmod(eta, 60)
-            total   = (float(filesize) / (1024 * 1024))
-            label   = '%s %s'%(LANGUAGE(30023),SETTINGS_LOC)
-            label2  = '%.02f MB of %.02f MB'%(currently_downloaded,total)
-            label2 += '%s %.02f Kb/s'%(LANGUAGE(30024),kbps_speed)
-            label2 += '%s %02d:%02d'%(LANGUAGE(30025),eta[0],eta[1])
-            dia.update(int(percent), '%s\n%s\n%s'%(label,fle,label2))
+            if filesize <= 0: filesize = 1# Fallback to prevent division by zero or negative
+            elapsed_time = time.time() - start_time
+            if elapsed_time <= 0: elapsed_time = 0.001 # Prevent ZeroDivisionError on instant hooks
+                
+            downloaded_bytes = numblocks * blocksize
+            percent = min((downloaded_bytes * 100) / filesize, 100) 
+            currently_downloaded_mb = float(downloaded_bytes) / (1024 * 1024) 
+            total_mb = float(filesize) / (1024 * 1024)
+            # Speed in bytes per second, converted to KB/s
+            bytes_per_sec = downloaded_bytes / elapsed_time
+            kbps_speed = bytes_per_sec / 1024 
+            
+            if bytes_per_sec > 0: 
+                eta_seconds = max(0, (filesize - downloaded_bytes) / bytes_per_sec)
+            else: 
+                eta_seconds = 0 
+            eta_minutes, eta_remaining_seconds = divmod(int(eta_seconds), 60)
+            
+            label = '%s %s' % (LANGUAGE(30023), SETTINGS_LOC)
+            label2 = '%.02f MB of %.02f MB' % (currently_downloaded_mb, total_mb)
+            label2 += ' | %s %.02f Kb/s' % (LANGUAGE(30024), kbps_speed)
+            label2 += ' | %s %02d:%02d' % (LANGUAGE(30025), eta_minutes, eta_remaining_seconds)
+            dia.update(int(percent), '%s\n%s\n%s' % (label, fle, label2))
         except Exception as e: 
-            log("pbhook failed! %s" + str(e), xbmc.LOGERROR)
+            log("pbhook failed! Error: %s" % str(e), xbmc.LOGERROR)
             dia.update(100)
-        if dia.iscanceled(): raise Exception
             
             
-    def deleleAPK(self, file):
+    def deleteAPK(self, file): # Renamed typo from deleleAPK
         try:
             count = 0
-            while not self.myMonitor.abortRequested() and count < 15:
-                if   self.myMonitor.waitForAbort(1): break
-                elif xbmcvfs.exists(file):
-                    count += 1 
+            while count < 15:
+                if self.myMonitor.waitForAbort(1): 
+                    log("Installer: Deletion aborted due to Kodi shutdown.")
+                    break
+                if xbmcvfs.exists(file):
                     if xbmcvfs.delete(file):
-                        log(f'Installer: deleleAPK = {file}')
+                        log(f'Installer: deleteAPK success = {file}')
                         break
-        except Exception as e: log("Installer: deleleAPK Failed! " + str(e), xbmc.LOGERROR)
+                    else:
+                        log(f'Installer: File locked, retrying deletion... ({count+1}/15)', xbmc.LOGDEBUG)
+                else:
+                    log(f'Installer: deleteAPK skipped, file does not exist: {file}', xbmc.LOGDEBUG)
+                    break
+                count += 1
+        except Exception as e: 
+            log("Installer: deleteAPK Failed! " + str(e), xbmc.LOGERROR)
             
         
     def installAPK(self, apkfile):
+        xbmc.executebuiltin('XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),0.5,true)')
         xbmc.executebuiltin('StartAndroidActivity(%s,,,"content://%s")'%(FMANAGER,apkfile))
-        # xbmc.executebuiltin('StartAndroidActivity("","android.intent.action.INSTALL_PACKAGE ","application/vnd.android.package-archive","content://%s")'%apkfile)
-        # xbmc.executebuiltin('XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),0.5,true)')
+        # xbmc.executebuiltin('StartAndroidActivity("", "android.intent.action.VIEW", "application/vnd.android.package-archive", "file://%s")'%xbmcvfs.translatePath(apkfile))
+        # xbmc.executebuiltin('StartAndroidActivity("","android.intent.action.INSTALL_PACKAGE ","application/vnd.android.package-archive","content://%s")'%xbmcvfs.translatePath(apkfile))
 
 
 if __name__ == '__main__': Installer()._run()

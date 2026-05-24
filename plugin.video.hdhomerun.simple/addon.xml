@@ -41,6 +41,7 @@
         <summary lang="pt_BR">Interface HDHomeRun Simples.</summary>
         <summary lang="ru_RU">Простой интерфейс HDHomeRun.</summary>
         <summary lang="sv_SE">Enkelt HDHomeRun-gränssnitt.</summary>
+        <summary lang="zh_CN">简易 HDHomeRun 接口。</summary>
         <description lang="bs_BA">Automatski pronađite sve kompatibilne HDHomeRun uređaje na vašoj mreži, jednostavno i lako HDHomeRun sučelje.</description>
         <description lang="da_DK">Find automatisk alle de kompatible HDHomeRun-enheder på dit netværk, enkel og nem HDHomeRun-brugerflade.</description>
         <description lang="de_DE">Finde automatisch alle kompatiblen HDHomeRun-Geräte in Deinem Netzwerk. Einfache Benutzerschnittstelle für HDHomeRun.</description>
@@ -50,6 +51,7 @@
         <description lang="it_IT">Trova automaticamente tutti i dispositivi HDHomeRun compatibili sulla tua rete, interfaccia HDHomeRun semplice e facile.</description>
         <description lang="pt_BR">Encontre automaticamente todos os dispositivos HDHomeRun compatíveis em sua rede, interface HDHomeRun simples e fácil.</description>
         <description lang="sv_SE">Hitta automatiskt alla kompatibla HDHomeRun-enheter i ditt nätverk, enkelt och smidigt HDHomeRun-gränssnitt.</description>
+        <description lang="zh_CN">自动搜索局域网内所有兼容的 HDHomeRun 设备，极简易用的 HDHomeRun 操作界面。</description>
         <disclaimer lang="bs_BA">Zahtijeva kompatibilan HDHomeRun uređaj</disclaimer>
         <disclaimer lang="da_DK">Kræver en kompatibel HDHomeRun-enhed</disclaimer>
         <disclaimer lang="en_GB">Requires a compatible HDHomeRun device</disclaimer>
@@ -58,5 +60,6 @@
         <disclaimer lang="it_IT">Richiede un dispositivo HDHomeRun compatibile</disclaimer>
         <disclaimer lang="pt_BR">Requer um dispositivo HDHomeRun compatível</disclaimer>
         <disclaimer lang="sv_SE">Kräver en kompatibel HDHomeRun-enhet</disclaimer>
+        <disclaimer lang="zh_CN">需搭配兼容的 HDHomeRun 硬件设备使用</disclaimer>
     </extension>
 </addon>

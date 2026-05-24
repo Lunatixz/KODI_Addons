@@ -22,6 +22,7 @@ import datetime, queue, heapq, random, pickle, sys
 try:    from simplecache             import SimpleCache
 except: from simplecache.simplecache import SimpleCache #pycharm stub
 
+from typing      import Union
 from contextlib  import contextmanager, closing
 from collections import defaultdict
 from functools   import partial, wraps, reduce, update_wrapper

@@ -33,7 +33,7 @@ msgid "Enable Debugging"
 msgstr ""
 
 msgctxt "#32001"
-msgid "Kodi Library"
+msgid "Scraping"
 msgstr ""
 
 msgctxt "#32002"
@@ -41,7 +41,7 @@ msgid "Start Delay/Service Interval (Seconds)"
 msgstr ""
 
 msgctxt "#32003"
-msgid "Scraper Interval (Hours)"
+msgid "Scraper Interval (Days)"
 msgstr ""
 
 msgctxt "#32004"
@@ -53,7 +53,7 @@ msgid "Enable Refresh"
 msgstr ""
 
 msgctxt "#32006"
-msgid "Refresh Interval (Hours)"
+msgid "Refresh Interval (Days)"
 msgstr ""
 
 msgctxt "#32007"
@@ -91,3 +91,47 @@ msgstr ""
 msgctxt "#32015"
 msgid "Include Episodes"
 msgstr ""
+
+msgctxt "#32016"
+msgid "Dry Run [No files removed/deleted]."
+msgstr ""
+
+msgctxt "#32017"
+msgid "Allow Media Deletion [If True and Dry Run; Media moved to .kodi_trash]."
+msgstr ""
+
+msgctxt "#32018"
+msgid "Permissions"
+msgstr ""
+
+msgctxt "#32019"
+msgid "Mapping"
+msgstr ""
+
+msgctxt "#32020"
+msgid "Enable Path ReMapping"
+msgstr ""
+
+msgctxt "#32021"
+msgid "Remote Path"
+msgstr ""
+
+msgctxt "#32022"
+msgid "Local Path"
+msgstr ""
+
+msgctxt "#32023"
+msgid "Clean Library after Scan."
+msgstr ""
+
+
+
+
+
+
+
+
+
+
+
+

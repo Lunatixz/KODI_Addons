@@ -3,6 +3,7 @@
     <setting id="Enable_Debugging" type="bool" label="32000" default="false" />
     <setting id="Run_Playing" type="bool" label="32011" default="false" />
     <setting id="Run_Idling" type="bool" label="32014" default="true" />
+    <setting id="Clean_OnScanFinished" type="bool" label="32023" default="false" />
     <setting id="Start_Delay" type="number" label="32002" default="15" />
 	<setting label="32001" type="lsep"/>
     <setting id="Scraper_Enabled" type="bool" label="32010" default="false" />

@@ -48,6 +48,27 @@ def log(msg, level=xbmc.LOGDEBUG):
     if level == xbmc.LOGERROR: msg = '%s, %s'%(msg,traceback.format_exc())
     xbmc.log('%s-%s-%s'%(ADDON_ID,ADDON_VERSION,str(msg)),level)
     
+def _getEXTProperty(key, default=''):
+    try:
+        value = (xbmcgui.Window(10000).getProperty(key) or default)
+        try: value = literal_eval(value)
+        except (ValueError, SyntaxError): pass
+        if not '.TRASH' in key: log(f'Globals: [10000] _getEXTProperty, key = {key}, value = {str(value)[:128]}, type = {type(value).__name__}')
+        return value 
+    except Exception as e: 
+        log(f'Globals: [10000] _getEXTProperty, failed! key = {key}, value = {str(value)[:128]}, type = {type(value).__name__}\n{e}')
+        return default
+
+def _setEXTProperty(key, value):
+    if not value is None: 
+        xbmcgui.Window(10000).setProperty(key, value)
+        if not '.TRASH' in key: log(f'Globals: [10000] _setEXTProperty, key = {key}, value = {str(value)[:128]}, type = {type(value).__name__}')
+    return value
+
+def _clrEXTProperty(key):
+    log(f'Globals: [10000] _clrEXTProperty, key = {key}')
+    return xbmcgui.Window(10000).clearProperty(key)
+
 def dumpPICKLE(item={}, fle=None):
     try:
         if fle and hasattr(item,'write'):        
@@ -150,9 +171,13 @@ def isScanning():
 def isPlaying():
     return (xbmc.getCondVisibility('Player.Playing') or False)
 
-def findDupes(items=[], key='label', matches=defaultdict(list)):
-    [matches[item[key]].append(item) for item in items if key in item]
-    return [match for match in matches.values() if len(match) > 1]
+def findDupes(items=[], key='label'):
+    if items is None: items = []
+    matches = {}
+    for item in items:
+        if key in item: 
+            matches.setdefault(item[key],[]).append(item)
+    return {k: v for k, v in matches.items() if len(v) > 1}
     
 def findMatch(match, items=[], key='file'):
     return [item for item in items if item.get(key) == match] 

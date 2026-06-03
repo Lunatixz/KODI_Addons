@@ -260,7 +260,7 @@ class Service(object):
         master      = None
         message     = '[DRY RUN] Processing:' if REAL_SETTINGS.getSettingBool('Dry_Run_Mode') else 'Processing:'
         if show is None: show = REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')
-        self.log(f'cleanTV, episodes = {len(episodes)}, show = {show}')
+        self.log(f'cleanTV, tvshowid = {tvshowid}, show = {show}')
         try:
             if episodes and episodes[0] and not self._verifyNetwork(episodes[0].get('file')): return False
             if show:
@@ -271,8 +271,8 @@ class Service(object):
                 if self.monitor.waitForAbort(0.01): break
                 elif not episode: continue
                 shadow_copies = sorted(duplicates.get(episode.get('label'),{}), key=lambda x: self.get_stream_weight(x.get('file', '')), reverse=True)
-                self.log(f'cleanTV, episode = {episode.get('label')}, shadow_copies = {len(shadow_copies)}')
                 if shadow_copies:
+                    self.log(f'cleanTV, episode = {episode.get('label')}, shadow_copies = {len(shadow_copies)}')
                     master_copy = shadow_copies.pop(0) #duplicate we want to keep.
                     for sidx, shadow_copy in enumerate(shadow_copies):
                         if self.monitor.waitForAbort(0.01): break
@@ -288,19 +288,23 @@ class Service(object):
 
                             state_snapshot = self.get_media_bookmark("episode", shadow_copy.get('episodeid'))
                             if not xbmcvfs.exists(mapped_ep_path):
+                                self.log('cleanTV, shadow entry no longer exists: %s' % shadow_copy.get('file'))
                                 if self.executeRemoveEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Missing File)"):
                                     self.restore_media_bookmark("episode", master_copy.get('file'), state_snapshot)
                                     
                             if (master_copy.get('file','-1') == shadow_copy.get('file') and master_copy.get('episodeid',-1) != shadow_copy.get('episodeid')):
+                                self.log('cleanTV, duplicate shadow entry detected: %s' % shadow_copy.get('file'))
                                 if self.executeRemoveEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Shadow Duplicate)"):
                                     self.restore_media_bookmark("episode", master_copy.get('file'), state_snapshot)
                                     
                             elif master_copy.get('file','-1') != shadow_copy.get('file'):
+                                self.log('cleanTV, duplicate entry detected: %s' % shadow_copy.get('file'))
                                 if self.executeRemoveEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Physical Duplicate)"):
                                     self.executeTrashFile(mapped_ep_path)
                                     self.restore_media_bookmark("episode", master_copy.get('file'), state_snapshot)
 
                 if not xbmcvfs.exists(self.remapPath(episode.get('file', ''))):
+                    self.log('cleanTV, media no longer exists: %s' % episode.get('file'))
                     percent = int((eidx / len(episodes)) * 100) if len(episodes) > 0 else 0
                     if pDialog: pDialog.update(percent, message="%s %s\nAbandoned: %s" % (message,episode.get('showtitle',tvshowid),episode.get('label', '')))
                     self.executeRemoveEpisode(episode.get('episodeid'), episode.get('file'), "cleanTV (Missing File)")

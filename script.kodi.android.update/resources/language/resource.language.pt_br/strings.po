@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Generator: Weblate 5.17.1\n"
-
+msgctxt "#30000"
 msgctxt "Addon Summary"
 msgid "Download and Install Kodi packages."
 msgstr "Baixe e instale pacotes Kodi."
@@ -25,7 +25,6 @@ msgctxt "Addon Description"
 msgid "Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds."
 msgstr "Baixe e instale pacotes Android Kodi; selecione entre · · Nightlies, Releases, Snapshots e Test-builds."
 
-msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr "Habilitar depuração [erros de log]"
 

@@ -25,7 +25,6 @@ msgctxt "Addon Description"
 msgid "Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds."
 msgstr "Laadi alla ja paigalda Kodi android pakette; valikus on Nightlies, Releases, Snapshots ja Test-builds."
 
-msgctxt "#30000"
 msgid "Enable Debugging [Log errors]"
 msgstr "Luba silumine [logi vead]"
 

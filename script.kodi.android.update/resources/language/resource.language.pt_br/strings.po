@@ -23,7 +23,7 @@ msgstr "Baixe e instale pacotes Kodi."
 
 msgctxt "Addon Description"
 msgid "Download and Install Kodi android packages; select from  Nightlies, Releases, Snapshots and Test-builds."
-msgstr "Baixe e instale pacotes Android Kodi; selecione entre · · Nightlies, Releases, Snapshots e Test-builds."
+msgstr "Baixe e instale pacotes Android Kodi; selecione entre · · Nightlies, Releases, Snapshots e Test-builds.[CR][CR]msgid Enable Debugging [Log errors][CR]msgstr Habilitar depuração [erros de log]"
 
 msgid "Enable Debugging [Log errors]"
 msgstr "Habilitar depuração [erros de log]"

@@ -100,14 +100,21 @@ class Installer(object):
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30009), ICON, 4000)
         
 
+    def getURL(self, url):
+        try:
+            HEADER = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
+            return urllib.request.urlopen(urllib.request.Request(url, headers=HEADER)).read()
+        except Exception as e:
+            log(f"getURL failed! {e}", xbmc.LOGERROR)
+       
+
     def openURL(self, url):
         if url is None: return
         log('openURL, url = ' + str(url))
         try:
             cacheResponce = self.cache.get(ADDON_NAME + '.openURL, url = %s'%url)
             if not cacheResponce:
-                request = urllib.request.Request(url)
-                cacheResponce = urllib.request.urlopen(request, timeout = TIMEOUT).read()
+                cacheResponce = self.getURL(url)
                 self.cache.set(ADDON_NAME + '.openURL, url = %s'%url, cacheResponce, expiration=datetime.timedelta(minutes=5))
             return BeautifulSoup(cacheResponce, "html.parser")
         except Exception as e:
@@ -216,7 +223,7 @@ class Installer(object):
             
             
     def requestPermission(self):
-        xbmcgui.Dialog().ok(LANGUAGE(30026))
+        # xbmcgui.Dialog().ok(LANGUAGE(30026))
         xbmc.executebuiltin('StartAndroidActivity("", "android.settings.APPLICATION_DETAILS_SETTINGS", "", "package:org.xbmc.kodi")')
         
         

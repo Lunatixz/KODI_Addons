@@ -50,6 +50,7 @@
         <description lang="fi_FI">Etsi yhteensopivat HDHomeRun-laitteet verkostasi automaattisesti. Yksinkertainen ja helppokäyttöinen HDHomeRun-käyttöliittymä.</description>
         <description lang="it_IT">Trova automaticamente tutti i dispositivi HDHomeRun compatibili sulla tua rete, interfaccia HDHomeRun semplice e facile.</description>
         <description lang="pt_BR">Encontre automaticamente todos os dispositivos HDHomeRun compatíveis em sua rede, interface HDHomeRun simples e fácil.</description>
+        <description lang="ru_RU">Автоматически находит все совместимые устройства HDHomeRun в вашей сети. Простой и лёгкий интерфейс HDHomeRun.</description>
         <description lang="sv_SE">Hitta automatiskt alla kompatibla HDHomeRun-enheter i ditt nätverk, enkelt och smidigt HDHomeRun-gränssnitt.</description>
         <description lang="zh_CN">自动搜索局域网内所有兼容的 HDHomeRun 设备，极简易用的 HDHomeRun 操作界面。</description>
         <disclaimer lang="bs_BA">Zahtijeva kompatibilan HDHomeRun uređaj</disclaimer>
@@ -59,6 +60,7 @@
         <disclaimer lang="fi_FI">Vaatii yhteensopivan HDHomeRun-laitteen</disclaimer>
         <disclaimer lang="it_IT">Richiede un dispositivo HDHomeRun compatibile</disclaimer>
         <disclaimer lang="pt_BR">Requer um dispositivo HDHomeRun compatível</disclaimer>
+        <disclaimer lang="ru_RU">Требуется совместимое устройство HDHomeRun</disclaimer>
         <disclaimer lang="sv_SE">Kräver en kompatibel HDHomeRun-enhet</disclaimer>
         <disclaimer lang="zh_CN">需搭配兼容的 HDHomeRun 硬件设备使用</disclaimer>
     </extension>

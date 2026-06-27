@@ -18,216 +18,266 @@
 # -*- coding: utf-8 -*-
 from globals            import *
 from collections        import defaultdict
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, TimeoutError
-
-try:
-    import multiprocessing
-    cpu_count   = multiprocessing.cpu_count()
-    ENABLE_POOL = False #True force disable multiproc. until monkeypatch/wrapper to fix pickling error. 
-except:
-    ENABLE_POOL = False
-    cpu_count   = os.cpu_count()
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, TimeoutError, as_completed
 
 class ExecutorPool:
-    def __init__(self):
-        self.CPUCount = cpu_count
-        if ENABLE_POOL: self.pool = ProcessPoolExecutor
-        else:           self.pool = ThreadPoolExecutor
-        self.log(f"__init__, multiprocessing = {ENABLE_POOL}, CORES = {self.CPUCount}, THREADS = {self._calculate_thread_count()}")
+    def __init__(self, workers=THREAD_WORKERS):
+        self._workers  = workers
+        self._executor = ThreadPoolExecutor(max_workers=workers)
+    
+    def __del__(self):
+        self.shutdown()
 
-
-    def _calculate_thread_count(self):
-        if ENABLE_POOL: return self.CPUCount
-        else:           return int(os.getenv('THREAD_COUNT', self.CPUCount * 2))
-            
-            
     def log(self, msg, level=xbmc.LOGDEBUG):
-        return log('%s: %s'%(self.__class__.__name__,msg),level)
+        return log(f"{self.__class__.__name__}: {msg}", level)
 
+    def isShutdown(self):
+        return getattr(self._executor, "_shutdown", False)
 
+    def shutdown(self, wait=False, cancel=True):
+        try: 
+            self._executor.shutdown(wait=wait, cancel=cancel)
+            self.log("shutdown, _executor")
+        except Exception: pass
+        
+    def getTimeout(self):
+        try: return int(REAL_SETTINGS.getSetting('API_Timeout') or REAL_SETTINGS.getSetting('Start_Delay') or 15)
+        except Exception: return 15
+
+    def getUseExecutor(self):
+        value = REAL_SETTINGS.getSetting('Enable_Executor')
+        if value == '': return True
+        return value.lower() == "true"
+            
     def executor(self, func, timeout=None, *args, **kwargs):
-        self.log("executor, func = %s, timeout = %s"%(func.__name__,timeout))
-        with self.pool(self._calculate_thread_count()) as executor:
-            try: return executor.submit(func, *args, **kwargs).result(timeout)
-            except Exception as e: self.log("executor, func = %s failed! %s\nargs = %s, kwargs = %s"%(func.__name__,e,args,kwargs), xbmc.LOGERROR)
+        if timeout is None: timeout = self.getTimeout()
+        useExecutor = self.getUseExecutor()
+        if not useExecutor and xbmc.getCondVisibility('Player.Playing'): useExecutor = True
+        if useExecutor:
+            if self.isShutdown(): 
+                self._executor = ThreadPoolExecutor(max_workers=self._workers)
+                
+            with timeit(func):
+                try:
+                    future = self._executor.submit(func, *args, **kwargs)
+                    return future.result(timeout=float(timeout) )
+                except TimeoutError:
+                    self.log(f"executor, func = {func.__name__} timed out after {timeout}s", xbmc.LOGWARNING)
+                    future.cancel()
+                except Exception as e: 
+                    self.log(f"executor, func = {func.__name__} failed! {e}", xbmc.LOGERROR)
+        return self.execute(func, *args, **kwargs)
 
+    def execute(self, func, *args, **kwargs):
+        try:
+            with timeit(func):
+                return func(*args, **kwargs)
+        except Exception as e: self.log(f"execute, func = {func.__name__} failed! {e}", xbmc.LOGERROR)
 
-    def executors(self, func, items=[], *args, **kwargs):
-        self.log("executors, func = %s, items = %s"%(func.__name__,len(items)))
-        with self.pool(self._calculate_thread_count()) as executor:
-            try: return list(executor.map(wrapped_partial(func, *args, **kwargs), items))
-            except Exception as e: self.log("executors, func = %s, items = %s failed! %s\nargs = %s, kwargs = %s"%(func.__name__,len(items),e,args,kwargs), xbmc.LOGERROR)
-
+    def _wrapped_partial(self, func, *args, **kwargs):
+        partial_func = partial(func, *args, **kwargs)
+        update_wrapper(partial_func, func)
+        return partial_func
+        
+    def executors(self, func, items=[], timeout=None, *args, **kwargs):
+        if timeout is None: timeout = self.getTimeout()
+        useExecutor = self.getUseExecutor()
+        if not useExecutor and xbmc.getCondVisibility('Player.Playing'): useExecutor = True
+        if useExecutor:
+            if self.isShutdown(): 
+                self._executor = ThreadPoolExecutor(max_workers=self._workers)
+                
+            with timeit(func):
+                futures = {self._executor.submit(self._wrapped_partial(func, *args, **kwargs), i): i for i in items}
+                results = []
+                for future in as_completed(futures, timeout=float(timeout)):
+                    try: results.append(future.result())
+                    except Exception as e: self.log(f"executors, func = {func.__name__} failed! {e}", xbmc.LOGERROR)
+                if results: return results
+        return self.generator(func, items, *args, **kwargs)
 
     def generator(self, func, items=[], *args, **kwargs):
         self.log("generator, items = %s"%(len(items)))
-        try: return [wrapped_partial(func, *args, **kwargs)(i) for i in items]
-        except Exception as e: self.log("generator, func = %s, items = %s failed! %s\nargs = %s, kwargs = %s"%(func.__name__,len(items),e,args,kwargs), xbmc.LOGERROR)
-
-
-class LlNode:
-    def __init__(self, package: tuple, priority: int=0, timer: int=0):
-        self.prev      = None
-        self.next      = None
-        self.package   = package
-        self.priority  = priority
-        self.time      = timer
-
-
-class CustomQueue:
-    pool = ExecutorPool()
-    
-    def __init__(self, fifo: bool=False, lifo: bool=False, priority: bool=False, delay: bool=False, timer: bool=False, service=None):
-        self.log("__init__, fifo = %s, lifo = %s, priority = %s, delay = %s, timer = %s"%(fifo, lifo, priority, delay, timer))
-        self.isRunning = False
-        self.service   = service
-        self.fifo      = fifo
-        self.lifo      = lifo
-        self.priority  = priority
-        self.delay     = delay
-        self.timer     = timer
-        self.head      = None
-        self.tail      = None
-        self.min_heap  = []
-        self.qsize     = 0
-        self.nodes     = set()
-        self.itemCount = defaultdict(int)
-        self.popThread = Thread(target=self._start)
-        self.executor  = True
- 
- 
-    def log(self, msg, level=xbmc.LOGDEBUG):
-        return log('%s: %s'%(self.__class__.__name__,msg),level)
-
-
-    def _clear(self):
-        self.nodes     = set()
-        self.head      = None
-        self.tail      = None
-        self.min_heap  = []
-        self.itemCount = defaultdict(int)
-
-        
-    def _run(self):
-        self.log("_run")
-        if self.popThread.is_alive():
-            if hasattr(self.popThread, 'cancel'): self.popThread.cancel()
-            try: self.popThread.join()
-            except: pass
-        self.popThread = Thread(target=self._start)
-        self.popThread.daemon = True
-        self.popThread.start()
-
-
-    def _wait(self, package):
-        self.log(f"_wait, func = {package[0].__name__}")
-        self._exe(package[0],*package[1],**package[2])
-           
-
-    def _exe(self, func, *args, **kwargs):
-        self.log(f"_exe, func = {func.__name__}, executor = {self.executor}")
         try:
-            if    self.executor: self.pool.executor(func, None, *args, **kwargs)
-            else: Thread(target=func, args=args, kwargs=kwargs).start()
-        except Exception as e:
-            self.log(f"_exe, func = {func.__name__} failed! {e}\nargs = {args}, kwargs = {kwargs}", xbmc.LOGERROR)
-               
-               
-    def _exists(self, package: tuple, priority: int = 0, timer: int = 0):
-        if priority:
-            for idx, item in enumerate(self.min_heap):
-                epriority,_,epackage = item
-                if package == epackage:
-                    if priority < epriority:
-                        try:
-                            self.min_heap.pop(idx)
-                            heapq.heapify(self.min_heap)  # Ensure heap property is maintained
-                            self.log("_exists, replacing queue: func = %s, priority %s => %s"%(epackage[0].__name__,epriority,priority))
-                        except: self.log("_exists, replacing queue: func = %s, idx = %s failed!"%(epackage[0].__name__,idx))
-                    else: return True
-        elif timer:
-            for idx, func in enumerate(self.nodes):
-                if func == package[0].__name__: return True
-            self.nodes.add(package[0].__name__)
-        return False
-        
-             
-    def _push(self, package: tuple, priority: int = 0, delay: int = 0, timer: int = 0):
-        if   priority == -1: priority = self.qsize + 1 #lazy FIFO
-        elif delay: #lazy timer
-            if not timer: timer = time.time()
-            timer += delay
-        
-        if self.priority:
-            if not self._exists(package, priority, timer):
-                try:
-                    self.qsize += 1
-                    self.itemCount[priority] += 1
-                    self.log(f"_push, func = {package[0].__name__}, priority = {priority}")
-                    heapq.heappush(self.min_heap, (priority, self.itemCount[priority], package))
-                    if not self.isRunning: self._run()
-                except Exception as e:
-                    self.log(f"_push, func = {package[0].__name__} failed! {e}", xbmc.LOGFATAL)
-        else:
-            if timer and self._exists(package, priority, timer): print('%s exists'%(package[0].__name__))
-            else:
-                node = LlNode(package, priority, timer)
-                if self.head:
-                    self.tail.next = node
-                    node.prev = self.tail
-                    self.tail = node
-                else:
-                    self.head = node
-                    self.tail = node
-                self.log(f"_push, func = {package[0].__name__}, timer = {timer}")
-                if not self.isRunning: self._run()
-                
+            with timeit(func):
+                results = [self._wrapped_partial(func, *args, **kwargs)(i) for i in items]
+                return [r for r in results if r is not None]
+        except Exception as e: self.log(f"generator, func = {func.__name__} failed! {e}", xbmc.LOGERROR) 
+        return []
 
-    def _process(self, node, fifo=True):
-        package = node.package
-        next_node = node.next if fifo else node.prev
-        if next_node: next_node.prev = None if fifo else next_node.prev
-        if node.prev: node.prev.next = None if fifo else node.prev
-        if fifo: self.head = next_node
-        else:    self.tail = next_node
-        return package
+@contextmanager
+def timeit(method):
+    start_time = time.time()
+    try: yield
+    finally:
+        end_time = time.time()
+        log('%s timeit => %.2f ms'%(method.__qualname__.replace('.',': '),(end_time-start_time)*1000))
+
+def poolit(method):
+    @wraps(method)
+    def wrapper(items=None, wait=None, *args, **kwargs):
+        if wait is None: wait = int(REAL_SETTINGS.getSetting('Start_Delay') or 15)
+        monitor = xbmc.Monitor()
+        if monitor.abortRequested(): return None
+        if items is None: items = []
+        execution_state = { 'result': None, 'error': None }
         
+        def __worker():
+            try:
+                if monitor.abortRequested(): return
+                execution_state['result'] = ExecutorPool().executors(method, items, wait, *args, **kwargs)
+                xbmc.log(f"{method.__qualname__} pool completed on {current_thread().name}", xbmc.LOGINFO)
+            except Exception: execution_state['error'] = traceback.format_exc()
+
+        if monitor.abortRequested(): return None
+        thread = Thread(target=__worker)
+        thread.name = f"{ADDON_ID}.poolit.{method.__qualname__}"
+        thread.daemon = True
+        thread.start()
         
-    def _start(self):
-        self.isRunning = True
-        while not self.service.monitor.abortRequested():
-            if not self.head and not self.priority:
-                self.log("_start, The queue is empty!")
-                break
-            elif self.service.monitor.waitForAbort(0.0001):
-                self.log("_start, waitForAbort!")
-                break
-            elif self.priority:
-                if not self.min_heap:
-                    self.log("_start, The priority queue is empty!")
-                    break
+        xbmc.log(f"{method.__name__} supervisor thread started: {thread.name}", xbmc.LOGDEBUG)
+        thread.join(timeout=float(wait))
+        if thread.is_alive():
+            xbmc.log(f"{method.__name__} pool timed out! Background supervisor abandoned.", xbmc.LOGWARNING)
+            return None
+        if execution_state['error']:
+            xbmc.log(f"{method.__name__} pool failed with errors:\n{execution_state['error']}", xbmc.LOGERROR)
+            return None
+        return execution_state['result']
+    return wrapper
+    
+class Task(object):
+    def __init__(self, func, args=(), kwargs=None, priority=3, execute_at=0):
+        self.func         = func
+        self.args         = args
+        self.kwargs       = kwargs if kwargs is not None else {}
+        self.priority     = priority
+        self.execute_at   = execute_at
+        self.is_cancelled = False
+
+    def cancel(self):
+        self.is_cancelled = True
+
+    def __lt__(self, other):
+        # Tie-breaker logic (won't be reached if counters are unique, but standard safety)
+        return self.priority < other.priority
+
+class CustomQueue(object):
+    def __init__(self, service, workers=THREAD_WORKERS):
+        self.service  = service
+        self.monitor  = service.monitor
+        self.cache    = service.cache
+        self.pool      = ExecutorPool()
+        self.lock     = Lock()
+        self.wake     = Event()
+        
+        self.heap     = []
+        self.pending  = {}
+        self.counter  = 0
+        
+        self.useExecutor = True#SETTINGS.getSettingBool('Enable_Executor')
+        self.queueThread = Thread(target=self.execute, name=f"{ADDON_ID}.priorityQUE")
+        
+    def log(self, msg, level=xbmc.LOGDEBUG):
+        return log(f'{self.__class__.__name__}: {msg}', level)
+        
+    def _freeze(self, obj):
+        if isinstance(obj, list): return tuple(self._freeze(item) for item in obj)
+        if isinstance(obj, dict): return tuple(sorted((k, self._freeze(v)) for k, v in obj.items()))
+        if isinstance(obj, set):  return frozenset(self._freeze(item) for item in obj)
+        return obj
+        
+    def _get_task_key(self, func, args, kwargs):
+        return (func.__name__, tuple(self._freeze(arg) for arg in args), tuple(sorted((k, self._freeze(v)) for k, v in kwargs.items())) if kwargs else ())
+
+    def push(self, package: tuple, priority: int = 3, delay: int = 0, timer: int = 0):
+        now = time.time()
+        if   timer: execute_at = timer
+        elif delay: execute_at = now + delay
+        else:       execute_at = now
+            
+        func, args, kwargs = package
+        if kwargs is None: kwargs = {}
+        task_key = self._get_task_key(func, args, kwargs)
+        if task_key:
+            priority = max(1, min(5, int(priority)))
+            with self.lock:
+                if task_key in self.pending:
+                    existing_task = self.pending[task_key]
+                    # Lower numerical value means HIGHER priority (1 is highest, 5 is lowest)
+                    if priority < existing_task.priority:
+                        self.log(f"push, Upgrading {func.__name__} priority from {existing_task.priority} to {priority}.", xbmc.LOGDEBUG)
+                        existing_task.cancel()  # Cancel lower-priority duplicate
+                        new_task = Task(func, args, kwargs, priority, execute_at)
+                        self.pending[task_key] = new_task
+                        self.counter += 1
+                        heapq.heappush(self.heap, (priority, self.counter, new_task))
+                    else: self.log(f"push, Task {func.__name__} ignored (already queued with higher/equal priority {existing_task.priority}).", xbmc.LOGDEBUG)
                 else:
-                    try:
-                        priority, _, package = heapq.heappop(self.min_heap)
-                        self.qsize -= 1
-                        self._exe(package[0],*package[1],**package[2])
-                    except Exception as e: self.log("_start, failed! %s"%(e), xbmc.LOGERROR)
-            elif self.fifo or self.lifo:
-                curr_node = self.head if self.fifo else self.tail
-                if curr_node is None: break
-                else:
-                    try:
-                        package = self._process(curr_node, fifo=self.fifo)
-                        if self.timer or curr_node.time:
-                            if time.time() < curr_node.time: self._push(package, timer=curr_node.time)
-                            else:
-                                self.nodes.remove((package[0].__name__))
-                                self._exe(package[0],*package[1],**package[2])
-                        else: self._exe(package[0],*package[1],**package[2])
-                    except Exception as e: self.log("_start, failed! %s"%(e), xbmc.LOGERROR)
+                    new_task = Task(func, args, kwargs, priority, execute_at)
+                    self.pending[task_key] = new_task
+                    self.counter += 1
+                    heapq.heappush(self.heap, (priority, self.counter, new_task))
+                    self.log(f"push, Pushed task {func.__name__} (Priority: {priority}).", xbmc.LOGDEBUG)
+
+            if not self.monitor.abortRequested() and not self.queueThread.is_alive():
+                self.useExecutor = True#SETTINGS.getSettingBool('Enable_Executor')
+                self.queueThread = Thread(target=self.execute, name=f"{ADDON_ID}.queueThread")
+                self.queueThread.daemon = True
+                self.queueThread.start()
+
+    def pop(self):
+        with self.lock:
+            while not self.monitor.abortRequested() and self.heap:
+                _, _, task = heapq.heappop(self.heap)
+                task_key = self._get_task_key(task.func, task.args, task.kwargs)
+                if task.is_cancelled: continue
+                if self.pending.get(task_key) is task:
+                    self.pending.pop(task_key, None)
+                return task
+            return None
+
+    def execute(self):
+        self.log("execute, Thread execution loop active.", xbmc.LOGINFO)
+        while not self.monitor.abortRequested():
+            if self.monitor.waitForAbort(2.0):
+                self.log("execute, Shutdown/Abort requested. Exiting queue.", xbmc.LOGINFO)
+                break
             else:
-                self.log("_start, queue undefined!")
-                break
-                
-        self.isRunning = False
-        self.log("_start, finished: shutting down...")
+                task = self.pop()
+                if task is None:
+                    self.monitor.waitForAbort(2.0)
+                    continue
+                    
+                if task.execute_at and task.execute_at > time.time():
+                    with self.lock:
+                        self.counter += 1
+                        heapq.heappush(self.heap, (task.priority, self.counter, task))
+                    self.monitor.waitForAbort(min(0.5, max(0.0, task.execute_at - time.time())))
+                    continue
+                        
+                self.log(f"execute, Dispatching {task.func.__name__} (Priority: {task.priority}) to ThreadPool.", xbmc.LOGDEBUG)
+                try:
+                    with timeit(task.func):
+                        if self.useExecutor:
+                            future = self.pool._executor.submit(task.func, *task.args, **task.kwargs)
+                            future.result()
+                        else: 
+                            task.func(*task.args, **task.kwargs)
+                except Exception as e: self.log(f"execute, failed! {e}", xbmc.LOGERROR)
+        self.shutdown()
+        self.log("execute, finished: shutting down...")
+
+    def _future_callback(self, future):
+        try: 
+            return future.result()
+        except Exception as e: 
+            self.log(f"_future_callback, failed! {e}", xbmc.LOGERROR)
+            return future.cancel()
+
+    def shutdown(self, wait=False, cancel=True):
+        try: 
+            self.pool._executor.shutdown(wait=wait, cancel_futures=cancel)
+            self.log("shutdown, pool")
+        except Exception: pass
+            

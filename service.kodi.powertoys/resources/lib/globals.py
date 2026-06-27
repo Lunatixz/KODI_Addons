@@ -16,18 +16,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Kodi PowerToys.  If not, see <http://www.gnu.org/licenses/>.
 # -*- coding: utf-8 -*-
-import time, traceback, json, os, platform, pathlib, re
+import time, traceback, json, os, platform, pathlib, re, base64, zlib
 import datetime, queue, heapq, random, pickle, sys
 
 try:    from simplecache             import SimpleCache
 except: from simplecache.simplecache import SimpleCache #pycharm stub
 
 from typing      import Union
+from ast         import literal_eval
 from contextlib  import contextmanager, closing
 from collections import defaultdict
 from functools   import partial, wraps, reduce, update_wrapper
 from kodi_six    import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
-from threading   import Lock, Thread, Event, Timer, BoundedSemaphore
+from threading   import Lock, Thread, Event, Timer, BoundedSemaphore, current_thread
 from infotagger.listitem import ListItemInfoTag
 
 # Plugin Info
@@ -42,6 +43,7 @@ FANART              = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE            = REAL_SETTINGS.getLocalizedString
 
 DEFAULT_ENCODING    = "utf-8"
+THREAD_WORKERS      = os.cpu_count() * 2
 
 def log(msg, level=xbmc.LOGDEBUG):
     if not REAL_SETTINGS.getSettingBool('Enable_Debugging') and level != xbmc.LOGERROR: return
@@ -165,6 +167,12 @@ def timerit(method):
     wrapper._lock = Lock()
     return wrapper
 
+def getInfoLabel(key, default=""):
+    return (xbmc.getInfoLabel(key) or default)
+
+def getInfoBool(self, key):
+    return (xbmc.getCondVisibility(key) or False)
+    
 def isScanning():
     return (xbmc.getCondVisibility('Library.IsScanningVideo') or False)
 
@@ -179,8 +187,8 @@ def findDupes(items=[], key='label'):
             matches.setdefault(item[key],[]).append(item)
     return {k: v for k, v in matches.items() if len(v) > 1}
     
-def findMatch(match, items=[], key='file'):
-    return [item for item in items if item.get(key) == match] 
+def findMatch(match, items=[], key='label'):
+    return [item for item in items if item.get(key) == match.get(key)] 
     
 def decodeString(base64_bytes):
     try:
@@ -224,10 +232,10 @@ def getTVshows():
     return sendJSON({"method":"VideoLibrary.GetTVShows","params":{"properties":["file"]}}).get('result',{}).get('tvshows', [])
        
 def getEpisodes(tvshowid):
-    return sendJSON({"method":"VideoLibrary.GetEpisodes","params":{"tvshowid":tvshowid,"properties":["file"]}}).get('result',{}).get('episodes', [])
+    return sendJSON({"method":"VideoLibrary.GetEpisodes","params":{"tvshowid":tvshowid,"properties":["file","season","episode","showtitle","tvshowid"]}}).get('result',{}).get('episodes', [])
 
 def getMovies():
-    return sendJSON({"method":"VideoLibrary.GetMovies","params":{"properties":["file"]}}).get('result',{}).get('movies', [])
+    return sendJSON({"method":"VideoLibrary.GetMovies","params":{"properties":["file","year"]}}).get('result',{}).get('movies', [])
 
 def getDirectory(path):
     return sendJSON({"method":"Files.GetDirectory","params":{"directory":path,"media":"files"}}).get('result',{}).get('files', [])
@@ -258,7 +266,7 @@ def buildListItem(label="", label2="", icon=ICON, url="", info={}, art={}, props
     listitem.setArt(art)
     if info:
         infoTag = ListItemInfoTag(listitem, media)
-        infoTag.set_info(self.cleanInfo(info,media))
-    [listitem.setProperty(key, self.cleanProp(pvalue)) for key, pvalue in list(props.items())]
+        infoTag.set_info(info)
+    [listitem.setProperty(key, dumpJSON(pvalue) if isinstance(pvalue, (dict, list, tuple, set)) else str(pvalue)) for key, pvalue in list(props.items())]
     return listitem
            

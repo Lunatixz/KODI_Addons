@@ -17,7 +17,7 @@
 # along with Kodi PowerToys.  If not, see <http://www.gnu.org/licenses/>.
 # -*- coding: utf-8 -*-
 from globals import *
-from cqueue import CustomQueue
+from cqueue  import CustomQueue
 
 class SetEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -26,7 +26,7 @@ class SetEncoder(json.JSONEncoder):
 
 class Player(xbmc.Player):
     def __init__(self, monitor=None):
-        xbmc.Player.__init__(self)
+        super(Player, self).__init__()
         self.monitor = monitor
         self.service = monitor.service if monitor else None
         self.playingItem = {'listitem':xbmcgui.ListItem()}
@@ -93,16 +93,15 @@ class Player(xbmc.Player):
 
     def getPlayerProgress(self):
         try:    return abs(int((self.getRemainingTime() / self.getPlayerTime()) * 100) - 100)
-        except: return int((BUILTIN.getInfoLabel('Player.Progress') or '-1'))
+        except: return int((getInfoLabel('Player.Progress') or '-1'))
 
     def getTimeLabel(self, prop: str='TimeRemaining') -> Union[int, float]:
-        if self.isPlaying(): return timeString2Seconds(BUILTIN.getInfoLabel('%s(hh:mm:ss)'%(prop),'Player'))
+        if self.isPlaying(): return timeString2Seconds(getInfoLabel('%s(hh:mm:ss)'%(prop),'Player'))
         return -1
-
 
 class Monitor(xbmc.Monitor):
     def __init__(self, service=None):
-        xbmc.Monitor.__init__(self)
+        super(Monitor, self).__init__()
         self.service = service
         self.player  = Player(self)
         
@@ -111,119 +110,86 @@ class Monitor(xbmc.Monitor):
         
     def onNotification(self, sender, method, data):
         self.log("onNotification, sender %s - method: %s  - data: %s" % (sender, method, data))
-        
         if self.service:
             if method == "VideoLibrary.OnScanFinished" and REAL_SETTINGS.getSettingBool('Clean_OnScanFinished'):
                 self.log("Event Intercept -> Library Scan Finished. Injecting optimization pass.")
-                self.service._que(self.service.runClean, priority=1)
+                self.service._que(self.service.runClean, priority=5)
             elif method in ["VideoLibrary.OnUpdate", "VideoLibrary.OnScanStarted"]:
-                if hasattr(self.service, 'directory_cache'):
-                    self.service.directory_cache.clear()
-
+                if hasattr(self.service, '_cache'):
+                    self.service._cache.clear()
 
 class Service(object):
     cache = SimpleCache()
     cache.enable_mem_cache = True
     
     def __init__(self):
-        self.running  = False
+        self.isRunning  = False
         self.monitor  = Monitor(self)
         self.player   = self.monitor.player
-        self.priority = CustomQueue(priority=True, service=self)
+        self.queue    = CustomQueue(service=self)
         self.pid      = "%s_%s" % (platform.node(), os.getpid())
-        self.waitTime = REAL_SETTINGS.getSettingInt('Start_Delay')
-        self.directory_cache = {}
-        
-        raw_tasks = (self.cache.get('tasks', checksum=ADDON_VERSION, json_data=True) or dict())
-        if isinstance(raw_tasks, str):
-            try:              raw_tasks = json.loads(raw_tasks)
-            except Exception: raw_tasks = dict()
-                
-        self.tasks = {}
-        for k, v in list(raw_tasks.items()):
-            if k in ['scrapeDirectory', 'cleanTV', 'refreshTVshow', 'refreshMovie']:
-                self.tasks[k] = set(tuple(x) if isinstance(x, list) else x for x in v)
-            else:
-                self.tasks[k] = list(v)
+        self.wait     = REAL_SETTINGS.getSettingInt('Start_Delay')
+        self._cache   = {}
+        self._tasks   = self._load()
 
-        for k in ['scrapeDirectory', 'cleanTV', 'refreshTVshow', 'refreshMovie']:
-            self.tasks.setdefault(k, set())
-        self.tasks.setdefault('cleanMovies', list())
-        self.log('__init__ tasks = %s'%(dict([(key,len(value)) for key, value in list(self.tasks.items())])))
-    
-    
     def __del__(self):
-        self._exit()
+        self._save()
         
-    
     def log(self, msg, level=xbmc.LOGDEBUG):
         log('%s: %s'%(self.__class__.__name__,msg),level)
 
+    def _load(self):
+        _tasks = {}
+        _raw   = (self.cache.get('tasks', checksum=ADDON_VERSION, json_data=True) or dict())
+        if isinstance(_raw, str):
+            try:              _raw = json.loads(_raw)
+            except Exception: _raw = dict()
+        for k, v in list(_raw.items()):
+            if k in ['scrapeDirectory', 'cleanTV', 'refreshTVshow', 'refreshMovie']:
+                _tasks[k] = set(tuple(x) if isinstance(x, list) else x for x in v)
+            else:
+                _tasks[k] = list(v)
+        for k in ['scrapeDirectory', 'cleanTV', 'refreshTVshow', 'refreshMovie']:
+            _tasks.setdefault(k, set())
+        _tasks.setdefault('cleanMovies', list())
+        self.log('_load tasks = %s'%(dict([(key,len(value)) for key, value in list(_tasks.items())])))
+        return _tasks
+        
     def _menu(self, sysARG):
         self.log('_menu')
         try:    param = sysARG[1]
         except: param = None
         if param is None: return
               
-    def _que(self, func, priority=-1, *args, **kwargs):
-        if priority == -1: priority = self.priority.qsize + 1
+    def _que(self, func, priority=3, *args, **kwargs):
         self.log('_que, priority = %s, func = %s, args = %s, kwargs = %s' % (priority,func.__name__, args, kwargs))
-        self.priority._push((func, args, kwargs), priority)
+        self.queue.push((func, args, kwargs), priority)
 
+    def _sleep(self, wait=0.5) -> bool:
+        while not self.monitor.abortRequested() and wait > 0:
+            if self.monitor.waitForAbort(wait): return True
+            wait -= 0.5
+        return False
+               
     def _start(self):
-        self.waitTime = REAL_SETTINGS.getSettingInt('Start_Delay')
-        self.log('_start, wait = %s'%(self.waitTime))
-        self.monitor.waitForAbort(self.waitTime)
+        self.log('_start, wait = %s'%(self.wait))
+        self.monitor.waitForAbort(self.wait)
         while not self.monitor.abortRequested():
             if    self.monitor.waitForAbort(2.0): break
             else: self._run()
-        self._exit()
+        self._save()
 
-    def _run(self):
-        if   self._chkPlaying() or isScanning(): self.log('_run, waiting for scraper or player to finish...')
-        elif self.tasks.get('scrapeDirectory'):  self._que(self.scrapeDirectory, -1, self.tasks.get('scrapeDirectory').pop())
-        elif self.tasks.get('cleanTV'):          self._que(self.cleanTV        , -1, self.tasks.get('cleanTV').pop())
-        elif self.tasks.get('cleanMovies'):      self._que(self.cleanMovies    , -1, self.tasks.get('cleanMovies').pop(0))
-        elif self.tasks.get('refreshTVshow'):    self._que(self.refreshTV      , -1, self.tasks.get('refreshTVshow').pop())
-        elif self.tasks.get('refreshMovie'):     self._que(self.refreshMovie   , -1, self.tasks.get('refreshMovie').pop())
-        elif not self.running:
-            self.running = True
-            if REAL_SETTINGS.getSettingBool('Scraper_Enabled'):
-                self.log('_run, starting background scraper...')
-                with self._chkUpdate(self.runScraper,REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')): pass
-            if REAL_SETTINGS.getSettingBool('Refresh_Enabled'):
-                self.log('_run, starting background refresh...')
-                with self._chkUpdate(self.runRefresh,REAL_SETTINGS.getSettingInt('Refresh_Interval_DAYS')): pass
-            self.running = False
-   
-    def _exit(self):
-        self.log('_exit tasks = %s'%(dict([(key,len(value)) for key, value in list(self.tasks.items())])))
-        serialized_tasks = {}
-        for k, v in list(self.tasks.items()):
-            serialized_tasks[k] = list(v)
-        self.cache.set('tasks', json.dumps(serialized_tasks, cls=SetEncoder), checksum=ADDON_VERSION, expiration=datetime.timedelta(days=28), json_data=True)
-                   
-    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
-    def getDirectory(self, path):
-        return (getDirectory(path) or [])
-    
-    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
-    def getTVshows(self):
-        return (getTVshows() or [])
-    
-    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
-    def getMovies(self):
-        return (getMovies() or [])
-    
-    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
-    def getEpisodes(self, tvshowid):
-        return (getEpisodes(tvshowid) or [])
-
+    def _save(self):
+        self.log('_save tasks = %s'%(dict([(key,len(value)) for key, value in list(self._tasks.items())])))
+        _tasks = {}
+        for k, v in list(self._tasks.items()): _tasks[k] = list(v)
+        self.cache.set('tasks', json.dumps(_tasks, cls=SetEncoder), checksum=ADDON_VERSION, expiration=datetime.timedelta(days=28), json_data=True)
+            
     def _chkPlaying(self):
         return self.player.isPlaying() and not REAL_SETTINGS.getSettingBool('Run_Playing')
         
     def _chkIdle(self):
-        if REAL_SETTINGS.getSettingBool('Run_Idling'): return int(xbmc.getGlobalIdleTime() or '0') > self.waitTime
+        if REAL_SETTINGS.getSettingBool('Run_Idling'): return int(xbmc.getGlobalIdleTime() or '0') > self.wait
         return False
         
     @contextmanager
@@ -234,89 +200,195 @@ class Service(object):
         if epoch >= nxrun:
             try: 
                 finished = func(*args, **kwargs)
-                yield self.log('_chkUpdate, func = %s, next run in %s days, finished = %s' % (func.__name__, days, finished))
             except Exception as e: 
                 finished = False
                 self.log('_chkUpdate, failed! %s'%(e), xbmc.LOGERROR)
             finally:
                 if finished: 
-                    self.cache.set(func.__name__, (epoch + runevery), expiration=datetime.timedelta(days=28))
-        else: yield
+                    self.log('_chkUpdate, func = %s, next run in %s days, finished = %s' % (func.__name__, days, finished))
+                    # self.cache.set(func.__name__, (epoch + runevery), expiration=datetime.timedelta(days=28))
+        yield
          
-    def scrapeDirectory(self, path, show=None):
-        if show is None: show = REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')
+    def _run(self):
+        self.log('_run tasks = %s'%(dict([(key,len(value)) for key, value in list(self._tasks.items())])))
+        if   self._chkPlaying() or isScanning(): self.log('_run, waiting for scraper or player to finish...')
+        elif self._tasks.get('scrapeDirectory'):  self._que(self.scrapeDirectory, 2, self._tasks.get('scrapeDirectory').pop())
+        elif self._tasks.get('cleanTV'):          self._que(self.cleanTV        , 3, self._tasks.get('cleanTV').pop())
+        elif self._tasks.get('cleanMovies'):      self._que(self.cleanMovies    , 3, self._tasks.get('cleanMovies').pop(0))
+        elif self._tasks.get('refreshTVshow'):    self._que(self.refreshTVshow  , 4, *self._tasks.get('refreshTVshow').pop())
+        elif self._tasks.get('refreshMovie'):     self._que(self.refreshMovie   , 4, *self._tasks.get('refreshMovie').pop())
+        elif not self.isRunning:
+            self.isRunning = True
+            if REAL_SETTINGS.getSettingBool('Scraper_Enabled'):
+                with self._chkUpdate(self.runScraper,REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')): pass
+            if REAL_SETTINGS.getSettingBool('Refresh_Enabled'):
+                with self._chkUpdate(self.runRefresh,REAL_SETTINGS.getSettingInt('Refresh_Interval_DAYS')): pass
+            self.isRunning = False
+   
+    # @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
+    def getDirectory(self, path):
+        return getDirectory(path)
+    
+    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
+    def getTVshows(self):
+        return getTVshows()
+    
+    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
+    def getMovies(self):
+        return getMovies()
+    
+    @cacheit(expiration=datetime.timedelta(days=REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')))
+    def getEpisodes(self, tvshowid):
+        return getEpisodes(tvshowid)
+
+    def scrapeDirectory(self, path, show_dialog=None):
+        if show_dialog is None: show_dialog = REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')
         self.log('scrapeDirectory, scraping [%s]'%(path))
-        if sendJSON({"method":"VideoLibrary.Scan","params":{"directory":path,"showdialogs":show}}).get('result') == "OK":
+        if sendJSON({"method":"VideoLibrary.Scan","params":{"directory":path,"showdialogs":show_dialog}}).get('result') == "OK":
             while not self.monitor.abortRequested():
                 if   self.monitor.waitForAbort(0.5): break
                 elif isScanning(): self.log('scrapeDirectory, waiting for scraper to finish...')
                 else: break
             self.log('scrapeDirectory, finished!')
 
-    def cleanTV(self, tvshowid, show=None):
-        episodes    = self.getEpisodes(tvshowid)
-        duplicates  = findDupes(episodes)
-        pDialog     = None
-        master      = None
-        message     = '[DRY RUN] Processing:' if REAL_SETTINGS.getSettingBool('Dry_Run_Mode') else 'Processing:'
-        if show is None: show = REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')
-        self.log(f'cleanTV, tvshowid = {tvshowid}, show = {show}')
+    def runScraper(self):
         try:
-            if episodes and episodes[0] and not self._verifyNetwork(episodes[0].get('file')): return False
-            if show:
-                pDialog = xbmcgui.DialogProgressBG()
-                pDialog.create(ADDON_NAME, 'Cleaning TV library entries...')
+            return (self.scrapeTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder')       , (self.getTVshows() or [])) & 
+                    self.scrapeMovies(REAL_SETTINGS.getSetting('Scraper_Movie_Folder'), (self.getMovies()  or [])))
+        except Exception as e:
+            self.log('runScraper, Scan failed! %s'%(e), xbmc.LOGERROR)
+            notification(LANGUAGE(32009))
+            return False
 
-            for eidx, episode in enumerate(episodes):
-                if self.monitor.waitForAbort(0.01): break
-                elif not episode: continue
-                shadow_copies = sorted(duplicates.get(episode.get('label'),{}), key=lambda x: self.get_stream_weight(x.get('file', '')), reverse=True)
+    def scrapeTV(self, path, shows=[], includeEpisodes=None):
+        if includeEpisodes is None: includeEpisodes = REAL_SETTINGS.getSettingBool('Refresh_Include_Episodes')
+        files = (self.getDirectory(path) or [])
+        if len(files) > 0:
+            self.log('scrapeTV path = %s, files = %s'%(path,len(files)))
+            items = dict([(show['file'],show) for show in shows if show.get('file')])
+            random.shuffle(files)
+            for file in files:
+                if   self.monitor.waitForAbort(0.01): return 
+                elif file.get('file') and not filefile.get('file') in items: 
+                    self._tasks.setdefault('scrapeDirectory',set()).add(file['file'])
+                    if includeEpisodes:
+                        missing = self.parseEpisodes(items[file['file']],(self.getEpisodes(items[file['file']]['tvshowid']) or [])).get('missing',[])
+                        if len(missing) > 0: 
+                            random.shuffle(missing)
+                            for episode in missing: 
+                                self._tasks.setdefault('scrapeDirectory',set()).add(episode['file'])
+        return True
+        
+    def scrapeMovies(self, path, movies=[]):
+        files = (self.getDirectory(path) or [])
+        if len(files) > 0: 
+            self.log('scrapeMovies path = %s, files = %s'%(path,len(files)))
+            items = dict([(self._pathKey(self._directoryPath(movie['file'])),movie) for movie in movies if movie.get('file')])
+            random.shuffle(files)
+            for file in files:
+                if   self.monitor.waitForAbort(0.01): return False
+                elif not self._pathKey(file.get('file')) in items:
+                    self._tasks.setdefault('scrapeDirectory',set()).add(file.get('file'))
+        return True
+
+    def cleanTV(self, tvshowid, show_dialog=None):
+        pDialog     = None
+        processed   = set()
+        episodes    = (self.getEpisodes(tvshowid) or [])
+        message     = '[DRY RUN] Processing:' if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled') else 'Processing:'
+        if episodes and episodes[0] and not self._verifySource(episodes[0].get('file')): return False
+        episodes   = [self._episodeKey(episode) for episode in episodes]
+        
+        if show_dialog is None: show_dialog = REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')
+        duplicates = findDupes(episodes, key='episode_key')
+        if show_dialog and duplicates:
+            pDialog = xbmcgui.DialogProgressBG()
+            pDialog.create(ADDON_NAME, 'Cleaning TV library entries...')
+
+        for eidx, episode in enumerate(episodes):
+            percent = int((eidx / len(episodes)) * 100) if len(episodes) > 0 else 0
+            if self.monitor.waitForAbort(0.01): return False
+            elif not episode: continue
+            elif not xbmcvfs.exists(episode.get('file', '')):
+                self.log('cleanTV, episode file no longer exists: %s' % episode.get('file'))
+                if pDialog: pDialog.update(percent, message="%s %s\nAbandoned: %s" % (message,episode.get('showtitle',tvshowid),episode.get('label', '')))
+                self._removeEpisode(episode.get('episodeid'), episode.get('file'), "cleanTV (Missing File)")
+            else:
+                if episode.get('episode_key') in processed: continue
+                shadow_copies = sorted(duplicates.get(episode.get('episode_key'),{}), key=lambda x: self.get_stream_weight(x.get('file', '')), reverse=True)
+                print('shadow_copies',shadow_copies)
                 if shadow_copies:
-                    self.log(f'cleanTV, episode = {episode.get('label')}, shadow_copies = {len(shadow_copies)}')
-                    master_copy = shadow_copies.pop(0) #duplicate we want to keep.
+                    processed.add(episode.get('episode_key'))
+                    self.log("cleanTV, episode = %s, shadow_copies = %s" % (episode.get('label'), len(shadow_copies)))
+                    master_copy = shadow_copies.pop(0) #duplicate we want to keep weighted by quality keywords.
                     for sidx, shadow_copy in enumerate(shadow_copies):
-                        if self.monitor.waitForAbort(0.01): break
-                        elif not shadow_copy: continue
+                        if not shadow_copy: continue
+                        elif self.monitor.waitForAbort(0.01): return False
                         if master_copy.get('label') == shadow_copy.get('label'):
-                            mapped_ep_path = self.remapPath(shadow_copy.get('file', ''))
                             if pDialog: pDialog.update(int((sidx / len(shadow_copies)) * 100) if len(shadow_copies) > 0 else 0, message="%s %s\nDuplicates: %s" % (message,episode.get('showtitle',tvshowid),shadow_copy.get('label', '')))
-                            
-                            if master_copy.get('file') == shadow_copy.get('file'):
+
+                            #todo playcount shadow_copy and add to master_copy?
+                            if not xbmcvfs.exists(shadow_copy.get('file')):
+                                self.log('cleanTV, shadow entry file no longer exists: %s' % shadow_copy.get('file'))
+                                self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Missing File)")
+                                    
+                            elif master_copy.get('file','-1') == shadow_copy.get('file','0'):
                                 if master_copy.get('episode') != shadow_copy.get('episode'):
                                     self.log('cleanTV, skipping multi-episode stack tracking link: %s' % shadow_copy.get('file'))
                                     continue
-
-                            state_snapshot = self.get_media_bookmark("episode", shadow_copy.get('episodeid'))
-                            if not xbmcvfs.exists(mapped_ep_path):
-                                self.log('cleanTV, shadow entry no longer exists: %s' % shadow_copy.get('file'))
-                                if self.executeRemoveEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Missing File)"):
-                                    self.restore_media_bookmark("episode", master_copy.get('file'), state_snapshot)
+                                elif master_copy.get('episodeid',-1) != shadow_copy.get('episodeid'):
+                                    self.log('cleanTV, duplicate shadow entry detected: %s' % shadow_copy.get('file'))
+                                    self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Shadow Duplicate)")
                                     
-                            if (master_copy.get('file','-1') == shadow_copy.get('file') and master_copy.get('episodeid',-1) != shadow_copy.get('episodeid')):
-                                self.log('cleanTV, duplicate shadow entry detected: %s' % shadow_copy.get('file'))
-                                if self.executeRemoveEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Shadow Duplicate)"):
-                                    self.restore_media_bookmark("episode", master_copy.get('file'), state_snapshot)
-                                    
-                            elif master_copy.get('file','-1') != shadow_copy.get('file'):
+                            elif master_copy.get('file','-1') != shadow_copy.get('file','0'):
                                 self.log('cleanTV, duplicate entry detected: %s' % shadow_copy.get('file'))
-                                if self.executeRemoveEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Physical Duplicate)"):
-                                    self.executeTrashFile(mapped_ep_path)
-                                    self.restore_media_bookmark("episode", master_copy.get('file'), state_snapshot)
+                                self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Physical Duplicate)")
 
-                if not xbmcvfs.exists(self.remapPath(episode.get('file', ''))):
-                    self.log('cleanTV, media no longer exists: %s' % episode.get('file'))
-                    percent = int((eidx / len(episodes)) * 100) if len(episodes) > 0 else 0
-                    if pDialog: pDialog.update(percent, message="%s %s\nAbandoned: %s" % (message,episode.get('showtitle',tvshowid),episode.get('label', '')))
-                    self.executeRemoveEpisode(episode.get('episodeid'), episode.get('file'), "cleanTV (Missing File)")
+        if pDialog: pDialog.close()
+        return True
 
-            if pDialog: pDialog.close()
-            self.log('cleanTV, finished!')
-            return True
-        except Exception as e:
-            if 'pDialog' in locals() and pDialog: pDialog.close()
-            self.log('cleanTV, failed! %s'%(e), xbmc.LOGERROR)
-            return False
-
+    def cleanMovies(self, movies, show_dialog=None):
+        pDialog = None
+        movies = [movie for movie in (movies or []) if movie]
+        if not movies: return True
+        if movies and not self._verifySource(movies[0].get('file')): return False
+        if show_dialog is None: show_dialog = REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')
+        if show_dialog:
+            pDialog = xbmcgui.DialogProgressBG()
+            pDialog.create(ADDON_NAME, 'Cleaning Movie library entries...')
+        
+        message = '[DRY RUN] Processing:' if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled') else 'Processing:'
+        shadow_copies = sorted(list(movies), key=lambda x: self.get_stream_weight(x.get('file', '')), reverse=True)
+        master_copy   = None
+        while not self.monitor.abortRequested():
+            if not shadow_copies: break
+            master_copy = shadow_copies.pop(0)
+            if xbmcvfs.exists(master_copy.get('file')): break
+            else: 
+                self.log('cleanMovies, movie file no longer exists: %s' % master_copy.get('file'))
+                self._removeMovie(master_copy.get('movieid'), master_copy.get('file'), "cleanMovies (Missing File)")
+        if master_copy:
+            self.log("cleanMovies, duplicate movies detected (%s) - %s" % (len(movies), master_copy.get('label')))
+            for midx, movie in enumerate(shadow_copies):
+                percent = int((midx / len(shadow_copies)) * 100) if len(shadow_copies) > 0 else 0
+                if self.monitor.waitForAbort(0.01): return False
+                elif not movie: continue
+                elif not xbmcvfs.exists(movie.get('file')):
+                    self.log('cleanMovies, movie file no longer exists: %s' % movie.get('file'))
+                    if pDialog: pDialog.update(percent, message="%s\nAbandoned: %s" % (message,movie.get('label','')))
+                    self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Missing File)")
+                else:
+                    if pDialog: pDialog.update(percent, message="Processing: %s" % movie.get('label', ''))
+                    if master_copy.get('movieid',-1) != movie.get('movieid') and master_copy.get('file','-1') == movie.get('file','0'):
+                        self.log('cleanMovies, duplicate shadow entry detected: %s' % master_copy.get('file'))
+                        self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Shadow copy)")
+                    elif master_copy.get('file','-1') != movie.get('file'):
+                        self.log('cleanMovies, duplicate file detected: %s' % master_copy.get('file'))
+                        self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Physical Duplicate)")
+                            
+        if pDialog: pDialog.close()
+        return True
+       
     def refreshTV(self, shows=[]):
         clean           = REAL_SETTINGS.getSettingBool('Refresh_Clean')
         ignoreNFO       = REAL_SETTINGS.getSettingBool('Refresh_Ignore_NFO')
@@ -324,71 +396,25 @@ class Service(object):
         self.log('refreshTV shows = %s, clean = %s, ignoreNFO = %s, includeEpisodes = %s'%(len(shows),clean,ignoreNFO,includeEpisodes))
         if len(shows) > 0: random.shuffle(shows)
         for show in shows:
-            if   self.monitor.waitForAbort(0.1): return False
-            elif clean: self.tasks.setdefault('cleanTV',set()).add(show.get('tvshowid',-1))
-            self.tasks.setdefault('refreshTVshow',set()).add((show.get('tvshowid')))
+            if   self.monitor.waitForAbort(0.01): return False
+            elif clean: self._tasks.setdefault('cleanTV',set()).add(show.get('tvshowid',-1))
+            self._tasks.setdefault('refreshTVshow',set()).add((show.get('tvshowid'),ignoreNFO,includeEpisodes))
         return True
 
-    def cleanMovies(self, movies, master=None, show=None):
-        pDialog = None
-        if show is None: show = REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')
-        
-        if movies and not self._verifyNetwork(movies[0].get('file')):
-            return False
-
-        try:
-            if show:
-                pDialog = xbmcgui.DialogProgressBG()
-                pDialog.create(ADDON_NAME, 'Cleaning Movie library entries...')
-            
-            working_list = sorted(list(movies), key=lambda x: self.get_stream_weight(x.get('file', '')), reverse=True)
-            total_movies = len(working_list)
-            
-            if master is None and working_list: 
-                master = working_list.pop(0)
-            if master is None:
-                if pDialog: pDialog.close()
-                self.log('cleanMovies, no master file found physically available!')
-                return True
-
-            for idx, movie in enumerate(working_list):
-                if self.monitor.waitForAbort(0.01): break
-                
-                percent = int((idx / total_movies) * 100) if total_movies > 0 else 0
-                if pDialog: pDialog.update(percent, message="Processing: %s" % movie.get('label', ''))
-
-                if master.get('label') == movie.get('label') and master.get('movieid',-1) != movie.get('movieid'):
-                    mapped_movie_path = self.remapPath(movie.get('file', ''))
-                    state_snapshot = self.get_media_bookmark("movie", movie.get('movieid'))
-
-                    if not xbmcvfs.exists(mapped_movie_path) or master.get('file','-1') == movie.get('file'):
-                        if self.executeRemoveMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Missing or Shadow)"):
-                            self.restore_media_bookmark("movie", master.get('file'), state_snapshot)
-                    elif master.get('file','-1') != movie.get('file'):
-                        if self.executeRemoveMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Physical Duplicate)"):
-                            self.executeTrashFile(mapped_movie_path)
-                            self.restore_media_bookmark("movie", master.get('file'), state_snapshot)
-                            
-            if pDialog: pDialog.close()
-            self.log('cleanMovies, finished!')
-            return True
-        except Exception as e:
-            if 'pDialog' in locals() and pDialog: pDialog.close()
-            self.log('cleanMovies, failed! %s'%(e), xbmc.LOGERROR)
-            return False
-
-    def refreshMovies(self, movies=[], clean=None, ignore=None):
+    def refreshMovies(self, movies=[], clean=None, ignoreNFO=None):
         if clean is None: clean = REAL_SETTINGS.getSettingBool('Refresh_Clean')
         if ignoreNFO is None: ignoreNFO = REAL_SETTINGS.getSettingBool('Refresh_Ignore_NFO')
-        self.log('refreshMovies, movies = %s, clean = %s, ignore = %s'%(len(movies),clean,ignore))
+        self.log('refreshMovies, movies = %s, clean = %s, ignoreNFO = %s'%(len(movies),clean,ignoreNFO))
         if len(movies) > 0: random.shuffle(movies)
+        if clean:
+            for group in self._movieDuplicateGroups(movies):
+                self._tasks.setdefault('cleanMovies',list()).append(group)
         for movie in movies:
-            if self.monitor.waitForAbort(0.1): return False
-            if clean: self.tasks.setdefault('cleanMovies',list()).extend(findMatch(movie.get('file'),movies))
-            self.tasks.setdefault('refreshMovie',set()).add((movie.get('movieid'),ignore))
+            if self.monitor.waitForAbort(0.01): return False
+            self._tasks.setdefault('refreshMovie',set()).add((movie.get('movieid'),ignoreNFO))
         return True
 
-    def _verifyNetwork(self, path):
+    def _verifySource(self, path):
         if not path: return True
         root_share = None
         for proto in ['smb://', 'nfs://', 'ftp://', 'dav://', 'sftp://']:
@@ -397,57 +423,62 @@ class Service(object):
                 if   len(parts) >= 4: root_share = f"{parts[0]}//{parts[2]}/{parts[3]}/"
                 elif len(parts) >= 3: root_share = f"{parts[0]}//{parts[2]}/"
                 if root_share and not xbmcvfs.exists(root_share):
-                    self.log("_verifyNetwork, Network mount root %s is offline! Aborting removal." % root_share, xbmc.LOGERROR)
+                    self.log("_verifySource, Network mount root %s is offline! Aborting removal." % root_share, xbmc.LOGERROR)
                     return False
                 break
         return True
 
+    def refreshTVshow(self, tvshowid, ignorenfo=True, includeEpisodes=True):
+        self.log('refreshTVshow, tvshowid = %s, ignorenfo = %s, includeEpisodes = %s' % (tvshowid, ignorenfo, includeEpisodes))
+        return refreshTVshow(tvshowid, ignorenfo, includeEpisodes)
+
+    def refreshMovie(self, movieid, ignorenfo=True):
+        self.log('refreshMovie, movieid = %s, ignorenfo = %s' % (movieid, ignorenfo))
+        return refreshMovie(movieid, ignorenfo)
+
+    def _episodeKey(self, episode):
+        episode = dict(episode or {})
+        episode['episode_key'] = (
+            episode.get('tvshowid'),
+            episode.get('season'),
+            episode.get('episode')
+        )
+        return episode
+
+    def _movieKey(self, movie):
+        return (movie.get('label'), movie.get('year'))
+
+    def _movieDuplicateGroups(self, movies):
+        groups = {}
+        for movie in movies or []:
+            if not movie: continue
+            groups.setdefault(self._movieKey(movie), []).append(movie)
+        return [group for group in groups.values() if len(group) > 1]
+
+    def _directoryPath(self, path):
+        path = path or ''
+        if '://' in path:
+            idx = path.rstrip('/').rfind('/')
+            return path[:idx + 1] if idx > -1 else path
+        directory = os.path.dirname(path)
+        if directory and not directory.endswith((os.sep, '/', '\\')):
+            directory += os.sep
+        return directory
+
+    def _pathKey(self, path):
+        return (path or '').replace('\\', '/').rstrip('/').lower()
+
     def get_stream_weight(self, file_path):
         weight = 0
-        normalized = file_path.lower()
-        if "2160p" in normalized or "4k" in normalized: weight += 50
+        normalized = (file_path or '').lower()
+        if   "2160p" in normalized or "4k" in normalized: weight += 50
         elif "1080p" in normalized: weight += 30
-        elif "720p" in normalized: weight += 10
-        if "remux" in normalized: weight += 20
-        if "x265" in normalized or "hevc" in normalized: weight += 15
-        if "x264" in normalized or "h264" in normalized: weight += 5
+        elif "720p"  in normalized: weight += 10
+        if   "remux" in normalized: weight += 20
+        if   "x265"  in normalized or "hevc" in normalized: weight += 15
+        if   "x264"  in normalized or "h264" in normalized: weight += 5
         if not normalized.startswith(('smb:', 'nfs:')): weight += 5
         return weight
-
-    def get_media_bookmark(self, media_type, media_id):
-        method = "VideoLibrary.GetEpisodeDetails" if media_type == "episode" else "VideoLibrary.GetMovieDetails"
-        parkey = "episodeid" if media_type == "episode" else "movieid"
-        try:
-            result = sendJSON({"method": method, "params": {parkey: int(media_id), "properties": ["resume", "playcount"]}})
-            if "result" in result:
-                details = result["result"].get('%sdetails' % media_type, {})
-                return {"resume": details.get("resume", {"position": 0.0, "total": 0.0}), "playcount": details.get("playcount", 0)}
-        except Exception: pass
-        return {}
-
-    def restore_media_bookmark(self, media_type, file_path, state):
-        if not state or "resume" not in state: return
-        try:
-            method  = "VideoLibrary.GetEpisodes" if media_type == "episode" else "VideoLibrary.GetMovies"
-            results = sendJSON({"method": method_search, "params": {"properties": ["file"]}})
-            details = results.get("result", {}).get("episodes" if media_type == "episode" else "movies", [])
-            for item in details:
-                if item.get('file') == file_path:
-                    new_id = item.get('episodeid') if media_type == "episode" else item.get('movieid')
-                    parmethod = "VideoLibrary.SetEpisodeDetails" if media_type == "episode" else "VideoLibrary.SetMovieDetails"
-                    parkey    = "episodeid" if media_type == "episode" else "movieid"
-                    sendJSON({"method": parmethod, "params": {parkey: int(new_id), "resume": state["resume"], "playcount": state["playcount"]}})
-                    break
-        except Exception: pass
-
-    def runScraper(self):
-        try:
-            return (self.scrapeTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder'), (self.getTVshows() or []),REAL_SETTINGS.getSettingBool('Refresh_Include_Episodes')) & 
-                    self.scrapeMovies(REAL_SETTINGS.getSetting('Scraper_Movie_Folder'), (self.getMovies() or [])))
-        except Exception as e:
-            self.log('runScraper, Scan failed! %s'%(e), xbmc.LOGERROR)
-            self.notification(LANGUAGE(32009))
-            return False
 
     def runRefresh(self):
         try:
@@ -455,114 +486,75 @@ class Service(object):
                     self.refreshMovies((self.getMovies() or [])))
         except Exception as e:
             self.log('runRefresh, Scan failed! %s'%(e), xbmc.LOGERROR)
-            self.notification(LANGUAGE(32009))
+            notification(LANGUAGE(32009))
             return False
 
     def runClean(self):
-        ...
-        # try: return (self.cleanTV([findDupes(self.getEpisodes(get 'tvshowid'))]) & self.cleanMovies([findMatch(get movie file,self.getMovies())]))
-        # except Exception as e:
-            # self.log('runClean, Scan failed! %s'%(e), xbmc.LOGERROR)
-            # self.notification(LANGUAGE(32009))
-            # return False
+        try:
+            tvshows  = self.getTVshows()
+            movies   = self.getMovies()
+            tv_ok    = True
+            movie_ok = True
+            for show in tvshows:
+                if self.monitor.waitForAbort(0.01): return False
+                tv_ok = self.cleanTV(show.get('tvshowid')) and tv_ok
+            for group in self._movieDuplicateGroups(movies):
+                if self.monitor.waitForAbort(0.01): return False
+                movie_ok = self.cleanMovies(group) and movie_ok
+            return tv_ok and movie_ok
+        except Exception as e:
+            self.log('runClean, Scan failed! %s'%(e), xbmc.LOGERROR)
+            notification(LANGUAGE(32009))
+            return False
 
-    def remapPath(self, path):
-        if REAL_SETTINGS.getSettingBool('PathMapping_Enabled'):
-            remote_prefix = REAL_SETTINGS.getSetting('PathMapping_Remote')
-            local_prefix = REAL_SETTINGS.getSetting('PathMapping_Local')
-            if remote_prefix and path.startswith(remote_prefix):
-                return path.replace(remote_prefix, local_prefix, 1)
-        return path
-
-    def executeRemoveEpisode(self, episode_id, file_path, context=""):
-        if REAL_SETTINGS.getSettingBool('Dry_Run_Mode'):
+    def _removeEpisode(self, episode_id, file_path, context=""):
+        if not self._verifySource(file_path): return False
+        if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'):
             self.log('[DRY RUN] %s -> Skipping removal of Episode ID: %s (%s)' % (context, episode_id, file_path))
             return False
         self.log('%s -> Removing Database Entry for Episode ID: %s' % (context, episode_id))
-        removeEpisode(episode_id)
+        if removeEpisode(episode_id) and REAL_SETTINGS.getSettingBool('Delete_Enabled'):
+            xbmcvfs.delete(file_path)
         return True
 
-    def executeRemoveMovie(self, movie_id, file_path, context=""):
-        if REAL_SETTINGS.getSettingBool('Dry_Run_Mode'):
+    def _removeMovie(self, movie_id, file_path, context=""):
+        if not self._verifySource(file_path): return False
+        if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'):
             self.log('[DRY RUN] %s -> Skipping removal of Movie ID: %s (%s)' % (context, movie_id, file_path))
             return False
         self.log('%s -> Removing Database Entry for Movie ID: %s' % (context, movie_id))
-        removeMovie(movie_id)
+        if removeMovie(movie_id) and REAL_SETTINGS.getSettingBool('Delete_Enabled'):
+            xbmcvfs.delete(file_path)
         return True
 
-    def executeTrashFile(self, file_path):
-        if not REAL_SETTINGS.getSettingBool('Physical_Delete_Enabled'):
-            return False
-        try:
-            base_dir  = os.path.dirname(file_path)
-            file_name = os.path.basename(file_path)
-            trash_dir = os.path.join(base_dir, '.kodi_trash')
-            if not trash_dir.endswith(('/', '\\')): trash_dir += '/'
-            
-            if not xbmcvfs.exists(trash_dir):
-                xbmcvfs.mkdirs(trash_dir)
-            new_position = os.path.join(trash_dir, file_name)
-            if REAL_SETTINGS.getSettingBool('Dry_Run_Mode'):
-                self.log('[DRY RUN] Trash physical file: %s -> %s' % (file_path, new_position))
-                return True
-            return xbmcvfs.rename(file_path, new_position)
-        except Exception as e: self.log('executeTrashFile failed: %s' % str(e), xbmc.LOGERROR)
-        return False
-            
     def parseEpisodes(self, show={}, episodes=[]):
-        self.log('parseEpisodes show = %s'%(show.get('tvshowid')))
+        self.log('parseEpisodes tvshowid = %s'%(show.get('tvshowid')))
         refresh   = [] 
         missing   = [] 
-        abandoned = [] 
-        
+        abandoned = []
+        processed = set()
+        episode_files = set([episode.get('file') for episode in episodes if episode.get('file')])
         if len(episodes) > 0: random.shuffle(episodes)
+        
         for episode in episodes:
-            if self.monitor.waitForAbort(0.1): break
+            if self.monitor.waitForAbort(0.01): break
             elif not episode.get('file'): continue
-            
-            dir_path = os.path.dirname(episode['file'])
-            if dir_path not in self.directory_cache:
-                self.directory_cache[dir_path] = {f.get('file'): f for f in (self.getDirectory(os.path.join(dir_path,'')) or []) if f.get('file')}
+            dir_path = self._directoryPath(episode['file'])
+            if dir_path not in self._cache:
+                self._cache[dir_path] = {f.get('file'): f for f in (self.getDirectory(dir_path) or []) if f.get('file')}
                 
-            items_dict = self.directory_cache[dir_path]
-            mapped_ep_path = self.remapPath(episode['file'])
-            if episode['file'] in items_dict:
+            items_dict = self._cache[dir_path]
+            if episode['file'] in items_dict: 
                 refresh.append(episode)
             else:
-                if not xbmcvfs.exists(mapped_ep_path): 
+                if not xbmcvfs.exists(episode['file']): 
                     abandoned.append(episode)
-                else:
-                    for f_path, item in items_dict.items():
-                        if f_path != episode['file']:
-                            missing.append(item)
+                    
+            if dir_path not in processed:
+                for f_path, item in items_dict.items():
+                    if f_path not in episode_files:
+                        missing.append(item)
+                processed.add(dir_path)
         return {'refresh': refresh, 'missing': missing, 'abandoned': abandoned}
-
-    def scrapeTV(self, path, shows=[], includeEpisodes=None):
-        if includeEpisodes is None: includeEpisodes = REAL_SETTINGS.getSettingBool('Refresh_Include_Episodes')
-        self.log('scrapeTV path = %s'%(path))
-        items = dict([(show['file'],show) for show in shows if show.get('file')])
-        files = (self.getDirectory(path) or [])
-        if len(files) > 0: random.shuffle(files)
-        for file in files:
-            if   not file.get('file'): continue
-            elif not file['file'] in items:
-                self.tasks.setdefault('scrapeDirectory',set()).add(file['file'])
-            elif not self.monitor.waitForAbort(0.1) and includeEpisodes:
-                missing = self.parseEpisodes(items[file['file']],(self.getEpisodes(items[file['file']]['tvshowid']) or [])).get('missing',[])
-                if len(missing) > 0: 
-                    random.shuffle(missing)
-                    for episode in missing:
-                        self.tasks.setdefault('scrapeDirectory',set()).add(episode['file'])
-        return True
-
-    def scrapeMovies(self, path, movies=[]):
-        self.log('scrapeMovies, path = %s'%(path))
-        paths = dict([(os.path.split(item['file'])[0],item) for item in movies if item.get('file')])
-        items = (self.getDirectory(path) or [])
-        if len(items) > 0: random.shuffle(items)
-        for item in items:
-            if not item.get('file') in paths:
-                self.tasks.setdefault('scrapeDirectory',set()).add(item.get('file'))
-        return True
-
+        
 if __name__ == '__main__': Service()._start()

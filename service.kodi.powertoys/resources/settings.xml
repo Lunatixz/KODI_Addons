@@ -14,13 +14,9 @@
     <setting id="Scraper_Movie_Folder" type="folder" label="32008"  source="video" option="writeable" default="" subsetting="true" />
     <setting id="Refresh_Enabled" type="bool" label="32005" default="false" />
     <setting id="Refresh_Interval_DAYS" type="number" label="32006" default="7" subsetting="true" />
-    <setting id="Refresh_Ignore_NFO" type="bool" label="32013" default="true" subsetting="true" />
+    <setting id="Refresh_Ignore_NFO" type="bool" label="32013" default="false" subsetting="true" />
     <setting id="Refresh_Clean" type="bool" label="32012" default="false" />
 	<setting label="32018" type="lsep"/>
-    <setting id="Dry_Run_Mode" type="bool" label="32016" default="true" />
-    <setting id="Physical_Delete_Enabled" type="bool" label="32017" default="false" />
-	<setting label="32019" type="lsep"/>
-    <setting id="PathMapping_Enabled" type="bool" label="32020" default="false" />
-    <setting id="PathMapping_Remote" type="text" label="32021" visible="eq(-1,true)" default="smb://foo/bar" />
-    <setting id="PathMapping_Local" type="text" label="32022" visible="eq(-2,true)" default="/foo/bar" />
+    <setting id="Dry_Run_Enabled" type="bool" label="32016" default="true" />
+    <setting id="Delete_Enabled" type="bool" label="32017" default="false" />
 </settings>

@@ -81,7 +81,7 @@ msgid "Remove shadow (duplicate) library entries that share the same file name."
 msgstr ""
 
 msgctxt "#32013"
-msgid "Include NFO Meta"
+msgid "Ingore NFO Meta"
 msgstr ""
 
 msgctxt "#32014"
@@ -93,11 +93,11 @@ msgid "Include Episodes"
 msgstr ""
 
 msgctxt "#32016"
-msgid "Dry Run [No files removed/deleted]."
+msgid "Dry Run [No files/library entires deleted!]."
 msgstr ""
 
 msgctxt "#32017"
-msgid "Allow Media Deletion [If True and Dry Run; Media moved to .kodi_trash]."
+msgid "Allow Media Deletion [Duplicate Files will be deleted!]."
 msgstr ""
 
 msgctxt "#32018"
@@ -123,3 +123,15 @@ msgstr ""
 msgctxt "#32023"
 msgid "Clean Library after Scan."
 msgstr ""
+
+
+
+
+
+
+
+
+
+
+
+

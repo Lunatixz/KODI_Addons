@@ -16,7 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Kodi PowerToys.  If not, see <http://www.gnu.org/licenses/>.
 # -*- coding: utf-8 -*-
-from service     import Service
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'resources', 'lib'))
+
+from service import Service
 
 if __name__ == '__main__': Service()._menu(sys.argv)
     

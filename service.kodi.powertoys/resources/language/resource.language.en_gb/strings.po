@@ -18,15 +18,15 @@ msgstr ""
 
 msgctxt "Addon Summary"
 msgid ""
-msgstr ""
+msgstr "Automated library maintenance: scraping, refresh, cleaning, and network sync."
 
 msgctxt "Addon Description"
 msgid ""
-msgstr ""
+msgstr "PowerToys automates Kodi library maintenance. Scrapes new content from configured source folders, periodically refreshes metadata, removes duplicate library entries, and syncs UI refresh across network peers."
 
 msgctxt "Addon Disclaimer"
 msgid ""
-msgstr ""
+msgstr "Use at your own risk. Dry Run is enabled by default."
 
 msgctxt "#32000"
 msgid "Enable Debugging"
@@ -37,7 +37,7 @@ msgid "Scraping"
 msgstr ""
 
 msgctxt "#32002"
-msgid "Start Delay/Service Interval (Seconds)"
+msgid "Service Start Delay (Seconds)"
 msgstr ""
 
 msgctxt "#32003"
@@ -45,7 +45,7 @@ msgid "Scraper Interval (Days)"
 msgstr ""
 
 msgctxt "#32004"
-msgid "Show Dialog"
+msgid "Show Scraper Progress Dialog"
 msgstr ""
 
 msgctxt "#32005"
@@ -81,7 +81,7 @@ msgid "Remove shadow (duplicate) library entries that share the same file name."
 msgstr ""
 
 msgctxt "#32013"
-msgid "Ingore NFO Meta"
+msgid "Ignore NFO Meta"
 msgstr ""
 
 msgctxt "#32014"
@@ -89,11 +89,11 @@ msgid "Only Run when Idle"
 msgstr ""
 
 msgctxt "#32015"
-msgid "Include Episodes"
+msgid "Include Episodes in TV Refresh"
 msgstr ""
 
 msgctxt "#32016"
-msgid "Dry Run [No files/library entires deleted!]."
+msgid "Dry Run [No files/library entries deleted!]."
 msgstr ""
 
 msgctxt "#32017"
@@ -104,24 +104,16 @@ msgctxt "#32018"
 msgid "Permissions"
 msgstr ""
 
-msgctxt "#32019"
-msgid "Mapping"
-msgstr ""
-
-msgctxt "#32020"
-msgid "Enable Path ReMapping"
-msgstr ""
-
-msgctxt "#32021"
-msgid "Remote Path"
-msgstr ""
-
-msgctxt "#32022"
-msgid "Local Path"
-msgstr ""
-
 msgctxt "#32023"
 msgid "Clean Library after Scan."
+msgstr ""
+
+msgctxt "#32024"
+msgid "Library maintenance complete."
+msgstr ""
+
+msgctxt "#32025"
+msgid "Sync Library Refresh to Network Peers"
 msgstr ""
 
 

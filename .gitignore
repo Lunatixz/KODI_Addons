@@ -4,3 +4,6 @@
 *.db
 *.db
 addon_generator.py.bak
+service.kodi.powertoys/docs/superpowers/specs/2026-07-31-network-library-sync-design.md
+service.kodi.powertoys/docs/superpowers/plans/2026-07-31-network-library-sync.md
+service.kodi.powertoys/docs/superpowers/plans/2026-07-31-code-quality-ux-improvements.md

@@ -820,7 +820,7 @@
     </extension>
 </addon>
 
-<addon id="service.kodi.powertoys" version="1.1.5a" name="Kodi PowerToys" provider-name="Lunatixz">
+<addon id="service.kodi.powertoys" version="1.1.6" name="Kodi PowerToys" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.kodi-six" version="0.1.3.1"/>
@@ -836,7 +836,28 @@
         <assets>
             <icon>resources/images/icon.jpg</icon>
         </assets>
-        <summary lang="en_GB"></summary>
+        <summary lang="en_GB">Automated library maintenance: scraping, refresh, cleaning, and network sync.</summary>
+    </extension>
+</addon>
+
+<addon id="service.pkbridge" version="0.1.0" name="PKBridge" provider-name="Lunatixz">
+    <requires>
+        <import addon="xbmc.python" version="3.0.1"/>
+        <import addon="script.module.six" version="1.14.0"/>
+        <import addon="script.module.kodi-six" version="0.1.0"/>
+        <import addon="script.module.pyqrcode" version="1.0"/>
+    </requires>
+    <extension point="xbmc.service" library="resources/lib/service.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Emulates a Plex Media Server, serving your Kodi library to Plex apps.</summary>
+        <description lang="en_GB">PKBridge runs a local service that pretends to be a Plex Media Server. Plex apps on your network discover it automatically and can browse, search, and stream your Kodi library — movies, TV shows, and music — as if it were a real Plex server. No Plex account or Plex Media Server required.</description>
+        <platform>all</platform>
+        <license>GPL-3.0-or-later</license>
+        <reuselanguageinvoker>true</reuselanguageinvoker>
+        <assets>
+            <icon>resources/images/icon.png</icon>
+            <fanart>resources/images/fanart.jpg</fanart>
+        </assets>
     </extension>
 </addon>
 

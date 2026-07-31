@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="30000">
+        <setting id="Server_Name" type="text" label="30010" default="PKBridge Kodi Server"/>
+        <setting id="TCP_PORT" type="text" label="30011" default="32400"/>
+        <setting id="GDM_Enable" type="bool" label="30012" default="true"/>
+        <setting id="DNS_Redirect_IP" type="text" label="30013" default="" />
+        <setting id="Debug" type="bool" label="30020" default="false"/>
+    </category>
+</settings>

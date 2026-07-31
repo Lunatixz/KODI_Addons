@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<strings>
+    <string id="30000">General</string>
+    <string id="30001">Server</string>
+    <string id="30002">Advanced</string>
+    <string id="30010">Server Name</string>
+    <string id="30011">Server Port (default: 32400)</string>
+    <string id="30012">Enable GDM Discovery</string>
+    <string id="30013">DNS Redirect IP (for plex.tv interception)</string>
+    <string id="30020">Enable Debug Logging</string>
+</strings>

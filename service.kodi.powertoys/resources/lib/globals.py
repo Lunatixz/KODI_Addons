@@ -23,6 +23,7 @@ try:    from simplecache             import SimpleCache
 except: from simplecache.simplecache import SimpleCache #pycharm stub
 
 from typing      import Union
+from contextlib  import contextmanager
 from functools   import wraps
 from kodi_six    import xbmc, xbmcaddon, xbmcgui, xbmcvfs
 from threading   import Lock, Thread

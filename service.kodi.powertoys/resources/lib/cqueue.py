@@ -61,6 +61,9 @@ class CustomQueue:
 
     def _loop(self):
         while not self.monitor.abortRequested():
+            if isScanning():
+                if self.monitor.waitForAbort(1.0): break
+                continue
             task = None
             with self.lock:
                 if self.heap:
@@ -76,6 +79,7 @@ class CustomQueue:
                 task.func(*task.args, **task.kwargs)
             except Exception as e:
                 self.log(f"execute failed: {e}", xbmc.LOGERROR)
+            if self.monitor.waitForAbort(1.0): break
 
     def shutdown(self):
         pass

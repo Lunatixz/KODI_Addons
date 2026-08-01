@@ -118,6 +118,7 @@ class SyncManager:
         self.peers = {}
         self._last_broadcast = 0
         self._lock = threading.Lock()
+        self._local_ip = self._get_local_ip()
 
     def log(self, msg, level=xbmc.LOGDEBUG):
         log('SyncManager: %s' % msg, level)
@@ -128,7 +129,7 @@ class SyncManager:
             return
         self.log('Starting')
         self.zeroconf = Zeroconf()
-        self.browser = ServiceBrowser(self.zeroconf, self.SERVICE_TYPE, handlers=[self._on_service_found])
+        self.browser = ServiceBrowser(self.zeroconf, self.SERVICE_TYPE, self)
 
     def stop(self):
         self.log('Stopping')
@@ -137,25 +138,25 @@ class SyncManager:
         if self.zeroconf:
             self.zeroconf.close()
 
-    def _on_service_found(self, zeroconf, service_type, name):
+    def addService(self, zeroconf, service_type, name):
         try:
             info = zeroconf.get_service_info(service_type, name)
-            if info and info.addresses:
-                ip = socket.inet_ntoa(info.addresses[0])
-                if ip:
-                    self._register_peer(ip, info.server, info.port)
+            if not info or not info.getAddress():
+                return
+            ip = socket.inet_ntoa(info.getAddress())
+            if ip == self._local_ip:
+                self.log('Skipping self: %s' % ip)
+                return
+            with self._lock:
+                if name not in self.peers:
+                    self.log('New peer: %s:%d (%s)' % (ip, info.getPort(), info.getServer()))
+                self.peers[name] = {"ip": ip, "host": info.getServer(), "port": info.getPort()}
         except Exception as e:
-            self.log('_on_service_found error: %s' % e, xbmc.LOGWARNING)
+            self.log('addService error: %s' % e, xbmc.LOGWARNING)
 
-    def _register_peer(self, ip, host, port):
-        local_ip = self._get_local_ip()
-        if ip == local_ip:
-            self.log('Skipping self: %s' % ip)
-            return
+    def removeService(self, zeroconf, service_type, name):
         with self._lock:
-            if ip not in self.peers:
-                self.log('New peer: %s:%d (%s)' % (ip, port, host))
-            self.peers[ip] = {"host": host, "port": port}
+            self.peers.pop(name, None)
 
     def _get_local_ip(self):
         try:
@@ -176,8 +177,8 @@ class SyncManager:
             return
         self._last_broadcast = now
         self.log('Broadcasting Container.Refresh to %d peers' % len(self.peers))
-        for ip, peer in list(self.peers.items()):
-            self._send_refresh(ip, peer['port'])
+        for peer in list(self.peers.values()):
+            self._send_refresh(peer['ip'], peer['port'])
 
     def _send_refresh(self, ip, port):
         try:
@@ -253,7 +254,7 @@ class Service(object):
         
     def _chkIdle(self):
         if REAL_SETTINGS.getSettingBool('Run_Idling'): return int(xbmc.getGlobalIdleTime() or '0') > self.wait
-        return False
+        return True
         
     @contextmanager
     def _chkUpdate(self, func, days=1, nextrun=None, *args, **kwargs):

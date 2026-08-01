@@ -857,7 +857,7 @@ class Engine(threading.Thread):
         self.zc = zc
         self.readers   = {} # maps socket to reader
         self.condition = threading.Condition()
-        self.timeout   = int(Globals.settings.getSetting('API_Timeout') or "10") * 2
+        self.timeout   = 20
         self.start()
 
 

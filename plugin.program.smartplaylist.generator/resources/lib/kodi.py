@@ -109,7 +109,7 @@ class Kodi:
             self.executebuiltin('Dialog.Close(busydialognocancel)')
         elif self.getInfoBool('IsActive(busydialog)','Window'):
             self.executebuiltin('Dialog.Close(busydialog)')
-        
+
 
     def notificationDialog(self, message, header=ADDON_NAME, sound=False, time=PROMPT_DELAY, icon=ICON):
         self.log('notificationDialog: %s'%(message))
@@ -156,16 +156,16 @@ class Kodi:
             select = xbmcgui.Dialog().select(header, items, (autoclose*1000), preselect, useDetails)
             if select == -1: return
         return select
-            
-            
+
+
     def getListItem(self, label='', label2='', path='', offscreen=False):
         return xbmcgui.ListItem(label,label2,path,offscreen)
 
 
     def infoTagVideo(self, offscreen=False):
         return xbmc.InfoTagVideo(offscreen)
-              
-                      
+
+
     def findItemsInLST(self, items, values, item_key='getLabel', val_key='', index=True):
         if not values: return [-1]
         if not isinstance(values,list): values = [values]
@@ -173,25 +173,25 @@ class Kodi:
         def _match(fkey,fvalue):
             if str(fkey).lower() == str(fvalue).lower():
                 matches.append(idx if index else item)
-                        
+
         for value in values:
-            if isinstance(value,dict): 
+            if isinstance(value,dict):
                 value = value.get(val_key,'')
-                
-            for idx, item in enumerate(items): 
-                if isinstance(item,xbmcgui.ListItem): 
-                    if item_key == 'getLabel':  
+
+            for idx, item in enumerate(items):
+                if isinstance(item,xbmcgui.ListItem):
+                    if item_key == 'getLabel':
                         _match(item.getLabel() ,value)
-                    elif item_key == 'getLabel2': 
+                    elif item_key == 'getLabel2':
                         _match(item.getLabel2(),value)
-                    elif item_key == 'getPath': 
+                    elif item_key == 'getPath':
                         _match(item.getPath(),value)
-                elif isinstance(item,dict):       
+                elif isinstance(item,dict):
                     _match(item.get(item_key,''),value)
                 else: _match(item,value)
         return matches
-     
-     
+
+
     def buildMenuListItem(self, label="", label2="", icon=ICON, url="", info={}, art={}, props={}, oscreen=False, media='video'):
         if not art: art = {'thumb':icon,'logo':icon,'icon':icon}
         listitem = self.getListItem(label, label2, url, offscreen=oscreen)

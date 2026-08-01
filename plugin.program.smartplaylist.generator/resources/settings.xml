@@ -162,7 +162,7 @@
                 <setting id="Enable_IMDB" type="boolean" label="32113" help="">
                     <level>0</level>
                     <default>false</default>
-					<enable>false</enable>
+					<enable>true</enable>
                     <control type="toggle"/>
                 </setting>
                 <setting id="IMDB_ClientID" type="string" label="32101" help="32113" parent="Enable_IMDB">

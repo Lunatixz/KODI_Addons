@@ -107,7 +107,7 @@ def decodeString(base64_bytes):
     except Exception as e: return ''
 
 def validString(s):
-    return "".join(x for x in s if (x.isalnum() or x not in '\/:*?"<>|')).rstrip()
+    return "".join(x for x in s if (x.isalnum() or x not in r'\/:*?"<>|')).rstrip()
    
 def strpTime(datestring, format=DTFORMAT):
     try:              return datetime.datetime.strptime(datestring, format)

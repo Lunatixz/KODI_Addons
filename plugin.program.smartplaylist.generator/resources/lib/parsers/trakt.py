@@ -46,6 +46,7 @@ class Trakt:
         
     @cacheit(expiration=datetime.timedelta(minutes=15))
     def get_lists(self):
+        if not self.enabled: return []
         tmp = []
         trakt_user   = REAL_SETTINGS.getSetting('Trakt_Username')
         access_token = REAL_SETTINGS.getSetting('Trakt_TokenID')
@@ -60,7 +61,6 @@ class Trakt:
         while not self.monitor.abortRequested():
             params   = {'page': current_page, 'limit': limit}
             response = requests.get(url, headers=headers, params=params)
-            print('response',response,url,params,headers)
             if response.status_code != 200: 
                 self.log("get_lists, failed! to fetch data from Trakt: %s"%(response.status_code))
                 break
@@ -75,7 +75,7 @@ class Trakt:
                 if current_page >= total_pages: break
                 elif self.monitor.waitForAbort(0.5): break
                 current_page += 1
-        return sorted(tmp,key=itemgetter('name')) if tmp else None
+        return sorted(tmp,key=itemgetter('name'))
                 
             
     @cacheit(expiration=datetime.timedelta(minutes=15))
@@ -99,20 +99,20 @@ class Trakt:
                     results = response.json()
                     for item in results:
                         if list_type == 'person':
-                            tmlLST = self.get_trakt_person(item.get(list_type,{}).get('ids',{}).get('trakt'))
-                            for type, items in list(tmlLST.items()):
-                                tmp.setdefault(type,[]).extend(items)
-                        else:
-                            if list_type == 'season' and 'show' in item: item[list_type].update(item.pop('show'))
-                            tmp.setdefault(self.convert_type(list_type),[]).append({'type':item.get('type'),'title':item.get(list_type,{}).get('title'),'year':item.get(list_type,{}).get('year'),'season':item.get(list_type,{}).get('number'),'uniqueid':item.get(list_type,{}).get('ids'),'data':item})
+                            person = item.get('person', {})
+                            person_id = person.get('ids', {}).get('trakt')
+                            if person.get('name') and person_id:
+                                tmp.setdefault('persons', []).append({'name': person.get('name'),'id': str(person_id)})
+                        elif list_type == 'season' and 'show' in item: item[list_type].update(item.pop('show'))
+                        else: tmp.setdefault(self.convert_type(list_type),[]).append({'type':item.get('type'),'title':item.get(list_type,{}).get('title'),'year':item.get(list_type,{}).get('year'),'season':item.get(list_type,{}).get('number'),'uniqueid':item.get(list_type,{}).get('ids'),'data':item})
                     self.log("get_list_items, %s = %s, page = %s"%(list_type,len(results),page))
                     # Check if more pages exist via Trakt headers
                     total_pages = int(response.headers.get('X-Pagination-Page-Count', 1))
                     if page >= total_pages: break
                     page += 1
         return tmp
-        
-        
+
+
     @cacheit(expiration=datetime.timedelta(minutes=15))
     def get_trakt_person(self, trakt_id):
         tmp   = {}
@@ -126,7 +126,7 @@ class Trakt:
             page = 1
             while not self.monitor.abortRequested():
                 params   = {'page': page, 'limit': limit}
-                response = requests.get(base_url, headers=headers, params=params)
+                response = requests.get(url, headers=headers, params=params)
                 if response.status_code != 200:
                     self.log("get_trakt_person, failed! to fetch data from Trakt: %s"%(response.status_code))
                     break

@@ -36,26 +36,16 @@ class XSP:
         return log('%s: %s'%(self.__class__.__name__,msg),level)
         
         
-    def create(self, list_name, match_items, pretty_print=True):
-        def __indent(elem, level=0):
-            """
-            Indent XML for pretty printing
-            """
-            i = "\n" + level*"  "
-            if len(elem):
-                if not elem.text or not elem.text.strip():
-                    elem.text = i + "  "
-                if not elem.tail or not elem.tail.strip():
-                    elem.tail = i
-                for elem in elem:
-                    __indent(elem, level+1)
-                if not elem.tail or not elem.tail.strip():
-                    elem.tail = i
-            else:
-                if level and (not elem.tail or not elem.tail.strip()):
-                    elem.tail = i
-
+    def _write(self, root, path, list_name, pretty_print):
+        self.log('create, Out: %s'%(ET.tostring(root, encoding='unicode')))
+        if pretty_print: ET.indent(root)
+        fle = xbmcvfs.File(path, 'w')
+        ET.ElementTree(root).write(fle, encoding='utf-8', xml_declaration=True)
+        fle.close()
+        if REAL_SETTINGS.getSetting('Notify_Enable') == "true": self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),{True:LANGUAGE(32020),False:LANGUAGE(32021)}[xbmcvfs.exists(path)],list_name))
         
+        
+    def create(self, list_name, match_items, pretty_print=True):
         mixed_names = []
         for type, items in (list(match_items.items())):
             if len(items) == 0: continue
@@ -87,16 +77,9 @@ class XSP:
                     value.text = match_value
                     
             if len(values) > 0:
-                self.log('create, Out: %s'%(ET.tostring(root, encoding='unicode'))) 
-                if pretty_print: __indent(root)
-                tree = ET.ElementTree(root)
                 path = os.path.join(xbmcvfs.translatePath(REAL_SETTINGS.getSetting('XSP_LOC')),'%s.xsp'%("%s - %s"%(validString(list_name),type.title().replace('Tvshows','TV Shows'))))
                 self.log('create, File: %s'%(path))
-                fle = xbmcvfs.File(path, 'w')
-                tree.write(fle, encoding='utf-8', xml_declaration=True)
-                fle.close()
-                
-                if REAL_SETTINGS.getSetting('Notify_Enable') == "true": self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),{True:LANGUAGE(32020),False:LANGUAGE(32021)}[xbmcvfs.exists(path)],list_name))
+                self._write(root, path, list_name, pretty_print)
             else: self.kodi.notificationDialog(LANGUAGE(32024)%(validString(list_name)))
         
         if self.kodi.hasPseudoTV and len(mixed_names) > 1:
@@ -117,15 +100,8 @@ class XSP:
                 value.text = name
                     
             if len(values) > 0:
-                self.log('create, Out: %s'%(ET.tostring(root, encoding='unicode'))) 
-                if pretty_print: __indent(root)
-                tree = ET.ElementTree(root)
                 path = REAL_SETTINGS.getSetting('XSP_LOC').replace(os.path.basename(os.path.normpath(REAL_SETTINGS.getSetting('XSP_LOC'))),"Mixed")
                 path = os.path.join(xbmcvfs.translatePath(path),'%s.xsp'%("%s - %s"%(validString(list_name),"Mixed")))
                 self.log('create, File: %s'%(path))
-                fle = xbmcvfs.File(path, 'w')
-                tree.write(fle, encoding='utf-8', xml_declaration=True)
-                fle.close()
-                
-                if REAL_SETTINGS.getSetting('Notify_Enable') == "true": self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),{True:LANGUAGE(32020),False:LANGUAGE(32021)}[xbmcvfs.exists(path)],list_name))
+                self._write(root, path, list_name, pretty_print)
             else: self.kodi.notificationDialog(LANGUAGE(32024)%(validString(list_name)))

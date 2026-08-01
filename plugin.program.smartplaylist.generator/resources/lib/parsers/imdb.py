@@ -17,6 +17,7 @@
 # along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
 #
 # -*- coding: utf-8 -*-
+import csv
 import requests
 
 from globals  import *
@@ -24,31 +25,60 @@ from bs4      import BeautifulSoup
 from operator import itemgetter
 
 class IMDB:
+    TITLE_TYPES = {'movie':'movies','tvseries':'tvshows','tvminiseries':'tvshows','tvepisode':'episodes'}
+
     def __init__(self, cache=None):
         if cache is None: self.cache = SimpleCache()
         else:
             self.cache = cache
             self.cache.enable_mem_cache = False
-        
-        self.enabled = REAL_SETTINGS.getSetting('Enable_Trakt') == 'true'
-        self.name    = LANGUAGE(32100)
+
+        self.enabled = REAL_SETTINGS.getSetting('Enable_IMDB') == 'true'
+        self.name    = LANGUAGE(32112)
         self.logo    = os.path.join(ADDON_PATH,'resources','images','imdb.png')
-        
-        
+
+
     def log(self, msg, level=xbmc.LOGDEBUG):
         return log('%s: %s'%(self.__class__.__name__,msg),level)
-        
-        
-    def convert_type(self, list_type):
-        return {'movie':'movies','show':'tvshows','episode':'episodes'}[list_type]
 
 
-    def clean_string(self, string):
-        return string.replace('copy','').replace('\r\n\t','')
-        
-        
-    # @cacheit(expiration=datetime.timedelta(minutes=15))
+    @staticmethod
+    def classify(ttype):
+        return IMDB.TITLE_TYPES.get((ttype or '').lower().replace(' ',''))
+
+
+    def _parse_csv(self, text):
+        tmp = {}
+        for row in csv.DictReader(text.lstrip('\ufeff').splitlines()):
+            key   = self.classify(row.get('Title Type',''))
+            const = (row.get('Const') or '').strip()
+            if not key or not const.startswith('tt'): continue
+            tmp.setdefault(key, []).append({'title': row.get('Title'),'year': row.get('Year'),'uniqueid': {'imdb': const},'data': row})
+        return tmp
+
+
+    def _parse_page(self, list_id, headers):
+        tmp = {}
+        response = requests.get(f"https://www.imdb.com/list/{list_id}/", headers=headers, timeout=15)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, "html.parser")
+        script_tag = soup.find("script", id="__NEXT_DATA__")
+        if script_tag:
+            data = json.loads(script_tag.string)
+            items = data.get('props', {}).get('pageProps', {}).get('contentData', {}).get('list', {}).get('items', [])
+            for entry in items:
+                item  = entry.get('item') or {}
+                const = item.get('id','')
+                key   = self.classify((item.get('titleType') or {}).get('id'))
+                if not key or not const.startswith('tt'): continue
+                tmp.setdefault(key, []).append({'title':(item.get('titleText') or {}).get('text'),'year':None,'uniqueid': {'imdb': const},'data': item})
+        if not tmp: self.log('get_list_items, page scrape found nothing for %s'%(list_id))
+        return tmp
+
+
+    @cacheit(expiration=datetime.timedelta(minutes=15))
     def get_lists(self):
+        if not self.enabled: return []
         imdb_user = REAL_SETTINGS.getSetting('IMDB_ClientID')
         tmp = []
         self.log('get_lists, imdb_user = %s'%(imdb_user))
@@ -67,8 +97,8 @@ class IMDB:
                     list_id   = l.get('id')
                     list_name = l.get('title') or l.get('name')
                     if list_id and list_name:
-                        tmp.append({"name": list_name, "id": list_id, "url": f"https://imdb.com{list_id}/"})
-                except Exception as e: self.log(f"get_list_items, failed! Error fetching user profile: {e}")
+                        tmp.append({"name": list_name, "description": l.get('description') or '', "id": list_id, "icon": self.logo})
+                except Exception as e: self.log(f"get_lists, failed! Error fetching user profile: {e}")
         if not tmp:
             for link in soup.find_all("a", href=True):
                 try:
@@ -77,29 +107,24 @@ class IMDB:
                         list_id = href.split('/')[2]
                         name = link.get_text(strip=True)
                         if list_id.startswith('ls') and name and not any(x['id'] == list_id for x in tmp):
-                            tmp.append({"name": name, "id": list_id, "url": f"https://imdb.com{list_id}/"})
-                except Exception as e: self.log(f"get_list_items, failed! Error fetching user profile: {e}")
-        return sorted(tmp, key=itemgetter('name')) if tmp else None
+                            tmp.append({"name": name, "id": list_id, "icon": self.logo})
+                except Exception as e: self.log(f"get_lists, failed! Error fetching user profile: {e}")
+        return sorted(tmp, key=itemgetter('name'))
 
 
-    # @cacheit(expiration=datetime.timedelta(hours=int(REAL_SETTINGS.getSetting('Run_Every_Hours')), minutes=15))
+    @cacheit(expiration=datetime.timedelta(minutes=15))
     def get_list_items(self, list_id):
         self.log('get_list_items, list_id = %s'%(list_id))
+        headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+                    "Accept-Language": "en-US,en;q=0.9",
+                    "Accept": "text/csv,text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"}
         tmp = {}
-        url = f"https://www.imdb.com/list/{list_id}/"
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-                   "Accept-Language": "en-US,en;q=0.5"}
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, "html.parser")
-        movie_elements = soup.find_all("h3", class_="ipc-title__text")
-        for el in movie_elements:
-            try:
-                if el.string and not el.string.startswith(('Explore', 'More', 'Recently')):
-                    parent_link = el.find_parent("a")
-                    if parent_link and '/title/tt' in parent_link['href']:
-                        imdb_id = parent_link['href'].split('/')[2]
-                        title = el.string.split('. ', 1)[-1] if '. ' in el.string else el.string
-                        tmp.append({"title": title, "uniqueid": {'imdb':imdb_id}})
-            except Exception as e: self.log(f"get_list_items, failed! Error fetching user profile: {e}")
-        return tmp
+        try:
+            response = requests.get(f"https://www.imdb.com/list/{list_id}/export", headers=headers, timeout=15)
+            response.raise_for_status()
+            tmp = self._parse_csv(response.text)
+            if tmp: return tmp
+            self.log('get_list_items, csv empty for %s, falling back to page scrape'%(list_id))
+        except Exception as e:
+            self.log('get_list_items, csv failed for %s! %s, falling back to page scrape'%(list_id, e))
+        return self._parse_page(list_id, headers)

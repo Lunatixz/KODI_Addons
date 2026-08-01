@@ -66,32 +66,39 @@ class SPGenerator:
         func_list = {'movies'  : self.kodi.get_kodi_movies,
                      'tvshows' : self.kodi.get_kodi_tvshows,
                      'seasons' : self.kodi.get_kodi_tvshows,
-                     'episodes': self.kodi.get_kodi_episodes,
-                     'persons' : log}
+                     'episodes': self.kodi.get_kodi_episodes}
 
-        def __match(list_item, type, kodi_items):
+        def __match(list_item, type, index):
             self.cntpct = round(self.cnt*100//self.tot)
-            for kodi_item in kodi_items:
-                match = None
-                if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, '%s (%s%%)'%(self.msg, self.cntpct))
-                for key in (list(list_item.get('uniqueid',{}).keys())):
-                    if list_item.get('uniqueid',{}).get(key) == kodi_item.get('uniqueid',{}).get(key,random.random()): match = kodi_item
-                    if match: 
-                        self.log('match_items, __match found! type %s | %s -> %s'%(type,kodi_item.get('uniqueid'),list_item.get('uniqueid')))
-                        if type == "seasons": matches.setdefault(type,[]).extend(self.kodi.get_kodi_seasons(kodi_item, list_item))
-                        else:                 matches.setdefault(type,[]).append(match)
-                        break
+            if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, '%s (%s%%)'%(self.msg, self.cntpct))
+            for key in (list(list_item.get('uniqueid',{}).keys())):
+                kodi_item = index.get((key, list_item.get('uniqueid',{}).get(key)))
+                if not kodi_item: continue
+                self.log('match_items, __match found! type %s | %s -> %s'%(type,kodi_item.get('uniqueid'),list_item.get('uniqueid')))
+                if type == "seasons": matches.setdefault(type,[]).extend(self.kodi.get_kodi_seasons(kodi_item, list_item))
+                else:                 matches.setdefault(type,[]).append(kodi_item)
+                break
             self.cnt += 1
-                
+
         for type, list_items in list(source_items.items()):
             self.log('match_items, type %s | list_items = %s'%(type, len(list_items)))
-            kodi_items  = func_list.get(type)()
+            index = {}
+            for kodi_item in func_list.get(type)():
+                for key, value in list((kodi_item.get('uniqueid') or {}).items()):
+                    index.setdefault((key, value), kodi_item)
             self.msg    = '%s %s'%(LANGUAGE(32022),type.title().replace('Tvshows','TV Shows'))
             self.cntpct = 0
             self.cnt    = 0
             self.tot    = len(list(list_items))
-            poolit(__match)(list_items, **{'type':type,'kodi_items':kodi_items})
+            poolit(__match)(list_items, **{'type':type,'index':index})
         return matches
+
+
+    def build_person(self, module, person):
+        name = person.get('name')
+        self.log('build_person, name = %s, id = %s'%(name, person.get('id')))
+        tmlLST = self.match_items(module.get_trakt_person(person.get('id')))
+        if tmlLST: self.xsp.create(name, tmlLST)
 
 
     def run(self, param="None"):
@@ -117,9 +124,11 @@ class SPGenerator:
                             for idx, list_item in enumerate(list_items):
                                 self.pct = int((idx+1)*100//len(list_items))
                                 self.dia = self.kodi.progressBGDialog(self.pct, self.dia, message='%s:\n%s'%(ADDON_NAME,list_item.get('name')))
-                                tmlLST = self.match_items(module.get_list_items(list_item.get('id')))
+                                tmlLST = module.get_list_items(list_item.get('id'))
+                                persons = tmlLST.pop('persons', [])
                                 self.log("run, get_list_items\n%s"%(tmlLST))
-                                self.xsp.create(list_item.get('name'),tmlLST)
+                                self.xsp.create(list_item.get('name'),self.match_items(tmlLST))
+                                for person in persons: self.build_person(module, person)
                                 REAL_SETTINGS.setSetting('Build_%s'%(source),datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
                         else: self.kodi.notificationDialog(LANGUAGE(32023)%(source))
             else: self.kodi.notificationDialog(LANGUAGE(32025)%(ADDON_NAME))

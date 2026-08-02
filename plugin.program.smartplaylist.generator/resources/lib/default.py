@@ -71,8 +71,11 @@ class SPGenerator:
         def __match(list_item, type, index):
             self.cntpct = round(self.cnt*100//self.tot)
             if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, '%s (%s%%)'%(self.msg, self.cntpct))
-            for key in (list(list_item.get('uniqueid',{}).keys())):
-                kodi_item = index.get((key, list_item.get('uniqueid',{}).get(key)))
+            uniqueid = list_item.get('uniqueid') or {}
+            for key in list(uniqueid.keys()):
+                value = uniqueid.get(key)
+                if isinstance(value, (dict, list)): continue
+                kodi_item = index.get((key, value))
                 if not kodi_item: continue
                 self.log('match_items, __match found! type %s | %s -> %s'%(type,kodi_item.get('uniqueid'),list_item.get('uniqueid')))
                 if type == "seasons": matches.setdefault(type,[]).extend(self.kodi.get_kodi_seasons(kodi_item, list_item))
@@ -85,6 +88,7 @@ class SPGenerator:
             index = {}
             for kodi_item in func_list.get(type)():
                 for key, value in list((kodi_item.get('uniqueid') or {}).items()):
+                    if isinstance(value, (dict, list)): continue
                     index.setdefault((key, value), kodi_item)
             self.msg    = '%s %s'%(LANGUAGE(32022),type.title().replace('Tvshows','TV Shows'))
             self.cntpct = 0

@@ -83,3 +83,7 @@ class CustomQueue:
 
     def shutdown(self):
         pass
+
+    def snapshot(self):
+        with self.lock:
+            return [(t.func.__name__, t.args) for t in self.heap]

@@ -244,6 +244,12 @@ class Service(object):
         self._save()
 
     def _save(self):
+        for func_name, args in self.queue.snapshot():
+            if   func_name == 'scrapeDirectory': self._tasks.setdefault('scrapeDirectory',set()).add(args[0])
+            elif func_name == 'cleanTV':         self._tasks.setdefault('cleanTV',set()).add(args[0])
+            elif func_name == 'cleanMovies':     self._tasks.setdefault('cleanMovies',list()).append(args[0])
+            elif func_name == 'refreshTVshow':   self._tasks.setdefault('refreshTVshow',set()).add(tuple(args))
+            elif func_name == 'refreshMovie':    self._tasks.setdefault('refreshMovie',set()).add(tuple(args))
         self.log('_save tasks = %s'%(dict([(key,len(value)) for key, value in list(self._tasks.items())])))
         _tasks = {}
         for k, v in list(self._tasks.items()): _tasks[k] = list(v)

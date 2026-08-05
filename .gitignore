@@ -8,3 +8,4 @@ service.kodi.powertoys/docs/superpowers/specs/2026-07-31-network-library-sync-de
 service.kodi.powertoys/docs/superpowers/plans/2026-07-31-network-library-sync.md
 service.kodi.powertoys/docs/superpowers/plans/2026-07-31-code-quality-ux-improvements.md
 plugin.program.smartplaylist.generator/test_imdb.py
+generator.log

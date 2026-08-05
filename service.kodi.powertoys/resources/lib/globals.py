@@ -142,7 +142,7 @@ def getEpisodes(tvshowid):
     return sendJSON({"method":"VideoLibrary.GetEpisodes","params":{"tvshowid":tvshowid,"properties":["file","season","episode","showtitle","tvshowid"]}}).get('result',{}).get('episodes', [])
 
 def getMovies():
-    return sendJSON({"method":"VideoLibrary.GetMovies","params":{"properties":["file","year"]}}).get('result',{}).get('movies', [])
+    return sendJSON({"method":"VideoLibrary.GetMovies","params":{"properties":["file","year","label"]}}).get('result',{}).get('movies', [])
 
 def getDirectory(path):
     return sendJSON({"method":"Files.GetDirectory","params":{"directory":path,"media":"files"}}).get('result',{}).get('files', [])

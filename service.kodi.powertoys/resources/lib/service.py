@@ -466,9 +466,6 @@ class Service(object):
                     if master_copy.get('movieid',-1) != movie.get('movieid') and master_copy.get('file','-1') == movie.get('file','0'):
                         self.log('cleanMovies, duplicate shadow entry detected: %s' % master_copy.get('file'))
                         self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Shadow copy)")
-                    elif master_copy.get('file','-1') != movie.get('file'):
-                        self.log('cleanMovies, duplicate file detected: %s' % master_copy.get('file'))
-                        self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Physical Duplicate)")
                             
         if pDialog: pDialog.close()
         return True
@@ -584,6 +581,11 @@ class Service(object):
             for show in tvshows:
                 if self.monitor.waitForAbort(0.01): return False
                 tv_ok = self.cleanTV(show.get('tvshowid')) and tv_ok
+            for movie in movies:
+                if self.monitor.waitForAbort(0.01): return False
+                if movie.get('file') and not xbmcvfs.exists(movie.get('file')):
+                    self.log('cleanMovies, movie file no longer exists: %s' % movie.get('file'))
+                    self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Missing File)")
             for group in self._movieDuplicateGroups(movies):
                 if self.monitor.waitForAbort(0.01): return False
                 movie_ok = self.cleanMovies(group) and movie_ok

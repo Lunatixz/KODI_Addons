@@ -211,3 +211,63 @@ msgstr ""
 msgctxt "#32119"
 msgid "Options"
 msgstr ""
+
+msgctxt "#32200"
+msgid "OpenRouter"
+msgstr ""
+
+msgctxt "#32201"
+msgid "Enable OpenRouter"
+msgstr ""
+
+msgctxt "#32202"
+msgid "API Key"
+msgstr ""
+
+msgctxt "#32203"
+msgid "AI Model"
+msgstr ""
+
+msgctxt "#32204"
+msgid "Add AI Playlist"
+msgstr ""
+
+msgctxt "#32205"
+msgid "Manage AI Playlists"
+msgstr ""
+
+msgctxt "#32206"
+msgid "Select AI Playlists"
+msgstr ""
+
+msgctxt "#32207"
+msgid "Build AI Playlists"
+msgstr ""
+
+msgctxt "#32208"
+msgid "Generate Smartplaylists from AI prompts via OpenRouter."
+msgstr ""
+
+msgctxt "#32209"
+msgid "API key from openrouter.ai"
+msgstr ""
+
+msgctxt "#32210"
+msgid "Model used to interpret prompts and return media lists."
+msgstr ""
+
+msgctxt "#32211"
+msgid "Type a prompt describing the content you want; it appears in Select AI Playlists."
+msgstr ""
+
+msgctxt "#32212"
+msgid "Edit, add rules, regenerate, or delete stored AI playlists."
+msgstr ""
+
+msgctxt "#32213"
+msgid "Invalid OpenRouter API key. Check your settings."
+msgstr ""
+
+msgctxt "#32214"
+msgid "OpenRouter: no model responded. Check your API key and model access."
+msgstr ""

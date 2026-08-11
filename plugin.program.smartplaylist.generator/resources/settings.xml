@@ -218,5 +218,106 @@
                 </setting>
             </group>
         </category>
+        <category id="OpenRouter" label="32200" help="">
+            <group id="0" label="32200">
+                <setting id="Enable_OpenRouter" type="boolean" label="32201" help="32208">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="OpenRouter_APIKEY" type="string" label="32202" help="32209" parent="Enable_OpenRouter">
+                    <level>0</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="Enable_OpenRouter">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="edit" format="string">
+                        <heading>32202</heading>
+                        <hidden>true</hidden>
+                    </control>
+                </setting>
+                <setting id="OpenRouter_Model" type="string" label="32203" help="32210" parent="Enable_OpenRouter">
+                    <level>0</level>
+                    <default>cohere/north-mini-code:free</default>
+                    <constraints>
+                        <allowempty>false</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="Enable_OpenRouter">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="button" format="action">
+                        <data>RunScript(special://home/addons/plugin.program.smartplaylist.generator/resources/lib/parsers/openrouter.py, getContextModels)</data>
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="Add_OpenRouter_Playlist" type="string" label="32204" help="32211" parent="Enable_OpenRouter">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="Enable_OpenRouter">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="button" format="action">
+                        <data>RunScript(special://home/addons/plugin.program.smartplaylist.generator/resources/lib/parsers/openrouter.py, AddPlaylist)</data>
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="Manage_OpenRouter_Playlists" type="string" label="32205" help="32212" parent="Enable_OpenRouter">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="Enable_OpenRouter">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="button" format="action">
+                        <data>RunScript(special://home/addons/plugin.program.smartplaylist.generator/resources/lib/parsers/openrouter.py, ManagePlaylists)</data>
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="Select_OpenRouter" type="string" label="32206" help="32209" parent="Enable_OpenRouter">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="Enable_OpenRouter">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="button" format="action">
+                        <data>RunScript(special://home/addons/plugin.program.smartplaylist.generator/resources/lib/default.py, Select_OpenRouter)</data>
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="Build_OpenRouter" type="string" label="32207" help="32210" parent="Enable_OpenRouter">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="Enable_OpenRouter">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="button" format="action">
+                        <data>RunScript(special://home/addons/plugin.program.smartplaylist.generator/resources/lib/default.py, Build_OpenRouter)</data>
+                        <close>true</close>
+                    </control>
+                </setting>
+            </group>
+        </category>
     </section>
 </settings>

@@ -51,15 +51,27 @@ class Kodi:
         
         
     def isRunning(self, key):
-        return self.getEXTPropertyBool('%s.Running.%s'%(ADDON_ID,key))
+        if not self.getEXTPropertyBool('%s.Running.%s'%(ADDON_ID,key)): return False
+        # Auto-expire a stale lock: a crashed/killed build must not block forever.
+        stamp = self.getEXTProperty('%s.RunningTime.%s'%(ADDON_ID,key))
+        if stamp:
+            try:
+                if time.time() - float(stamp) > RUNNING_TIMEOUT:
+                    self.setEXTPropertyBool('%s.Running.%s'%(ADDON_ID,key),False)
+                    return False
+            except Exception: pass
+        return True
 
 
     @contextmanager
     def setRunning(self, key):
         if not self.isRunning(key):
             self.setEXTPropertyBool('%s.Running.%s'%(ADDON_ID,key),True)
+            self.setEXTProperty('%s.RunningTime.%s'%(ADDON_ID,key),time.time())
             try: yield
-            finally: self.setEXTPropertyBool('%s.Running.%s'%(ADDON_ID,key),False)
+            finally:
+                self.setEXTPropertyBool('%s.Running.%s'%(ADDON_ID,key),False)
+                self.setEXTProperty('%s.RunningTime.%s'%(ADDON_ID,key),'')
         else: yield
 
 

@@ -57,13 +57,23 @@ PLAYER              = xbmc.Player
 SELECT_DELAY        = 900  #secs
 AUTOCLOSE_DELAY     = 300  #secs
 PROMPT_DELAY        = 4000 #msecs
+RUNNING_TIMEOUT     = 900  #secs, stale build lock expiry
 DTFORMAT            = '%Y-%m-%d %I:%M %p'
 
 def log(event, level=xbmc.LOGDEBUG):
     if REAL_SETTINGS.getSetting('Debug_Enable') == 'true' or level >= 3:
         if level >= 3: event = '%s\n%s'%(event, traceback.format_exc())
+        event = redact(event)
         event = '%s-%s-%s'%(ADDON_ID, ADDON_VERSION, event)
         xbmc.log(event,level)
+
+
+def redact(text):
+    # Never let credentials reach the log: mask Bearer tokens and API-key
+    # header values regardless of caller.
+    text = re.sub(r'(Bearer\s+)[A-Za-z0-9._~+\-/]+', r'\1***', text)
+    text = re.sub(r'(trakt-api-key["\']?\s*[:=]\s*["\']?)[^\s"\'&]+', r'\1***', text, flags=re.IGNORECASE)
+    return text
         
 def poolit(method):
     @wraps(method)

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.program.smartplaylist.generator" version="0.2.2b" name="Smartplaylist Generator" provider-name="Lunatixz">
+<addon id="plugin.program.smartplaylist.generator" version="0.2.3" name="Smartplaylist Generator" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -21,6 +21,25 @@
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.program.smartplaylist.generator</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=379825</forum>
         <disclaimer lang="en_GB">BETA PROJECT; SUBJECT TO BUGS</disclaimer>
+        <news>
+Version 0.2.3
+New sources and modules
+- OpenRouter AI module: natural-language prompts build smartplaylists in Trakt format - model picker (free/BYOK tagged, preselects current), always-on AI proofreading (title + prompt), manual rules, Regenerate, auto-rebuild after add/edit, auto-add to selection
+- IMDB user lists: full Trakt-parity parsing (CSV export with page-scrape fallback)
+- Trakt person credits: per-person Movies / TV Shows playlists from cast
+
+AI reliability and cost
+- Model chain sticks to the user's configured model first, then rolls through live free models (includes free BYOK); hard wall-clock timeout; bounded roll; never logs API keys; standard API error notifications
+- Default model: cohere/north-mini-code:free (free, fast)
+
+Matching and output
+- Entries matched to real library titles/files: unique-id wins, title matches must agree on year, episodes match by show+season+episode
+- AI returns episode numbers, years, and reference IDs (imdb/tmdb/trakt/tvdb); no entry limit; chronological ordering
+- File-name collision handling; auto Container.Refresh after builds
+
+Reliability fixes
+- Stale "build running" lock auto-expires; failed builds no longer record a build timestamp; missing XSP files are rebuilt on startup/auto-runs; progress dialog always closed; faster library matching
+</news>
         <reuselanguageinvoker>false</reuselanguageinvoker>
         <assets>
             <icon>resources/images/icon.png</icon>

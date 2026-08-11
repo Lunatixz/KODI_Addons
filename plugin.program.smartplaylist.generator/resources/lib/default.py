@@ -18,7 +18,7 @@
 #
 # -*- coding: utf-8 -*-
 from globals  import *
-from parsers  import trakt, imdb
+from parsers  import trakt, imdb, openrouter
 from kodi     import Kodi
 from xsp      import XSP
 
@@ -41,7 +41,7 @@ class SPGenerator:
         self.sysARG    = sysARG
         self.kodi      = Kodi(self.cache)
         self.xsp       = XSP()
-        self.modules   = {LANGUAGE(32100):trakt.Trakt(self.cache),LANGUAGE(32112):imdb.IMDB(self.cache)}
+        self.modules   = {LANGUAGE(32100):trakt.Trakt(self.cache),LANGUAGE(32112):imdb.IMDB(self.cache),LANGUAGE(32200):openrouter.OpenRouter(self.cache)}
 
 
     def log(self, msg, level=xbmc.LOGDEBUG):
@@ -61,48 +61,82 @@ class SPGenerator:
         if not selects is None: self.log('build_lists, source = %s, saving = %s'%(source,self.kodi.setCacheSetting('%s.%s'%(ADDON_ID,source),[{'name':listitems[select].getLabel(),'id':listitems[select].getPath(),'icon':listitems[select].getArt('icon')} for select in selects])))
         
 
-    def match_items(self, source_items):
+    @staticmethod
+    def _norm(title):
+        return re.sub(r'[^a-z0-9]', '', (title or '').lower())
+
+
+    def match_items(self, source_items, by_title=False):
         matches   = {}
         func_list = {'movies'  : self.kodi.get_kodi_movies,
                      'tvshows' : self.kodi.get_kodi_tvshows,
                      'seasons' : self.kodi.get_kodi_tvshows,
                      'episodes': self.kodi.get_kodi_episodes}
 
-        def __match(list_item, type, index):
+        def __match(list_item, type, index, titles, eps, by_title):
             self.cntpct = round(self.cnt*100//self.tot)
             if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, '%s (%s%%)'%(self.msg, self.cntpct))
             uniqueid = list_item.get('uniqueid') or {}
+            kodi_item = None
+            # 1) Authoritative: match on a real unique id when present.
             for key in list(uniqueid.keys()):
                 value = uniqueid.get(key)
                 if isinstance(value, (dict, list)): continue
                 kodi_item = index.get((key, value))
-                if not kodi_item: continue
+                if kodi_item: break
+            # 2) AI fallback: episodes match by show + season + episode when
+            #    available, else title AND year must both hit a real entry.
+            if not kodi_item and by_title:
+                if type == 'episodes' and list_item.get('season') is not None:
+                    kodi_item = eps.get((self._norm(list_item.get('showtitle')), str(list_item.get('season') or ''), str(list_item.get('episode') or '')))
+                if not kodi_item:
+                    title = self._norm(list_item.get('title'))
+                    year  = str(list_item.get('year') or '')
+                    kodi_item = titles.get((title, year)) if year else titles.get((title, ''))
+            if kodi_item:
                 self.log('match_items, __match found! type %s | %s -> %s'%(type,kodi_item.get('uniqueid'),list_item.get('uniqueid')))
                 if type == "seasons": matches.setdefault(type,[]).extend(self.kodi.get_kodi_seasons(kodi_item, list_item))
                 else:                 matches.setdefault(type,[]).append(kodi_item)
-                break
             self.cnt += 1
 
         for type, list_items in list(source_items.items()):
             self.log('match_items, type %s | list_items = %s'%(type, len(list_items)))
-            index = {}
+            index  = {}
+            titles = {}
+            eps    = {}
             for kodi_item in func_list.get(type)():
                 for key, value in list((kodi_item.get('uniqueid') or {}).items()):
                     if isinstance(value, (dict, list)): continue
                     index.setdefault((key, value), kodi_item)
+                nkey = self._norm(kodi_item.get('title'))
+                titles.setdefault((nkey, str(kodi_item.get('year') or '')), kodi_item)
+                titles.setdefault((nkey, ''), kodi_item)
+                if type == 'episodes':
+                    eps.setdefault((self._norm(kodi_item.get('showtitle')), str(kodi_item.get('season') or ''), str(kodi_item.get('episode') or '')), kodi_item)
             self.msg    = '%s %s'%(LANGUAGE(32022),type.title().replace('Tvshows','TV Shows'))
             self.cntpct = 0
             self.cnt    = 0
             self.tot    = len(list(list_items))
-            poolit(__match)(list_items, **{'type':type,'index':index})
+            poolit(__match)(list_items, **{'type':type,'index':index,'titles':titles,'eps':eps,'by_title':by_title})
         return matches
+
+
+    def _playlists_exist(self, name):
+        # True when at least one <name> - *.xsp exists in the playlists folder.
+        # On any error assume they exist so we don't block/rebuild spuriously.
+        try:
+            files, _ = xbmcvfs.listdir(xbmcvfs.translatePath(REAL_SETTINGS.getSetting('XSP_LOC')))
+            prefix = '%s - ' % (validString(name))
+            return any(f.endswith('.xsp') and f.startswith(prefix) for f in files)
+        except Exception:
+            return True
 
 
     def build_person(self, module, person):
         name = person.get('name')
         self.log('build_person, name = %s, id = %s'%(name, person.get('id')))
         tmlLST = self.match_items(module.get_trakt_person(person.get('id')))
-        if tmlLST: self.xsp.create(name, tmlLST)
+        if tmlLST: self.xsp.create(name, tmlLST, uid='person.%s'%(person.get('id')))
 
 
     def run(self, param="None"):
@@ -121,26 +155,39 @@ class SPGenerator:
                     
             elif 'Build_' in param and not self.kodi.isRunning(source):
                 if REAL_SETTINGS.getSettingBool('Enable_%s'%(source)):
+                    auto = param.endswith('_auto')
                     with self.kodi.setRunning(source):
                         list_items = self.kodi.getCacheSetting('%s.%s'%(ADDON_ID,source))
                         if len(list_items) > 0:
+                            self.pct = 0
                             self.dia = self.kodi.progressBGDialog(self.pct)
                             for idx, list_item in enumerate(list_items):
+                                list_id  = list_item.get('id')
+                                build_key = '%s.BuildTime.%s'%(ADDON_ID, list_id)
+                                if auto:
+                                    last = self.kodi.getCacheSetting(build_key, default=0)
+                                    if last and (time.time() - last) < REAL_SETTINGS.getSettingInt('Run_Every_Hours')*3600 and self._playlists_exist(list_item.get('name')):
+                                        self.log('run, skipping %s, last built %s'%(list_item.get('name'),datetime.datetime.fromtimestamp(last).strftime(DTFORMAT)))
+                                        continue
                                 self.pct = int((idx+1)*100//len(list_items))
                                 self.dia = self.kodi.progressBGDialog(self.pct, self.dia, message='%s:\n%s'%(ADDON_NAME,list_item.get('name')))
-                                tmlLST = module.get_list_items(list_item.get('id'))
+                                tmlLST = module.get_list_items(list_id)
                                 persons = tmlLST.pop('persons', [])
                                 self.log("run, get_list_items\n%s"%(tmlLST))
-                                self.xsp.create(list_item.get('name'),self.match_items(tmlLST))
+                                matches = self.match_items(tmlLST, by_title=getattr(module, 'match_mode', '') == 'title')
+                                self.xsp.create(list_item.get('name'), matches, uid='%s.%s'%(source,list_id))
                                 for person in persons: self.build_person(module, person)
+                                if matches: self.kodi.setCacheSetting(build_key, time.time())
                                 REAL_SETTINGS.setSetting('Build_%s'%(source),datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
+                            self.dia = self.kodi.progressBGDialog(100, self.dia)
+                            self.kodi.executebuiltin('Container.Refresh')
                         else: self.kodi.notificationDialog(LANGUAGE(32023)%(source))
             else: self.kodi.notificationDialog(LANGUAGE(32025)%(ADDON_NAME))
 
         elif param == 'Run_All':
             if REAL_SETTINGS.getSettingBool('Auto_Enable'): self.auto_lists()
             for source in list(self.modules.keys()):
-                self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Build_%s)'%(ADDON_ID,source))
+                self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Build_%s_auto)'%(ADDON_ID,source))
             REAL_SETTINGS.setSetting('Last_Update',datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
         elif self.kodi.yesnoDialog('%s?'%(LANGUAGE(32110))):
             self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Run_All)'%(ADDON_ID))

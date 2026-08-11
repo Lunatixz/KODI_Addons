@@ -25,17 +25,42 @@ try:    from simplecache             import SimpleCache
 except: from simplecache.simplecache import SimpleCache #pycharm stub
 
 class XSP:
+    MANIFEST_KEY = 'xsp.manifest'
+
     def __init__(self, sysARG=sys.argv):
         self.log('__init__, sysARG = %s'%(sysARG))
         self.cache  = SimpleCache()
         self.cache.enable_mem_cache = False
         self.kodi = Kodi(self.cache)
-        
+        self._manifest = self.cache.get(self.MANIFEST_KEY, ADDON_VERSION, True) or {}
+
 
     def log(self, msg, level=xbmc.LOGDEBUG):
         return log('%s: %s'%(self.__class__.__name__,msg),level)
-        
-        
+
+
+    def _unique_path(self, path, uid):
+        # File-name collision handling: the same playlist (same uid) rebuilds
+        # onto its file; a different playlist that would land on the same file
+        # gets a " - N" suffix. Manifest persists so this holds across runs.
+        owner = self._manifest.get(path)
+        if owner == uid: return path
+        if owner is None:
+            self._manifest[path] = uid
+        else:
+            base, ext = os.path.splitext(path)
+            n = 2
+            while True:
+                candidate = '%s - %s%s'%(base, n, ext)
+                if self._manifest.get(candidate) in (None, uid):
+                    path = candidate
+                    self._manifest[path] = uid
+                    break
+                n += 1
+        self.cache.set(self.MANIFEST_KEY, self._manifest, ADDON_VERSION, datetime.timedelta(days=90), True)
+        return path
+
+
     def _write(self, root, path, list_name, pretty_print):
         self.log('create, Out: %s'%(ET.tostring(root, encoding='unicode')))
         if pretty_print: ET.indent(root)
@@ -45,10 +70,20 @@ class XSP:
         if REAL_SETTINGS.getSetting('Notify_Enable') == "true": self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),{True:LANGUAGE(32020),False:LANGUAGE(32021)}[xbmcvfs.exists(path)],list_name))
         
         
-    def create(self, list_name, match_items, pretty_print=True):
+    @staticmethod
+    def _sort_items(items, type):
+        # Write entries in a sensible order: movies/tvshows by year,
+        # episodes/seasons by season then episode number.
+        if type in ('episodes', 'seasons'):
+            return sorted(items, key=lambda i: (int(i.get('season') or 0), int(i.get('episode') or 0)))
+        return sorted(items, key=lambda i: int(i.get('year') or 0))
+
+
+    def create(self, list_name, match_items, pretty_print=True, uid=''):
         mixed_names = []
         for type, items in (list(match_items.items())):
             if len(items) == 0: continue
+            items = self._sort_items(items, type)
             match_item = {'movies'  :{'match_type':type      , 'match_field':'title'   ,'match_key':'title','match_opr':'is'},
                           'tvshows' :{'match_type':type      , 'match_field':'title'   ,'match_key':'title','match_opr':'is'},
                           'seasons' :{'match_type':'episodes', 'match_field':'path'    ,'match_key':'file' ,'match_opr':'contains'},
@@ -78,6 +113,7 @@ class XSP:
                     
             if len(values) > 0:
                 path = os.path.join(xbmcvfs.translatePath(REAL_SETTINGS.getSetting('XSP_LOC')),'%s.xsp'%("%s - %s"%(validString(list_name),type.title().replace('Tvshows','TV Shows'))))
+                path = self._unique_path(path, uid)
                 self.log('create, File: %s'%(path))
                 self._write(root, path, list_name, pretty_print)
             else: self.kodi.notificationDialog(LANGUAGE(32024)%(validString(list_name)))
@@ -102,6 +138,7 @@ class XSP:
             if len(values) > 0:
                 path = REAL_SETTINGS.getSetting('XSP_LOC').replace(os.path.basename(os.path.normpath(REAL_SETTINGS.getSetting('XSP_LOC'))),"Mixed")
                 path = os.path.join(xbmcvfs.translatePath(path),'%s.xsp'%("%s - %s"%(validString(list_name),"Mixed")))
+                path = self._unique_path(path, uid)
                 self.log('create, File: %s'%(path))
                 self._write(root, path, list_name, pretty_print)
             else: self.kodi.notificationDialog(LANGUAGE(32024)%(validString(list_name)))

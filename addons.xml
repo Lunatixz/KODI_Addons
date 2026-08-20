@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.program.smartplaylist.generator" version="0.2.3" name="Smartplaylist Generator" provider-name="Lunatixz">
+<addon id="plugin.program.smartplaylist.generator" version="0.2.5" name="Smartplaylist Generator" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -23,6 +23,14 @@
         <forum>https://forum.kodi.tv/showthread.php?tid=379825</forum>
         <disclaimer lang="en_GB">BETA PROJECT; SUBJECT TO BUGS</disclaimer>
         <news>
+Version 0.2.5
+- IMDB: fixed empty "IMDB user doesn't return a list" — IMDb now requires a browser WAF token and changed its page layout; add your aws-waf-token cookie in IMDB settings (DevTools > Application > Cookies), valid a few days
+- IMDB: list and title parsing updated for the new page structure; CSV export is gone, page scrape is now the only path
+- IMDB: image/cookie requests use one shared header builder
+
+Version 0.2.4
+- Generated playlists keep the order the source API returns items in (no more year/episode re-sorting)
+
 Version 0.2.3
 New sources and modules
 - OpenRouter AI module: natural-language prompts build smartplaylists in Trakt format - model picker (free/BYOK tagged, preselects current), always-on AI proofreading (title + prompt), manual rules, Regenerate, auto-rebuild after add/edit, auto-add to selection
@@ -839,7 +847,7 @@ Reliability fixes
     </extension>
 </addon>
 
-<addon id="service.kodi.powertoys" version="1.1.9" name="Kodi PowerToys" provider-name="Lunatixz">
+<addon id="service.kodi.powertoys" version="1.1.10" name="Kodi PowerToys" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.kodi-six" version="0.1.3.1"/>
@@ -857,6 +865,8 @@ Reliability fixes
         </assets>
         <summary lang="en_GB">Automated library maintenance: scraping, refresh, cleaning, and network sync.</summary>
         <news>
+v1.1.10 (2026-08-14)
+- Fix: network sync now browses the correct service type, so peers are actually discovered
 v1.1.9 (2026-08-01)
 - Add: Sync Library Refresh to Network Peers via zeroconf discovery
 - Fix: movie duplicate detection incorrectly grouped same-year movies (missing label property)

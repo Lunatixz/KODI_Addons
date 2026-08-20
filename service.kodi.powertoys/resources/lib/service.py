@@ -107,7 +107,7 @@ class Monitor(xbmc.Monitor):
                     self.service.sync.broadcast_refresh()
 
 class SyncManager:
-    SERVICE_TYPE = "_xbmc._tcp.local."
+    SERVICE_TYPE = "_xbmc-jsonrpc-h._tcp.local."
     REFRESH_COMMAND = {"jsonrpc": "2.0", "method": "Container.Refresh", "id": "kodi.powertoys.sync"}
     DEBOUNCE_SECONDS = 5
 

@@ -42,6 +42,15 @@ class IMDB:
         return log('%s: %s'%(self.__class__.__name__,msg),level)
 
 
+    def _headers(self, **extra):
+        headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+                    "Accept-Language": "en-US,en;q=0.9"}
+        headers.update(extra)
+        cookie = REAL_SETTINGS.getSetting('IMDB_Cookie')
+        if cookie: headers['Cookie'] = 'aws-waf-token=%s'%cookie
+        return headers
+
+
     @staticmethod
     def classify(ttype):
         return IMDB.TITLE_TYPES.get((ttype or '').lower().replace(' ',''))
@@ -65,13 +74,14 @@ class IMDB:
         script_tag = soup.find("script", id="__NEXT_DATA__")
         if script_tag:
             data = json.loads(script_tag.string)
-            items = data.get('props', {}).get('pageProps', {}).get('contentData', {}).get('list', {}).get('items', [])
+            items = ((data.get('props', {}).get('pageProps', {}).get('contentData', {}).get('list', {}).get('items', []))
+                     or ((data.get('props', {}).get('pageProps', {}).get('mainColumnData', {}).get('list', {}).get('titleListItemSearch', {}) or {}).get('edges', [])))
             for entry in items:
-                item  = entry.get('item') or {}
+                item  = entry.get('item') or entry.get('listItem') or {}
                 const = item.get('id','')
                 key   = self.classify((item.get('titleType') or {}).get('id'))
                 if not key or not const.startswith('tt'): continue
-                tmp.setdefault(key, []).append({'title':(item.get('titleText') or {}).get('text'),'year':None,'uniqueid': {'imdb': const},'data': item})
+                tmp.setdefault(key, []).append({'title':(item.get('titleText') or {}).get('text'),'year':(item.get('releaseYear') or {}).get('year') if item.get('releaseYear') else None,'uniqueid': {'imdb': const},'data': item})
         if not tmp: self.log('get_list_items, page scrape found nothing for %s'%(list_id))
         return tmp
 
@@ -83,21 +93,25 @@ class IMDB:
         tmp = []
         self.log('get_lists, imdb_user = %s'%(imdb_user))
         url = f"https://www.imdb.com/user/{imdb_user}/lists"
-        headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-                    "Accept-Language": "en-US,en;q=0.9"}
+        headers = self._headers()
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, "html.parser")
         script_tag = soup.find("script", id="__NEXT_DATA__")
         if script_tag:
             data = json.loads(script_tag.string)
-            lists_data = data.get('props', {}).get('pageProps', {}).get('lists', [])
+            lists_data = (data.get('props', {}).get('pageProps', {}).get('lists', [])
+                          or ((data.get('props', {}).get('pageProps', {}).get('mainColumnData', {}).get('userListSearch', {}) or {}).get('edges', [])))
             for l in lists_data:
                 try:
-                    list_id   = l.get('id')
-                    list_name = l.get('title') or l.get('name')
+                    node = l.get('node') if 'node' in l else l
+                    list_id   = node.get('id')
+                    name = node.get('name') or {}
+                    list_name = name.get('originalText') if isinstance(name, dict) else name
+                    desc = node.get('description') or {}
+                    if isinstance(desc, dict): desc = desc.get('plainText','') or ''
                     if list_id and list_name:
-                        tmp.append({"name": list_name, "description": l.get('description') or '', "id": list_id, "icon": self.logo})
+                        tmp.append({"name": list_name, "description": desc, "id": list_id, "icon": self.logo})
                 except Exception as e: self.log(f"get_lists, failed! Error fetching user profile: {e}")
         if not tmp:
             for link in soup.find_all("a", href=True):
@@ -115,9 +129,7 @@ class IMDB:
     @cacheit(expiration=datetime.timedelta(minutes=15))
     def get_list_items(self, list_id):
         self.log('get_list_items, list_id = %s'%(list_id))
-        headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-                    "Accept-Language": "en-US,en;q=0.9",
-                    "Accept": "text/csv,text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"}
+        headers = self._headers(Accept="text/csv,text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
         tmp = {}
         try:
             response = requests.get(f"https://www.imdb.com/list/{list_id}/export", headers=headers, timeout=15)

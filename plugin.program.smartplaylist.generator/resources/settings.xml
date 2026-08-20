@@ -180,6 +180,21 @@
                         <heading>32102</heading>
                     </control>
                 </setting>
+                <setting id="IMDB_Cookie" type="string" label="32120" help="32121" parent="Enable_IMDB">
+                    <level>0</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="Enable_IMDB">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="edit" format="string">
+                        <heading>32120</heading>
+                    </control>
+                </setting>
                 <setting id="Select_IMDB" type="string" label="32105" help="32109" parent="Enable_IMDB">
                     <level>0</level>
                     <constraints>

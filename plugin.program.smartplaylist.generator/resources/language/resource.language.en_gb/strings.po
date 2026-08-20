@@ -271,3 +271,11 @@ msgstr ""
 msgctxt "#32214"
 msgid "OpenRouter: no model responded. Check your API key and model access."
 msgstr ""
+
+msgctxt "#32120"
+msgid "IMDB WAF Token"
+msgstr ""
+
+msgctxt "#32121"
+msgid "Paste the aws-waf-token cookie value from your browser (open imdb.com, DevTools > Application > Cookies). Required because IMDb blocks automated browsers; valid a few days."
+msgstr ""

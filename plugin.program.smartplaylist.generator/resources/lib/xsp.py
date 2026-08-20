@@ -70,20 +70,10 @@ class XSP:
         if REAL_SETTINGS.getSetting('Notify_Enable') == "true": self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),{True:LANGUAGE(32020),False:LANGUAGE(32021)}[xbmcvfs.exists(path)],list_name))
         
         
-    @staticmethod
-    def _sort_items(items, type):
-        # Write entries in a sensible order: movies/tvshows by year,
-        # episodes/seasons by season then episode number.
-        if type in ('episodes', 'seasons'):
-            return sorted(items, key=lambda i: (int(i.get('season') or 0), int(i.get('episode') or 0)))
-        return sorted(items, key=lambda i: int(i.get('year') or 0))
-
-
     def create(self, list_name, match_items, pretty_print=True, uid=''):
         mixed_names = []
         for type, items in (list(match_items.items())):
             if len(items) == 0: continue
-            items = self._sort_items(items, type)
             match_item = {'movies'  :{'match_type':type      , 'match_field':'title'   ,'match_key':'title','match_opr':'is'},
                           'tvshows' :{'match_type':type      , 'match_field':'title'   ,'match_key':'title','match_opr':'is'},
                           'seasons' :{'match_type':'episodes', 'match_field':'path'    ,'match_key':'file' ,'match_opr':'contains'},

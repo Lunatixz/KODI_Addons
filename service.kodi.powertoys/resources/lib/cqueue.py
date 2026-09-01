@@ -64,6 +64,9 @@ class CustomQueue:
             if isScanning():
                 if self.monitor.waitForAbort(1.0): break
                 continue
+            if self.service._playing:
+                if self.monitor.waitForAbort(1.0): break
+                continue
             task = None
             with self.lock:
                 if self.heap:

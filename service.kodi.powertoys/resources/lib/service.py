@@ -41,6 +41,8 @@ class Player(xbmc.Player):
 
     def onPlayBackStarted(self):
         self.log('onPlayBackStarted')
+        if self.service and not REAL_SETTINGS.getSettingBool('Run_Playing'):
+            self.service._playing = True
 
     def onAVStarted(self):
         self.playingItem = {'listitem':self.getPlayerItem(), 'elapsed':self.getPlayedTime(), 'totaltime':self.getPlayerTime()}
@@ -49,14 +51,20 @@ class Player(xbmc.Player):
     def onPlayBackError(self):
         self.log('onPlayBackError')
         self.playingItem = self.onStop(self.playingItem)
+        if self.service:
+            self.service._playing = False
         
     def onPlayBackEnded(self):
         self.log('onPlayBackEnded')
         self.playingItem = self.onStop(self.playingItem)
+        if self.service:
+            self.service._playing = False
         
     def onPlayBackStopped(self):
         self.log('onPlayBackStopped')
         self.playingItem = self.onStop(self.playingItem)
+        if self.service:
+            self.service._playing = False
 
     def onStop(self, playingItem={}):
         self.log('onStop, playingItem = %s'%(self.playingItem))
@@ -196,6 +204,7 @@ class Service(object):
     
     def __init__(self):
         self.isRunning  = False
+        self._playing   = False
         self.monitor  = Monitor(self)
         self.player   = self.monitor.player
         self.queue    = CustomQueue(service=self)
@@ -255,9 +264,6 @@ class Service(object):
         for k, v in list(self._tasks.items()): _tasks[k] = list(v)
         self.cache.set('tasks', json.dumps(_tasks, default=list), checksum=ADDON_VERSION, expiration=datetime.timedelta(days=28), json_data=True)
             
-    def _chkPlaying(self):
-        return self.player.isPlaying() and not REAL_SETTINGS.getSettingBool('Run_Playing')
-        
     def _chkIdle(self):
         if REAL_SETTINGS.getSettingBool('Run_Idling'): return int(xbmc.getGlobalIdleTime() or '0') > self.wait
         return True
@@ -281,7 +287,7 @@ class Service(object):
          
     def _run(self):
         self.log('_run tasks = %s'%(dict([(key,len(value)) for key, value in list(self._tasks.items())])))
-        if self._chkPlaying() or isScanning():
+        if self._playing or isScanning():
             self.log('_run, waiting for scraper or player to finish...')
             return
         if not self._chkIdle():
@@ -330,9 +336,10 @@ class Service(object):
         if sendJSON({"method":"VideoLibrary.Scan","params":{"directory":path,"showdialogs":show_dialog}}).get('result') == "OK":
             while not self.monitor.abortRequested():
                 if   self.monitor.waitForAbort(0.5): break
+                elif self._playing: break
                 elif isScanning(): self.log('scrapeDirectory, waiting for scraper to finish...')
                 else: break
-            self.log('scrapeDirectory, finished!')
+        self.log('scrapeDirectory, finished!')
 
     def runScraper(self):
         try:
@@ -393,6 +400,7 @@ class Service(object):
         for eidx, episode in enumerate(episodes):
             percent = int((eidx / len(episodes)) * 100) if len(episodes) > 0 else 0
             if self.monitor.waitForAbort(0.01): return False
+            elif self._playing: return False
             elif not episode: continue
             elif not xbmcvfs.exists(episode.get('file', '')):
                 self.log('cleanTV, episode file no longer exists: %s' % episode.get('file'))
@@ -456,6 +464,7 @@ class Service(object):
             for midx, movie in enumerate(shadow_copies):
                 percent = int((midx / len(shadow_copies)) * 100) if len(shadow_copies) > 0 else 0
                 if self.monitor.waitForAbort(0.01): return False
+                elif self._playing: return False
                 elif not movie: continue
                 elif not xbmcvfs.exists(movie.get('file')):
                     self.log('cleanMovies, movie file no longer exists: %s' % movie.get('file'))
@@ -478,6 +487,7 @@ class Service(object):
         if len(shows) > 0: random.shuffle(shows)
         for show in shows:
             if   self.monitor.waitForAbort(0.01): return False
+            elif self._playing: return False
             elif clean: self._tasks.setdefault('cleanTV',set()).add(show.get('tvshowid',-1))
             self._tasks.setdefault('refreshTVshow',set()).add((show.get('tvshowid'),ignoreNFO,includeEpisodes))
         return True
@@ -492,6 +502,7 @@ class Service(object):
                 self._tasks.setdefault('cleanMovies',list()).append(group)
         for movie in movies:
             if self.monitor.waitForAbort(0.01): return False
+            elif self._playing: return False
             self._tasks.setdefault('refreshMovie',set()).add((movie.get('movieid'),ignoreNFO))
         return True
 

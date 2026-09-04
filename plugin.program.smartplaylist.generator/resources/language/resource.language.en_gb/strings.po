@@ -181,15 +181,11 @@ msgid "Auto Enable all lists"
 msgstr ""
 
 msgctxt "#32112"
-msgid "IMDB"
+msgid "Allow Community Lists"
 msgstr ""
 
 msgctxt "#32113"
-msgid "Enable IMDB"
-msgstr ""
-
-msgctxt "#32114"
-msgid "Enter IMDB Username"
+msgid "Include popular, trending, official, and top lists from the community."
 msgstr ""
 
 msgctxt "#32115"
@@ -272,10 +268,22 @@ msgctxt "#32214"
 msgid "OpenRouter: no model responded. Check your API key and model access."
 msgstr ""
 
-msgctxt "#32120"
-msgid "IMDB WAF Token"
+msgctxt "#32300"
+msgid "MDBList"
 msgstr ""
 
-msgctxt "#32121"
-msgid "Paste the aws-waf-token cookie value from your browser (open imdb.com, DevTools > Application > Cookies). Required because IMDb blocks automated browsers; valid a few days."
+msgctxt "#32301"
+msgid "Enable MDBList"
+msgstr ""
+
+msgctxt "#32302"
+msgid "API Key"
+msgstr ""
+
+msgctxt "#32303"
+msgid "API key from mdblist.com/preferences (free, 1000 req/day)."
+msgstr ""
+
+msgctxt "#32304"
+msgid "Invalid MDBList API key. Check your settings."
 msgstr ""

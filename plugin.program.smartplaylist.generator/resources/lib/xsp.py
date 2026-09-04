@@ -67,7 +67,6 @@ class XSP:
         fle = xbmcvfs.File(path, 'w')
         ET.ElementTree(root).write(fle, encoding='utf-8', xml_declaration=True)
         fle.close()
-        if REAL_SETTINGS.getSetting('Notify_Enable') == "true": self.kodi.notificationDialog('%s %s:\n%s'%(LANGUAGE(32017),{True:LANGUAGE(32020),False:LANGUAGE(32021)}[xbmcvfs.exists(path)],list_name))
         
         
     def create(self, list_name, match_items, pretty_print=True, uid=''):

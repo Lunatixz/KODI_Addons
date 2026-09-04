@@ -85,7 +85,7 @@ class OpenRouter:
 
         self.enabled = REAL_SETTINGS.getSetting('Enable_OpenRouter') == 'true'
         self.name    = LANGUAGE(32200)
-        self.logo    = ICON
+        self.logo    = os.path.join(ADDON_PATH,'resources','images','openrouter.png')
         self._error_notified = False
 
 

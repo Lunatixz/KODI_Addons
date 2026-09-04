@@ -88,6 +88,16 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="Allow_CommunityLists" type="boolean" label="32112" help="32113" parent="Enable_Trakt">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="Enable_Trakt">true</condition>
+                        </dependency>
+                    </dependencies>
+                </setting>
                 <setting id="Trakt_Username" type="string" label="32101" help="32102" parent="Enable_Trakt">
                     <level>0</level>
                     <default></default>
@@ -157,15 +167,24 @@
                 </setting>
             </group>
         </category>
-		<category id="IMDB" label="32112" help="">
-            <group id="0" label="32112">
-                <setting id="Enable_IMDB" type="boolean" label="32113" help="">
+        <category id="MDBList" label="32300" help="">
+            <group id="0" label="32300">
+                <setting id="Enable_MDBList" type="boolean" label="32301" help="">
                     <level>0</level>
                     <default>false</default>
-					<enable>true</enable>
                     <control type="toggle"/>
                 </setting>
-                <setting id="IMDB_ClientID" type="string" label="32101" help="32113" parent="Enable_IMDB">
+                <setting id="Allow_CommunityLists_MDB" type="boolean" label="32112" help="32113" parent="Enable_MDBList">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="Enable_MDBList">true</condition>
+                        </dependency>
+                    </dependencies>
+                </setting>
+                <setting id="MDBList_APIKEY" type="string" label="32302" help="32303" parent="Enable_MDBList">
                     <level>0</level>
                     <default></default>
                     <constraints>
@@ -173,29 +192,15 @@
                     </constraints>
                     <dependencies>
                         <dependency type="visible">
-                            <condition operator="is" setting="Enable_IMDB">true</condition>
+                            <condition operator="is" setting="Enable_MDBList">true</condition>
                         </dependency>
                     </dependencies>
                     <control type="edit" format="string">
-                        <heading>32102</heading>
+                        <heading>32303</heading>
+                        <hidden>true</hidden>
                     </control>
                 </setting>
-                <setting id="IMDB_Cookie" type="string" label="32120" help="32121" parent="Enable_IMDB">
-                    <level>0</level>
-                    <default></default>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition operator="is" setting="Enable_IMDB">true</condition>
-                        </dependency>
-                    </dependencies>
-                    <control type="edit" format="string">
-                        <heading>32120</heading>
-                    </control>
-                </setting>
-                <setting id="Select_IMDB" type="string" label="32105" help="32109" parent="Enable_IMDB">
+                <setting id="Select_MDBList" type="string" label="32105" help="32109" parent="Enable_MDBList">
                     <level>0</level>
                     <constraints>
                         <allowempty>true</allowempty>
@@ -203,17 +208,17 @@
                     <dependencies>
                         <dependency type="visible">
                             <and>
-                                <condition operator="is" setting="Enable_IMDB">true</condition>
-                                <condition operator="!is" setting="IMDB_ClientID"></condition>
+                                <condition operator="is" setting="Enable_MDBList">true</condition>
+                                <condition operator="!is" setting="MDBList_APIKEY"></condition>
                             </and>
                         </dependency>
                     </dependencies>
                     <control type="button" format="action">
-                        <data>RunScript(special://home/addons/plugin.program.smartplaylist.generator/resources/lib/default.py, Select_IMDB)</data>
+                        <data>RunScript(special://home/addons/plugin.program.smartplaylist.generator/resources/lib/default.py, Select_MDBList)</data>
                         <close>true</close>
                     </control>
                 </setting>
-                <setting id="Build_IMDB" type="string" label="32106" help="32110" parent="Enable_IMDB">
+                <setting id="Build_MDBList" type="string" label="32106" help="32110" parent="Enable_MDBList">
                     <level>0</level>
                     <constraints>
                         <allowempty>true</allowempty>
@@ -221,13 +226,13 @@
                     <dependencies>
                         <dependency type="visible">
                             <and>
-                                <condition operator="is" setting="Enable_IMDB">true</condition>
-                                <condition operator="!is" setting="IMDB_ClientID"></condition>
+                                <condition operator="is" setting="Enable_MDBList">true</condition>
+                                <condition operator="!is" setting="MDBList_APIKEY"></condition>
                             </and>
                         </dependency>
                     </dependencies>
                     <control type="button" format="action">
-                        <data>RunScript(special://home/addons/plugin.program.smartplaylist.generator/resources/lib/default.py, Build_IMDB)</data>
+                        <data>RunScript(special://home/addons/plugin.program.smartplaylist.generator/resources/lib/default.py, Build_MDBList)</data>
                         <close>true</close>
                     </control>
                 </setting>

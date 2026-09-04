@@ -18,7 +18,7 @@
 #
 # -*- coding: utf-8 -*-
 from globals  import *
-from parsers  import trakt, imdb, openrouter
+from parsers  import trakt, mdblist, openrouter
 from kodi     import Kodi
 from xsp      import XSP
 
@@ -41,7 +41,24 @@ class SPGenerator:
         self.sysARG    = sysARG
         self.kodi      = Kodi(self.cache)
         self.xsp       = XSP()
-        self.modules   = {LANGUAGE(32100):trakt.Trakt(self.cache),LANGUAGE(32112):imdb.IMDB(self.cache),LANGUAGE(32200):openrouter.OpenRouter(self.cache)}
+        self.modules   = {LANGUAGE(32100):trakt.Trakt(self.cache),LANGUAGE(32300):mdblist.MDBList(self.cache),LANGUAGE(32200):openrouter.OpenRouter(self.cache)}
+        self._build_times = self._load_build_times()
+
+
+    def _build_times_path(self):
+        return os.path.join(xbmcvfs.translatePath(SETTINGS_LOC), 'build_times.json')
+
+
+    def _load_build_times(self):
+        try:
+            with open(self._build_times_path(), 'r') as f: return json.load(f)
+        except: return {}
+
+
+    def _save_build_times(self):
+        try:
+            with open(self._build_times_path(), 'w') as f: json.dump(self._build_times, f)
+        except Exception as e: self.log('_save_build_times, failed: %s'%e, xbmc.LOGERROR)
 
 
     def log(self, msg, level=xbmc.LOGDEBUG):
@@ -158,14 +175,17 @@ class SPGenerator:
                     auto = param.endswith('_auto')
                     with self.kodi.setRunning(source):
                         list_items = self.kodi.getCacheSetting('%s.%s'%(ADDON_ID,source))
+                        if not list_items:
+                            list_items = [{'name':item.get('name'),'id':item.get('id'),'icon':item.get('icon',ICON)} for item in module.get_lists()]
+                            self.kodi.setCacheSetting('%s.%s'%(ADDON_ID,source), list_items)
                         if len(list_items) > 0:
                             self.pct = 0
                             self.dia = self.kodi.progressBGDialog(self.pct)
                             for idx, list_item in enumerate(list_items):
                                 list_id  = list_item.get('id')
-                                build_key = '%s.BuildTime.%s'%(ADDON_ID, list_id)
+                                build_key = '%s.%s'%(source, list_id)
                                 if auto:
-                                    last = self.kodi.getCacheSetting(build_key, default=0)
+                                    last = self._build_times.get(build_key, 0)
                                     if last and (time.time() - last) < REAL_SETTINGS.getSettingInt('Run_Every_Hours')*3600 and self._playlists_exist(list_item.get('name')):
                                         self.log('run, skipping %s, last built %s'%(list_item.get('name'),datetime.datetime.fromtimestamp(last).strftime(DTFORMAT)))
                                         continue
@@ -177,7 +197,9 @@ class SPGenerator:
                                 matches = self.match_items(tmlLST, by_title=getattr(module, 'match_mode', '') == 'title')
                                 self.xsp.create(list_item.get('name'), matches, uid='%s.%s'%(source,list_id))
                                 for person in persons: self.build_person(module, person)
-                                if matches: self.kodi.setCacheSetting(build_key, time.time())
+                                if matches:
+                                    self._build_times[build_key] = time.time()
+                                    self._save_build_times()
                                 REAL_SETTINGS.setSetting('Build_%s'%(source),datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
                             self.dia = self.kodi.progressBGDialog(100, self.dia)
                             self.kodi.executebuiltin('Container.Refresh')

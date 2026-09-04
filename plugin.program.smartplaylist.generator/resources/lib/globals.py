@@ -98,10 +98,13 @@ def cacheit(expiration=datetime.timedelta(minutes=15), checksum=ADDON_VERSION, j
             cacheName = "%s.%s"%(method_class.__class__.__name__, method.__name__)
             for item in args[1:]: cacheName += u".%s"%item
             for k, v in list(kwargs.items()): cacheName += u".%s"%(v)
-            results = method_class.cache.get(cacheName.lower(), checksum, json_data)
+            effective_checksum = checksum
+            if hasattr(method_class, 'cache_checksum'):
+                effective_checksum = checksum + '_' + str(method_class.cache_checksum)
+            results = method_class.cache.get(cacheName.lower(), effective_checksum, json_data)
             if results: return results
             value = method(*args, **kwargs)
-            method_class.cache.set(cacheName.lower(), value, checksum, expiration, json_data)
+            method_class.cache.set(cacheName.lower(), value, effective_checksum, expiration, json_data)
             return value
         return wrapper
     return internal

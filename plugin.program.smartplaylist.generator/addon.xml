@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.program.smartplaylist.generator" version="0.2.5" name="Smartplaylist Generator" provider-name="Lunatixz">
+<addon id="plugin.program.smartplaylist.generator" version="0.2.6" name="Smartplaylist Generator" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -7,22 +7,25 @@
         <import addon="script.module.infotagger" version="0.0.5"/>
         <import addon="script.module.simplecache" version="1.0.0"/>
         <import addon="script.module.requests" version="0.0.1"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="resources/lib/default.py">
         <provides>executable</provides>
     </extension>
     <extension point="xbmc.service" library="resources/lib/service.py"/>
     <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Generate Smartplaylists from third-party lists.</summary>
+        <description lang="en_GB">Generate Smartplaylists from third-party lists.</description>
         <platform>all</platform>
         <license>GPL-3.0-or-later</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.program.smartplaylist.generator</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=379825</forum>
+        <disclaimer lang="en_GB">BETA PROJECT; SUBJECT TO BUGS</disclaimer>
         <news>
-Version 0.2.5
-- IMDB: fixed empty "IMDB user doesn't return a list" — IMDb now requires a browser WAF token and changed its page layout; add your aws-waf-token cookie in IMDB settings (DevTools > Application > Cookies), valid a few days
-- IMDB: list and title parsing updated for the new page structure; CSV export is gone, page scrape is now the only path
-- IMDB: image/cookie requests use one shared header builder
+Version 0.2.6
+- MDBList: new source — user lists, top 50 public lists, official curated lists, and external/linked lists (IMDb, Trakt, Letterboxd, etc.) via API key (free 1,000 req/day)
+- Trakt: added popular, trending, and official public lists alongside user lists
+- Added "Allow Community Lists" setting to Trakt and MDBList tabs (off by default) to gate non-user lists
+- Removed IMDB source (replaced by MDBList)
 
 Version 0.2.4
 - Generated playlists keep the order the source API returns items in (no more year/episode re-sorting)
@@ -50,8 +53,5 @@ Reliability fixes
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
-        <summary lang="en_GB">Generate Smartplaylists from third-party lists.</summary>
-        <description lang="en_GB">Generate Smartplaylists from third-party lists.</description>
-        <disclaimer lang="en_GB">BETA PROJECT; SUBJECT TO BUGS</disclaimer>
     </extension>
 </addon>

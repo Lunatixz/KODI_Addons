@@ -286,10 +286,9 @@ class Service(object):
         yield
          
     def _run(self):
-        self.log('_run tasks = %s'%(dict([(key,len(value)) for key, value in list(self._tasks.items())])))
         if self._playing or isScanning():
-            self.log('_run, waiting for scraper or player to finish...')
             return
+        self.log('_run tasks = %s'%(dict([(key,len(value)) for key, value in list(self._tasks.items())])))
         if not self._chkIdle():
             return
         if self._tasks.get('scrapeDirectory'):

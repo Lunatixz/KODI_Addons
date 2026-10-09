@@ -18,15 +18,15 @@ msgstr ""
 
 msgctxt "Addon Summary"
 msgid ""
-msgstr "Automated library maintenance: scraping, refresh, cleaning, and network sync."
+msgstr ""
 
 msgctxt "Addon Description"
 msgid ""
-msgstr "PowerToys automates Kodi library maintenance. Scrapes new content from configured source folders, periodically refreshes metadata, removes duplicate library entries, and syncs UI refresh across network peers."
+msgstr ""
 
 msgctxt "Addon Disclaimer"
 msgid ""
-msgstr "Use at your own risk. Dry Run is enabled by default."
+msgstr ""
 
 msgctxt "#32000"
 msgid "Enable Debugging"
@@ -115,15 +115,3 @@ msgstr ""
 msgctxt "#32025"
 msgid "Sync Library Refresh to Network Peers"
 msgstr ""
-
-
-
-
-
-
-
-
-
-
-
-

@@ -857,7 +857,7 @@ class Engine(threading.Thread):
         self.zc = zc
         self.readers   = {} # maps socket to reader
         self.condition = threading.Condition()
-        self.timeout   = 20
+        self.timeout   = 60
         self.start()
 
 
@@ -964,7 +964,7 @@ class Reaper(threading.Thread):
 
     def run(self):
         while not MONITOR().abortRequested():
-            self.zc.wait(10 * 1000)
+            self.zc.wait(30 * 1000)
             if _GLOBAL_DONE:
                 return
             now = currentTimeMillis()

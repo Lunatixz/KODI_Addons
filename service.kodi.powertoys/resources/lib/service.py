@@ -104,6 +104,9 @@ class Monitor(xbmc.Monitor):
     def onNotification(self, sender, method, data):
         self.log("onNotification, sender %s - method: %s  - data: %s" % (sender, method, data))
         if self.service:
+            if sender == ADDON_ID and method.endswith(".RefreshLibrary"):
+                self.log("Peer refresh signal received")
+                xbmc.executebuiltin("Container.Refresh")
             if method == "VideoLibrary.OnScanFinished" and REAL_SETTINGS.getSettingBool('Clean_OnScanFinished'):
                 self.log("Event Intercept -> Library Scan Finished. Injecting optimization pass.")
                 self.service._que(self.service.runClean, priority=5)
@@ -116,7 +119,7 @@ class Monitor(xbmc.Monitor):
 
 class SyncManager:
     SERVICE_TYPE = "_xbmc-jsonrpc-h._tcp.local."
-    REFRESH_COMMAND = {"jsonrpc": "2.0", "method": "Container.Refresh", "id": "kodi.powertoys.sync"}
+    REFRESH_COMMAND = {"jsonrpc": "2.0", "method": "JSONRPC.NotifyAll", "params": {"sender": ADDON_ID, "message": "RefreshLibrary", "data": {}}, "id": "kodi.powertoys.sync"}
     DEBOUNCE_SECONDS = 5
 
     def __init__(self):
@@ -184,7 +187,10 @@ class SyncManager:
             self.log('Debounce: skipping refresh (last broadcast %.1fs ago)' % (now - self._last_broadcast))
             return
         self._last_broadcast = now
-        self.log('Broadcasting Container.Refresh to %d peers' % len(self.peers))
+        self.log('Broadcasting refresh to %d peers' % len(self.peers))
+        threading.Thread(target=self._broadcast_loop, daemon=True).start()
+
+    def _broadcast_loop(self):
         for peer in list(self.peers.values()):
             self._send_refresh(peer['ip'], peer['port'])
 
@@ -200,7 +206,7 @@ class SyncManager:
 
 class Service(object):
     cache = SimpleCache()
-    cache.enable_mem_cache = True
+    cache.enable_mem_cache = False
     
     def __init__(self):
         self.isRunning  = False
@@ -247,7 +253,7 @@ class Service(object):
         self.monitor.waitForAbort(self.wait)
         self.sync.start()
         while not self.monitor.abortRequested():
-            if    self.monitor.waitForAbort(2.0): break
+            if    self.monitor.waitForAbort(5.0): break
             else: self._run()
         self.sync.stop()
         self._save()
@@ -288,7 +294,6 @@ class Service(object):
     def _run(self):
         if self._playing or isScanning():
             return
-        self.log('_run tasks = %s'%(dict([(key,len(value)) for key, value in list(self._tasks.items())])))
         if not self._chkIdle():
             return
         if self._tasks.get('scrapeDirectory'):

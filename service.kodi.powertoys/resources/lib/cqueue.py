@@ -74,7 +74,7 @@ class CustomQueue:
                     key = (task.func.__name__, task.args)
                     self.pending.discard(key)
             if task is None:
-                if self.monitor.waitForAbort(2.0):
+                if self.monitor.waitForAbort(5.0):
                     break
                 continue
             self.log(f"execute, {task.func.__name__} (Priority: {task.priority})")

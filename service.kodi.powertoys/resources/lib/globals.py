@@ -136,13 +136,13 @@ def sendJSON(param):
     return response
 
 def getTVshows():
-    return sendJSON({"method":"VideoLibrary.GetTVShows","params":{"properties":["file"]}}).get('result',{}).get('tvshows', [])
+    return sendJSON({"method":"VideoLibrary.GetTVShows","params":{"properties":["file","art","plot","mpaa","imdbnumber"]}}).get('result',{}).get('tvshows', [])
        
 def getEpisodes(tvshowid):
-    return sendJSON({"method":"VideoLibrary.GetEpisodes","params":{"tvshowid":tvshowid,"properties":["file","season","episode","showtitle","tvshowid"]}}).get('result',{}).get('episodes', [])
+    return sendJSON({"method":"VideoLibrary.GetEpisodes","params":{"tvshowid":tvshowid,"properties":["file","season","episode","showtitle","tvshowid","art","plot"]}}).get('result',{}).get('episodes', [])
 
 def getMovies():
-    return sendJSON({"method":"VideoLibrary.GetMovies","params":{"properties":["file","year","label"]}}).get('result',{}).get('movies', [])
+    return sendJSON({"method":"VideoLibrary.GetMovies","params":{"properties":["file","year","label","art","plot","mpaa","imdbnumber"]}}).get('result',{}).get('movies', [])
 
 def getDirectory(path):
     return sendJSON({"method":"Files.GetDirectory","params":{"directory":path,"media":"files"}}).get('result',{}).get('files', [])

@@ -1,25 +1,268 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<settings>
-    <setting label="32001" type="lsep"/>
-    <setting id="Scraper_Enabled" type="bool" label="32010" default="false" />
-    <setting id="Scraper_Show_Dialog" type="bool" label="32004" default="true" subsetting="true" />
-    <setting id="Scraper_Interval_DAYS" type="number" label="32003" default="1" subsetting="true" />
-    <setting id="Scraper_TV_Folder" type="folder" label="32007" source="video" option="writeable" default="" subsetting="true" />
-    <setting id="Scraper_Movie_Folder" type="folder" label="32008" source="video" option="writeable" default="" subsetting="true" />
-    <setting id="Refresh_Enabled" type="bool" label="32005" default="false" />
-    <setting id="Refresh_Interval_DAYS" type="number" label="32006" default="7" subsetting="true" />
-    <setting id="Refresh_Include_Episodes" type="bool" label="32015" default="true" subsetting="true" />
-    <setting id="Refresh_Ignore_NFO" type="bool" label="32013" default="false" subsetting="true" />
-    <setting id="Refresh_Clean" type="bool" label="32012" default="false" />
-    <setting id="Clean_OnScanFinished" type="bool" label="32023" default="false" />
-    <setting label="32025" type="lsep"/>
-    <setting id="Sync_Enabled" type="bool" label="32025" default="false" />
-    <setting label="32018" type="lsep"/>
-    <setting id="Dry_Run_Enabled" type="bool" label="32016" default="true" />
-    <setting id="Delete_Enabled" type="bool" label="32017" default="false" />
-    <setting label="32000" type="lsep"/>
-    <setting id="Enable_Debugging" type="bool" label="32000" default="false" />
-    <setting id="Run_Playing" type="bool" label="32011" default="false" />
-    <setting id="Run_Idling" type="bool" label="32014" default="false" />
-    <setting id="Start_Delay" type="number" label="32002" default="15" />
+<?xml version="1.0" ?>
+<settings version="1">
+    <section id="service.kodi.powertoys">
+        <category id="scraping" label="32001" help="">
+            <group id="1" label="">
+                <setting id="Scraper_Enabled" type="boolean" label="32010" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="Scraper_TV_Folder" type="path" label="32007" help="" parent="Scraper_Enabled">
+                    <level>1</level>
+                    <default/>
+                    <constraints>
+                        <sources><source>video</source></sources>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="path">
+                        <heading>32007</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="Scraper_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="Scraper_Movie_Folder" type="path" label="32008" help="" parent="Scraper_Enabled">
+                    <level>1</level>
+                    <default/>
+                    <constraints>
+                        <sources><source>video</source></sources>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="path">
+                        <heading>32008</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="Scraper_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="Scraper_Interval_DAYS" type="integer" label="32003" help="" parent="Scraper_Enabled">
+                    <level>1</level>
+                    <default>1</default>
+                    <constraints><minimum>1</minimum></constraints>
+                    <control type="edit" format="integer">
+                        <heading>32003</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="Scraper_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="Scraper_Show_Dialog" type="boolean" label="32004" help="" parent="Scraper_Enabled">
+                    <level>1</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable" setting="Scraper_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+            </group>
+        </category>
+        <category id="refresh" label="32042" help="">
+            <group id="1" label="">
+                <setting id="Refresh_Enabled" type="boolean" label="32005" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="Refresh_Interval_DAYS" type="integer" label="32006" help="" parent="Refresh_Enabled">
+                    <level>1</level>
+                    <default>7</default>
+                    <constraints><minimum>1</minimum></constraints>
+                    <control type="edit" format="integer">
+                        <heading>32006</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="Refresh_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="Refresh_Art_Only" type="boolean" label="32027" help="" parent="Refresh_Enabled">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable" setting="Refresh_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="Refresh_QA_Blank" type="boolean" label="32050" help="" parent="Refresh_Art_Only">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable" setting="Refresh_Art_Only">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="Refresh_Include_Episodes" type="boolean" label="32015" help="" parent="Refresh_Enabled">
+                    <level>1</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable" setting="Refresh_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="Refresh_Ignore_NFO" type="boolean" label="32013" help="" parent="Refresh_Enabled">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable" setting="Refresh_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="Refresh_Clean" type="boolean" label="32012" help="" parent="Refresh_Enabled">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable" setting="Refresh_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+            </group>
+        </category>
+        <category id="cleaning" label="32043" help="">
+            <group id="1" label="">
+                <setting id="Clean_OnScanFinished" type="boolean" label="32023" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="Clean_Exclude" type="string" label="32029" help="">
+                    <level>1</level>
+                    <default/>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="edit" format="string">
+                        <heading>32029</heading>
+                    </control>
+                </setting>
+                <setting id="Dry_Run_Enabled" type="boolean" label="32016" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="Delete_Enabled" type="boolean" label="32017" help="" parent="Dry_Run_Enabled">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable" setting="Dry_Run_Enabled">false</dependency>
+                    </dependencies>
+                </setting>
+            </group>
+        </category>
+        <category id="texture" label="32044" help="">
+            <group id="1" label="">
+                <setting id="Texture_Enabled" type="boolean" label="32047" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="Texture_Interval_DAYS" type="integer" label="32048" help="" parent="Texture_Enabled">
+                    <level>1</level>
+                    <default>7</default>
+                    <constraints><minimum>1</minimum></constraints>
+                    <control type="edit" format="integer">
+                        <heading>32048</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="Texture_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="Texture_Delete_Files" type="boolean" label="32049" help="" parent="Texture_Enabled">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable" setting="Texture_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+            </group>
+        </category>
+        <category id="backup" label="32045" help="">
+            <group id="1" label="">
+                <setting id="Backup_Enabled" type="boolean" label="32031" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="Backup_Folder" type="path" label="32032" help="" parent="Backup_Enabled">
+                    <level>1</level>
+                    <default/>
+                    <constraints>
+                        <sources><source>video</source></sources>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="path">
+                        <heading>32032</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="Backup_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="Backup_Interval_DAYS" type="integer" label="32033" help="" parent="Backup_Enabled">
+                    <level>1</level>
+                    <default>7</default>
+                    <constraints><minimum>1</minimum></constraints>
+                    <control type="edit" format="integer">
+                        <heading>32033</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="Backup_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+            </group>
+        </category>
+        <category id="sync" label="32025" help="">
+            <group id="1" label="">
+                <setting id="Sync_Enabled" type="boolean" label="32025" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+        <category id="maintenance" label="32026" help="">
+            <group id="1" label="">
+                <setting id="Scan_Retry_On_Error" type="boolean" label="32028" help="">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="Alert_Offline_Shares" type="boolean" label="32030" help="">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="Report_Context_Menu" type="boolean" label="32034" help="">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+        <category id="general" label="32046" help="">
+            <group id="1" label="">
+                <setting id="Run_Playing" type="boolean" label="32011" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="Run_Idling" type="boolean" label="32014" help="">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="Start_Delay" type="integer" label="32002" help="">
+                    <level>1</level>
+                    <default>15</default>
+                    <constraints><minimum>0</minimum></constraints>
+                    <control type="edit" format="integer">
+                        <heading>32002</heading>
+                    </control>
+                </setting>
+                <setting id="Enable_Debugging" type="boolean" label="32000" help="">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+    </section>
 </settings>

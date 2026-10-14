@@ -18,11 +18,11 @@ msgstr ""
 
 msgctxt "Addon Summary"
 msgid ""
-msgstr "Automated library maintenance: scraping, refresh, cleaning, and network sync."
+msgstr "Automated library maintenance: scraping, refresh, cleaning, texture cache, backup, and network sync."
 
 msgctxt "Addon Description"
 msgid ""
-msgstr "PowerToys automates Kodi library maintenance. Scrapes new content from configured source folders, periodically refreshes metadata, removes duplicate library entries, and syncs UI refresh across network peers."
+msgstr "PowerToys automates Kodi library maintenance. Scrapes new content from configured source folders, periodically refreshes metadata (optionally only items missing artwork or with blank plot/MPAA), removes missing files and duplicate library entries (quality-weighted, IMDb-aware), prunes orphaned texture cache artwork and re-caches missing thumbnails, backs up the library on a schedule, and syncs UI refresh across network peers. Context menu actions provide on-demand clean, scan, and a library health report. All destructive operations honor Dry Run; file deletion is a separate opt-in."
 
 msgctxt "Addon Disclaimer"
 msgid ""
@@ -116,9 +116,125 @@ msgctxt "#32025"
 msgid "Sync Library Refresh to Network Peers"
 msgstr ""
 
+msgctxt "#32026"
+msgid "Maintenance"
+msgstr ""
 
+msgctxt "#32027"
+msgid "Only refresh items missing artwork (poster/fanart)"
+msgstr ""
 
+msgctxt "#32028"
+msgid "Retry scraper automatically after a scan error"
+msgstr ""
 
+msgctxt "#32029"
+msgid "Exclude titles from cleaning (comma-separated)"
+msgstr ""
+
+msgctxt "#32030"
+msgid "Alert when a network share is offline"
+msgstr ""
+
+msgctxt "#32031"
+msgid "Enable scheduled library backup"
+msgstr ""
+
+msgctxt "#32032"
+msgid "Backup Folder"
+msgstr ""
+
+msgctxt "#32033"
+msgid "Backup Interval (Days)"
+msgstr ""
+
+msgctxt "#32034"
+msgid "Enable context menu actions (clean, scan, health report)"
+msgstr ""
+
+msgctxt "#32035"
+msgid "Library Health Report"
+msgstr ""
+
+msgctxt "#32036"
+msgid "Library backup complete."
+msgstr ""
+
+msgctxt "#32037"
+msgid "Source Offline"
+msgstr ""
+
+msgctxt "#32038"
+msgid "PowerToys: Clean this show"
+msgstr ""
+
+msgctxt "#32039"
+msgid "PowerToys: Clean this movie"
+msgstr ""
+
+msgctxt "#32040"
+msgid "PowerToys: Scan this folder"
+msgstr ""
+
+msgctxt "#32041"
+msgid "PowerToys: Library health report"
+msgstr ""
+
+msgctxt "#32042"
+msgid "Refresh"
+msgstr ""
+
+msgctxt "#32043"
+msgid "Cleaning"
+msgstr ""
+
+msgctxt "#32044"
+msgid "Texture Cache"
+msgstr ""
+
+msgctxt "#32045"
+msgid "Backup"
+msgstr ""
+
+msgctxt "#32046"
+msgid "General"
+msgstr ""
+
+msgctxt "#32047"
+msgid "Enable texture cache maintenance (prune orphaned artwork, re-cache missing)"
+msgstr ""
+
+msgctxt "#32048"
+msgid "Texture maintenance interval (Days)"
+msgstr ""
+
+msgctxt "#32049"
+msgid "Also delete orphaned thumbnail files from disk (requires Dry Run off)"
+msgstr ""
+
+msgctxt "#32050"
+msgid "Also refresh items with a blank plot or MPAA rating"
+msgstr ""
+
+msgctxt "#32051"
+msgid "Run scraper now"
+msgstr ""
+
+msgctxt "#32052"
+msgid "Run refresh now"
+msgstr ""
+
+msgctxt "#32053"
+msgid "Run clean now"
+msgstr ""
+
+msgctxt "#32054"
+msgid "Run texture maintenance now"
+msgstr ""
+
+msgctxt "#32055"
+msgid "Run backup now"
+msgstr ""
 
 
 

@@ -19,6 +19,7 @@
 from globals import *
 from cqueue  import CustomQueue
 from zeroconf import Zeroconf, ServiceBrowser
+from texture import prune, recache_missing, cache_stats, format_size
 import socket, urllib.request, threading
 
 class Player(xbmc.Player):
@@ -107,6 +108,11 @@ class Monitor(xbmc.Monitor):
             if sender == ADDON_ID and method.endswith(".RefreshLibrary"):
                 self.log("Peer refresh signal received")
                 xbmc.executebuiltin("Container.Refresh")
+                self._confirm_refresh(data)
+            if sender == ADDON_ID and method.endswith(".RefreshConfirmed"):
+                self.log("Peer refresh confirmed")
+                if self.service and hasattr(self.service, 'sync'):
+                    self.service.sync.on_confirm(data)
             if method == "VideoLibrary.OnScanFinished" and REAL_SETTINGS.getSettingBool('Clean_OnScanFinished'):
                 self.log("Event Intercept -> Library Scan Finished. Injecting optimization pass.")
                 self.service._que(self.service.runClean, priority=5)
@@ -116,11 +122,71 @@ class Monitor(xbmc.Monitor):
             if method == "VideoLibrary.OnScanFinished":
                 if self.service and hasattr(self.service, 'sync'):
                     self.service.sync.broadcast_refresh()
+            if method == "VideoLibrary.OnScanError" and REAL_SETTINGS.getSettingBool('Scan_Retry_On_Error'):
+                now = time.time()
+                if self.service and not self.service.isRunning and (now - self.service._lastScanRetry) > 3600:
+                    self.service._lastScanRetry = now
+                    self.log('Scan error detected, re-queuing scraper (cooldown 1h)', xbmc.LOGWARNING)
+                    self.service._que(self.service.runScraper, 2)
+            if sender == ADDON_ID and method.endswith(".HealthReport"):
+                if self.service: threading.Thread(target=self.service.healthReport, daemon=True).start()
+            if sender == ADDON_ID and method.endswith(".RunScraper"):
+                if self.service and REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self.service.isRunning:
+                    self.service._que(self.service.runScraper, 2)
+            if sender == ADDON_ID and method.endswith(".RunRefresh"):
+                if self.service and REAL_SETTINGS.getSettingBool('Refresh_Enabled'):
+                    self.service._que(self.service.runRefresh, 2)
+            if sender == ADDON_ID and method.endswith(".RunClean"):
+                if self.service: self.service._que(self.service.runClean, 3)
+            if sender == ADDON_ID and method.endswith(".RunTexture"):
+                if self.service and REAL_SETTINGS.getSettingBool('Texture_Enabled'):
+                    self.service._que(self.service.runTexture, 3)
+            if sender == ADDON_ID and method.endswith(".RunBackup"):
+                if self.service and REAL_SETTINGS.getSettingBool('Backup_Enabled'):
+                    self.service._que(self.service.runBackup, 3)
+            if sender == ADDON_ID and method.endswith(".CleanTVShow"):
+                try:
+                    tvshowid = int((json.loads(data) if isinstance(data, str) else (data or {})).get('tvshowid', -1))
+                    if tvshowid >= 0 and self.service: self.service._que(self.service.cleanTV, 3, tvshowid)
+                except Exception as e: self.log('CleanTVShow error: %s' % e, xbmc.LOGWARNING)
+            if sender == ADDON_ID and method.endswith(".CleanMovie"):
+                try:
+                    payload = json.loads(data) if isinstance(data, str) else (data or {})
+                    movieid = int(payload.get('movieid', -1))
+                    if movieid >= 0 and self.service:
+                        movies = [m for m in (self.service.getMovies() or []) if m.get('movieid') == movieid]
+                        if movies:
+                            group = next((g for g in self.service._movieDuplicateGroups(self.service.getMovies() or []) if any(m.get('movieid') == movieid for m in g)), movies)
+                            self.service._que(self.service.cleanMovies, 3, group)
+                except Exception as e: self.log('CleanMovie error: %s' % e, xbmc.LOGWARNING)
+            if sender == ADDON_ID and method.endswith(".ScanFolder"):
+                try:
+                    payload = json.loads(data) if isinstance(data, str) else (data or {})
+                    path = payload.get('path')
+                    if path and self.service: self.service._que(self.service.scrapeDirectory, 2, path)
+                except Exception as e: self.log('ScanFolder error: %s' % e, xbmc.LOGWARNING)
+
+    def _confirm_refresh(self, data):
+        try:
+            payload = json.loads(data) if isinstance(data, str) else (data or {})
+            cb_ip, cb_port, token = payload.get('ip'), payload.get('port'), payload.get('token')
+            if not (cb_ip and token): return
+            confirm = {"jsonrpc":"2.0","method":"JSONRPC.NotifyAll",
+                       "params":{"sender":ADDON_ID,"message":"RefreshConfirmed","data":{"token":token}},
+                       "id":"kodi.powertoys.sync"}
+            url = 'http://%s:%d/jsonrpc' % (cb_ip, cb_port or 8080)
+            req = urllib.request.Request(url, data=json.dumps(confirm).encode('utf-8'))
+            req.add_header('Content-Type', 'application/json')
+            urllib.request.urlopen(req, timeout=5)
+            self.log('Refresh confirmed to %s:%s' % (cb_ip, cb_port))
+        except Exception as e:
+            self.log('Failed to confirm refresh: %s' % e, xbmc.LOGWARNING)
 
 class SyncManager:
     SERVICE_TYPE = "_xbmc-jsonrpc-h._tcp.local."
-    REFRESH_COMMAND = {"jsonrpc": "2.0", "method": "JSONRPC.NotifyAll", "params": {"sender": ADDON_ID, "message": "RefreshLibrary", "data": {}}, "id": "kodi.powertoys.sync"}
     DEBOUNCE_SECONDS = 5
+    CONFIRM_TIMEOUT = 15
+    MAX_RETRIES = 3
 
     def __init__(self):
         self.log('SyncManager.__init__')
@@ -130,6 +196,8 @@ class SyncManager:
         self._last_broadcast = 0
         self._lock = threading.Lock()
         self._local_ip = self._get_local_ip()
+        self._pending = {}   # token -> {peer, ip, port, ts, retries}
+        self._token = 0
 
     def log(self, msg, level=xbmc.LOGDEBUG):
         log('SyncManager: %s' % msg, level)
@@ -187,22 +255,59 @@ class SyncManager:
             self.log('Debounce: skipping refresh (last broadcast %.1fs ago)' % (now - self._last_broadcast))
             return
         self._last_broadcast = now
-        self.log('Broadcasting refresh to %d peers' % len(self.peers))
+        self._retry_stale()
+        self.log('Broadcasting refresh to %d peers (%d pending)' % (len(self.peers), len(self._pending)))
         threading.Thread(target=self._broadcast_loop, daemon=True).start()
 
     def _broadcast_loop(self):
-        for peer in list(self.peers.values()):
-            self._send_refresh(peer['ip'], peer['port'])
+        for name, peer in list(self.peers.items()):
+            if name in self._pending: continue
+            self._send_refresh(name, peer['ip'], peer['port'])
 
-    def _send_refresh(self, ip, port):
+    def _send_refresh(self, name, ip, port):
+        self._token += 1
+        token = '%s:%d:%d' % (ip, port, self._token)
         try:
+            cmd = {"jsonrpc":"2.0","method":"JSONRPC.NotifyAll",
+                   "params":{"sender":ADDON_ID,"message":"RefreshLibrary",
+                             "data":{"ip":self._local_ip,"port":8080,"token":token}},
+                   "id":"kodi.powertoys.sync"}
             url = 'http://%s:%d/jsonrpc' % (ip, port)
-            req = urllib.request.Request(url, data=json.dumps(self.REFRESH_COMMAND).encode('utf-8'))
+            req = urllib.request.Request(url, data=json.dumps(cmd).encode('utf-8'))
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req, timeout=5)
-            self.log('Refresh sent to %s:%d (HTTP %d)' % (ip, port, response.getcode()))
+            with self._lock:
+                self._pending[token] = {'peer':name,'ip':ip,'port':port,'ts':time.time(),'retries':0}
+            self.log('Refresh sent to %s:%d, awaiting confirm (token %s)' % (ip, port, token))
         except Exception as e:
             self.log('Failed to send refresh to %s:%d: %s' % (ip, port, e), xbmc.LOGWARNING)
+            with self._lock:
+                self._pending[token] = {'peer':name,'ip':ip,'port':port,'ts':time.time(),'retries':1}
+
+    def on_confirm(self, data):
+        try:
+            payload = json.loads(data) if isinstance(data, str) else (data or {})
+            token = payload.get('token')
+            with self._lock:
+                entry = self._pending.pop(token, None)
+            if entry:
+                self.log('Refresh confirmed by %s (%s:%d)' % (entry['peer'], entry['ip'], entry['port']))
+        except Exception as e:
+            self.log('on_confirm error: %s' % e, xbmc.LOGWARNING)
+
+    def _retry_stale(self):
+        now = time.time()
+        with self._lock:
+            stale = [t for t, e in self._pending.items() if now - e['ts'] > self.CONFIRM_TIMEOUT]
+        for token in stale:
+            with self._lock:
+                entry = self._pending.pop(token, None)
+            if not entry: continue
+            if entry['retries'] >= self.MAX_RETRIES:
+                self.log('Giving up on %s after %d retries' % (entry['peer'], entry['retries']))
+            else:
+                self.log('Retrying %s (attempt %d)' % (entry['peer'], entry['retries']+1))
+                self._send_refresh(entry['peer'], entry['ip'], entry['port'])
 
 class Service(object):
     cache = SimpleCache()
@@ -219,6 +324,8 @@ class Service(object):
         self.wait     = REAL_SETTINGS.getSettingInt('Start_Delay')
         self._cache   = {}
         self._tasks   = self._load()
+        self._warned  = set()
+        self._lastScanRetry = 0
 
     def __del__(self):
         self._save()
@@ -251,12 +358,29 @@ class Service(object):
     def _start(self):
         self.log('_start, wait = %s'%(self.wait))
         self.monitor.waitForAbort(self.wait)
+        self._detectSources()
         self.sync.start()
         while not self.monitor.abortRequested():
             if    self.monitor.waitForAbort(5.0): break
             else: self._run()
         self.sync.stop()
         self._save()
+
+    def _detectSources(self):
+        if REAL_SETTINGS.getSetting('Scraper_TV_Folder') and REAL_SETTINGS.getSetting('Scraper_Movie_Folder'): return
+        sources = sendJSON({"method":"Files.GetSources","params":{"media":"video"}}).get('result',{}).get('sources',[])
+        self.log('_detectSources, kodi video sources = %s' % [(s.get('label'),s.get('file')) for s in sources])
+        tv_kw, movie_kw = ('tv','show','series','season'), ('movie','film')
+        for src in sources:
+            label = (src.get('label') or '').lower()
+            path  = (src.get('file')  or '').lower()
+            text  = '%s %s' % (label, path)
+            if not REAL_SETTINGS.getSetting('Scraper_TV_Folder') and any(k in text for k in tv_kw) and not any(k in text for k in movie_kw):
+                REAL_SETTINGS.setSetting('Scraper_TV_Folder', src.get('file',''))
+                self.log('_detectSources, set TV source: %s' % src.get('file'))
+            elif not REAL_SETTINGS.getSetting('Scraper_Movie_Folder') and any(k in text for k in movie_kw) and not any(k in text for k in tv_kw):
+                REAL_SETTINGS.setSetting('Scraper_Movie_Folder', src.get('file',''))
+                self.log('_detectSources, set movie source: %s' % src.get('file'))
 
     def _save(self):
         for func_name, args in self.queue.snapshot():
@@ -317,6 +441,10 @@ class Service(object):
                 with self._chkUpdate(self.runScraper,REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')): pass
             if REAL_SETTINGS.getSettingBool('Refresh_Enabled'):
                 with self._chkUpdate(self.runRefresh,REAL_SETTINGS.getSettingInt('Refresh_Interval_DAYS')): pass
+            if REAL_SETTINGS.getSettingBool('Backup_Enabled'):
+                with self._chkUpdate(self.runBackup,REAL_SETTINGS.getSettingInt('Backup_Interval_DAYS')): pass
+            if REAL_SETTINGS.getSettingBool('Texture_Enabled'):
+                with self._chkUpdate(self.runTexture,REAL_SETTINGS.getSettingInt('Texture_Interval_DAYS')): pass
             self.isRunning = False
    
     def getDirectory(self, path):
@@ -392,6 +520,9 @@ class Service(object):
         processed   = set()
         episodes    = (self.getEpisodes(tvshowid) or [])
         message     = '[DRY RUN] Processing:' if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled') else 'Processing:'
+        if episodes and self._excluded(episodes[0].get('showtitle')):
+            self.log('cleanTV, excluded show: %s' % episodes[0].get('showtitle'))
+            return True
         if episodes and episodes[0] and not self._verifySource(episodes[0].get('file')): return False
         episodes   = [self._episodeKey(episode) for episode in episodes]
         
@@ -420,25 +551,24 @@ class Service(object):
                     for sidx, shadow_copy in enumerate(shadow_copies):
                         if not shadow_copy: continue
                         elif self.monitor.waitForAbort(0.01): return False
-                        if master_copy.get('label') == shadow_copy.get('label'):
-                            if pDialog: pDialog.update(int((sidx / len(shadow_copies)) * 100) if len(shadow_copies) > 0 else 0, message="%s %s\nDuplicates: %s" % (message,episode.get('showtitle',tvshowid),shadow_copy.get('label', '')))
+                        if pDialog: pDialog.update(int((sidx / len(shadow_copies)) * 100) if len(shadow_copies) > 0 else 0, message="%s %s\nDuplicates: %s" % (message,episode.get('showtitle',tvshowid),shadow_copy.get('label', '')))
 
-                            #todo playcount shadow_copy and add to master_copy?
-                            if not xbmcvfs.exists(shadow_copy.get('file')):
-                                self.log('cleanTV, shadow entry file no longer exists: %s' % shadow_copy.get('file'))
-                                self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Missing File)")
-                                    
-                            elif master_copy.get('file','-1') == shadow_copy.get('file','0'):
-                                if master_copy.get('episode') != shadow_copy.get('episode'):
-                                    self.log('cleanTV, skipping multi-episode stack tracking link: %s' % shadow_copy.get('file'))
-                                    continue
-                                elif master_copy.get('episodeid',-1) != shadow_copy.get('episodeid'):
-                                    self.log('cleanTV, duplicate shadow entry detected: %s' % shadow_copy.get('file'))
-                                    self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Shadow Duplicate)")
-                                    
-                            elif master_copy.get('file','-1') != shadow_copy.get('file','0'):
-                                self.log('cleanTV, duplicate entry detected: %s' % shadow_copy.get('file'))
-                                self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Physical Duplicate)")
+                        #todo playcount shadow_copy and add to master_copy?
+                        if not xbmcvfs.exists(shadow_copy.get('file')):
+                            self.log('cleanTV, shadow entry file no longer exists: %s' % shadow_copy.get('file'))
+                            self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Missing File)")
+
+                        elif master_copy.get('file','-1') == shadow_copy.get('file','0'):
+                            if master_copy.get('episode') != shadow_copy.get('episode'):
+                                self.log('cleanTV, skipping multi-episode stack tracking link: %s' % shadow_copy.get('file'))
+                                continue
+                            elif master_copy.get('episodeid',-1) != shadow_copy.get('episodeid'):
+                                self.log('cleanTV, duplicate shadow entry detected: %s' % shadow_copy.get('file'))
+                                self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Shadow Duplicate)")
+
+                        elif master_copy.get('file','-1') != shadow_copy.get('file','0'):
+                            self.log('cleanTV, duplicate entry detected: %s' % shadow_copy.get('file'))
+                            self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Physical Duplicate)")
 
         if pDialog: pDialog.close()
         return True
@@ -447,6 +577,9 @@ class Service(object):
         pDialog = None
         movies = [movie for movie in (movies or []) if movie]
         if not movies: return True
+        if self._excluded(movies[0].get('label')):
+            self.log('cleanMovies, excluded movie: %s' % movies[0].get('label'))
+            return True
         if movies and not self._verifySource(movies[0].get('file')): return False
         if show_dialog is None: show_dialog = REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')
         if show_dialog:
@@ -476,9 +609,13 @@ class Service(object):
                     self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Missing File)")
                 else:
                     if pDialog: pDialog.update(percent, message="Processing: %s" % movie.get('label', ''))
-                    if master_copy.get('movieid',-1) != movie.get('movieid') and master_copy.get('file','-1') == movie.get('file','0'):
-                        self.log('cleanMovies, duplicate shadow entry detected: %s' % master_copy.get('file'))
-                        self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Shadow copy)")
+                    if master_copy.get('movieid',-1) != movie.get('movieid'):
+                        if master_copy.get('file','-1') == movie.get('file','0'):
+                            self.log('cleanMovies, duplicate shadow entry detected: %s' % master_copy.get('file'))
+                            self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Shadow copy)")
+                        else:
+                            self.log('cleanMovies, physical duplicate detected: %s' % movie.get('file'))
+                            self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Physical Duplicate)")
                             
         if pDialog: pDialog.close()
         return True
@@ -487,11 +624,13 @@ class Service(object):
         clean           = REAL_SETTINGS.getSettingBool('Refresh_Clean')
         ignoreNFO       = REAL_SETTINGS.getSettingBool('Refresh_Ignore_NFO')
         includeEpisodes = REAL_SETTINGS.getSettingBool('Refresh_Include_Episodes')
-        self.log('refreshTV shows = %s, clean = %s, ignoreNFO = %s, includeEpisodes = %s'%(len(shows),clean,ignoreNFO,includeEpisodes))
+        artOnly         = REAL_SETTINGS.getSettingBool('Refresh_Art_Only')
+        self.log('refreshTV shows = %s, clean = %s, ignoreNFO = %s, includeEpisodes = %s, artOnly = %s'%(len(shows),clean,ignoreNFO,includeEpisodes,artOnly))
         if len(shows) > 0: random.shuffle(shows)
         for show in shows:
             if   self.monitor.waitForAbort(0.01): return False
             elif self._playing: return False
+            elif artOnly and not self._needsRefresh(show): continue
             elif clean: self._tasks.setdefault('cleanTV',set()).add(show.get('tvshowid',-1))
             self._tasks.setdefault('refreshTVshow',set()).add((show.get('tvshowid'),ignoreNFO,includeEpisodes))
         return True
@@ -499,7 +638,8 @@ class Service(object):
     def refreshMovies(self, movies=[], clean=None, ignoreNFO=None):
         if clean is None: clean = REAL_SETTINGS.getSettingBool('Refresh_Clean')
         if ignoreNFO is None: ignoreNFO = REAL_SETTINGS.getSettingBool('Refresh_Ignore_NFO')
-        self.log('refreshMovies, movies = %s, clean = %s, ignoreNFO = %s'%(len(movies),clean,ignoreNFO))
+        artOnly = REAL_SETTINGS.getSettingBool('Refresh_Art_Only')
+        self.log('refreshMovies, movies = %s, clean = %s, ignoreNFO = %s, artOnly = %s'%(len(movies),clean,ignoreNFO,artOnly))
         if len(movies) > 0: random.shuffle(movies)
         if clean:
             for group in self._movieDuplicateGroups(movies):
@@ -507,8 +647,24 @@ class Service(object):
         for movie in movies:
             if self.monitor.waitForAbort(0.01): return False
             elif self._playing: return False
+            elif artOnly and not self._needsRefresh(movie): continue
             self._tasks.setdefault('refreshMovie',set()).add((movie.get('movieid'),ignoreNFO))
         return True
+
+    def _needsRefresh(self, item):
+        art = item.get('art') or {}
+        if not (art.get('poster') and art.get('fanart')): return True
+        if REAL_SETTINGS.getSettingBool('Refresh_QA_Blank'):
+            if not (item.get('plot') or '').strip(): return True
+            if not (item.get('mpaa') or '').strip(): return True
+        return False
+
+    def _excluded(self, name):
+        if not name: return False
+        exclude = (REAL_SETTINGS.getSetting('Clean_Exclude') or '').strip()
+        if not exclude: return False
+        return any(x.strip().lower() == name.strip().lower() for x in exclude.split(',') if x.strip())
+
 
     def _verifySource(self, path):
         if not path: return True
@@ -542,7 +698,9 @@ class Service(object):
         return episode
 
     def _movieKey(self, movie):
-        return (movie.get('label'), movie.get('year'))
+        imdb = (movie.get('imdbnumber') or '').strip()
+        if imdb: return ('imdb', imdb)
+        return ('label', movie.get('label'), movie.get('year'))
 
     def _movieDuplicateGroups(self, movies):
         groups = {}
@@ -589,6 +747,7 @@ class Service(object):
 
     def runClean(self):
         try:
+            self._alertOfflineShares()
             tvshows  = self.getTVshows()
             movies   = self.getMovies()
             tv_ok    = True
@@ -610,6 +769,89 @@ class Service(object):
         except Exception as e:
             self.log('runClean, Scan failed! %s'%(e), xbmc.LOGERROR)
             notification(LANGUAGE(32009))
+            return False
+
+    def _alertOfflineShares(self):
+        if not REAL_SETTINGS.getSettingBool('Alert_Offline_Shares'): return
+        for path in [REAL_SETTINGS.getSetting('Scraper_TV_Folder'), REAL_SETTINGS.getSetting('Scraper_Movie_Folder')]:
+            if not path or not path.startswith(('smb:','nfs:','ftp:','dav:','sftp:')): continue
+            parts = path.split('/')
+            root_share = (f"{parts[0]}//{parts[2]}/{parts[3]}/" if len(parts) >= 4 else f"{parts[0]}//{parts[2]}/") if len(parts) >= 3 else None
+            if root_share and not xbmcvfs.exists(root_share) and root_share not in self._warned:
+                self._warned.add(root_share)
+                self.log('_alertOfflineShares, share offline: %s' % root_share, xbmc.LOGWARNING)
+                notification('%s: %s' % (ADDON_NAME, root_share), header=LANGUAGE(32037), icon=xbmcgui.NOTIFICATION_WARNING, show=True)
+
+    def runBackup(self):
+        folder = REAL_SETTINGS.getSetting('Backup_Folder')
+        if not folder or not xbmcvfs.exists(folder):
+            self.log('runBackup, invalid folder: %s' % folder, xbmc.LOGWARNING)
+            return False
+        self.log('runBackup, exporting library to %s' % folder)
+        resp = sendJSON({"method":"VideoLibrary.Export","params":{"path":folder,"playlists":False,"movies":{"enabled":True,"thumbnails":False},"tvshows":{"enabled":True,"episodes":True,"thumbnails":False}}})
+        ok = resp.get('result') == 'OK'
+        if ok: notification(LANGUAGE(32036), show=True)
+        return ok
+
+    def runTexture(self):
+        try:
+            dry = REAL_SETTINGS.getSettingBool('Dry_Run_Enabled')
+            self.log('runTexture, dry_run = %s' % dry)
+            stale = recache_missing(dry_run=dry)
+            orphans = prune(dry_run=dry)
+            self.log('runTexture, stale removed = %s, orphans removed = %s' % (stale, orphans))
+            return True
+        except Exception as e:
+            self.log('runTexture failed: %s' % e, xbmc.LOGERROR)
+            return False
+
+    def healthReport(self):
+        try:
+            tvshows = (self.getTVshows() or [])
+            movies  = (self.getMovies() or [])
+            episodes_total, missing, dupes = 0, [], []
+            for show in tvshows:
+                eps = (self.getEpisodes(show.get('tvshowid')) or [])
+                episodes_total += len(eps)
+                eps = [self._episodeKey(e) for e in eps]
+                for e in eps:
+                    if e.get('file') and not xbmcvfs.exists(e.get('file')): missing.append(e.get('file'))
+                for key, group in findDupes(eps, key='episode_key').items():
+                    dupes.append('TV %s: %d copies' % (key, len(group)))
+            missing_movies = [m.get('file') for m in movies if m.get('file') and not xbmcvfs.exists(m.get('file'))]
+            missing.extend(missing_movies)
+            for group in self._movieDuplicateGroups(movies):
+                dupes.append('Movie %s: %d copies' % (group[0].get('label'), len(group)))
+            nxscraper = self.cache.get('runScraper') or 0
+            nxrefresh = self.cache.get('runRefresh') or 0
+            nxtbackup = self.cache.get('runBackup') or 0
+            nxttexture = self.cache.get('runTexture') or 0
+            tex_rows, tex_bytes = cache_stats()
+            lines = [
+                'TV Shows: %d' % len(tvshows),
+                'Episodes: %d' % episodes_total,
+                'Movies: %d' % len(movies),
+                'Texture cache: %d rows, %s' % (tex_rows, format_size(tex_bytes)),
+                '',
+                'Missing files: %d' % len(missing),
+            ]
+            lines.extend('  %s' % m for m in missing[:25])
+            if len(missing) > 25: lines.append('  ... and %d more' % (len(missing) - 25))
+            lines.append('')
+            lines.append('Duplicate groups: %d' % len(dupes))
+            lines.extend('  %s' % d for d in dupes[:25])
+            if len(dupes) > 25: lines.append('  ... and %d more' % (len(dupes) - 25))
+            lines.append('')
+            lines.append('Next scraper run:  %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxscraper)) if nxscraper else 'n/a'))
+            lines.append('Next refresh run:  %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxrefresh)) if nxrefresh else 'n/a'))
+            lines.append('Next backup run:   %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxtbackup)) if nxtbackup else 'n/a'))
+            lines.append('Next texture run:  %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxttexture)) if nxttexture else 'n/a'))
+            report = '\n'.join(lines)
+            self.log('healthReport:\n%s' % report)
+            xbmcgui.Dialog().textviewer(LANGUAGE(32035), report)
+            return True
+        except Exception as e:
+            self.log('healthReport failed: %s' % e, xbmc.LOGERROR)
             return False
 
     def _removeEpisode(self, episode_id, file_path, context=""):

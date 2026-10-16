@@ -70,13 +70,23 @@ class Generator:
             try:
                 with open(addon_path, "r", encoding="utf-8") as f:
                     lines = f.readlines()
-                addon_xml = "".join(line.rstrip() + "\n" for line in lines if "<?xml" not in line)
-                addons_xml += addon_xml.rstrip() + "\n\n"
+                xml_content = "".join(line.rstrip() + "\n" for line in lines if "<?xml" not in line)
+                self._check_news(addon, xml_content)
+                addons_xml += xml_content.rstrip() + "\n\n"
             except Exception as e:
                 _log(f"Excluding {addon_path} for {e}")
 
         addons_xml = addons_xml.strip() + "\n</addons>\n"
         self._save_file(addons_xml.encode("UTF-8"), "addons.xml")
+
+    def _check_news(self, addon, xml_content):
+        try:
+            import re
+            m = re.search(r'<news>(.*?)</news>', xml_content, re.DOTALL)
+            if m and len(m.group(1).strip()) > 1500:
+                _log(f"WARNING: {addon} <news> is {len(m.group(1).strip())} chars (max 1500)")
+        except Exception:
+            pass
 
     def _generate_md5_file(self):
         try:

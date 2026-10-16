@@ -415,8 +415,16 @@ class Service(object):
                     self.cache.set(func.__name__, (epoch + runevery), checksum=ADDON_VERSION, expiration=datetime.timedelta(days=28))
         yield
          
+    def _pauseWhilePlaying(self):
+        if not self._playing: return True
+        self.log('_pauseWhilePlaying, playback started - holding...')
+        while self._playing and not self.monitor.abortRequested():
+            if self.monitor.waitForAbort(5.0): return False
+        self.log('_pauseWhilePlaying, playback stopped - resuming...')
+        return True
+
     def _run(self):
-        if self._playing or isScanning():
+        if isScanning():
             return
         if not self._chkIdle():
             return
@@ -441,9 +449,9 @@ class Service(object):
                 with self._chkUpdate(self.runScraper,REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')): pass
             if REAL_SETTINGS.getSettingBool('Refresh_Enabled'):
                 with self._chkUpdate(self.runRefresh,REAL_SETTINGS.getSettingInt('Refresh_Interval_DAYS')): pass
-            if REAL_SETTINGS.getSettingBool('Backup_Enabled'):
+            if not self._playing and REAL_SETTINGS.getSettingBool('Backup_Enabled'):
                 with self._chkUpdate(self.runBackup,REAL_SETTINGS.getSettingInt('Backup_Interval_DAYS')): pass
-            if REAL_SETTINGS.getSettingBool('Texture_Enabled'):
+            if not self._playing and REAL_SETTINGS.getSettingBool('Texture_Enabled'):
                 with self._chkUpdate(self.runTexture,REAL_SETTINGS.getSettingInt('Texture_Interval_DAYS')): pass
             self.isRunning = False
    
@@ -535,7 +543,7 @@ class Service(object):
         for eidx, episode in enumerate(episodes):
             percent = int((eidx / len(episodes)) * 100) if len(episodes) > 0 else 0
             if self.monitor.waitForAbort(0.01): return False
-            elif self._playing: return False
+            elif not self._pauseWhilePlaying(): return False
             elif not episode: continue
             elif not xbmcvfs.exists(episode.get('file', '')):
                 self.log('cleanTV, episode file no longer exists: %s' % episode.get('file'))
@@ -601,7 +609,7 @@ class Service(object):
             for midx, movie in enumerate(shadow_copies):
                 percent = int((midx / len(shadow_copies)) * 100) if len(shadow_copies) > 0 else 0
                 if self.monitor.waitForAbort(0.01): return False
-                elif self._playing: return False
+                elif not self._pauseWhilePlaying(): return False
                 elif not movie: continue
                 elif not xbmcvfs.exists(movie.get('file')):
                     self.log('cleanMovies, movie file no longer exists: %s' % movie.get('file'))
@@ -629,7 +637,6 @@ class Service(object):
         if len(shows) > 0: random.shuffle(shows)
         for show in shows:
             if   self.monitor.waitForAbort(0.01): return False
-            elif self._playing: return False
             elif artOnly and not self._needsRefresh(show): continue
             elif clean: self._tasks.setdefault('cleanTV',set()).add(show.get('tvshowid',-1))
             self._tasks.setdefault('refreshTVshow',set()).add((show.get('tvshowid'),ignoreNFO,includeEpisodes))
@@ -646,7 +653,6 @@ class Service(object):
                 self._tasks.setdefault('cleanMovies',list()).append(group)
         for movie in movies:
             if self.monitor.waitForAbort(0.01): return False
-            elif self._playing: return False
             elif artOnly and not self._needsRefresh(movie): continue
             self._tasks.setdefault('refreshMovie',set()).add((movie.get('movieid'),ignoreNFO))
         return True
@@ -757,6 +763,7 @@ class Service(object):
                 tv_ok = self.cleanTV(show.get('tvshowid')) and tv_ok
             for movie in movies:
                 if self.monitor.waitForAbort(0.01): return False
+                elif not self._pauseWhilePlaying(): return False
                 if movie.get('file') and not xbmcvfs.exists(movie.get('file')):
                     self.log('cleanMovies, movie file no longer exists: %s' % movie.get('file'))
                     self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Missing File)")

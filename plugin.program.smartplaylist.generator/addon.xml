@@ -13,13 +13,10 @@
     </extension>
     <extension point="xbmc.service" library="resources/lib/service.py"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Generate Smartplaylists from third-party lists.</summary>
-        <description lang="en_GB">Generate Smartplaylists from third-party lists.</description>
         <platform>all</platform>
         <license>GPL-3.0-or-later</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.program.smartplaylist.generator</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=379825</forum>
-        <disclaimer lang="en_GB">BETA PROJECT; SUBJECT TO BUGS</disclaimer>
         <news>
 Version 0.2.6
 - MDBList: new source — user lists, top 50 public lists, official curated lists, and external/linked lists (IMDb, Trakt, Letterboxd, etc.) via API key (free 1,000 req/day)
@@ -53,5 +50,8 @@ Reliability fixes
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
+        <summary lang="en_GB">Generate Smartplaylists from third-party lists.</summary>
+        <description lang="en_GB">Generate Smartplaylists from third-party lists.</description>
+        <disclaimer lang="en_GB">BETA PROJECT; SUBJECT TO BUGS</disclaimer>
     </extension>
 </addon>

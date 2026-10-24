@@ -20,7 +20,6 @@ class Service(object):
         self.getBuild()
         self.getPlatform()
         self.getVersion()
-        sys.exit()
         
                 
     def getBuild(self):
@@ -33,31 +32,25 @@ class Service(object):
             
     def getPlatform(self): 
         try:
-            count = 0
-            while not self.myMonitor.abortRequested() and count < 15:
-                if self.myMonitor.waitForAbort(1): break
-                else:
-                    count += 1 
-                    machine = platform.machine()
-                    if len(machine) > 0: 
-                        REAL_SETTINGS.setSetting("Platform",machine)
-                        log(f'Service: getPlatform = {machine}')
-                        return
+            for count in range(15):
+                machine = platform.machine()
+                if len(machine) > 0: 
+                    REAL_SETTINGS.setSetting("Platform",machine)
+                    log(f'Service: getPlatform = {machine}')
+                    return
+                if self.myMonitor.waitForAbort(1): return
         except Exception as e: log(f"Service: getPlatform failed!\n{e}", xbmc.LOGERROR)
         
         
     def getVersion(self):
         try:
-            count = 0
-            while not self.myMonitor.abortRequested() and count < 15:
-                if self.myMonitor.waitForAbort(1): break
-                else:
-                    count += 1 
-                    version = (xbmc.getInfoLabel('System.OSVersionInfo') or 'busy')
-                    if version.lower() != 'busy': 
-                        REAL_SETTINGS.setSetting("Version",str(version))
-                        log(f'Service: getVersion = {version}')
-                        break
+            for count in range(15):
+                version = (xbmc.getInfoLabel('System.OSVersionInfo') or 'busy')
+                if version.lower() != 'busy': 
+                    REAL_SETTINGS.setSetting("Version",str(version))
+                    log(f'Service: getVersion = {version}')
+                    return
+                if self.myMonitor.waitForAbort(1): return
         except Exception as e: log(f"Service: getVersion failed!\n{e}", xbmc.LOGERROR)
               
               
@@ -66,7 +59,7 @@ class Service(object):
         if xbmcvfs.exists(PATH):
             if not CACHE and CLEAN:
                 log(f'Service: chkLastFile = {PATH}')
-                Installer().deleteFile(PATH)
+                deleteFile(PATH)
                 xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30007), ICON, 4000)
               
               

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.3.9" provider-name="Team Kodi">
+<addon id="script.kodi.windows.update" name="Kodi Windows Installer" version="1.4.0" provider-name="Team Kodi">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.six" version="1.0.0"/>
@@ -12,7 +12,7 @@
     <extension point="xbmc.addon.metadata">
         <license>GPL-3.0-or-later</license>
         <platform>windows</platform>
-        <website>http://kodi.tv</website>
+        <website>https://kodi.tv</website>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/script.kodi.windows.update</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=325226</forum>
         <assets>
@@ -45,16 +45,16 @@
         <description lang="bs_BA">Preuzmite i instalirajte Kodi izvršne datoteke za Windows; odaberite između Nightlies, Releases, Snapshots i Test-builds.</description>
         <description lang="da_DK">Download og installer Windows eksekverbare filer til Kodi; vælg fra Nightlies, Udgivelser, Snapshots og Test-builds.</description>
         <description lang="de_DE">Kodi für Windows herunterladen und installieren. Auswählen zwischen Nightlies, Releases, Snapshopts und Test-Builds.</description>
-        <description lang="en_GB">Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
+        <description lang="en_GB">Download and Install Kodi Windows executables; select from  Nightlies, Releases, Snapshots and Test-builds.</description>
         <description lang="es_ES">Descargar e instalar los ejecutables de kodi para Windows; seleccionar entre  Nightlies, Releases, Snapshots y Test-builds.</description>
         <description lang="es_MX">Descarga e instala ejecutables de Kodi para Windows; selecciona entre  Nightlies, Releases, Snapshots y Test-builds.</description>
         <description lang="fi_FI">Lataa ja asenna Kodin Windows-asennuksia kehityshaaroista Release, Nightly, Snapshot ja Test.</description>
-        <description lang="fr_FR">Télécharger et installer les exécutables dans la fenêtre Kodi ; sélectionner parmi Nightlies, Releases, Snapshots et Test-builds.</description>
-        <description lang="hr_HR">Preuzmi i instaliraj Kodi window izvršne datoteke; odaberi iz  Nightlies, Releases, Snapshots i Testnih-izgradnja.</description>
+        <description lang="fr_FR">Télécharger et installer les exécutables Kodi pour Windows ; sélectionner parmi Nightlies, Releases, Snapshots et Test-builds.</description>
+        <description lang="hr_HR">Preuzmi i instaliraj Kodi Windows izvršne datoteke; odaberi iz  Nightlies, Releases, Snapshots i Testnih-izgradnja.</description>
         <description lang="it_IT">Scarica e installa gli eseguibili Windows di Kodi; seleziona da Nightlies, Release, Snapshot e Test-build.</description>
         <description lang="ko_KR">Kodi 윈도 실행 파일을 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다.</description>
         <description lang="pl_PL">Pobieraj i instaluj pliki wykonywalne Kodi: kompilacje nocne, testowe, wydania finalne, migawki.</description>
-        <description lang="pt_BR">Baixe e instale os executáveis da janela Kodi; selecione entre · · Nightlies, Releases, Snapshots e Test-builds.</description>
+        <description lang="pt_BR">Baixe e instale os executáveis do Kodi para Windows; selecione entre Nightlies, Releases, Snapshots e Test-builds.</description>
         <description lang="ru_RU">Загрузка и установка исполняемых файлов Kodi: ночные и тестовые сборки, релизы, снапшоты.</description>
         <description lang="sv_SE">Hämta och installera körbara Kodi-filer för Windows; välj från  Nightlies, Releases, Snapshots och Test-byggen.</description>
         <description lang="zh_CN">下载并安装 Kodi windows 可执行文件。从 Nightlies、Releases、Snapshots 和 Test-builds 中选择。</description>

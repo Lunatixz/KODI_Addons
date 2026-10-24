@@ -11,3 +11,4 @@ plugin.program.smartplaylist.generator/test_imdb.py
 generator.log
 service.kodi.powertoys/AGENTS.md
 plugin.program.smartplaylist.generator/AGENTS.md
+plugin.program.android.deeplinks/ANDROID_DEEPLINK.md

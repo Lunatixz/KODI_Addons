@@ -13,7 +13,7 @@ import socket, json
 from bs4 import BeautifulSoup
 from simplecache import SimpleCache
 from six.moves import urllib
-from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
+from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcvfs
 from contextlib import contextmanager
 
 # Plugin Info
@@ -29,11 +29,12 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
 
 ## GLOBALS ##
 TIMEOUT   = 15
+SHUTDOWN  = 10 #Seconds shown in the pre-install shutdown countdown.
+TRIES     = 3  #mirrors.kodi.tv 302s to a random mirror, retry re-rolls unreachable ones.
 MIN_VER   = 5 #Minimum Android Version Compatible with Kodi
 DEBUG     = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
-CLEAN     = REAL_SETTINGS.getSetting('Disable_Maintenance') == 'false'
 VERSION   = REAL_SETTINGS.getSetting("Version") #VERSION = 'Android 4.0.0 API level 24, kernel: Linux ARM 64-bit version 3.10.96+' #Test
-BASE_URL  = 'http://mirrors.kodi.tv/'
+BASE_URL  = 'https://mirrors.kodi.tv/'
 BRANCHS   =  {32:'z',31:'y',30:'x',29:'w',28:'v',27:'u',26:'t',25:'s',24:'r',23:'q',
               22:'piers',21:'omega',20:'nexus',19:'matrix',18:'leia',17:'krypton',16:'jarvis',15:'isengard',14:'helix',13:'gotham','':''}
 BUILD_OPT = {'nightlies':LANGUAGE(30017),'releases':LANGUAGE(30016),'snapshots':LANGUAGE(30015),'test-builds':LANGUAGE(30018)}
@@ -51,9 +52,9 @@ USERAPP   = REAL_SETTINGS.getSetting("USERAPP")
 CUSTOM    = (REAL_SETTINGS.getSetting('Custom_Manager') or 'com.android.documentsui')
 FMANAGER  = {0:'com.android.documentsui',1:CUSTOM}[int(REAL_SETTINGS.getSetting('File_Manager'))]
 
-if DEVICESTR is None:   PLATFORM = ""
+if   DEVICESTR is None: PLATFORM = ""
+elif '86' in DEVICESTR: PLATFORM = "x86"       #x86 and x86_64 both use the mirror's x86 build.
 elif '64' in DEVICESTR: PLATFORM = "arm64-v8a"
-elif '86' in DEVICESTR: PLATFORM = "x86"
 else:                   PLATFORM = "arm"
 
 def log(msg, level=xbmc.LOGDEBUG):
@@ -76,21 +77,39 @@ def busy_dialog():
     try: yield
     finally: xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
+def countdownDialog(seconds=SHUTDOWN):
+    # Warn the user Kodi is about to close, Cancel keeps Kodi (and the install) running.
+    monitor = xbmc.Monitor()
+    dia = xbmcgui.DialogProgress()
+    dia.create(ADDON_NAME, LANGUAGE(30027) % seconds)
+    try:
+        for left in range(seconds, -1, -1):
+            if dia.iscanceled():
+                log('countdownDialog, canceled by user, aborting shutdown')
+                return False
+            dia.update(int(left * 100 / seconds), LANGUAGE(30027) % left)
+            if left > 0 and monitor.waitForAbort(1): return False
+        return True
+    finally:
+        dia.close()
+
+# ponytail: global default covers urlretrieve, which takes no timeout= argument.
 socket.setdefaulttimeout(TIMEOUT)
 class Installer(object):
     def __init__(self):
         self.myMonitor = xbmc.Monitor()
         self.cache     = SimpleCache()
         self.lastURL   = REAL_SETTINGS.getSetting("LastURL")
-        self.lastPATH  = REAL_SETTINGS.getSetting("LastPATH")
-        self.chkVer()
+        self.lastPATH  = REAL_SETTINGS.getSetting("LastPath")
+        self.aborted   = self.chkVer()
         
     def _run(self):
+        if self.aborted: return
         if not self.lastURL: self.lastURL = self.buildMain()
         self.selectPath(self.lastURL)
         
         
-    def chkVer(self):
+    def chkVer(self): # Returns True when the installer must not run.
         try:    build = int(re.compile(r'Android (\d+)').findall(VERSION)[0])
         except: build = MIN_VER
         if build < MIN_VER:
@@ -98,7 +117,9 @@ class Installer(object):
             if not xbmcgui.Dialog().yesno(ADDON_NAME, LANGUAGE(30011)%(build), LANGUAGE(30012)): return False 
             xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":"%s","enabled":false}, "id": 1}'%(ADDON_ID))
             xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30009), ICON, 4000)
-        
+            return True
+        return False
+
 
     def getURL(self, url):
         try:
@@ -150,9 +171,8 @@ class Installer(object):
             for item in self.getItems(soup):
                 try: #folders
                     label, label2 = re.compile("(.*?)/-(.*)").match(item).groups()
-                    if   label == PLATFORM:               label2 = LANGUAGE(30014)%PLATFORM
-                    elif label.lower() == BRANCH.lower(): label2 = LANGUAGE(30022)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
-                    else:                                 label2 = '' #Don't use time-stamp for folders
+                    if   BUILD and label.lower() == BRANCH.lower(): label2 = LANGUAGE(30022)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
+                    else:                                            label2 = '' #Don't use time-stamp for folders
                     liz = xbmcgui.ListItem(label.title(),label2,path=(url + label))
                     liz.setArt({'icon':ICON,'thumb':ICON})
                     yield liz
@@ -176,7 +196,7 @@ class Installer(object):
             if len(items) == 0: 
                 break
                 
-            if len(items) == 2 and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().startswith('.apk'): 
+            if len(items) == 2 and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().endswith('.apk'): 
                 select = 1 
             else: 
                 dialog_title = url.replace(BASE_URL, './').replace('//', '/')
@@ -240,21 +260,28 @@ class Installer(object):
             self.requestPermission()
             return log("downloadAPK, Download aborted: Missing Android Storage Permissions.", xbmc.LOGERROR)
 
-        if not self.fileExists(dest):
-            start_time = time.time()
-            dia = xbmcgui.DialogProgress()
-            fle = dest.rsplit('/', 1)[1]
-            dia.create(ADDON_NAME, LANGUAGE(30002)%fle)
-            try: 
-                urllib.request.urlretrieve(url.rstrip('/'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time, fle))
-                self.installAPK(dest)
-            except Exception as e:
-                xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
-                self.deleleAPK(dest)
-                if "User canceled download" in str(e): log("downloadAPK, Download canceled by user.", xbmc.LOGINFO)
-                else: log("downloadAPK, Failed! (%s) %s"%(url,str(e)), xbmc.LOGERROR)
-            finally:
-                dia.close()
+        if self.fileExists(dest): return self.installAPK(dest) #Already downloaded, install as is.
+        start_time = time.time()
+        dia = xbmcgui.DialogProgress()
+        fle = os.path.basename(dest)
+        dia.create(ADDON_NAME, LANGUAGE(30002)%fle)
+        try: 
+            for attempt in range(TRIES):
+                try:
+                    urllib.request.urlretrieve(url.rstrip('/'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time, fle))
+                    break
+                except Exception as e:
+                    if attempt == TRIES - 1 or "User canceled download" in str(e): raise
+                    log('downloadAPK, attempt %d failed (%s), retrying...' % (attempt + 1, e))
+                    start_time = time.time()
+            self.installAPK(dest)
+        except Exception as e:
+            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
+            self.deleteAPK(dest)
+            if "User canceled download" in str(e): log("downloadAPK, Download canceled by user.", xbmc.LOGINFO)
+            else: log("downloadAPK, Failed! (%s) %s"%(url,str(e)), xbmc.LOGERROR)
+        finally:
+            dia.close()
         
         
     def pbhook(self, numblocks, blocksize, filesize, dia, start_time, fle):
@@ -280,12 +307,11 @@ class Installer(object):
             
             label = '%s %s' % (LANGUAGE(30023), SETTINGS_LOC)
             label2 = '%.02f MB of %.02f MB' % (currently_downloaded_mb, total_mb)
-            label2 += ' | %s %.02f Kb/s' % (LANGUAGE(30024), kbps_speed)
-            label2 += ' | %s %02d:%02d' % (LANGUAGE(30025), eta_minutes, eta_remaining_seconds)
+            label2 += '%s %.02f Kb/s' % (LANGUAGE(30024), kbps_speed)
+            label2 += '%s %02d:%02d' % (LANGUAGE(30025), eta_minutes, eta_remaining_seconds)
             dia.update(int(percent), '%s\n%s\n%s' % (label, fle, label2))
         except Exception as e: 
-            log("pbhook failed! Error: %s" % str(e), xbmc.LOGERROR)
-            dia.update(100)
+            log("pbhook failed! %s" % str(e), xbmc.LOGERROR)
             
             
     def deleteAPK(self, file): # Renamed typo from deleleAPK
@@ -310,10 +336,11 @@ class Installer(object):
             
         
     def installAPK(self, apkfile):
-        xbmc.executebuiltin('XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),0.5,true)')
-        xbmc.executebuiltin('StartAndroidActivity(%s,,,"content://%s")'%(FMANAGER,apkfile))
-        # xbmc.executebuiltin('StartAndroidActivity("", "android.intent.action.VIEW", "application/vnd.android.package-archive", "file://%s")'%xbmcvfs.translatePath(apkfile))
-        # xbmc.executebuiltin('StartAndroidActivity("","android.intent.action.INSTALL_PACKAGE ","application/vnd.android.package-archive","content://%s")'%xbmcvfs.translatePath(apkfile))
+        if not countdownDialog(): return log('installAPK, canceled by user, installation aborted.')
+        # Quotes keep file managers whose name contains spaces/commas a single parameter.
+        xbmc.executebuiltin('StartAndroidActivity("%s",,,"content://%s")'%(FMANAGER,apkfile))
+        xbmc.sleep(500) #Give the file manager time to launch before Kodi closes.
+        xbmc.executebuiltin('Quit')
 
 
 if __name__ == '__main__': Installer()._run()

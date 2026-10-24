@@ -8,15 +8,14 @@
 # -*- coding: utf-8 -*-
 
 import platform, traceback, sys
-import os, time, datetime, re, threading, json
-import socket, subprocess
-import xbmc, xbmcgui, xbmcvfs, xbmcaddon
+import os, time, datetime, re, json
+import subprocess
 
 from bs4 import BeautifulSoup
 from simplecache import SimpleCache
 from six.moves import urllib
 from contextlib import contextmanager
-from kodi_six import xbmc, xbmcaddon, xbmcplugin, xbmcgui, xbmcvfs
+from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcvfs
 
 # Plugin Info
 ADDON_ID      = 'script.kodi.windows.update'
@@ -31,9 +30,12 @@ LANGUAGE      = REAL_SETTINGS.getLocalizedString
  
 ## GLOBALS ##
 TIMEOUT   = 15
+SHUTDOWN  = 10 #Seconds shown in the pre-install shutdown countdown.
+GRACE     = 5  #Seconds to wait for Kodi to exit before forcing it closed.
+TRIES     = 3  #mirrors.kodi.tv 302s to a random mirror, retry re-rolls unreachable ones.
 DEBUG     = REAL_SETTINGS.getSetting('Enable_Debugging') == 'true'
 CLEAN     = REAL_SETTINGS.getSetting('Disable_Maintenance') == 'false'
-BASE_URL  = 'http://mirrors.kodi.tv/'
+BASE_URL  = 'https://mirrors.kodi.tv/'
 WIND_URL  = BASE_URL + '%s/windows/%s/'
 BRANCHS   =  {22:'piers',21:'omega',20:'nexus',19:'matrix',18:'leia',17:'krypton',16:'jarvis',15:'isengard',14:'helix',13:'gotham','':''}
 BUILD_OPT = {'nightlies':LANGUAGE(30017),'releases':LANGUAGE(30016),'snapshots':LANGUAGE(30015),'test-builds':LANGUAGE(30018)}
@@ -46,7 +48,11 @@ except:
     BUILD = ''
     BRANCH = 'master'
 
-PLATFORM = {True:"win64", False:"win32", None:""}[('64' in REAL_SETTINGS.getSetting("Platform") or None)]
+MACHINE = (REAL_SETTINGS.getSetting("Platform") or '').lower()
+if   'arm64' in MACHINE or 'aarch64' in MACHINE: PLATFORM = 'winarm64'
+elif '64' in MACHINE:                             PLATFORM = 'win64'
+elif MACHINE:                                     PLATFORM = 'win32'
+else:                                             PLATFORM = ''
 
 def log(msg, level=xbmc.LOGDEBUG):
     if DEBUG == False and level != xbmc.LOGERROR: return
@@ -61,11 +67,6 @@ def selectDialog(label, items, pselect=-1, uDetails=True):
     if select >= 0: return select
     return None
         
-def log(msg, level=xbmc.LOGDEBUG):
-    if DEBUG == False and level != xbmc.LOGERROR: return
-    if level == xbmc.LOGERROR: msg += ' ,' + traceback.format_exc()
-    xbmc.log(ADDON_ID + '-' + ADDON_VERSION + '-' + (msg), level)
-
 @contextmanager
 def busy_dialog():
     log('globals: busy_dialog')
@@ -73,28 +74,76 @@ def busy_dialog():
     try: yield
     finally: xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
+def countdownDialog(seconds=SHUTDOWN):
+    # Warn the user Kodi is about to close, Cancel keeps Kodi (and the installer) running.
+    monitor = xbmc.Monitor()
+    dia = xbmcgui.DialogProgress()
+    dia.create(ADDON_NAME, LANGUAGE(30027) % seconds)
+    try:
+        for left in range(seconds, -1, -1):
+            if dia.iscanceled():
+                log('countdownDialog, canceled by user, aborting shutdown')
+                return False
+            dia.update(int(left * 100 / seconds), LANGUAGE(30027) % left)
+            if left > 0 and monitor.waitForAbort(1): return False
+        return True
+    finally:
+        dia.close()
+
+def shortPath(path, keep=2):
+    # '~' the Kodi userdata root and elide middle folders so the label stays short.
+    home = xbmcvfs.translatePath('special://home').rstrip('\\/')
+    if path.lower().startswith(home.lower()): path = '~' + path[len(home):]
+    parts = path.replace('/', '\\').split('\\')
+    if len(parts) > keep + 1: parts = parts[:1] + ['...'] + parts[-keep:]
+    return '\\'.join(parts)
+
+def deleteFile(file):
+    monitor = xbmc.Monitor()
+    try:
+        if not xbmcvfs.exists(file): return log(f'Installer: deleteFile skipped, file does not exist: {file}', xbmc.LOGDEBUG)
+        for count in range(15):
+            if xbmcvfs.delete(file):
+                log(f'Installer: deleteFile success = {file}')
+                return
+            log(f'Installer: File locked, retrying deletion... ({count+1}/15)', xbmc.LOGDEBUG)
+            if monitor.abortRequested() or monitor.waitForAbort(1): return
+    except Exception as e: log("Installer: deleteFile Failed! " + str(e), xbmc.LOGERROR)
+
+def killME():
+    log('Installer: Kodi did not exit on its own, force closing.')
+    subprocess.run('taskkill /f /im kodi.exe', capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
+
+def quitKodi():
+    # Quit Kodi, force close it only if it is still running once the grace period is over.
+    xbmc.executebuiltin('Quit')
+    if not xbmc.Monitor().waitForAbort(GRACE): killME()
+
+
 class Installer(object):
     def __init__(self):
         self.myMonitor = xbmc.Monitor()
         self.cache     = SimpleCache()
         self.lastURL   = REAL_SETTINGS.getSetting("LastURL")
-        self.lastPATH  = REAL_SETTINGS.getSetting("LastPATH")
-        self.chkUWP()
+        self.lastPATH  = REAL_SETTINGS.getSetting("LastPath")
+        self.aborted   = self.chkUWP()
 
 
     def _run(self):
+        if self.aborted: return
         if not self.lastURL: self.lastURL = self.buildMain()
         self.selectPath(self.lastURL)
         
         
-    def chkUWP(self):
+    def chkUWP(self): # Returns True when the installer must not run.
         isUWP = (xbmc.getCondVisibility("system.platform.uwp") or sys.platform == "win10" or re.search(r"[/\\]WindowsApps[/\\]XBMCFoundation\.Kodi_", xbmcvfs.translatePath("special://xbmc/")))
-        if isUWP:
-            xbmcgui.Dialog().notification(ADDON_NAME, VERSION, ICON, 8000)
-            if not xbmcgui.Dialog().yesno(ADDON_NAME, LANGUAGE(30009), LANGUAGE(30012)): return True 
-            xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":"%s","enabled":false}, "id": 1}'%(ADDON_ID))
-            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30011), ICON, 4000)
-        
+        if not isUWP: return False
+        xbmcgui.Dialog().notification(ADDON_NAME, VERSION, ICON, 8000)
+        if not xbmcgui.Dialog().yesno(ADDON_NAME, LANGUAGE(30009), LANGUAGE(30012)): return True
+        xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":"%s","enabled":false}, "id": 1}'%(ADDON_ID))
+        xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30011), ICON, 4000)
+        return True
+
         
     def openURL(self, url):
         if url is None: return
@@ -141,7 +190,7 @@ class Installer(object):
                     if 'uwp' in item.lower(): continue #ignore UWP builds
                     label, label2 = re.compile("(.*?)/-(.*)").match(item).groups()
                     if   label.lower() == PLATFORM.lower(): label2 = LANGUAGE(30014)%REAL_SETTINGS.getSetting("Platform")
-                    elif label.lower() == BRANCH.lower():   label2 = LANGUAGE(30021)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
+                    elif BUILD and label.lower() == BRANCH.lower(): label2 = LANGUAGE(30021)%(BUILD.get('major',''),BUILD.get('minor',''),BUILD.get('revision',''))
                     else:                                   label2 = '' #Don't use time-stamp for folders
                     liz = (xbmcgui.ListItem(label.title(),label2,path=(url + label)))
                     liz.setArt({'icon':ICON,'thumb':ICON})
@@ -165,7 +214,7 @@ class Installer(object):
         while not self.myMonitor.abortRequested():
             items = list(self.buildItems(url))
             if   len(items) == 0: break
-            elif len(items) == 2  and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().startswith('.exe'): select = 1 #If one folder bypass selection.
+            elif len(items) == 2  and not bypass and items[0].getLabel().lower() == 'parent directory' and not items[1].getLabel().endswith('.exe'): select = 1 #If one folder bypass selection.
             else: select = selectDialog(url.replace(BASE_URL,'./').replace('//','/'), items, [idx for idx, item in enumerate(items) if item.getLabel() in self.lastPATH])
             if select is None: return #return on cancel.
             label  = items[select].getLabel()
@@ -184,7 +233,7 @@ class Installer(object):
             
     def fileExists(self, dest):
         if xbmcvfs.exists(dest):
-            if not xbmcgui.Dialog().yesno(ADDON_NAME, LANGUAGE(30004), dest.rsplit('/', 1)[-1], nolabel=LANGUAGE(30005), yeslabel=LANGUAGE(30006)): return True
+            if not xbmcgui.Dialog().yesno(ADDON_NAME, LANGUAGE(30004), os.path.basename(dest), nolabel=LANGUAGE(30005), yeslabel=LANGUAGE(30006)): return True
         return False
         
         
@@ -192,61 +241,59 @@ class Installer(object):
         if not self.fileExists(dest):
             start_time = time.time()
             dia = xbmcgui.DialogProgress()
-            fle = dest.rsplit('\\', 1)[1]
-            dia.create(ADDON_NAME, LANGUAGE(30002))
-            try: urllib.request.urlretrieve(url.rstrip('/'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time, fle))
+            fle = os.path.basename(dest)
+            dia.create(ADDON_NAME, '%s\n%s' % (LANGUAGE(30002), fle))
+            try:
+                for attempt in range(TRIES):
+                    try:
+                        urllib.request.urlretrieve(url.rstrip('/'), dest, lambda nb, bs, fs: self.pbhook(nb, bs, fs, dia, start_time, fle))
+                        break
+                    except Exception as e:
+                        if attempt == TRIES - 1 or 'User canceled download' in str(e): raise
+                        log('downloadFile, attempt %d failed (%s), retrying...' % (attempt + 1, e))
+                        start_time = time.time()
             except Exception as e:
+                deleteFile(dest)
+                if 'User canceled download' in str(e): log("downloadFile, Download canceled by user.", xbmc.LOGINFO)
+                else:
+                    xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
+                    log("downloadFile, Failed! (%s) %s"%(url,str(e)), xbmc.LOGERROR)
+                return
+            finally:
                 dia.close()
-                xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
-                self.deleteFile(dest)
-                return log("downloadAPK, Failed! (%s) %s"%(url,str(e)), xbmc.LOGERROR)
         return self.installFile(dest)
 
             
     def pbhook(self, numblocks, blocksize, filesize, dia, start_time, fle):
+        if dia.iscanceled(): raise RuntimeError("User canceled download")
         try: 
-            percent = min(numblocks * blocksize * 100 / filesize, 100) 
-            currently_downloaded = float(numblocks) * blocksize / (1024 * 1024) 
-            kbps_speed = numblocks * blocksize / (time.time() - start_time) 
-            if kbps_speed > 0: eta = (filesize - numblocks * blocksize) / kbps_speed 
-            else: eta = 0 
-            kbps_speed = kbps_speed / 1024 
-            if eta < 0: eta = divmod(0, 60)
-            else: eta = divmod(eta, 60)
-            total   = (float(filesize) / (1024 * 1024))
-            label   = '%s %s'%(LANGUAGE(30023),SETTINGS_LOC)
-            label2  = '%.02f MB of %.02f MB'%(currently_downloaded,total)
+            if filesize <= 0: filesize = 1 # Fallback to prevent division by zero or negative
+            elapsed_time = time.time() - start_time
+            if elapsed_time <= 0: elapsed_time = 0.001 # Prevent ZeroDivisionError on instant hooks
+            downloaded_bytes = numblocks * blocksize
+            percent = min((downloaded_bytes * 100) / filesize, 100)
+            currently_downloaded_mb = float(downloaded_bytes) / (1024 * 1024)
+            total_mb = float(filesize) / (1024 * 1024)
+            # Speed in bytes per second, converted to KB/s
+            bytes_per_sec = downloaded_bytes / elapsed_time
+            kbps_speed = bytes_per_sec / 1024
+            if bytes_per_sec > 0: eta_seconds = max(0, (filesize - downloaded_bytes) / bytes_per_sec)
+            else:                 eta_seconds = 0
+            eta_minutes, eta_remaining_seconds = divmod(int(eta_seconds), 60)
+            label   = '%s %s'%(LANGUAGE(30023), shortPath(xbmcvfs.translatePath(SETTINGS_LOC)))
+            label2  = '%.02f MB of %.02f MB'%(currently_downloaded_mb,total_mb)
             label2 += '%s %.02f Kb/s'%(LANGUAGE(30024),kbps_speed)
-            label2 += '%s %02d:%02d'%(LANGUAGE(30025),eta[0],eta[1])
+            label2 += '%s %02d:%02d'%(LANGUAGE(30025),eta_minutes,eta_remaining_seconds)
             dia.update(int(percent), '%s\n%s\n%s'%(label,fle,label2))
         except Exception as e: 
-            log("pbhook failed! %s" + str(e), xbmc.LOGERROR)
-            dia.update(100)
-        if dia.iscanceled(): raise Exception
+            log("pbhook failed! %s" % str(e), xbmc.LOGERROR)
 
-
-    def deleteFile(self, file):
-        try:
-            count = 0
-            while not self.myMonitor.abortRequested() and count < 15:
-                if   self.myMonitor.waitForAbort(1): break
-                elif xbmcvfs.exists(file):
-                    count += 1 
-                    if xbmcvfs.delete(file):
-                        log(f'Installer: deleteLast = {file}')
-                        break
-        except Exception as e: log("Installer: deleteLast Failed! " + str(e), xbmc.LOGERROR)
-            
 
     def installFile(self, exefile=None):
-        if exefile and xbmcvfs.exists(exefile):
-            xbmc.executebuiltin('AlarmClock(shutdowntimer,XBMC.Quit(),2.0,true)')
-            threading.Timer(2.0, self.killME).start()
-            subprocess.call(exefile, shell=True)
-            
-        
-    def killME(self):
-        subprocess.call('taskkill /f /im kodi.exe')
+        if not (exefile and xbmcvfs.exists(exefile)): return
+        if not countdownDialog(): return log('installFile, canceled by user, installation aborted.')
+        subprocess.Popen([exefile])
+        quitKodi()
         
         
 if __name__ == '__main__': Installer()._run()

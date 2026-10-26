@@ -22,7 +22,7 @@ msgid "Download and Install Kodi packages."
 msgstr "Preuzmite i instalirajte Kodi pakete."
 
 msgctxt "Addon Description"
-msgid "Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds."
+msgid "Download and Install Kodi Windows executables; select from  Nightlies, Releases, Snapshots and Test-builds."
 msgstr "Preuzmite i instalirajte Kodi izvršne datoteke za Windows; odaberite između Nightlies, Releases, Snapshots i Test-builds."
 
 msgctxt "Addon Disclaimer"

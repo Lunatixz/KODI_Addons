@@ -22,7 +22,7 @@ msgid "Download and Install Kodi packages."
 msgstr "Kodi 패키지를 다운로드하고 설치합니다."
 
 msgctxt "Addon Description"
-msgid "Download and Install Kodi window executables; select from  Nightlies, Releases, Snapshots and Test-builds."
+msgid "Download and Install Kodi Windows executables; select from  Nightlies, Releases, Snapshots and Test-builds."
 msgstr "Kodi 윈도 실행 파일을 다운로드하고 설치하십시오. 매일판, 릴리스, 스냅샷 및 테스트 빌드에서 선택합니다."
 
 msgctxt "Addon Disclaimer"

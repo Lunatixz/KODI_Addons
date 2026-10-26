@@ -179,7 +179,7 @@ The offline-share guard also applies: if the item's network mount root is unreac
 
 ## Health Report
 
-Programs menu or context menu. Shows: TV/episode/movie counts, texture cache rows + bytes, missing files (first 25 + count), duplicate groups (first 25 + count), and next scheduled runs for scraper/refresh/backup/texture. Also available as a web page at `/report`.
+Programs menu or context menu. Shows: TV/episode/movie counts, texture cache rows + bytes, missing files (first 25 + count), duplicate groups (first 25 + count), and next scheduled runs for scraper/refresh/backup/texture. A busy indicator shows while the report builds (it checks every episode's file, which can take a while on network shares); results are cached for 5 minutes so an immediate re-run answers instantly, and the cache is invalidated automatically when the library changes. Build failures surface as an error notification. Also available as a web page at `/report`.
 
 ---
 

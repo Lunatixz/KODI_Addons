@@ -8,7 +8,7 @@ Based on code by j48antialias:
 https://anarchintosh-projects.googlecode.com/files/addons_xml_generator.py
 """
 
-import os, sys, datetime, hashlib
+import os, sys, datetime, hashlib, traceback
 import xml.etree.ElementTree
 from zipfile import ZipFile
 from shutil import copyfile, rmtree
@@ -180,4 +180,7 @@ class Generator:
 
 
 if __name__ == "__main__":
-    Generator()
+    try:
+        Generator()
+    except Exception:
+        _log('CRASHED:\n' + traceback.format_exc())

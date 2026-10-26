@@ -154,7 +154,7 @@ class PowerToysHandler(BaseHTTPRequestHandler):
 
         if path == '/report':
             try:
-                report = self.svc._buildReport() if self.svc else 'Service not ready'
+                report = self.svc._cachedReport() if self.svc else 'Service not ready'
             except Exception as e:
                 report = 'Report failed: %s' % e
             html = ('<!DOCTYPE html><html><head><meta charset="utf-8">'

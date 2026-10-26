@@ -159,6 +159,9 @@ class Monitor(xbmc.Monitor):
             if method in ["VideoLibrary.OnUpdate", "VideoLibrary.OnScanStarted"]:
                 if hasattr(self.service, '_cache'):
                     self.service._cache.clear()
+                if hasattr(self.service, 'cache'):  # report counts went stale
+                    try:    self.service.cache.set('healthreport', '', checksum=ADDON_VERSION, json_data=True)
+                    except Exception: pass
             if method == "VideoLibrary.OnUpdate" and hasattr(self.service, '_onLibraryUpdate'):
                 self.service._onLibraryUpdate(method, data)
             if method == "VideoLibrary.OnScanFinished":
@@ -1166,11 +1169,17 @@ class Service(object):
             if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'): body = '[DRY RUN]\n%s' % body
             # always confirm, regardless of Dry Run (prompt is unconditional; the gate lives in _removeEpisode)
             if not xbmcgui.Dialog().yesno(LANGUAGE(32062), body): return False
+            pDialog = xbmcgui.DialogProgressBG()
+            pDialog.create(ADDON_NAME, 'Processing season...')
             removed = 0
-            for e in eps:
-                if self.monitor.waitForAbort(0.01): return False
-                elif not self._pauseWhilePlaying(): return False
-                if self._removeEpisode(e.get('episodeid'), e.get('file'), 'cleanSeason'): removed += 1
+            try:
+                for eidx, e in enumerate(eps):
+                    if self.monitor.waitForAbort(0.01): return False
+                    elif not self._pauseWhilePlaying(): return False
+                    pDialog.update(int((eidx / len(eps)) * 100), message='%s - Season %d: %s' % (showtitle, season, e.get('label', '')))
+                    if self._removeEpisode(e.get('episodeid'), e.get('file'), 'cleanSeason'): removed += 1
+            finally:
+                pDialog.close()
             if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'): notification(LANGUAGE(32063))
             else: notification(LANGUAGE(32064) % (removed, len(eps)))
             return True
@@ -1294,16 +1303,21 @@ class Service(object):
                 return total
             old_logs = []
             logsize = 0
+            pDialog = xbmcgui.DialogProgressBG()
+            pDialog.create(ADDON_NAME, 'Calculating cache sizes...')
             try:
-                _dirs, files = xbmcvfs.listdir(logdir)
-                for f in (files or []):
-                    if f == 'kodi.log': continue  # active log stays
-                    try:
-                        logsize += xbmcvfs.Stat(logdir + f).st_size()
-                        old_logs.append(logdir + f)
-                    except Exception: pass
-            except Exception: pass
-            t_size, p_size = dirsize(tempdir), dirsize(packdir)
+                try:
+                    _dirs, files = xbmcvfs.listdir(logdir)
+                    for f in (files or []):
+                        if f == 'kodi.log': continue  # active log stays
+                        try:
+                            logsize += xbmcvfs.Stat(logdir + f).st_size()
+                            old_logs.append(logdir + f)
+                        except Exception: pass
+                except Exception: pass
+                t_size, p_size = dirsize(tempdir), dirsize(packdir)
+            finally:
+                pDialog.close()
             body = 'temp: %s\npackages: %s\nold logs: %s\n\nDelete these files?' % (format_size(t_size), format_size(p_size), format_size(logsize))
             if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'): body = '[DRY RUN]\n%s' % body
             if not xbmcgui.Dialog().yesno(LANGUAGE(32070), body): return False
@@ -1322,12 +1336,17 @@ class Service(object):
                         except Exception: pass
                     for d in (_dirs or []): wipe(path + d + '/')
                 except Exception: pass
-            wipe(tempdir)
-            wipe(packdir)
-            for f in old_logs:
-                try:
-                    if xbmcvfs.delete(f): removed += 1
-                except Exception: pass
+            pDialog = xbmcgui.DialogProgressBG()
+            pDialog.create(ADDON_NAME, 'Deleting cache files...')
+            try:
+                wipe(tempdir)
+                wipe(packdir)
+                for f in old_logs:
+                    try:
+                        if xbmcvfs.delete(f): removed += 1
+                    except Exception: pass
+            finally:
+                pDialog.close()
             notification('%s: %s (%d)' % (LANGUAGE(32071), format_size(freed), removed))
             return True
         except Exception as e:
@@ -1392,16 +1411,22 @@ class Service(object):
     def runMusic(self):
         try:
             self.log('runMusic, scanning music library')
-            sendJSON({"method":"AudioLibrary.Scan"})
-            if self.monitor.waitForAbort(2.0): return False  # let the scan actually start
-            while not self.monitor.abortRequested() and xbmc.getCondVisibility('Library.IsScanningMusic'):
-                if self.monitor.waitForAbort(1.0): return False
-            if REAL_SETTINGS.getSettingBool('Music_Clean'):
-                self.log('runMusic, cleaning music library')
-                sendJSON({"method":"AudioLibrary.Clean"})
-                if self.monitor.waitForAbort(2.0): return False
+            pDialog = xbmcgui.DialogProgressBG()
+            pDialog.create(ADDON_NAME, 'Scanning music library...')
+            try:
+                sendJSON({"method":"AudioLibrary.Scan"})
+                if self.monitor.waitForAbort(2.0): return False  # let the scan actually start
                 while not self.monitor.abortRequested() and xbmc.getCondVisibility('Library.IsScanningMusic'):
                     if self.monitor.waitForAbort(1.0): return False
+                if REAL_SETTINGS.getSettingBool('Music_Clean'):
+                    self.log('runMusic, cleaning music library')
+                    pDialog.update(message='Cleaning music library...')
+                    sendJSON({"method":"AudioLibrary.Clean"})
+                    if self.monitor.waitForAbort(2.0): return False
+                    while not self.monitor.abortRequested() and xbmc.getCondVisibility('Library.IsScanningMusic'):
+                        if self.monitor.waitForAbort(1.0): return False
+            finally:
+                pDialog.close()
             notification(LANGUAGE(32024))
             return True
         except Exception as e:
@@ -1410,13 +1435,32 @@ class Service(object):
 
     def healthReport(self):
         try:
-            report = self._buildReport()
+            pDialog = xbmcgui.DialogProgressBG()
+            pDialog.create(ADDON_NAME, 'Building health report...')
+            try:
+                report = self._cachedReport()
+            finally:
+                pDialog.close()
             self.log('healthReport:\n%s' % report)
             xbmcgui.Dialog().textviewer(LANGUAGE(32035), report)
             return True
         except Exception as e:
             self.log('healthReport failed: %s' % e, xbmc.LOGERROR)
+            notification('Health report failed: %s' % e, show=True)
             return False
+
+    def _cachedReport(self, ttl_minutes=5):
+        # scanning every episode's file can take a while; cache so a re-run within
+        # a few minutes answers instantly (also serves the /report endpoint)
+        cached = self.cache.get('healthreport', checksum=ADDON_VERSION, json_data=True)
+        if cached: return cached
+        report = self._buildReport()
+        try:
+            self.cache.set('healthreport', report, checksum=ADDON_VERSION,
+                           expiration=datetime.timedelta(minutes=ttl_minutes), json_data=True)
+        except Exception as e:
+            self.log('_cachedReport set failed: %s' % e, xbmc.LOGDEBUG)
+        return report
 
     def _buildReport(self):
         tvshows = (self.getTVshows() or [])

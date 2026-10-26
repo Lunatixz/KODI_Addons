@@ -175,6 +175,34 @@
                 </setting>
             </group>
         </category>
+        <category id="music" label="32073" help="">
+            <group id="1" label="">
+                <setting id="Music_Enabled" type="boolean" label="32074" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="Music_Interval_DAYS" type="integer" label="32075" help="" parent="Music_Enabled">
+                    <level>1</level>
+                    <default>7</default>
+                    <constraints><minimum>1</minimum></constraints>
+                    <control type="edit" format="integer">
+                        <heading>32075</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="Music_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="Music_Clean" type="boolean" label="32076" help="" parent="Music_Enabled">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable" setting="Music_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+            </group>
+        </category>
         <category id="backup" label="32045" help="">
             <group id="1" label="">
                 <setting id="Backup_Enabled" type="boolean" label="32031" help="">
@@ -207,6 +235,17 @@
                         <dependency type="enable" setting="Backup_Enabled">true</dependency>
                     </dependencies>
                 </setting>
+                <setting id="Backup_Keep_Count" type="integer" label="32077" help="" parent="Backup_Enabled">
+                    <level>1</level>
+                    <default>0</default>
+                    <constraints><minimum>0</minimum></constraints>
+                    <control type="edit" format="integer">
+                        <heading>32077</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="Backup_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
             </group>
         </category>
         <category id="sync" label="32025" help="">
@@ -215,6 +254,67 @@
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
+                </setting>
+                <setting id="Sync_Wake_MACs" type="string" label="32080" help="" parent="Sync_Enabled">
+                    <level>1</level>
+                    <default/>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="edit" format="string">
+                        <heading>32080</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="Sync_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+            </group>
+        </category>
+        <category id="webserver" label="32056" help="">
+            <group id="1" label="">
+                <setting id="WebServer_Enabled" type="boolean" label="32057" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="WebServer_Port" type="integer" label="32058" help="" parent="WebServer_Enabled">
+                    <level>1</level>
+                    <default>9090</default>
+                    <constraints><minimum>1024</minimum><maximum>65535</maximum></constraints>
+                    <control type="edit" format="integer">
+                        <heading>32058</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="WebServer_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="WebServer_Auth" type="boolean" label="32059" help="" parent="WebServer_Enabled">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable" setting="WebServer_Enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="WebServer_User" type="string" label="32060" help="" parent="WebServer_Auth">
+                    <level>1</level>
+                    <default/>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="edit" format="string">
+                        <heading>32060</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="WebServer_Auth">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="WebServer_Pass" type="string" label="32061" help="" parent="WebServer_Auth">
+                    <level>1</level>
+                    <default/>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="edit" format="string">
+                        <heading>32061</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="WebServer_Auth">true</dependency>
+                    </dependencies>
                 </setting>
             </group>
         </category>
@@ -229,6 +329,27 @@
                     <level>1</level>
                     <default>false</default>
                     <control type="toggle"/>
+                </setting>
+                <setting id="Share_Watch_Enabled" type="boolean" label="32079" help="">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="FreeRam_Enabled" type="boolean" label="32083" help="">
+                    <level>1</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="FreeRam_Interval_HOURS" type="integer" label="32084" help="" parent="FreeRam_Enabled">
+                    <level>1</level>
+                    <default>24</default>
+                    <constraints><minimum>1</minimum></constraints>
+                    <control type="edit" format="integer">
+                        <heading>32084</heading>
+                    </control>
+                    <dependencies>
+                        <dependency type="enable" setting="FreeRam_Enabled">true</dependency>
+                    </dependencies>
                 </setting>
                 <setting id="Report_Context_Menu" type="boolean" label="32034" help="">
                     <level>1</level>

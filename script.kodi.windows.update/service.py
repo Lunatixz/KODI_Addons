@@ -16,10 +16,10 @@ class Service(object):
     myMonitor = xbmc.Monitor()
     
     def __init__(self):
-        self.chkLastFile()
         self.getBuild()
         self.getPlatform()
         self.getVersion()
+        self.chkLastFile()
         
                 
     def getBuild(self):

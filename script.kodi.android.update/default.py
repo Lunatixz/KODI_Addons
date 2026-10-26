@@ -99,7 +99,7 @@ class Installer(object):
     def __init__(self):
         self.myMonitor = xbmc.Monitor()
         self.cache     = SimpleCache()
-        self.lastURL   = REAL_SETTINGS.getSetting("LastURL")
+        self.lastURL   = REAL_SETTINGS.getSetting("LastURL").replace('http://mirrors.kodi.tv/', BASE_URL) #Migrate saved http links to https.
         self.lastPATH  = REAL_SETTINGS.getSetting("LastPath")
         self.aborted   = self.chkVer()
         
@@ -243,7 +243,7 @@ class Installer(object):
             
             
     def requestPermission(self):
-        # xbmcgui.Dialog().ok(LANGUAGE(30026))
+        xbmcgui.Dialog().ok(ADDON_NAME, LANGUAGE(30026))
         xbmc.executebuiltin('StartAndroidActivity("", "android.settings.APPLICATION_DETAILS_SETTINGS", "", "package:org.xbmc.kodi")')
         
         
@@ -256,11 +256,11 @@ class Installer(object):
         
         
     def downloadAPK(self, url, dest):
+        if self.fileExists(dest): return self.installAPK(dest) #Already downloaded, install as is.
         if not self.checkPermission(os.path.dirname(dest)):
             self.requestPermission()
             return log("downloadAPK, Download aborted: Missing Android Storage Permissions.", xbmc.LOGERROR)
 
-        if self.fileExists(dest): return self.installAPK(dest) #Already downloaded, install as is.
         start_time = time.time()
         dia = xbmcgui.DialogProgress()
         fle = os.path.basename(dest)
@@ -276,10 +276,11 @@ class Installer(object):
                     start_time = time.time()
             self.installAPK(dest)
         except Exception as e:
-            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
             self.deleteAPK(dest)
             if "User canceled download" in str(e): log("downloadAPK, Download canceled by user.", xbmc.LOGINFO)
-            else: log("downloadAPK, Failed! (%s) %s"%(url,str(e)), xbmc.LOGERROR)
+            else:
+                xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
+                log("downloadAPK, Failed! (%s) %s"%(url,str(e)), xbmc.LOGERROR)
         finally:
             dia.close()
         

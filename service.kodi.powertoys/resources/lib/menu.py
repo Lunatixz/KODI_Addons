@@ -25,6 +25,9 @@ def main():
         (LANG(32053), 'RunClean'),     # Run clean now
         (LANG(32054), 'RunTexture'),   # Run texture maintenance now
         (LANG(32055), 'RunBackup'),    # Run backup now
+        (LANG(32072), 'RunMusic'),     # Run music scan now
+        (LANG(32070), 'RunCacheClean'),# Clean system cache
+        (LANG(32081), 'RunFreeRam'),   # Free RAM now
         (LANG(32035), 'HealthReport'), # Library health report
     ]
     idx = xbmcgui.Dialog().select(ADDON.getAddonInfo('name'), [i[0] for i in items])

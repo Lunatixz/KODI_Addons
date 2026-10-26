@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kodi PowerToys</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>&#9889; Kodi PowerToys</h1>
+    <p class="subtitle">QR Action Builder</p>
+  </header>
+
+  <!-- BUILDER VIEW -->
+  <section id="builder-view">
+    <div class="card">
+      <h2>1. Add Commands</h2>
+      <p class="hint">Stack JSON-RPC commands to build a package. Scan the QR to execute.</p>
+      <div class="form-row">
+        <label for="method-select">Method</label>
+        <select id="method-select"></select>
+      </div>
+      <div class="form-row">
+        <label for="method-desc" id="method-desc" class="method-desc"></label>
+      </div>
+      <div class="form-row">
+        <label for="params-editor">Params (JSON)</label>
+        <textarea id="params-editor" rows="3" spellcheck="false">{}</textarea>
+      </div>
+      <button id="add-cmd" class="btn btn-primary">+ Add Command</button>
+    </div>
+
+    <div class="card" id="stack-card" style="display:none">
+      <h2>2. Command Stack</h2>
+      <ol id="cmd-stack"></ol>
+      <button id="clear-stack" class="btn btn-danger btn-sm">Clear All</button>
+    </div>
+
+    <div class="card" id="preview-card" style="display:none">
+      <h2>3. Preview</h2>
+      <pre id="json-preview"></pre>
+      <button id="gen-qr" class="btn btn-primary btn-lg">Generate QR Code</button>
+    </div>
+
+    <div class="card" id="qr-card" style="display:none">
+      <h2>QR Code</h2>
+      <p class="hint">Scan with your phone camera to open the action page.</p>
+      <div id="qr-container"></div>
+      <p id="qr-url" class="url-display"></p>
+    </div>
+  </section>
+
+  <!-- LANDING VIEW (QR scan target) -->
+  <section id="landing-view" style="display:none">
+    <div class="card">
+      <h2>QR Action</h2>
+      <p class="hint">The following commands were encoded in this QR code:</p>
+      <ol id="landing-cmds"></ol>
+    </div>
+    <div class="card">
+      <h2>Select Target Instance(s)</h2>
+      <p class="hint">Choose which Kodi device(s) to run these commands on.</p>
+      <div id="instance-list"></div>
+    </div>
+    <div class="card">
+      <button id="exec-btn" class="btn btn-primary btn-lg btn-execute">Execute</button>
+      <div id="exec-results"></div>
+    </div>
+  </section>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>

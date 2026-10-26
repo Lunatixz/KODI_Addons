@@ -111,6 +111,9 @@ def deleteFile(file):
     except Exception as e: log("Installer: deleteFile Failed! " + str(e), xbmc.LOGERROR)
 
 def killME():
+    # waitForAbort only reports Kodi's shutdown request, so confirm the process is still alive first.
+    running = subprocess.run('tasklist /fi "imagename eq kodi.exe" /nh', capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW).stdout
+    if 'kodi.exe' not in running.lower(): return log('Installer: Kodi already exited, nothing to force close.')
     log('Installer: Kodi did not exit on its own, force closing.')
     subprocess.run('taskkill /f /im kodi.exe', capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
@@ -124,7 +127,7 @@ class Installer(object):
     def __init__(self):
         self.myMonitor = xbmc.Monitor()
         self.cache     = SimpleCache()
-        self.lastURL   = REAL_SETTINGS.getSetting("LastURL")
+        self.lastURL   = REAL_SETTINGS.getSetting("LastURL").replace('http://mirrors.kodi.tv/', BASE_URL) #Migrate saved http links to https.
         self.lastPATH  = REAL_SETTINGS.getSetting("LastPath")
         self.aborted   = self.chkUWP()
 
@@ -292,7 +295,11 @@ class Installer(object):
     def installFile(self, exefile=None):
         if not (exefile and xbmcvfs.exists(exefile)): return
         if not countdownDialog(): return log('installFile, canceled by user, installation aborted.')
-        subprocess.Popen([exefile])
+        try:
+            os.startfile(exefile) #Shell launch so a manifest requesting elevation gets its UAC prompt.
+        except OSError as e:
+            xbmcgui.Dialog().notification(ADDON_NAME, LANGUAGE(30001), ICON, 4000)
+            return log('installFile, failed to launch %s: %s' % (exefile, e), xbmc.LOGERROR)
         quitKodi()
         
         

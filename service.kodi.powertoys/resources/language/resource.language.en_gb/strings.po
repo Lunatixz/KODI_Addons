@@ -18,15 +18,15 @@ msgstr ""
 
 msgctxt "Addon Summary"
 msgid ""
-msgstr ""
+msgstr "Automated library maintenance: scraping, refresh, cleaning, texture cache, backup, and network sync."
 
 msgctxt "Addon Description"
 msgid ""
-msgstr ""
+msgstr "PowerToys automates Kodi library maintenance. Scrapes new content from configured source folders, periodically refreshes metadata (optionally only items missing artwork or with blank plot/MPAA), removes missing files and duplicate library entries (quality-weighted, IMDb-aware), prunes orphaned texture cache artwork and re-caches missing thumbnails, backs up the library on a schedule, and syncs UI refresh across network peers. Context menu actions provide on-demand clean, scan, and a library health report. All destructive operations honor Dry Run; file deletion is a separate opt-in."
 
 msgctxt "Addon Disclaimer"
 msgid ""
-msgstr ""
+msgstr "Use at your own risk. Dry Run is enabled by default."
 
 msgctxt "#32000"
 msgid "Enable Debugging"
@@ -235,3 +235,127 @@ msgstr ""
 msgctxt "#32055"
 msgid "Run backup now"
 msgstr ""
+
+msgctxt "#32062"
+msgid "PowerToys: Delete this season"
+msgstr ""
+
+msgctxt "#32063"
+msgid "Dry Run: no changes were made."
+msgstr ""
+
+msgctxt "#32064"
+msgid "Removed: %d of %d episodes"
+msgstr ""
+
+msgctxt "#32065"
+msgid "PowerToys: Mark season watched"
+msgstr ""
+
+msgctxt "#32066"
+msgid "PowerToys: Mark show watched"
+msgstr ""
+
+msgctxt "#32067"
+msgid "Mark watched"
+msgstr ""
+
+msgctxt "#32068"
+msgid "Mark unwatched"
+msgstr ""
+
+msgctxt "#32069"
+msgid "Updated: %d episodes"
+msgstr ""
+
+msgctxt "#32070"
+msgid "Clean system cache"
+msgstr ""
+
+msgctxt "#32071"
+msgid "Freed"
+msgstr ""
+
+msgctxt "#32072"
+msgid "Run music scan now"
+msgstr ""
+
+msgctxt "#32073"
+msgid "Music"
+msgstr ""
+
+msgctxt "#32074"
+msgid "Enable music library scan/clean"
+msgstr ""
+
+msgctxt "#32075"
+msgid "Music scan interval (Days)"
+msgstr ""
+
+msgctxt "#32076"
+msgid "Clean music library after scan"
+msgstr ""
+
+msgctxt "#32077"
+msgid "Old backups to keep (0 = unlimited)"
+msgstr ""
+
+msgctxt "#32078"
+msgid "Network share recovered - rescanning"
+msgstr ""
+
+msgctxt "#32079"
+msgid "Auto-rescan when a network share recovers"
+msgstr ""
+
+msgctxt "#32080"
+msgid "Wake-on-LAN MAC addresses (comma-separated)"
+msgstr ""
+
+msgctxt "#32081"
+msgid "Free RAM now"
+msgstr ""
+
+msgctxt "#32082"
+msgid "Freed %d MB (gc: %d objects, free: %d MB)"
+msgstr ""
+
+msgctxt "#32083"
+msgid "Auto free RAM (garbage collection + memory trim)"
+msgstr ""
+
+msgctxt "#32084"
+msgid "Free RAM interval (Hours)"
+msgstr ""
+
+msgctxt "#32056"
+msgid "QR Server"
+msgstr ""
+
+msgctxt "#32057"
+msgid "Enable QR server (webpage to build JSON-RPC QR codes)"
+msgstr ""
+
+msgctxt "#32058"
+msgid "QR server port"
+msgstr ""
+
+msgctxt "#32059"
+msgid "Require login (HTTP Basic Auth)"
+msgstr ""
+
+msgctxt "#32060"
+msgid "Username"
+msgstr ""
+
+msgctxt "#32061"
+msgid "Password"
+msgstr ""
+
+
+
+
+
+
+
+

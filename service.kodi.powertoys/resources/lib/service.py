@@ -20,7 +20,8 @@ from globals import *
 from cqueue  import CustomQueue
 from zeroconf import Zeroconf, ServiceBrowser
 from texture import prune, recache_missing, cache_stats, format_size
-import socket, urllib.request, threading
+from webserver import start_server as startWebServer, stop_server as stopWebServer
+import socket, urllib.request, threading, gc, ctypes
 
 class Player(xbmc.Player):
     def __init__(self, monitor=None):
@@ -28,6 +29,7 @@ class Player(xbmc.Player):
         self.monitor = monitor
         self.service = monitor.service if monitor else None
         self.playingItem = {'listitem':xbmcgui.ListItem()}
+        self._playingDB = {}
         
     def log(self, msg, level=xbmc.LOGDEBUG):
         return log('%s: %s'%(self.__class__.__name__,msg),level)
@@ -47,25 +49,55 @@ class Player(xbmc.Player):
 
     def onAVStarted(self):
         self.playingItem = {'listitem':self.getPlayerItem(), 'elapsed':self.getPlayedTime(), 'totaltime':self.getPlayerTime()}
+        try:
+            # capture library identity while VideoPlayer.* labels are valid (watched-state sync)
+            self._playingDB = {'dbtype': xbmc.getInfoLabel('VideoPlayer.DBType') or '',
+                               'dbid': int(xbmc.getInfoLabel('VideoPlayer.DBID') or '0'),
+                               'file': self.getPlayerItem().getPath() or xbmc.getInfoLabel('VideoPlayer.Filename') or ''}
+        except Exception:
+            self._playingDB = {}
         self.log('onAVStarted, playingItem = %s'%(self.playingItem))
 
     def onPlayBackError(self):
         self.log('onPlayBackError')
+        self._pushWatchedState()
         self.playingItem = self.onStop(self.playingItem)
         if self.service:
             self.service._playing = False
         
     def onPlayBackEnded(self):
         self.log('onPlayBackEnded')
+        self._pushWatchedState()
         self.playingItem = self.onStop(self.playingItem)
         if self.service:
             self.service._playing = False
         
     def onPlayBackStopped(self):
         self.log('onPlayBackStopped')
+        self._pushWatchedState()
         self.playingItem = self.onStop(self.playingItem)
         if self.service:
             self.service._playing = False
+
+    def _pushWatchedState(self):
+        # after playback, push fresh playcount/lastplayed/resume to peers via the sync outbox
+        db, self._playingDB = self._playingDB, {}
+        if not self.service or not db or db.get('dbtype') not in ('movie', 'episode') or not db.get('dbid'):
+            return
+        try:
+            method, key = (('VideoLibrary.GetMovieDetails', 'movieid') if db['dbtype'] == 'movie'
+                           else ('VideoLibrary.GetEpisodeDetails', 'episodeid'))
+            d = sendJSON({"method": method, "params": {key: db['dbid'],
+                          "properties": ["playcount", "lastplayed", "resume", "file"]}}).get('result', {})
+            d = d.get('movie') or d.get('episode') or {}
+            f = d.get('file') or db.get('file')
+            if f and self.service.sync:
+                self.service.sync.queue_msg('WatchedUpdate', {'items': {f: {
+                    'playcount': d.get('playcount', 0),
+                    'lastplayed': d.get('lastplayed'),
+                    'resume': d.get('resume')}}})
+        except Exception as e:
+            self.log('_pushWatchedState: %s' % e, xbmc.LOGWARNING)
 
     def onStop(self, playingItem={}):
         self.log('onStop, playingItem = %s'%(self.playingItem))
@@ -108,17 +140,27 @@ class Monitor(xbmc.Monitor):
             if sender == ADDON_ID and method.endswith(".RefreshLibrary"):
                 self.log("Peer refresh signal received")
                 xbmc.executebuiltin("Container.Refresh")
-                self._confirm_refresh(data)
+                self._confirm(data, "RefreshConfirmed")
             if sender == ADDON_ID and method.endswith(".RefreshConfirmed"):
                 self.log("Peer refresh confirmed")
                 if self.service and hasattr(self.service, 'sync'):
                     self.service.sync.on_confirm(data)
+            if sender == ADDON_ID and method.endswith(".SyncConfirmed"):
+                self.log("Peer sync confirmed")
+                if self.service and hasattr(self.service, 'sync'):
+                    self.service.sync.on_confirm(data)
+            if sender == ADDON_ID and method.endswith(".ScanLibrary"):
+                self._handle_peer_scan(data)
+            if sender == ADDON_ID and method.endswith(".WatchedUpdate"):
+                self._handle_peer_watched(data)
             if method == "VideoLibrary.OnScanFinished" and REAL_SETTINGS.getSettingBool('Clean_OnScanFinished'):
                 self.log("Event Intercept -> Library Scan Finished. Injecting optimization pass.")
                 self.service._que(self.service.runClean, priority=5)
             if method in ["VideoLibrary.OnUpdate", "VideoLibrary.OnScanStarted"]:
                 if hasattr(self.service, '_cache'):
                     self.service._cache.clear()
+            if method == "VideoLibrary.OnUpdate" and hasattr(self.service, '_onLibraryUpdate'):
+                self.service._onLibraryUpdate(method, data)
             if method == "VideoLibrary.OnScanFinished":
                 if self.service and hasattr(self.service, 'sync'):
                     self.service.sync.broadcast_refresh()
@@ -131,8 +173,10 @@ class Monitor(xbmc.Monitor):
             if sender == ADDON_ID and method.endswith(".HealthReport"):
                 if self.service: threading.Thread(target=self.service.healthReport, daemon=True).start()
             if sender == ADDON_ID and method.endswith(".RunScraper"):
-                if self.service and REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self.service.isRunning:
-                    self.service._que(self.service.runScraper, 2)
+                if self.service:
+                    if hasattr(self.service, 'sync'): self.service.sync.queue_msg('ScanLibrary', {'path': None})
+                    if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self.service.isRunning:
+                        self.service._que(self.service.runScraper, 2)
             if sender == ADDON_ID and method.endswith(".RunRefresh"):
                 if self.service and REAL_SETTINGS.getSettingBool('Refresh_Enabled'):
                     self.service._que(self.service.runRefresh, 2)
@@ -144,6 +188,13 @@ class Monitor(xbmc.Monitor):
             if sender == ADDON_ID and method.endswith(".RunBackup"):
                 if self.service and REAL_SETTINGS.getSettingBool('Backup_Enabled'):
                     self.service._que(self.service.runBackup, 3)
+            if sender == ADDON_ID and method.endswith(".RunMusic"):
+                if self.service and REAL_SETTINGS.getSettingBool('Music_Enabled'):
+                    self.service._que(self.service.runMusic, 3)
+            if sender == ADDON_ID and method.endswith(".RunCacheClean"):
+                if self.service: threading.Thread(target=self.service.runCacheClean, daemon=True).start()
+            if sender == ADDON_ID and method.endswith(".RunFreeRam"):
+                if self.service: self.service._que(self.service.runRamFree, 3)
             if sender == ADDON_ID and method.endswith(".CleanTVShow"):
                 try:
                     tvshowid = int((json.loads(data) if isinstance(data, str) else (data or {})).get('tvshowid', -1))
@@ -159,28 +210,108 @@ class Monitor(xbmc.Monitor):
                             group = next((g for g in self.service._movieDuplicateGroups(self.service.getMovies() or []) if any(m.get('movieid') == movieid for m in g)), movies)
                             self.service._que(self.service.cleanMovies, 3, group)
                 except Exception as e: self.log('CleanMovie error: %s' % e, xbmc.LOGWARNING)
+            if sender == ADDON_ID and method.endswith(".CleanSeason"):
+                try:
+                    payload = json.loads(data) if isinstance(data, str) else (data or {})
+                    tvshowid, season = int(payload.get('tvshowid', -1)), int(payload.get('season', -99))
+                    if tvshowid >= 0 and season > -99 and self.service: self.service._que(self.service.cleanSeason, 3, tvshowid, season)
+                except Exception as e: self.log('CleanSeason error: %s' % e, xbmc.LOGWARNING)
+            if sender == ADDON_ID and method.endswith(".WatchSeason"):
+                try:
+                    payload = json.loads(data) if isinstance(data, str) else (data or {})
+                    tvshowid, season, watched = int(payload.get('tvshowid', -1)), int(payload.get('season', -99)), bool(payload.get('watched', True))
+                    if tvshowid >= 0 and season > -99 and self.service: self.service._que(self.service.markWatched, 3, tvshowid, season, watched)
+                except Exception as e: self.log('WatchSeason error: %s' % e, xbmc.LOGWARNING)
+            if sender == ADDON_ID and method.endswith(".WatchShow"):
+                try:
+                    payload = json.loads(data) if isinstance(data, str) else (data or {})
+                    tvshowid, watched = int(payload.get('tvshowid', -1)), bool(payload.get('watched', True))
+                    if tvshowid >= 0 and self.service: self.service._que(self.service.markWatched, 3, tvshowid, None, watched)
+                except Exception as e: self.log('WatchShow error: %s' % e, xbmc.LOGWARNING)
             if sender == ADDON_ID and method.endswith(".ScanFolder"):
                 try:
                     payload = json.loads(data) if isinstance(data, str) else (data or {})
                     path = payload.get('path')
-                    if path and self.service: self.service._que(self.service.scrapeDirectory, 2, path)
+                    if path and self.service:
+                        if hasattr(self.service, 'sync'): self.service.sync.queue_msg('ScanLibrary', {'path': path})
+                        self.service._que(self.service.scrapeDirectory, 2, path)
                 except Exception as e: self.log('ScanFolder error: %s' % e, xbmc.LOGWARNING)
 
-    def _confirm_refresh(self, data):
+    def _peerTokenSeen(self, token):
+        # shared re-ack-no-requeue LRU for peer push tokens (safe resends if acks get lost)
+        if not token: return False
+        if not getattr(self.service, '_peerTokens', None): self.service._peerTokens = {}
+        now = time.time()
+        for t, ts in list(self.service._peerTokens.items()):
+            if now - ts > 600: self.service._peerTokens.pop(t, None)
+        if token in self.service._peerTokens: return True
+        self.service._peerTokens[token] = now
+        return False
+
+    def _handle_peer_scan(self, data):
+        try:
+            payload = json.loads(data) if isinstance(data, str) else (data or {})
+            token, path = payload.get('token'), payload.get('path')
+            if not self.service: return
+            if self._peerTokenSeen(token):
+                self._confirm(data, "SyncConfirmed"); return
+            if path:
+                self.log('Peer scan received (path): %s' % path)
+                self.service._que(self.service.scrapeDirectory, 2, path)
+            elif REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self.service.isRunning:
+                self.log('Peer scan received (full)')
+                self.service._que(self.service.runScraper, 2)
+            if token: self._confirm(data, "SyncConfirmed")
+        except Exception as e:
+            self.log('ScanLibrary error: %s' % e, xbmc.LOGWARNING)
+
+    def _handle_peer_watched(self, data):
+        try:
+            payload = json.loads(data) if isinstance(data, str) else (data or {})
+            token = payload.get('token')
+            if not self.service: return
+            if self._peerTokenSeen(token):
+                self._confirm(data, "SyncConfirmed"); return
+            items = payload.get('items') or {}
+            if items: self.service._suppressWatchPush = time.time() + 2  # suppress echo before applying
+            applied = 0
+            for f, st in items.items():
+                try:
+                    # newest-lastplayed-wins: skip only when both sides have lastplayed and local is strictly newer
+                    local_lp = sendJSON({"method":"Files.GetFileDetails","params":{"file":f,"media":"video",
+                                        "properties":["lastplayed"]}}).get('result',{}).get('filedetails',{}).get('lastplayed')
+                    inc_lp = st.get('lastplayed')
+                    if local_lp and inc_lp and str(local_lp) > str(inc_lp):
+                        self.log('WatchedUpdate: local lastplayed newer, skipping %s' % f)
+                        continue
+                    params = {"file": f, "media": "video",
+                              "playcount": st.get('playcount', 0),
+                              "lastplayed": st.get('lastplayed'),
+                              "resume": st.get('resume')}
+                    if sendJSON({"method":"Files.SetFileDetails","params":params}).get('result') == 'OK':
+                        applied += 1
+                except Exception as fe:
+                    self.log('WatchedUpdate item failed (%s): %s' % (f, fe), xbmc.LOGWARNING)
+            if applied: self.log('WatchedUpdate: applied %d/%d from peer' % (applied, len(items)))
+            if token: self._confirm(data, "SyncConfirmed")
+        except Exception as e:
+            self.log('WatchedUpdate error: %s' % e, xbmc.LOGWARNING)
+
+    def _confirm(self, data, message="RefreshConfirmed"):
         try:
             payload = json.loads(data) if isinstance(data, str) else (data or {})
             cb_ip, cb_port, token = payload.get('ip'), payload.get('port'), payload.get('token')
             if not (cb_ip and token): return
             confirm = {"jsonrpc":"2.0","method":"JSONRPC.NotifyAll",
-                       "params":{"sender":ADDON_ID,"message":"RefreshConfirmed","data":{"token":token}},
+                       "params":{"sender":ADDON_ID,"message":message,"data":{"token":token}},
                        "id":"kodi.powertoys.sync"}
             url = 'http://%s:%d/jsonrpc' % (cb_ip, cb_port or 8080)
             req = urllib.request.Request(url, data=json.dumps(confirm).encode('utf-8'))
             req.add_header('Content-Type', 'application/json')
             urllib.request.urlopen(req, timeout=5)
-            self.log('Refresh confirmed to %s:%s' % (cb_ip, cb_port))
+            self.log('Confirmed (%s) to %s:%s' % (message, cb_ip, cb_port))
         except Exception as e:
-            self.log('Failed to confirm refresh: %s' % e, xbmc.LOGWARNING)
+            self.log('Failed to confirm %s: %s' % (message, e), xbmc.LOGWARNING)
 
 class SyncManager:
     SERVICE_TYPE = "_xbmc-jsonrpc-h._tcp.local."
@@ -188,38 +319,48 @@ class SyncManager:
     CONFIRM_TIMEOUT = 15
     MAX_RETRIES = 3
 
-    def __init__(self):
+    def __init__(self, service=None):
         self.log('SyncManager.__init__')
+        self.service = service
         self.zeroconf = None
         self.browser = None
         self.peers = {}
+        self._known_peers = {}   # session roster, survives removeService
+        self._entries = []       # durable outbox: [{id, msg, payload, ts, targets:{name:{ip,port,fails,next,sent_ts,token,delivered}}}]
+        self._seq = 0
+        self._sweeper_stop = threading.Event()
         self._last_broadcast = 0
         self._lock = threading.Lock()
         self._local_ip = self._get_local_ip()
-        self._pending = {}   # token -> {peer, ip, port, ts, retries}
+        self._pending = {}   # token -> {peer, ip, port, ts, retries} (refresh confirm path)
         self._token = 0
 
     def log(self, msg, level=xbmc.LOGDEBUG):
         log('SyncManager: %s' % msg, level)
 
     def start(self):
-        if not REAL_SETTINGS.getSettingBool('Sync_Enabled'):
-            self.log('Sync_Enabled is False, not starting')
+        if not REAL_SETTINGS.getSettingBool('Sync_Enabled') and not REAL_SETTINGS.getSettingBool('WebServer_Enabled'):
+            self.log('Sync_Enabled and WebServer_Enabled are False, not starting')
             return
         self.log('Starting')
+        self._load_outbox()
         self.zeroconf = Zeroconf()
         self.browser = ServiceBrowser(self.zeroconf, self.SERVICE_TYPE, self)
+        self._sweeper_stop.clear()
+        threading.Thread(target=self._sweep_loop, name='%s.sweeper' % ADDON_ID, daemon=True).start()
 
     def stop(self):
         self.log('Stopping')
+        self._sweeper_stop.set()
         if self.browser:
             self.browser.cancel()
         if self.zeroconf:
             self.zeroconf.close()
+        self.save_outbox()
 
     def addService(self, zeroconf, service_type, name):
         try:
-            info = zeroconf.get_service_info(service_type, name)
+            info = zeroconf.getServiceInfo(service_type, name)
             if not info or not info.getAddress():
                 return
             ip = socket.inet_ntoa(info.getAddress())
@@ -230,12 +371,24 @@ class SyncManager:
                 if name not in self.peers:
                     self.log('New peer: %s:%d (%s)' % (ip, info.getPort(), info.getServer()))
                 self.peers[name] = {"ip": ip, "host": info.getServer(), "port": info.getPort()}
+                self._known_peers[name] = {"ip": ip, "host": info.getServer(), "port": info.getPort()}
+                # peer (re)appeared: refresh any outbox targets, reset backoff, sweep now
+                woken = False
+                for e in self._entries:
+                    t = e['targets'].get(name)
+                    if t and not t['delivered']:
+                        t['ip'], t['port'] = ip, info.getPort()
+                        t['fails'], t['next'], t['sent_ts'] = 0, 0, None
+                        woken = True
+            if woken:
+                self.log('Peer %s returned, retrying pending sync entries' % name)
+                threading.Thread(target=self._sweep, daemon=True).start()
         except Exception as e:
             self.log('addService error: %s' % e, xbmc.LOGWARNING)
 
     def removeService(self, zeroconf, service_type, name):
         with self._lock:
-            self.peers.pop(name, None)
+            self.peers.pop(name, None)  # keep _known_peers roster for durable retries
 
     def _get_local_ip(self):
         try:
@@ -246,6 +399,172 @@ class SyncManager:
             return ip
         except Exception:
             return "127.0.0.1"
+
+    @property
+    def _local_web_port(self):
+        try:
+            return sendJSON({"method":"Settings.GetSettingValue","params":{"setting":"services.webserverport"}}).get('result',{}).get('value', 8080)
+        except Exception:
+            return 8080
+
+    # ── durable outbox (ScanLibrary / WatchedUpdate) ────────────────────
+    def queue_msg(self, msg, payload):
+        if not REAL_SETTINGS.getSettingBool('Sync_Enabled'):
+            return
+        new_entry = True
+        with self._lock:
+            if msg == 'ScanLibrary':
+                path = (payload or {}).get('path')
+                for e in self._entries:
+                    if e['msg'] == msg and (e['payload'] or {}).get('path') == path and any(not t['delivered'] for t in e['targets'].values()):
+                        return  # exact duplicate still pending
+            elif msg == 'WatchedUpdate':
+                # batch merge: fold into the pending entry; new eid + reset targets so the
+                # union is (re)sent under fresh tokens - applies are idempotent, stale acks no-op
+                for e in self._entries:
+                    if e['msg'] == msg and any(not t['delivered'] for t in e['targets'].values()):
+                        e['payload'].setdefault('items', {}).update((payload or {}).get('items') or {})
+                        self._seq += 1
+                        e['id'] = self._seq
+                        for name, t in e['targets'].items():
+                            t.update({'token': 'sync:%d:%s' % (e['id'], name), 'sent_ts': None,
+                                      'next': 0, 'fails': 0, 'delivered': False})
+                        new_entry = False
+                        break
+            if new_entry:
+                if not self._known_peers:
+                    self.log('queue_msg: no known peers, dropping %s %s' % (msg, payload), xbmc.LOGDEBUG)
+                    return
+                self._seq += 1
+                eid = self._seq
+                targets = {}
+                for name, peer in self._known_peers.items():
+                    token = 'sync:%d:%s' % (eid, name)
+                    targets[name] = {'ip': peer['ip'], 'port': peer['port'], 'fails': 0, 'next': 0, 'sent_ts': None, 'token': token, 'delivered': False}
+                self._entries.append({'id': eid, 'msg': msg, 'payload': payload, 'ts': time.time(), 'targets': targets})
+                while len(self._entries) > 50:  # ponytail: FIFO cap, oldest undelivered shed first
+                    self._entries.pop(0)
+                self.log('Queued %s to %d peers (payload=%s)' % (msg, len(targets), payload))
+        self.save_outbox()
+        threading.Thread(target=self._sweep, daemon=True).start()
+
+    def _sweep_loop(self):
+        while not self._sweeper_stop.is_set() and not (self.service and self.service.monitor.abortRequested()):
+            if self._sweeper_stop.wait(15): break
+            try:
+                if REAL_SETTINGS.getSettingBool('Sync_Enabled'):
+                    self._sweep()
+            except Exception as e:
+                self.log('sweep error: %s' % e, xbmc.LOGWARNING)
+
+    def _sweep(self):
+        now = time.time()
+        if not REAL_SETTINGS.getSettingBool('Sync_Enabled'):
+            return
+        with self._lock:
+            entries = list(self._entries)
+        done = False
+        for e in entries:
+            all_done = True
+            for name, t in list(e['targets'].items()):
+                if t['delivered']:
+                    continue
+                all_done = False
+                if now < t['next']:
+                    continue
+                if t['sent_ts'] and now - t['sent_ts'] <= self.CONFIRM_TIMEOUT:
+                    continue  # awaiting ack
+                if t['sent_ts']:  # ack timed out -> resend with backoff
+                    t['fails'] += 1
+                    t['next'] = now + min(15 * (2 ** min(t['fails'], 6)), 900)
+                    t['sent_ts'] = None
+                    self.log('No ack from %s for entry %d, retry %d in %ds' % (name, e['id'], t['fails'], int(t['next'] - now)))
+                threading.Thread(target=self._deliver, args=(e['id'], e['msg'], e['payload'], name, t), daemon=True).start()
+            if all_done and e['targets']:
+                with self._lock:
+                    if e in self._entries:
+                        self._entries.remove(e)
+                        done = True
+                self.log('Entry %d (%s) fully delivered, dropping' % (e['id'], e['msg']))
+        if done:
+            self.save_outbox()
+
+    def _deliver(self, eid, msg, payload, name, t):
+        try:
+            data = dict(payload or {})
+            data.update({'ip': self._local_ip, 'port': self._local_web_port, 'token': t['token']})
+            cmd = {"jsonrpc":"2.0","method":"JSONRPC.NotifyAll",
+                   "params":{"sender":ADDON_ID,"message":msg,"data":data},
+                   "id":"kodi.powertoys.sync"}
+            url = 'http://%s:%d/jsonrpc' % (t['ip'], t['port'])
+            req = urllib.request.Request(url, data=json.dumps(cmd).encode('utf-8'))
+            req.add_header('Content-Type', 'application/json')
+            urllib.request.urlopen(req, timeout=5)
+            with self._lock:
+                t['sent_ts'] = time.time()
+            self.log('%s sent to %s:%s, awaiting confirm (token %s)' % (msg, t['ip'], t['port'], t['token']))
+        except Exception as e:
+            with self._lock:
+                t['fails'] += 1
+                t['next'] = time.time() + min(15 * (2 ** min(t['fails'], 6)), 900)
+                t['sent_ts'] = None
+            self.log('Deliver %s to %s failed: %s' % (msg, name, e), xbmc.LOGWARNING)
+            if t['fails'] == 1:  # first failure -> peer may be asleep, try waking it once per entry
+                threading.Thread(target=self._wake_once, daemon=True).start()
+
+    def _wake_once(self):
+        now = time.time()
+        with self._lock:
+            if now - getattr(self, '_last_wake', 0) < 60:
+                return
+            self._last_wake = now
+        self.wake_peers()
+
+    def on_confirm(self, data):
+        try:
+            payload = json.loads(data) if isinstance(data, str) else (data or {})
+            token = payload.get('token')
+            with self._lock:
+                entry = self._pending.pop(token, None)  # legacy refresh confirm path
+                if not entry:
+                    for e in self._entries:
+                        t = e['targets'].get(token.split(':', 2)[-1]) if token and token.startswith('sync:') else None
+                        if t and t['token'] == token:
+                            t['delivered'] = True
+                            t['sent_ts'] = None
+                            self.log('Confirmed %s entry %d by %s' % (e['msg'], e['id'], token.split(':', 2)[-1]))
+                            break
+            if entry:
+                self.log('Refresh confirmed by %s (%s:%d)' % (entry['peer'], entry['ip'], entry['port']))
+        except Exception as e:
+            self.log('on_confirm error: %s' % e, xbmc.LOGWARNING)
+
+    def save_outbox(self):
+        try:
+            if not self.service: return
+            with self._lock:
+                slim = [{'id': e['id'], 'msg': e['msg'], 'payload': e['payload'], 'ts': e['ts'],
+                         'targets': {n: {'ip': t['ip'], 'port': t['port'], 'token': t['token']} for n, t in e['targets'].items() if not t['delivered']}}
+                        for e in self._entries]
+                slim = [e for e in slim if e['targets']]
+            self.service.cache.set('syncoutbox', json.dumps(slim), ADDON_VERSION, json_data=True)
+        except Exception as e:
+            self.log('save_outbox error: %s' % e, xbmc.LOGWARNING)
+
+    def _load_outbox(self):
+        try:
+            if not self.service: return
+            raw = self.service.cache.get('syncoutbox', checksum=ADDON_VERSION, json_data=True)
+            if isinstance(raw, str): raw = json.loads(raw)
+            for e in (raw or []):
+                targets = {n: dict(t, fails=0, next=0, sent_ts=None, delivered=False) for n, t in (e.get('targets') or {}).items()}
+                if targets:
+                    self._entries.append({'id': e['id'], 'msg': e['msg'], 'payload': e.get('payload'), 'ts': e.get('ts', time.time()), 'targets': targets})
+                    self._seq = max(self._seq, e['id'])
+            if self._entries:
+                self.log('Restored %d undelivered sync entries' % len(self._entries))
+        except Exception as e:
+            self.log('_load_outbox error: %s' % e, xbmc.LOGWARNING)
 
     def broadcast_refresh(self):
         if not REAL_SETTINGS.getSettingBool('Sync_Enabled'):
@@ -259,6 +578,28 @@ class SyncManager:
         self.log('Broadcasting refresh to %d peers (%d pending)' % (len(self.peers), len(self._pending)))
         threading.Thread(target=self._broadcast_loop, daemon=True).start()
 
+    def wake_peers(self):
+        # Wake-on-LAN: broadcast magic packets for every configured MAC (stdlib only)
+        macs = [m.strip() for m in (REAL_SETTINGS.getSetting('Sync_Wake_MACs') or '').replace(';', ',').split(',') if m.strip()]
+        if not macs:
+            self.log('wake_peers: no MACs configured', xbmc.LOGDEBUG)
+            return 0
+        sent = 0
+        for mac in macs:
+            try:
+                raw = bytes.fromhex(mac.replace(':', '').replace('-', ''))
+                if len(raw) != 6: continue
+                pkt = b'\xff' * 6 + raw * 16
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+                s.sendto(pkt, ('255.255.255.255', 9))
+                s.close()
+                sent += 1
+                self.log('WOL magic packet sent for %s' % mac)
+            except Exception as e:
+                self.log('WOL failed for %s: %s' % (mac, e), xbmc.LOGWARNING)
+        return sent
+
     def _broadcast_loop(self):
         for name, peer in list(self.peers.items()):
             if name in self._pending: continue
@@ -270,7 +611,7 @@ class SyncManager:
         try:
             cmd = {"jsonrpc":"2.0","method":"JSONRPC.NotifyAll",
                    "params":{"sender":ADDON_ID,"message":"RefreshLibrary",
-                             "data":{"ip":self._local_ip,"port":8080,"token":token}},
+                             "data":{"ip":self._local_ip,"port":self._local_web_port,"token":token}},
                    "id":"kodi.powertoys.sync"}
             url = 'http://%s:%d/jsonrpc' % (ip, port)
             req = urllib.request.Request(url, data=json.dumps(cmd).encode('utf-8'))
@@ -283,17 +624,6 @@ class SyncManager:
             self.log('Failed to send refresh to %s:%d: %s' % (ip, port, e), xbmc.LOGWARNING)
             with self._lock:
                 self._pending[token] = {'peer':name,'ip':ip,'port':port,'ts':time.time(),'retries':1}
-
-    def on_confirm(self, data):
-        try:
-            payload = json.loads(data) if isinstance(data, str) else (data or {})
-            token = payload.get('token')
-            with self._lock:
-                entry = self._pending.pop(token, None)
-            if entry:
-                self.log('Refresh confirmed by %s (%s:%d)' % (entry['peer'], entry['ip'], entry['port']))
-        except Exception as e:
-            self.log('on_confirm error: %s' % e, xbmc.LOGWARNING)
 
     def _retry_stale(self):
         now = time.time()
@@ -319,13 +649,17 @@ class Service(object):
         self.monitor  = Monitor(self)
         self.player   = self.monitor.player
         self.queue    = CustomQueue(service=self)
-        self.sync     = SyncManager()
+        self.sync     = SyncManager(self)
         self.pid      = "%s_%s" % (platform.node(), os.getpid())
         self.wait     = REAL_SETTINGS.getSettingInt('Start_Delay')
         self._cache   = {}
         self._tasks   = self._load()
         self._warned  = set()
         self._lastScanRetry = 0
+        self._peerTokens = {}
+        self._shareState = {}
+        self._lastShareCheck = 0
+        self._suppressWatchPush = 0  # deadline; set when applying a remote watched update
 
     def __del__(self):
         self._save()
@@ -360,9 +694,12 @@ class Service(object):
         self.monitor.waitForAbort(self.wait)
         self._detectSources()
         self.sync.start()
+        if REAL_SETTINGS.getSettingBool('WebServer_Enabled'):
+            startWebServer(self)
         while not self.monitor.abortRequested():
             if    self.monitor.waitForAbort(5.0): break
             else: self._run()
+        stopWebServer()
         self.sync.stop()
         self._save()
 
@@ -423,7 +760,36 @@ class Service(object):
         self.log('_pauseWhilePlaying, playback stopped - resuming...')
         return True
 
+    def _onLibraryUpdate(self, method, data):
+        # manual mark-watched (context/skin) -> push fresh state; suppressed right after
+        # we ourselves applied a remote update (breaks A->B->A ping-pong)
+        try:
+            if not REAL_SETTINGS.getSettingBool('Sync_Enabled'): return
+            if time.time() < self._suppressWatchPush: return
+            if isScanning(): return  # scan-driven adds aren't watched changes
+            payload = json.loads(data) if isinstance(data, str) else (data or {})
+            changed = payload.get('changedfields')
+            if changed is not None and not any(('playcount' in str(c) or 'lastplayed' in str(c) or 'resume' in str(c)) for c in changed):
+                return
+            item = payload.get('item') or {}
+            dbtype, dbid = item.get('type'), item.get('id')
+            if dbtype not in ('movie', 'episode') or not dbid: return
+            method, key = (('VideoLibrary.GetMovieDetails', 'movieid') if dbtype == 'movie'
+                           else ('VideoLibrary.GetEpisodeDetails', 'episodeid'))
+            d = sendJSON({"method": method, "params": {key: dbid,
+                          "properties": ["playcount", "lastplayed", "resume", "file"]}}).get('result', {})
+            d = d.get('movie') or d.get('episode') or {}
+            f = d.get('file')
+            if f:
+                self.sync.queue_msg('WatchedUpdate', {'items': {f: {
+                    'playcount': d.get('playcount', 0),
+                    'lastplayed': d.get('lastplayed'),
+                    'resume': d.get('resume')}}})
+        except Exception as e:
+            self.log('_onLibraryUpdate: %s' % e, xbmc.LOGWARNING)
+
     def _run(self):
+        self._watchShares()
         if isScanning():
             return
         if not self._chkIdle():
@@ -453,6 +819,10 @@ class Service(object):
                 with self._chkUpdate(self.runBackup,REAL_SETTINGS.getSettingInt('Backup_Interval_DAYS')): pass
             if not self._playing and REAL_SETTINGS.getSettingBool('Texture_Enabled'):
                 with self._chkUpdate(self.runTexture,REAL_SETTINGS.getSettingInt('Texture_Interval_DAYS')): pass
+            if not self._playing and REAL_SETTINGS.getSettingBool('Music_Enabled'):
+                with self._chkUpdate(self.runMusic,REAL_SETTINGS.getSettingInt('Music_Interval_DAYS')): pass
+            if not self._playing and REAL_SETTINGS.getSettingBool('FreeRam_Enabled'):
+                with self._chkUpdate(self.runRamFree, REAL_SETTINGS.getSettingInt('FreeRam_Interval_HOURS') / 24.0): pass
             self.isRunning = False
    
     def getDirectory(self, path):
@@ -778,27 +1148,234 @@ class Service(object):
             notification(LANGUAGE(32009))
             return False
 
+    def cleanSeason(self, tvshowid, season):
+        try:
+            eps = [e for e in (getEpisodes(tvshowid) or []) if e.get('season') == season]  # module-level: cached self.getEpisodes goes stale after removals
+            if not eps:
+                self.log('cleanSeason, no episodes for showid=%s season=%s' % (tvshowid, season))
+                return True
+            showtitle = eps[0].get('showtitle', '')
+            if self._excluded(showtitle): return False
+            total = 0
+            for e in eps:
+                f = e.get('file', '')
+                if f and xbmcvfs.exists(f):
+                    try:    total += xbmcvfs.Stat(f).st_size()
+                    except Exception: pass
+            body = '%s - Season %d\n%d episode(s), %s' % (showtitle, season, len(eps), format_size(total))
+            if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'): body = '[DRY RUN]\n%s' % body
+            # always confirm, regardless of Dry Run (prompt is unconditional; the gate lives in _removeEpisode)
+            if not xbmcgui.Dialog().yesno(LANGUAGE(32062), body): return False
+            removed = 0
+            for e in eps:
+                if self.monitor.waitForAbort(0.01): return False
+                elif not self._pauseWhilePlaying(): return False
+                if self._removeEpisode(e.get('episodeid'), e.get('file'), 'cleanSeason'): removed += 1
+            if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'): notification(LANGUAGE(32063))
+            else: notification(LANGUAGE(32064) % (removed, len(eps)))
+            return True
+        except Exception as e:
+            self.log('cleanSeason failed! %s' % e, xbmc.LOGERROR)
+            return False
+
+    def markWatched(self, tvshowid, season, watched):
+        try:
+            eps = sendJSON({"method":"VideoLibrary.GetEpisodes",
+                            "params":{"tvshowid":tvshowid,"properties":["season","episode","playcount"]}}).get('result',{}).get('episodes', [])
+            if season is not None: eps = [e for e in eps if e.get('season') == season]
+            if not eps:
+                self.log('markWatched, no episodes for showid=%s season=%s' % (tvshowid, season))
+                return True
+            now = datetime.datetime.now().replace(microsecond=0).isoformat()
+            updated = 0
+            for e in eps:
+                if self.monitor.waitForAbort(0.01): return False
+                params = {'episodeid': e.get('episodeid')}
+                if watched:
+                    params.update({'playcount': (e.get('playcount') or 0) + 1, 'lastplayed': now})
+                else:
+                    params.update({'playcount': 0, 'lastplayed': None, 'resume': None})
+                if sendJSON({"method":"VideoLibrary.SetEpisodeDetails","params":params}).get('result') == 'OK':
+                    updated += 1
+            notification(LANGUAGE(32069) % updated)
+            return True
+        except Exception as e:
+            self.log('markWatched failed! %s' % e, xbmc.LOGERROR)
+            return False
+
+    def _shareRoot(self, path):
+        if not path or not path.startswith(('smb:','nfs:','ftp:','dav:','sftp:')): return None
+        parts = path.split('/')
+        return (f"{parts[0]}//{parts[2]}/{parts[3]}/" if len(parts) >= 4 else f"{parts[0]}//{parts[2]}/") if len(parts) >= 3 else None
+
     def _alertOfflineShares(self):
         if not REAL_SETTINGS.getSettingBool('Alert_Offline_Shares'): return
         for path in [REAL_SETTINGS.getSetting('Scraper_TV_Folder'), REAL_SETTINGS.getSetting('Scraper_Movie_Folder')]:
-            if not path or not path.startswith(('smb:','nfs:','ftp:','dav:','sftp:')): continue
-            parts = path.split('/')
-            root_share = (f"{parts[0]}//{parts[2]}/{parts[3]}/" if len(parts) >= 4 else f"{parts[0]}//{parts[2]}/") if len(parts) >= 3 else None
+            root_share = self._shareRoot(path)
             if root_share and not xbmcvfs.exists(root_share) and root_share not in self._warned:
                 self._warned.add(root_share)
                 self.log('_alertOfflineShares, share offline: %s' % root_share, xbmc.LOGWARNING)
                 notification('%s: %s' % (ADDON_NAME, root_share), header=LANGUAGE(32037), icon=xbmcgui.NOTIFICATION_WARNING, show=True)
+
+    def _watchShares(self):
+        # offline->online transition detection on configured remote sources -> auto-rescan
+        if not REAL_SETTINGS.getSettingBool('Share_Watch_Enabled'): return
+        now = time.time()
+        if now - self._lastShareCheck < 60: return
+        self._lastShareCheck = now
+        for key, path in [('tv', REAL_SETTINGS.getSetting('Scraper_TV_Folder')), ('movie', REAL_SETTINGS.getSetting('Scraper_Movie_Folder'))]:
+            root = self._shareRoot(path)
+            if not root: continue
+            up = xbmcvfs.exists(root)
+            prev = self._shareState.get(root)
+            self._shareState[root] = up
+            if prev is False and up:
+                self.log('_watchShares, share recovered: %s -> rescanning %s' % (root, path))
+                notification(LANGUAGE(32078))
+                self._que(self.scrapeDirectory, 2, path)
 
     def runBackup(self):
         folder = REAL_SETTINGS.getSetting('Backup_Folder')
         if not folder or not xbmcvfs.exists(folder):
             self.log('runBackup, invalid folder: %s' % folder, xbmc.LOGWARNING)
             return False
-        self.log('runBackup, exporting library to %s' % folder)
-        resp = sendJSON({"method":"VideoLibrary.Export","params":{"path":folder,"playlists":False,"movies":{"enabled":True,"thumbnails":False},"tvshows":{"enabled":True,"episodes":True,"thumbnails":False}}})
+        sub = '%s/powertoys-%s' % (folder.rstrip('/\\'), time.strftime('%Y%m%d-%H%M'))
+        xbmcvfs.mkdirs(sub)
+        self.log('runBackup, exporting library to %s' % sub)
+        resp = sendJSON({"method":"VideoLibrary.Export","params":{"path":sub,"playlists":False,"movies":{"enabled":True,"thumbnails":False},"tvshows":{"enabled":True,"episodes":True,"thumbnails":False}}})
         ok = resp.get('result') == 'OK'
-        if ok: notification(LANGUAGE(32036), show=True)
+        if ok:
+            pruned = self._pruneBackups(folder)
+            if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'):
+                if pruned: notification(LANGUAGE(32063))  # dry run never deletes
+            else:
+                notification(LANGUAGE(32036), show=True)
         return ok
+
+    def _pruneBackups(self, folder):
+        # ponytail: automatic prune after a successful export; consent = Backup_Keep_Count setting,
+        # deletions still gated by Dry Run. No prompt possible on an unattended scheduled run.
+        keep = REAL_SETTINGS.getSettingInt('Backup_Keep_Count')
+        if keep <= 0: return 0
+        try:
+            dirs, _files = xbmcvfs.listdir(folder)
+            ours = sorted([d for d in (dirs or []) if d.startswith('powertoys-')], reverse=True)  # timestamp names = chronological
+            pruned = 0
+            for d in ours[keep:]:
+                target = '%s/%s' % (folder.rstrip('/\\'), d)
+                if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'):
+                    self.log('_pruneBackups [DRY RUN] would remove: %s' % target)
+                    pruned += 1
+                    continue
+                if xbmcvfs.rmdir(target, True):
+                    self.log('_pruneBackups removed: %s' % target)
+                    pruned += 1
+            return pruned
+        except Exception as e:
+            self.log('_pruneBackups failed: %s' % e, xbmc.LOGWARNING)
+            return 0
+
+    def runCacheClean(self):
+        # interactive system cache cleanup: always prompt, Dry Run gates the deletes
+        try:
+            tempdir  = xbmcvfs.translatePath('special://temp/')
+            packdir  = xbmcvfs.translatePath('special://packages/')
+            logdir   = xbmcvfs.translatePath('special://logpath/')
+            def dirsize(path):
+                total = 0
+                try:
+                    _dirs, files = xbmcvfs.listdir(path)
+                    for f in (files or []):
+                        try: total += xbmcvfs.Stat(path + f).st_size()
+                        except Exception: pass
+                    for d in (_dirs or []):
+                        total += dirsize(path + d + '/')
+                except Exception: pass
+                return total
+            old_logs = []
+            logsize = 0
+            try:
+                _dirs, files = xbmcvfs.listdir(logdir)
+                for f in (files or []):
+                    if f == 'kodi.log': continue  # active log stays
+                    try:
+                        logsize += xbmcvfs.Stat(logdir + f).st_size()
+                        old_logs.append(logdir + f)
+                    except Exception: pass
+            except Exception: pass
+            t_size, p_size = dirsize(tempdir), dirsize(packdir)
+            body = 'temp: %s\npackages: %s\nold logs: %s\n\nDelete these files?' % (format_size(t_size), format_size(p_size), format_size(logsize))
+            if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'): body = '[DRY RUN]\n%s' % body
+            if not xbmcgui.Dialog().yesno(LANGUAGE(32070), body): return False
+            if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'):
+                notification(LANGUAGE(32063))
+                return True
+            freed, removed = 0, 0
+            def wipe(path):
+                nonlocal freed, removed
+                try:
+                    _dirs, files = xbmcvfs.listdir(path)
+                    for f in (files or []):
+                        try:
+                            sz = xbmcvfs.Stat(path + f).st_size()
+                            if xbmcvfs.delete(path + f): freed += sz; removed += 1
+                        except Exception: pass
+                    for d in (_dirs or []): wipe(path + d + '/')
+                except Exception: pass
+            wipe(tempdir)
+            wipe(packdir)
+            for f in old_logs:
+                try:
+                    if xbmcvfs.delete(f): removed += 1
+                except Exception: pass
+            notification('%s: %s (%d)' % (LANGUAGE(32071), format_size(freed), removed))
+            return True
+        except Exception as e:
+            self.log('runCacheClean failed: %s' % e, xbmc.LOGERROR)
+            return False
+
+    def runRamFree(self):
+        # cross-platform RAM free: Python gc + platform allocator trim + own cache drop
+        try:
+            def freeMB():
+                try: return int(xbmc.getInfoLabel('System.Memory(free)') or 0) // 1048576
+                except Exception: return -1
+            before = freeMB()
+            collected = gc.collect()
+            trimmed = self._trimAllocator()
+            self._cache.clear()  # addon's own in-memory query cache
+            after = freeMB()
+            self.log('runRamFree: gc=%d objects, trim=%s, free %dMB -> %dMB' % (collected, trimmed, before, after))
+            notification(LANGUAGE(32082) % (max(before - after, 0) if before >= 0 and after >= 0 else 0, collected, after))
+            return True
+        except Exception as e:
+            self.log('runRamFree failed: %s' % e, xbmc.LOGERROR)
+            return False
+
+    def _trimAllocator(self):
+        # best-effort per-platform memory trim of Kodi's own process; unsupported platforms no-op.
+        # cannot purge other apps - Kodi's sandbox has no API for that.
+        try:
+            if sys.platform.startswith('linux'):
+                try:
+                    ctypes.CDLL('libc.so.6').malloc_trim(0)  # glibc: return freed heap pages to OS
+                    return 'malloc_trim'
+                except Exception:
+                    try:
+                        ctypes.CDLL(None).mallopt(-100, 0)  # Android bionic M_PURGE; unknown tags no-op
+                        return 'mallopt'
+                    except Exception:
+                        return None
+            elif sys.platform == 'win32':
+                k32 = ctypes.windll.kernel32
+                k32.GetCurrentProcess.restype = ctypes.c_void_p
+                k32.SetProcessWorkingSetSize.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_size_t]
+                # (SIZE_T)-1 trims own working set to minimum; brief page-in churn possible afterwards
+                k32.SetProcessWorkingSetSize(k32.GetCurrentProcess(), ctypes.c_size_t(-1), ctypes.c_size_t(-1))
+                return 'workingset'
+        except Exception as e:
+            self.log('_trimAllocator: %s' % e, xbmc.LOGDEBUG)
+        return None
 
     def runTexture(self):
         try:
@@ -812,54 +1389,76 @@ class Service(object):
             self.log('runTexture failed: %s' % e, xbmc.LOGERROR)
             return False
 
+    def runMusic(self):
+        try:
+            self.log('runMusic, scanning music library')
+            sendJSON({"method":"AudioLibrary.Scan"})
+            if self.monitor.waitForAbort(2.0): return False  # let the scan actually start
+            while not self.monitor.abortRequested() and xbmc.getCondVisibility('Library.IsScanningMusic'):
+                if self.monitor.waitForAbort(1.0): return False
+            if REAL_SETTINGS.getSettingBool('Music_Clean'):
+                self.log('runMusic, cleaning music library')
+                sendJSON({"method":"AudioLibrary.Clean"})
+                if self.monitor.waitForAbort(2.0): return False
+                while not self.monitor.abortRequested() and xbmc.getCondVisibility('Library.IsScanningMusic'):
+                    if self.monitor.waitForAbort(1.0): return False
+            notification(LANGUAGE(32024))
+            return True
+        except Exception as e:
+            self.log('runMusic failed: %s' % e, xbmc.LOGERROR)
+            return False
+
     def healthReport(self):
         try:
-            tvshows = (self.getTVshows() or [])
-            movies  = (self.getMovies() or [])
-            episodes_total, missing, dupes = 0, [], []
-            for show in tvshows:
-                eps = (self.getEpisodes(show.get('tvshowid')) or [])
-                episodes_total += len(eps)
-                eps = [self._episodeKey(e) for e in eps]
-                for e in eps:
-                    if e.get('file') and not xbmcvfs.exists(e.get('file')): missing.append(e.get('file'))
-                for key, group in findDupes(eps, key='episode_key').items():
-                    dupes.append('TV %s: %d copies' % (key, len(group)))
-            missing_movies = [m.get('file') for m in movies if m.get('file') and not xbmcvfs.exists(m.get('file'))]
-            missing.extend(missing_movies)
-            for group in self._movieDuplicateGroups(movies):
-                dupes.append('Movie %s: %d copies' % (group[0].get('label'), len(group)))
-            nxscraper = self.cache.get('runScraper') or 0
-            nxrefresh = self.cache.get('runRefresh') or 0
-            nxtbackup = self.cache.get('runBackup') or 0
-            nxttexture = self.cache.get('runTexture') or 0
-            tex_rows, tex_bytes = cache_stats()
-            lines = [
-                'TV Shows: %d' % len(tvshows),
-                'Episodes: %d' % episodes_total,
-                'Movies: %d' % len(movies),
-                'Texture cache: %d rows, %s' % (tex_rows, format_size(tex_bytes)),
-                '',
-                'Missing files: %d' % len(missing),
-            ]
-            lines.extend('  %s' % m for m in missing[:25])
-            if len(missing) > 25: lines.append('  ... and %d more' % (len(missing) - 25))
-            lines.append('')
-            lines.append('Duplicate groups: %d' % len(dupes))
-            lines.extend('  %s' % d for d in dupes[:25])
-            if len(dupes) > 25: lines.append('  ... and %d more' % (len(dupes) - 25))
-            lines.append('')
-            lines.append('Next scraper run:  %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxscraper)) if nxscraper else 'n/a'))
-            lines.append('Next refresh run:  %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxrefresh)) if nxrefresh else 'n/a'))
-            lines.append('Next backup run:   %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxtbackup)) if nxtbackup else 'n/a'))
-            lines.append('Next texture run:  %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxttexture)) if nxttexture else 'n/a'))
-            report = '\n'.join(lines)
+            report = self._buildReport()
             self.log('healthReport:\n%s' % report)
             xbmcgui.Dialog().textviewer(LANGUAGE(32035), report)
             return True
         except Exception as e:
             self.log('healthReport failed: %s' % e, xbmc.LOGERROR)
             return False
+
+    def _buildReport(self):
+        tvshows = (self.getTVshows() or [])
+        movies  = (self.getMovies() or [])
+        episodes_total, missing, dupes = 0, [], []
+        for show in tvshows:
+            eps = (self.getEpisodes(show.get('tvshowid')) or [])
+            episodes_total += len(eps)
+            eps = [self._episodeKey(e) for e in eps]
+            for e in eps:
+                if e.get('file') and not xbmcvfs.exists(e.get('file')): missing.append(e.get('file'))
+            for key, group in findDupes(eps, key='episode_key').items():
+                dupes.append('TV %s: %d copies' % (key, len(group)))
+        missing_movies = [m.get('file') for m in movies if m.get('file') and not xbmcvfs.exists(m.get('file'))]
+        missing.extend(missing_movies)
+        for group in self._movieDuplicateGroups(movies):
+            dupes.append('Movie %s: %d copies' % (group[0].get('label'), len(group)))
+        nxscraper = self.cache.get('runScraper') or 0
+        nxrefresh = self.cache.get('runRefresh') or 0
+        nxtbackup = self.cache.get('runBackup') or 0
+        nxttexture = self.cache.get('runTexture') or 0
+        tex_rows, tex_bytes = cache_stats()
+        lines = [
+            'TV Shows: %d' % len(tvshows),
+            'Episodes: %d' % episodes_total,
+            'Movies: %d' % len(movies),
+            'Texture cache: %d rows, %s' % (tex_rows, format_size(tex_bytes)),
+            '',
+            'Missing files: %d' % len(missing),
+        ]
+        lines.extend('  %s' % m for m in missing[:25])
+        if len(missing) > 25: lines.append('  ... and %d more' % (len(missing) - 25))
+        lines.append('')
+        lines.append('Duplicate groups: %d' % len(dupes))
+        lines.extend('  %s' % d for d in dupes[:25])
+        if len(dupes) > 25: lines.append('  ... and %d more' % (len(dupes) - 25))
+        lines.append('')
+        lines.append('Next scraper run:  %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxscraper)) if nxscraper else 'n/a'))
+        lines.append('Next refresh run:  %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxrefresh)) if nxrefresh else 'n/a'))
+        lines.append('Next backup run:   %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxtbackup)) if nxtbackup else 'n/a'))
+        lines.append('Next texture run:  %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(nxttexture)) if nxttexture else 'n/a'))
+        return '\n'.join(lines)
 
     def _removeEpisode(self, episode_id, file_path, context=""):
         if not self._verifySource(file_path): return False

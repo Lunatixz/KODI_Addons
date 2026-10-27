@@ -37,7 +37,7 @@ msgid "Scraping"
 msgstr ""
 
 msgctxt "#32002"
-msgid "Service Start Delay (Seconds)"
+msgid "Start delay and idle threshold (seconds)"
 msgstr ""
 
 msgctxt "#32003"
@@ -73,19 +73,19 @@ msgid "Enable Scraper"
 msgstr ""
 
 msgctxt "#32011"
-msgid "Run while Playing"
+msgid "Run tasks while media is playing"
 msgstr ""
 
 msgctxt "#32012"
-msgid "Remove shadow (duplicate) library entries that share the same file name."
+msgid "Also remove duplicate entries during refresh"
 msgstr ""
 
 msgctxt "#32013"
-msgid "Ignore NFO Meta"
+msgid "Ignore local NFO files when refreshing"
 msgstr ""
 
 msgctxt "#32014"
-msgid "Only Run when Idle"
+msgid "Only run when Kodi is idle"
 msgstr ""
 
 msgctxt "#32015"
@@ -93,11 +93,11 @@ msgid "Include Episodes in TV Refresh"
 msgstr ""
 
 msgctxt "#32016"
-msgid "Dry Run [No files/library entries deleted!]."
+msgid "Dry Run (preview only - no entries or files deleted)"
 msgstr ""
 
 msgctxt "#32017"
-msgid "Allow Media Deletion [Duplicate Files will be deleted!]."
+msgid "Also delete duplicate files from disk (permanent)"
 msgstr ""
 
 msgctxt "#32018"
@@ -113,7 +113,7 @@ msgid "Library maintenance complete."
 msgstr ""
 
 msgctxt "#32025"
-msgid "Sync Library Refresh to Network Peers"
+msgid "Sync with network peers"
 msgstr ""
 
 msgctxt "#32026"
@@ -149,7 +149,7 @@ msgid "Backup Interval (Days)"
 msgstr ""
 
 msgctxt "#32034"
-msgid "Enable context menu actions (clean, scan, health report)"
+msgid "Enable PowerToys context menu actions"
 msgstr ""
 
 msgctxt "#32035"
@@ -201,7 +201,7 @@ msgid "General"
 msgstr ""
 
 msgctxt "#32047"
-msgid "Enable texture cache maintenance (prune orphaned artwork, re-cache missing)"
+msgid "Enable texture cache maintenance (prune orphans, clear stale rows)"
 msgstr ""
 
 msgctxt "#32048"

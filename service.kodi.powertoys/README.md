@@ -23,9 +23,24 @@ All destructive operations honor **Dry Run** (enabled by default). Physical file
 
 ---
 
+## Quick Start
+
+1. **Settings → Scraping** — turn on the scraper. TV/Movie source paths are auto-detected from your Kodi video sources; just confirm they look right.
+2. **Settings → Cleaning** — leave **Dry Run** on while you evaluate. Every scheduled and on-demand action previews what it would do without changing anything.
+3. **Addons → Programs → Kodi PowerToys** — run *Library health report* for counts, missing files, duplicates, and next scheduled runs.
+4. Switch on the feature categories you want (Refresh, Texture Cache, Music, Backup, Network Sync, QR Server). Each stays dormant until its toggle is on.
+5. **Settings → Maintenance** — enable *PowerToys context menu actions* to get Clean/Season/Mark-watched items on library rows.
+
+Tips:
+- Set your Kodi **settings level to Advanced or Expert** (bottom of the settings window) to see every option below — Standard hides the advanced ones.
+- New here? Keep Dry Run on for the first few runs and read the prompts/notifications before flipping it off.
+- Everything scheduled skips itself while media is playing (unless you enable running during playback).
+
+---
+
 ## Network Sync
 
-Enabled by **Sync Library Refresh to Network Peers**. Discovery uses Kodi's own `_xbmc-jsonrpc-h._tcp` mDNS announcement, so **"Allow remote control via HTTP" must be enabled in Kodi (Settings → Services → Control)** on every instance. Discovery starts when either Sync or the QR server is enabled.
+Enabled by **Sync with network peers**. Discovery uses Kodi's own `_xbmc-jsonrpc-h._tcp` mDNS announcement, so **"Allow remote control via HTTP" must be enabled in Kodi (Settings → Services → Control)** on every instance. Discovery starts when either Sync or the QR server is enabled.
 
 ### What syncs
 
@@ -185,8 +200,8 @@ Programs menu or context menu. Shows: TV/episode/movie counts, texture cache row
 
 ## Scheduling & Playback Behavior
 
-- **Service start delay** — dual purpose: startup wait *and* the idle threshold (seconds of global idle required before scheduled work runs when **Only Run when Idle** is on).
-- **Run while Playing** (off by default): while something is playing, clean/refresh tasks **pause mid-task and resume** when playback stops; scheduled backup, texture, music, and Free RAM runs are skipped until playback ends; an in-flight directory scan stops waiting.
+- **Service start delay** — dual purpose: startup wait *and* the idle threshold (seconds of global idle required before scheduled work runs when **Only run when Kodi is idle** is on).
+- **Run tasks while media is playing** (off by default): while something is playing, clean/refresh tasks **pause mid-task and resume** when playback stops; scheduled backup, texture, music, and Free RAM runs are skipped until playback ends; an in-flight directory scan stops waiting.
 - **Task persistence** — pending scrape/clean/refresh tasks survive Kodi restarts (cached for 28 days, invalidated on addon upgrade). Sync outbox entries (unconfirmed scans/watched updates) persist too.
 - **Scan error retry** (off by default) — after a scan error, re-queues the scraper with a 1-hour cooldown.
 - **Offline share alert** (off by default) — warns once per share per session when a configured SMB/NFS/FTP/WebDAV source root is unreachable. Independently, **any library-entry removal silently aborts** if its source root is offline (safety guard).
@@ -200,7 +215,6 @@ Programs menu or context menu. Shows: TV/episode/movie counts, texture cache row
 
 1. Forces Python garbage collection (`gc.collect`) over Kodi's interpreter
 2. Best-effort platform memory trim of Kodi's own process — glibc `malloc_trim` (Linux), `mallopt(M_PURGE)` (Android), working-set trim (Windows); unsupported platforms skip gracefully
-3. Drops the addon's in-memory query cache
 
 Reports objects collected and free-memory before/after. Scope is honest: this frees **Kodi's own process** memory; Kodi's sandbox has no API to purge other apps.
 
@@ -212,10 +226,10 @@ Reports objects collected and free-memory before/after. Scope is honest: this fr
 Enable, TV/Movie source paths (auto-detected from video sources when empty), interval in days, progress dialog toggle.
 
 ### Refresh
-Enable + interval. **Only refresh items missing artwork** restricts to items lacking poster/fanart; **blank plot/MPAA QA** is a sub-option that only applies inside art-only mode. Include Episodes in TV Refresh (default on), Ignore NFO Meta (default off — refresh re-reads NFO files when on), Clean during refresh (queues cleans per item *while* refreshing — distinct from "Clean Library after Scan").
+Enable + interval. **Only refresh items missing artwork** restricts to items lacking poster/fanart; **blank plot/MPAA QA** is a sub-option that only applies inside art-only mode. Include Episodes in TV Refresh (default on), Ignore local NFO files when refreshing (default off), Clean during refresh (queues cleans per item *while* refreshing — distinct from "Clean Library after Scan").
 
 ### Cleaning
-Clean after scan, exclude list (**comma-separated, case-insensitive, exact title match**), Dry Run (default on — blocks all removals), Allow Media Deletion (greyed out until Dry Run is off — controls physical file deletion only). Duplicate matching: movies by IMDb number when present, else label+year; episodes by show/season/episode. Quality weighting picks the master copy: 2160p/4K +50, 1080p +30, 720p +10, remux +20, x265/HEVC +15, x264 +5, local (non-network) path +5.
+Clean after scan, exclude list (**comma-separated, case-insensitive, exact title match**), Dry Run (default on — blocks all removals), Also delete duplicate files from disk (permanent — greyed out until Dry Run is off). Duplicate matching: movies by IMDb number when present, else label+year; episodes by show/season/episode. Quality weighting picks the master copy: 2160p/4K +50, 1080p +30, 720p +10, remux +20, x265/HEVC +15, x264 +5, local (non-network) path +5.
 
 ### Texture Cache
 Enable + interval. Pruning covers **network-path textures only** (smb/nfs/ftp/dav/sftp); local artwork is skipped. Re-caching works by deleting stale database rows whose image file is gone — Kodi re-fetches the artwork when next viewed (nothing is downloaded by the addon). **Also delete orphaned thumbnail files from disk** requires both itself on **and** Dry Run off.
@@ -233,10 +247,10 @@ Enable peer sync, Wake-on-LAN MAC addresses (comma-separated).
 Enable, port (9090), optional HTTP Basic Auth credentials.
 
 ### Maintenance
-Retry scraper after scan error (1h cooldown), alert on offline shares, context menu actions (off by default), auto-rescan on share recovery (60s check; triggers when a configured share transitions offline→online), Auto free RAM + interval (hours).
+Enable PowerToys context menu actions (off by default; the first toggle in this category), retry scraper after scan error (1h cooldown), alert on offline shares, auto-rescan on share recovery (60s check; triggers when a configured share transitions offline→online), Auto free RAM + interval (hours).
 
 ### General
-Run while Playing (defers instead of aborting — see above), only run when idle (threshold = start delay), start delay (dual purpose), debugging.
+Run tasks while media is playing (defers instead of aborting — see above), only run when Kodi is idle (threshold = start delay), start delay (dual purpose), debugging.
 
 ---
 

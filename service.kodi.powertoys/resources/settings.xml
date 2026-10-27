@@ -124,14 +124,6 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="Clean_Exclude" type="string" label="32029" help="">
-                    <level>1</level>
-                    <default/>
-                    <constraints><allowempty>true</allowempty></constraints>
-                    <control type="edit" format="string">
-                        <heading>32029</heading>
-                    </control>
-                </setting>
                 <setting id="Dry_Run_Enabled" type="boolean" label="32016" help="">
                     <level>0</level>
                     <default>true</default>
@@ -144,6 +136,14 @@
                     <dependencies>
                         <dependency type="enable" setting="Dry_Run_Enabled">false</dependency>
                     </dependencies>
+                </setting>
+                <setting id="Clean_Exclude" type="string" label="32029" help="">
+                    <level>1</level>
+                    <default/>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="edit" format="string">
+                        <heading>32029</heading>
+                    </control>
                 </setting>
             </group>
         </category>
@@ -171,6 +171,7 @@
                     <control type="toggle"/>
                     <dependencies>
                         <dependency type="enable" setting="Texture_Enabled">true</dependency>
+                        <dependency type="enable" setting="Dry_Run_Enabled">false</dependency>
                     </dependencies>
                 </setting>
             </group>
@@ -214,7 +215,6 @@
                     <level>1</level>
                     <default/>
                     <constraints>
-                        <sources><source>video</source></sources>
                         <allowempty>true</allowempty>
                     </constraints>
                     <control type="button" format="path">
@@ -320,6 +320,11 @@
         </category>
         <category id="maintenance" label="32026" help="">
             <group id="1" label="">
+                <setting id="Report_Context_Menu" type="boolean" label="32034" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="Scan_Retry_On_Error" type="boolean" label="32028" help="">
                     <level>1</level>
                     <default>false</default>
@@ -350,11 +355,6 @@
                     <dependencies>
                         <dependency type="enable" setting="FreeRam_Enabled">true</dependency>
                     </dependencies>
-                </setting>
-                <setting id="Report_Context_Menu" type="boolean" label="32034" help="">
-                    <level>1</level>
-                    <default>false</default>
-                    <control type="toggle"/>
                 </setting>
             </group>
         </category>

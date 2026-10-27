@@ -84,9 +84,6 @@ class CustomQueue:
                 self.log(f"execute failed: {e}", xbmc.LOGERROR)
             if self.monitor.waitForAbort(1.0): break
 
-    def shutdown(self):
-        pass
-
     def snapshot(self):
         with self.lock:
             return [(t.func.__name__, t.args) for t in self.heap]

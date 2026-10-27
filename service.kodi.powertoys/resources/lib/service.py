@@ -34,14 +34,6 @@ class Player(xbmc.Player):
     def log(self, msg, level=xbmc.LOGDEBUG):
         return log('%s: %s'%(self.__class__.__name__,msg),level)
 
-    def isPseudoTV(self):
-        try:
-            sys_info = self.getPlayerItem().getProperty('sysInfo')
-            if not sys_info: return False
-            return '@%s'%(slugify(ADDON_NAME)) in loadJSON(decodeString(sys_info)).get('chid','')
-        except:
-            return False
-
     def onPlayBackStarted(self):
         self.log('onPlayBackStarted')
         if self.service and not REAL_SETTINGS.getSettingBool('Run_Playing'):
@@ -157,8 +149,6 @@ class Monitor(xbmc.Monitor):
                 self.log("Event Intercept -> Library Scan Finished. Injecting optimization pass.")
                 self.service._que(self.service.runClean, priority=5)
             if method in ["VideoLibrary.OnUpdate", "VideoLibrary.OnScanStarted"]:
-                if hasattr(self.service, '_cache'):
-                    self.service._cache.clear()
                 if hasattr(self.service, 'cache'):  # report counts went stale
                     try:    self.service.cache.set('healthreport', '', checksum=ADDON_VERSION, json_data=True)
                     except Exception: pass
@@ -655,7 +645,6 @@ class Service(object):
         self.sync     = SyncManager(self)
         self.pid      = "%s_%s" % (platform.node(), os.getpid())
         self.wait     = REAL_SETTINGS.getSettingInt('Start_Delay')
-        self._cache   = {}
         self._tasks   = self._load()
         self._warned  = set()
         self._lastScanRetry = 0
@@ -770,6 +759,7 @@ class Service(object):
             if not REAL_SETTINGS.getSettingBool('Sync_Enabled'): return
             if time.time() < self._suppressWatchPush: return
             if isScanning(): return  # scan-driven adds aren't watched changes
+            if self.isRunning: return  # our own refresh/scraper pass fires OnUpdate per item - not user intent
             payload = json.loads(data) if isinstance(data, str) else (data or {})
             changed = payload.get('changedfields')
             if changed is not None and not any(('playcount' in str(c) or 'lastplayed' in str(c) or 'resume' in str(c)) for c in changed):
@@ -1195,7 +1185,7 @@ class Service(object):
             if not eps:
                 self.log('markWatched, no episodes for showid=%s season=%s' % (tvshowid, season))
                 return True
-            now = datetime.datetime.now().replace(microsecond=0).isoformat()
+            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Kodi date format, not isoformat 'T'
             updated = 0
             for e in eps:
                 if self.monitor.waitForAbort(0.01): return False
@@ -1354,7 +1344,7 @@ class Service(object):
             return False
 
     def runRamFree(self):
-        # cross-platform RAM free: Python gc + platform allocator trim + own cache drop
+        # cross-platform RAM free: Python gc plus a best-effort platform allocator trim
         try:
             def freeMB():
                 try: return int(xbmc.getInfoLabel('System.Memory(free)') or 0) // 1048576
@@ -1362,7 +1352,6 @@ class Service(object):
             before = freeMB()
             collected = gc.collect()
             trimmed = self._trimAllocator()
-            self._cache.clear()  # addon's own in-memory query cache
             after = freeMB()
             self.log('runRamFree: gc=%d objects, trim=%s, free %dMB -> %dMB' % (collected, trimmed, before, after))
             notification(LANGUAGE(32082) % (max(before - after, 0) if before >= 0 and after >= 0 else 0, collected, after))

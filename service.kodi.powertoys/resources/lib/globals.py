@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Kodi PowerToys.  If not, see <http://www.gnu.org/licenses/>.
 # -*- coding: utf-8 -*-
-import time, traceback, json, os, platform, re, base64, zlib
+import time, traceback, json, os, platform
 import datetime, heapq, random, sys
 
 try:    from simplecache             import SimpleCache
@@ -36,8 +36,6 @@ ADDON_VERSION       = REAL_SETTINGS.getAddonInfo('version')
 ICON                = REAL_SETTINGS.getAddonInfo('icon')
 FANART              = REAL_SETTINGS.getAddonInfo('fanart')
 LANGUAGE            = REAL_SETTINGS.getLocalizedString
-
-DEFAULT_ENCODING    = "utf-8"
 
 def log(msg, level=xbmc.LOGDEBUG):
     if not REAL_SETTINGS.getSettingBool('Enable_Debugging') and level != xbmc.LOGERROR: return
@@ -88,20 +86,6 @@ def isScanning():
 
 def isPlaying():
     return (xbmc.getCondVisibility('Player.Playing') or False)
-
-def decodeString(base64_bytes):
-    try:
-        message_bytes = zlib.decompress(base64.b64decode(base64_bytes.encode(DEFAULT_ENCODING)))
-        return message_bytes.decode(DEFAULT_ENCODING)
-    except Exception as e: return ''
-
-def slugify(s, lowercase=False):
-  if lowercase: s = s.lower()
-  s = s.strip()
-  s = re.sub(r'[^\w\s-]', '', s)
-  s = re.sub(r'[\s_-]+', '_', s)
-  s = re.sub(r'^-+|-+$', '', s)
-  return s
 
 def findDupes(items=[], key='label'):
     if items is None: items = []

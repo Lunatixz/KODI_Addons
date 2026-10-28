@@ -855,7 +855,7 @@ Matching and output
     </extension>
 </addon>
 
-<addon id="service.kodi.powertoys" version="1.3.3" name="Kodi PowerToys" provider-name="Lunatixz">
+<addon id="service.kodi.powertoys" version="1.3.4" name="Kodi PowerToys" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.kodi-six" version="0.1.3.1"/>
@@ -866,49 +866,57 @@ Matching and output
     <extension point="xbmc.python.script" library="resources/lib/menu.py">
         <provides>executable</provides>
     </extension>
-    <extension point="kodi.context.item">
-        <menu>
-            <item library="resources/lib/context.py" args="clean_show">
-                <label>$ADDON[service.kodi.powertoys 32038]</label>
-                <visible>Container.Content(tvshows)</visible>
-            </item>
-            <item library="resources/lib/context.py" args="clean_movie">
-                <label>$ADDON[service.kodi.powertoys 32039]</label>
-                <visible>Container.Content(movies)</visible>
-            </item>
-            <item library="resources/lib/context.py" args="remove_movie">
-                <label>$ADDON[service.kodi.powertoys 32087]</label>
-                <visible>Container.Content(movies)</visible>
-            </item>
-            <item library="resources/lib/context.py" args="scan_folder">
-                <label>$ADDON[service.kodi.powertoys 32040]</label>
-                <visible>Container.Content(files) | Container.Content(video)</visible>
-            </item>
-            <item library="resources/lib/context.py" args="health_report">
-                <label>$ADDON[service.kodi.powertoys 32041]</label>
-                <visible>true</visible>
-            </item>
-            <item library="resources/lib/context.py" args="clean_season">
-                <label>$ADDON[service.kodi.powertoys 32062]</label>
-                <visible>ListItem.DBType = season</visible>
-            </item>
-            <item library="resources/lib/context.py" args="mark_watched_season">
-                <label>$ADDON[service.kodi.powertoys 32065]</label>
-                <visible>ListItem.DBType = season</visible>
-            </item>
-            <item library="resources/lib/context.py" args="mark_watched_show">
-                <label>$ADDON[service.kodi.powertoys 32066]</label>
-                <visible>Container.Content(tvshows)</visible>
-            </item>
-            <item library="resources/lib/context.py" args="remove_show">
-                <label>$ADDON[service.kodi.powertoys 32089]</label>
-                <visible>Container.Content(tvshows)</visible>
-            </item>
-            <item library="resources/lib/context.py" args="remove_episode">
-                <label>$ADDON[service.kodi.powertoys 32088]</label>
-                <visible>ListItem.DBType = episode</visible>
-            </item>
-        </menu>
+    <extension point="kodi.context.item" library="resources/lib/context.py">
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32038]</label>
+            <visible>Container.Content(tvshows)</visible>
+            <args>clean_show</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32039]</label>
+            <visible>Container.Content(movies)</visible>
+            <args>clean_movie</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32087]</label>
+            <visible>Container.Content(movies)</visible>
+            <args>remove_movie</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32040]</label>
+            <visible>Container.Content(files) | Container.Content(video)</visible>
+            <args>scan_folder</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32041]</label>
+            <visible>true</visible>
+            <args>health_report</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32062]</label>
+            <visible>ListItem.DBType = season</visible>
+            <args>clean_season</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32065]</label>
+            <visible>ListItem.DBType = season</visible>
+            <args>mark_watched_season</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32066]</label>
+            <visible>Container.Content(tvshows)</visible>
+            <args>mark_watched_show</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32089]</label>
+            <visible>Container.Content(tvshows)</visible>
+            <args>remove_show</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32088]</label>
+            <visible>ListItem.DBType = episode</visible>
+            <args>remove_episode</args>
+        </item>
     </extension>
     <extension point="xbmc.addon.metadata">
         <license>GPL-3.0-or-later</license>
@@ -931,7 +939,7 @@ Sync: broadcasts library refresh to network peers (zeroconf discovery) with conf
 Maintenance: scan-error retry, offline-share alerts, context menu actions (clean show/movie, scan folder, health report).
 All destructive operations honor Dry Run, and file deletion is a separate opt-in.</description>
         <news>
-v1.3.0 (2026-10-26)
+v1.3.4 (2026-10-26)
 - Add: peer scan push - scan commands received by any instance are queued and retried until every networked PowerToys instance confirms (paths propagate; offline peers picked up on wake)
 - Add: watched/resume state sync across peers - playback progress and manual mark-watched propagate automatically (newest lastplayed wins)
 - Add: season cleanup - context menu deletes a season's files and library entries behind an always-on confirmation, gated by Dry Run

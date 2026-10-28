@@ -23,7 +23,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 WEB_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'web')
 
 class PowerToysHandler(BaseHTTPRequestHandler):
-    server_version = 'PowerToys/1.2.0'
+    server_version = 'PowerToys/1.3.4'
 
     def log_message(self, fmt, *args):
         log('webserver: %s - %s' % (self.address_string(), fmt % args))

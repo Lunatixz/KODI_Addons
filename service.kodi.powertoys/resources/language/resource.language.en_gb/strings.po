@@ -245,7 +245,7 @@ msgid "Dry Run: no changes were made."
 msgstr ""
 
 msgctxt "#32064"
-msgid "Removed: %d of %d episodes"
+msgid "Removed: %d of %d entries"
 msgstr ""
 
 msgctxt "#32065"
@@ -326,6 +326,26 @@ msgstr ""
 
 msgctxt "#32084"
 msgid "Free RAM interval (Hours)"
+msgstr ""
+
+msgctxt "#32085"
+msgid "Nothing to clean - no missing or duplicate entries found"
+msgstr ""
+
+msgctxt "#32086"
+msgid "Queued - will run after playback stops"
+msgstr ""
+
+msgctxt "#32087"
+msgid "PowerToys: Remove this movie"
+msgstr ""
+
+msgctxt "#32088"
+msgid "PowerToys: Remove this episode"
+msgstr ""
+
+msgctxt "#32089"
+msgid "PowerToys: Remove this show"
 msgstr ""
 
 msgctxt "#32056"

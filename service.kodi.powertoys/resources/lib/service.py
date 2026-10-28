@@ -125,6 +125,11 @@ class Monitor(xbmc.Monitor):
         
     def log(self, msg, level=xbmc.LOGDEBUG):
         log('%s: %s'%(self.__class__.__name__,msg),level)
+
+    def _toastIfPlaying(self):
+        # queued context work waits silently in the queue otherwise - say so up front
+        if self.service and getattr(self.service, '_playing', False):
+            notification(LANGUAGE(32086))
         
     def onNotification(self, sender, method, data):
         self.log("onNotification, sender %s - method: %s  - data: %s" % (sender, method, data))
@@ -191,7 +196,9 @@ class Monitor(xbmc.Monitor):
             if sender == ADDON_ID and method.endswith(".CleanTVShow"):
                 try:
                     tvshowid = int((json.loads(data) if isinstance(data, str) else (data or {})).get('tvshowid', -1))
-                    if tvshowid >= 0 and self.service: self.service._que(self.service.cleanTV, 3, tvshowid)
+                    if tvshowid >= 0 and self.service:
+                        self.service._que(self.service.cleanTV, 1, tvshowid, None, True)
+                        self._toastIfPlaying()
                 except Exception as e: self.log('CleanTVShow error: %s' % e, xbmc.LOGWARNING)
             if sender == ADDON_ID and method.endswith(".CleanMovie"):
                 try:
@@ -201,26 +208,54 @@ class Monitor(xbmc.Monitor):
                         movies = [m for m in (self.service.getMovies() or []) if m.get('movieid') == movieid]
                         if movies:
                             group = next((g for g in self.service._movieDuplicateGroups(self.service.getMovies() or []) if any(m.get('movieid') == movieid for m in g)), movies)
-                            self.service._que(self.service.cleanMovies, 3, group)
+                            self.service._que(self.service.cleanMovies, 1, group, None, True)
+                            self._toastIfPlaying()
                 except Exception as e: self.log('CleanMovie error: %s' % e, xbmc.LOGWARNING)
             if sender == ADDON_ID and method.endswith(".CleanSeason"):
                 try:
                     payload = json.loads(data) if isinstance(data, str) else (data or {})
                     tvshowid, season = int(payload.get('tvshowid', -1)), int(payload.get('season', -99))
-                    if tvshowid >= 0 and season > -99 and self.service: self.service._que(self.service.cleanSeason, 3, tvshowid, season)
+                    if tvshowid >= 0 and season > -99 and self.service:
+                        self.service._que(self.service.cleanSeason, 1, tvshowid, season)
+                        self._toastIfPlaying()
                 except Exception as e: self.log('CleanSeason error: %s' % e, xbmc.LOGWARNING)
             if sender == ADDON_ID and method.endswith(".WatchSeason"):
                 try:
                     payload = json.loads(data) if isinstance(data, str) else (data or {})
                     tvshowid, season, watched = int(payload.get('tvshowid', -1)), int(payload.get('season', -99)), bool(payload.get('watched', True))
-                    if tvshowid >= 0 and season > -99 and self.service: self.service._que(self.service.markWatched, 3, tvshowid, season, watched)
+                    if tvshowid >= 0 and season > -99 and self.service:
+                        self.service._que(self.service.markWatched, 1, tvshowid, season, watched)
+                        self._toastIfPlaying()
                 except Exception as e: self.log('WatchSeason error: %s' % e, xbmc.LOGWARNING)
             if sender == ADDON_ID and method.endswith(".WatchShow"):
                 try:
                     payload = json.loads(data) if isinstance(data, str) else (data or {})
                     tvshowid, watched = int(payload.get('tvshowid', -1)), bool(payload.get('watched', True))
-                    if tvshowid >= 0 and self.service: self.service._que(self.service.markWatched, 3, tvshowid, None, watched)
+                    if tvshowid >= 0 and self.service:
+                        self.service._que(self.service.markWatched, 1, tvshowid, None, watched)
+                        self._toastIfPlaying()
                 except Exception as e: self.log('WatchShow error: %s' % e, xbmc.LOGWARNING)
+            if sender == ADDON_ID and method.endswith(".RemoveMovie"):
+                try:
+                    movieid = int((json.loads(data) if isinstance(data, str) else (data or {})).get('movieid', -1))
+                    if movieid >= 0 and self.service:
+                        self.service._que(self.service.removeMovieEntry, 1, movieid)
+                        self._toastIfPlaying()
+                except Exception as e: self.log('RemoveMovie error: %s' % e, xbmc.LOGWARNING)
+            if sender == ADDON_ID and method.endswith(".RemoveEpisode"):
+                try:
+                    episodeid = int((json.loads(data) if isinstance(data, str) else (data or {})).get('episodeid', -1))
+                    if episodeid >= 0 and self.service:
+                        self.service._que(self.service.removeEpisodeEntry, 1, episodeid)
+                        self._toastIfPlaying()
+                except Exception as e: self.log('RemoveEpisode error: %s' % e, xbmc.LOGWARNING)
+            if sender == ADDON_ID and method.endswith(".RemoveTVShow"):
+                try:
+                    tvshowid = int((json.loads(data) if isinstance(data, str) else (data or {})).get('tvshowid', -1))
+                    if tvshowid >= 0 and self.service:
+                        self.service._que(self.service.removeShowEntry, 1, tvshowid)
+                        self._toastIfPlaying()
+                except Exception as e: self.log('RemoveTVShow error: %s' % e, xbmc.LOGWARNING)
             if sender == ADDON_ID and method.endswith(".ScanFolder"):
                 try:
                     payload = json.loads(data) if isinstance(data, str) else (data or {})
@@ -886,9 +921,14 @@ class Service(object):
                     self._tasks.setdefault('scrapeDirectory',set()).add(file.get('file'))
         return True
 
-    def cleanTV(self, tvshowid, show_dialog=None):
+    def cleanTV(self, tvshowid, show_dialog=None, feedback=False):
         pDialog     = None
         processed   = set()
+        attempts = removed = 0
+        def rm(eid, fpath, ctx):
+            nonlocal attempts, removed
+            attempts += 1
+            if self._removeEpisode(eid, fpath, ctx): removed += 1
         episodes    = (self.getEpisodes(tvshowid) or [])
         message     = '[DRY RUN] Processing:' if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled') else 'Processing:'
         if episodes and self._excluded(episodes[0].get('showtitle')):
@@ -911,7 +951,7 @@ class Service(object):
             elif not xbmcvfs.exists(episode.get('file', '')):
                 self.log('cleanTV, episode file no longer exists: %s' % episode.get('file'))
                 if pDialog: pDialog.update(percent, message="%s %s\nAbandoned: %s" % (message,episode.get('showtitle',tvshowid),episode.get('label', '')))
-                self._removeEpisode(episode.get('episodeid'), episode.get('file'), "cleanTV (Missing File)")
+                rm(episode.get('episodeid'), episode.get('file'), "cleanTV (Missing File)")
             else:
                 if episode.get('episode_key') in processed: continue
                 shadow_copies = sorted(duplicates.get(episode.get('episode_key'),{}), key=lambda x: self.get_stream_weight(x.get('file', '')), reverse=True)
@@ -927,7 +967,7 @@ class Service(object):
                         #todo playcount shadow_copy and add to master_copy?
                         if not xbmcvfs.exists(shadow_copy.get('file')):
                             self.log('cleanTV, shadow entry file no longer exists: %s' % shadow_copy.get('file'))
-                            self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Missing File)")
+                            rm(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Missing File)")
 
                         elif master_copy.get('file','-1') == shadow_copy.get('file','0'):
                             if master_copy.get('episode') != shadow_copy.get('episode'):
@@ -935,17 +975,23 @@ class Service(object):
                                 continue
                             elif master_copy.get('episodeid',-1) != shadow_copy.get('episodeid'):
                                 self.log('cleanTV, duplicate shadow entry detected: %s' % shadow_copy.get('file'))
-                                self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Shadow Duplicate)")
+                                rm(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Shadow Duplicate)")
 
                         elif master_copy.get('file','-1') != shadow_copy.get('file','0'):
                             self.log('cleanTV, duplicate entry detected: %s' % shadow_copy.get('file'))
-                            self._removeEpisode(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Physical Duplicate)")
+                            rm(shadow_copy.get('episodeid'), shadow_copy.get('file'), "cleanTV (Physical Duplicate)")
 
         if pDialog: pDialog.close()
+        if feedback: self._cleanFeedback(attempts, removed)
         return True
 
-    def cleanMovies(self, movies, show_dialog=None):
+    def cleanMovies(self, movies, show_dialog=None, feedback=False):
         pDialog = None
+        attempts = removed = 0
+        def rm(mid, fpath, ctx):
+            nonlocal attempts, removed
+            attempts += 1
+            if self._removeMovie(mid, fpath, ctx): removed += 1
         movies = [movie for movie in (movies or []) if movie]
         if not movies: return True
         if self._excluded(movies[0].get('label')):
@@ -966,7 +1012,7 @@ class Service(object):
             if xbmcvfs.exists(master_copy.get('file')): break
             else: 
                 self.log('cleanMovies, movie file no longer exists: %s' % master_copy.get('file'))
-                self._removeMovie(master_copy.get('movieid'), master_copy.get('file'), "cleanMovies (Missing File)")
+                rm(master_copy.get('movieid'), master_copy.get('file'), "cleanMovies (Missing File)")
         if master_copy:
             self.log("cleanMovies, duplicate movies detected (%s) - %s" % (len(movies), master_copy.get('label')))
             for midx, movie in enumerate(shadow_copies):
@@ -977,18 +1023,19 @@ class Service(object):
                 elif not xbmcvfs.exists(movie.get('file')):
                     self.log('cleanMovies, movie file no longer exists: %s' % movie.get('file'))
                     if pDialog: pDialog.update(percent, message="%s\nAbandoned: %s" % (message,movie.get('label','')))
-                    self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Missing File)")
+                    rm(movie.get('movieid'), movie.get('file'), "cleanMovies (Missing File)")
                 else:
                     if pDialog: pDialog.update(percent, message="Processing: %s" % movie.get('label', ''))
                     if master_copy.get('movieid',-1) != movie.get('movieid'):
                         if master_copy.get('file','-1') == movie.get('file','0'):
                             self.log('cleanMovies, duplicate shadow entry detected: %s' % master_copy.get('file'))
-                            self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Shadow copy)")
+                            rm(movie.get('movieid'), movie.get('file'), "cleanMovies (Shadow copy)")
                         else:
                             self.log('cleanMovies, physical duplicate detected: %s' % movie.get('file'))
-                            self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Physical Duplicate)")
+                            rm(movie.get('movieid'), movie.get('file'), "cleanMovies (Physical Duplicate)")
                             
         if pDialog: pDialog.close()
+        if feedback: self._cleanFeedback(attempts, removed)
         return True
        
     def refreshTV(self, shows=[]):
@@ -1142,6 +1189,7 @@ class Service(object):
             return False
 
     def cleanSeason(self, tvshowid, season):
+        # confirmation happens in the context script; this runs the confirmed, gated pass
         try:
             eps = [e for e in (getEpisodes(tvshowid) or []) if e.get('season') == season]  # module-level: cached self.getEpisodes goes stale after removals
             if not eps:
@@ -1149,16 +1197,6 @@ class Service(object):
                 return True
             showtitle = eps[0].get('showtitle', '')
             if self._excluded(showtitle): return False
-            total = 0
-            for e in eps:
-                f = e.get('file', '')
-                if f and xbmcvfs.exists(f):
-                    try:    total += xbmcvfs.Stat(f).st_size()
-                    except Exception: pass
-            body = '%s - Season %d\n%d episode(s), %s' % (showtitle, season, len(eps), format_size(total))
-            if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'): body = '[DRY RUN]\n%s' % body
-            # always confirm, regardless of Dry Run (prompt is unconditional; the gate lives in _removeEpisode)
-            if not xbmcgui.Dialog().yesno(LANGUAGE(32062), body): return False
             pDialog = xbmcgui.DialogProgressBG()
             pDialog.create(ADDON_NAME, 'Processing season...')
             removed = 0
@@ -1200,6 +1238,75 @@ class Service(object):
             return True
         except Exception as e:
             self.log('markWatched failed! %s' % e, xbmc.LOGERROR)
+            return False
+
+    def removeMovieEntry(self, movieid):
+        # prompt already shown by the context script; this runs the confirmed, gated removal
+        try:
+            d = sendJSON({"method":"VideoLibrary.GetMovieDetails",
+                          "params":{"movieid":movieid,"properties":["label","file"]}}).get('result',{}).get('movie')
+            if not d:
+                notification(LANGUAGE(32085))
+                return False
+            if self._excluded(d.get('label')):
+                self.log('removeMovieEntry, excluded: %s' % d.get('label'))
+                return False
+            removed = 1 if self._removeMovie(movieid, d.get('file',''), 'removeMovieEntry') else 0
+            self._cleanFeedback(1, removed)
+            return True
+        except Exception as e:
+            self.log('removeMovieEntry failed! %s' % e, xbmc.LOGERROR)
+            return False
+
+    def removeEpisodeEntry(self, episodeid):
+        # prompt already shown by the context script; same gates as every other library/file removal
+        try:
+            d = sendJSON({"method":"VideoLibrary.GetEpisodeDetails",
+                          "params":{"episodeid":episodeid,"properties":["file","showtitle"]}}).get('result',{}).get('episode')
+            if not d:
+                notification(LANGUAGE(32085))
+                return False
+            if self._excluded(d.get('showtitle')):
+                self.log('removeEpisodeEntry, excluded show: %s' % d.get('showtitle'))
+                return False
+            removed = 1 if self._removeEpisode(episodeid, d.get('file',''), 'removeEpisodeEntry') else 0
+            self._cleanFeedback(1, removed)
+            return True
+        except Exception as e:
+            self.log('removeEpisodeEntry failed! %s' % e, xbmc.LOGERROR)
+            return False
+
+    def removeShowEntry(self, tvshowid):
+        # prompt already shown by the context script; show row only drops when every episode
+        # entry actually went - never bypasses an offline-share abort
+        try:
+            d = sendJSON({"method":"VideoLibrary.GetTVShowDetails",
+                          "params":{"tvshowid":tvshowid,"properties":["title"]}}).get('result',{}).get('tvshow')
+            title = (d or {}).get('title', '')
+            if self._excluded(title):
+                self.log('removeShowEntry, excluded: %s' % title)
+                return False
+            if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'):
+                notification(LANGUAGE(32063))
+                return True
+            eps = getEpisodes(tvshowid) or []  # module-level: fresh, not the cached wrapper
+            attempts = removed = 0
+            def rm(e):
+                nonlocal attempts, removed
+                attempts += 1
+                if self._removeEpisode(e.get('episodeid'), e.get('file'), 'removeShowEntry'): removed += 1
+            for e in eps:
+                if self.monitor.waitForAbort(0.01): return False
+                elif not self._pauseWhilePlaying(): return False
+                rm(e)
+            if removed == attempts:  # everything actually went - safe to drop the show row too
+                if sendJSON({"method":"VideoLibrary.RemoveTVShow","params":{"tvshowid":tvshowid}}).get('result') == 'OK':
+                    attempts += 1
+                    removed += 1
+            self._cleanFeedback(attempts, removed)
+            return True
+        except Exception as e:
+            self.log('removeShowEntry failed! %s' % e, xbmc.LOGERROR)
             return False
 
     def _shareRoot(self, path):
@@ -1512,6 +1619,12 @@ class Service(object):
         if removeMovie(movie_id) and REAL_SETTINGS.getSettingBool('Delete_Enabled'):
             xbmcvfs.delete(file_path)
         return True
+
+    def _cleanFeedback(self, attempts, removed):
+        # context actions must always answer: what was found, what changed, or that nothing matched
+        if attempts <= 0:            notification(LANGUAGE(32085))
+        elif REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'): notification(LANGUAGE(32063))
+        else:                        notification(LANGUAGE(32064) % (removed, attempts))
 
 
 if __name__ == '__main__': Service()._start()

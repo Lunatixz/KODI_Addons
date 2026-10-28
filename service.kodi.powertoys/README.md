@@ -166,19 +166,26 @@ Enabled by **Enable context menu actions** (off by default — enable it first).
 | Item | Visible on | Action |
 |---|---|---|
 | PowerToys: Clean this show | TV shows | Removes missing episodes + duplicate entries for that show |
+| PowerToys: Remove this movie | Movies | Removes the selected movie entry (and file, per gates) |
 | PowerToys: Clean this movie | Movies | Cleans the clicked movie's whole duplicate group |
-| PowerToys: Clean this season | **Season rows only** | See Season Cleanup below |
+| PowerToys: Delete this season | **Season rows only** | See Season Cleanup below |
+| PowerToys: Remove this episode | **Episode rows only** | Removes the selected episode entry (and file, per gates) |
 | PowerToys: Mark season watched | **Season rows only** | Watched/unwatched choice applied to every episode in the season |
 | PowerToys: Mark show watched | TV shows | Watched/unwatched choice applied to every episode in the show |
+| PowerToys: Remove this show | TV shows | Removes every season/episode entry plus the show itself (files per gates) |
 | PowerToys: Scan this folder | Files/video | Queues a scan of the selected path (and pushes it to peers) |
 | PowerToys: Library health report | Everywhere | Same report as the Programs menu |
+
+Confirmation prompts fire **immediately when you click** (before anything queues), and confirmed actions run at high priority in click order — so you can confirm one item after another without waiting on running scans or long tasks. Every prompt ends with an explicit action line stating exactly what confirming does: library removal, plus file deletion or "files kept on disk" based on your Allow Media Deletion / Dry Run settings.
+
+Every clean/mark action answers with a notification: how many entries were removed (or would be, under Dry Run), a "nothing to clean" notice when the item is healthy, or a "queued" notice if media is playing and the work will run after playback stops.
 
 ### Season cleanup
 
 One action removes an entire season — both the files on disk and the library entries:
 
 1. Select the season row → **Delete this season**
-2. Preview shows show, season, episode count, and total size, prefixed `[DRY RUN]` when Dry Run is on
+2. The prompt shows show, season, episode count, and total size, then states exactly what confirming does (library removal, file deletion per settings), prefixed `[DRY RUN]` when Dry Run is on
 3. **One yes/no confirmation always appears**, regardless of the Dry Run setting
 4. Deletion runs through the shared removal path, which enforces the gates:
 

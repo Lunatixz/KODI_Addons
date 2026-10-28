@@ -860,7 +860,7 @@ Reliability fixes
     </extension>
 </addon>
 
-<addon id="service.kodi.powertoys" version="1.3.2" name="Kodi PowerToys" provider-name="Lunatixz">
+<addon id="service.kodi.powertoys" version="1.3.3" name="Kodi PowerToys" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.kodi-six" version="0.1.3.1"/>
@@ -881,6 +881,11 @@ Reliability fixes
             <label>$ADDON[service.kodi.powertoys 32039]</label>
             <visible>Container.Content(movies)</visible>
             <args>clean_movie</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32087]</label>
+            <visible>Container.Content(movies)</visible>
+            <args>remove_movie</args>
         </item>
         <item>
             <label>$ADDON[service.kodi.powertoys 32040]</label>
@@ -906,6 +911,16 @@ Reliability fixes
             <label>$ADDON[service.kodi.powertoys 32066]</label>
             <visible>Container.Content(tvshows)</visible>
             <args>mark_watched_show</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32089]</label>
+            <visible>Container.Content(tvshows)</visible>
+            <args>remove_show</args>
+        </item>
+        <item>
+            <label>$ADDON[service.kodi.powertoys 32088]</label>
+            <visible>ListItem.DBType = episode</visible>
+            <args>remove_episode</args>
         </item>
     </extension>
     <extension point="xbmc.addon.metadata">
@@ -946,6 +961,9 @@ v1.3.0 (2026-10-26)
 - Change: settings reorganized - logical tab order, Dry Run/delete pair grouped, context-menu toggle now visible at Standard settings level, texture delete option greyed out until Dry Run is off, backup folder can browse any path
 - Change: setting labels rewritten for clarity (start delay/idle threshold, dry run, delete, NFO, sync, texture wording)
 - Change: dead code removed (legacy default.py, unused helpers and cache)
+- Fix: context clean actions now always answer - result notification with counts, a "nothing to clean" notice, or a "queued until playback stops" notice when clicked during playback
+- Add: one-click removal context items - remove selected movie, selected episode, or entire show; always confirmed, library changes gated by Dry Run, file deletion gated by Allow Media Deletion (season removal was already covered by Delete this season)
+- Change: context prompts now fire immediately on click and confirmed actions queue at high priority in click order, so multi-item removals breeze through without waiting on running scans; every prompt spells out exactly what confirming will do (library removal, file deletion per settings)
 - Change: README rewritten to document all features and APIs, with a Quick Start for new users
 v1.2.0 (2026-10-26)
 - Add: QR Action Server — built-in web page to stack JSON-RPC commands, generate a QR code, and execute on any discovered Kodi instance from your phone

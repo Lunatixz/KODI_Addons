@@ -77,7 +77,7 @@ msgid "Business & Legal"
 msgstr ""
 
 msgctxt "#30017"
-msgid ""Education"
+msgid "Education"
 msgstr ""
 
 msgctxt "#30018"

@@ -39,11 +39,6 @@ AI reliability and cost
 
 Matching and output
 - Entries matched to real library titles/files: unique-id wins, title matches must agree on year, episodes match by show+season+episode
-- AI returns episode numbers, years, and reference IDs (imdb/tmdb/trakt/tvdb); no entry limit; chronological ordering
-- File-name collision handling; auto Container.Refresh after builds
-
-Reliability fixes
-- Stale "build running" lock auto-expires; failed builds no longer record a build timestamp; missing XSP files are rebuilt on startup/auto-runs; progress dialog always closed; faster library matching
 </news>
         <reuselanguageinvoker>false</reuselanguageinvoker>
         <assets>

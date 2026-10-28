@@ -7,27 +7,56 @@ jobs:
     runs-on: ubuntu-latest
     name: Kodi addon checker
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
     - name: Set up Python 3.14
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v6
       with:
         python-version: 3.14
     - name: Install addon checker
       run: |
         pip install -q kodi-addon-checker
+    # mirrors.kodi.tv rotates to random mirrors: a dead one leaves Repository
+    # without .addons (AttributeError crash) and retry backoff stalls the run
+    # for minutes. Use a stable mirror instead; keep .addons init as fallback.
+    # Also tolerate legacy repo versions (e.g. screensaver.system47 '2.2h')
+    # that modern packaging rejects with InvalidVersion.
+    - name: Patch checker against dead Kodi mirrors
+      run: |
+        python -c "
+        import pathlib, kodi_addon_checker as k
+        root = pathlib.Path(k.__file__).parent
+        p = root / 'addons' / 'Repository.py'
+        s = p.read_text(encoding='utf-8')
+        old = '        try:\n            response = self._session.get'
+        assert old in s, 'pattern not found'
+        p.write_text(s.replace(old, '        self.addons = []\n' + old, 1), encoding='utf-8')
+        p2 = root / 'check_addon.py'
+        s2 = p2.read_text(encoding='utf-8')
+        old2 = 'http://mirrors.kodi.tv/addons/{branch}/addons.xml.gz'
+        assert old2 in s2, 'ROOT_URL not found'
+        p2.write_text(s2.replace(old2, 'https://mirror.netcologne.de/xbmc/addons/{branch}/addons.xml.gz', 1), encoding='utf-8')
+        p3 = root / 'versions.py'
+        s3 = p3.read_text(encoding='utf-8')
+        old3 = '        self.version = parse(str(version).lower())'
+        new3 = '        try:\n            self.version = parse(str(version).lower())\n        except Exception:\n            self.version = parse(\'0\')'
+        assert old3 in s3, 'AddonVersion parse line not found'
+        p3.write_text(s3.replace(old3, new3, 1), encoding='utf-8')
+        print('patched Repository.py + check_addon.py + versions.py')
+        "
     - name: Check with addon-checker
       run: |
-        kodi-addon-checker --branch omega plugin.program.smartplaylist.generator
-        kodi-addon-checker --branch omega plugin.video.channelsdvr
-        kodi-addon-checker --branch omega plugin.video.hdhomerun.simple
-        kodi-addon-checker --branch omega plugin.video.ispot.tv
-        kodi-addon-checker --branch omega plugin.video.playonbrowser
-        kodi-addon-checker --branch omega screensaver.bing
-        kodi-addon-checker --branch omega screensaver.system47
-        kodi-addon-checker --branch omega screensaver.unsplash
-        kodi-addon-checker --branch omega screensaver.videosaver
-        kodi-addon-checker --branch omega script.kodi.android.update
-        kodi-addon-checker --branch omega script.kodi.windows.update
-        kodi-addon-checker --branch omega script.module.pyhdhr
-        kodi-addon-checker --branch omega script.pystone.benchmark
-        kodi-addon-checker --branch omega service.kodi.powertoys
+        kodi-addon-checker --branch omega \
+          plugin.program.smartplaylist.generator \
+          plugin.video.channelsdvr \
+          plugin.video.hdhomerun.simple \
+          plugin.video.ispot.tv \
+          plugin.video.playonbrowser \
+          screensaver.bing \
+          screensaver.system47 \
+          screensaver.unsplash \
+          screensaver.videosaver \
+          script.kodi.android.update \
+          script.kodi.windows.update \
+          script.module.pyhdhr \
+          script.pystone.benchmark \
+          service.kodi.powertoys

@@ -174,21 +174,21 @@ class Monitor(xbmc.Monitor):
                 if self.service:
                     if hasattr(self.service, 'sync'): self.service.sync.queue_msg('ScanLibrary', {'path': None})
                     if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self.service.isRunning:
-                        self.service._que(self.service.runScraper, 2)
+                        self.service._que(self.service.runScraper, 2, True)  # True: manual menu run
             if sender == ADDON_ID and method.endswith(".RunRefresh"):
                 if self.service and REAL_SETTINGS.getSettingBool('Refresh_Enabled'):
-                    self.service._que(self.service.runRefresh, 2)
+                    self.service._que(self.service.runRefresh, 2, True)  # True: manual menu run
             if sender == ADDON_ID and method.endswith(".RunClean"):
-                if self.service: self.service._que(self.service.runClean, 3)
+                if self.service: self.service._que(self.service.runClean, 3, True)  # True: manual menu run
             if sender == ADDON_ID and method.endswith(".RunTexture"):
                 if self.service and REAL_SETTINGS.getSettingBool('Texture_Enabled'):
-                    self.service._que(self.service.runTexture, 3)
+                    self.service._que(self.service.runTexture, 3, True)  # True: manual menu run
             if sender == ADDON_ID and method.endswith(".RunBackup"):
                 if self.service and REAL_SETTINGS.getSettingBool('Backup_Enabled'):
-                    self.service._que(self.service.runBackup, 3)
+                    self.service._que(self.service.runBackup, 3, True)  # True: manual menu run
             if sender == ADDON_ID and method.endswith(".RunMusic"):
                 if self.service and REAL_SETTINGS.getSettingBool('Music_Enabled'):
-                    self.service._que(self.service.runMusic, 3)
+                    self.service._que(self.service.runMusic, 3, True)  # True: manual menu run
             if sender == ADDON_ID and method.endswith(".RunCacheClean"):
                 if self.service: threading.Thread(target=self.service.runCacheClean, daemon=True).start()
             if sender == ADDON_ID and method.endswith(".RunFreeRam"):
@@ -879,16 +879,24 @@ class Service(object):
                 else: break
         self.log('scrapeDirectory, finished!')
 
-    def runScraper(self):
+    def runScraper(self, manual=False):
+        # manual=True (menu) shows a busy dialog; scheduled/retry runs stay silent in the background
+        pDialog = xbmcgui.DialogProgressBG()
+        if manual: pDialog.create(ADDON_NAME, 'Scraping library...')
         try:
-            result = (self.scrapeTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder')       , (self.getTVshows() or [])) & 
-                    self.scrapeMovies(REAL_SETTINGS.getSetting('Scraper_Movie_Folder'), (self.getMovies()  or [])))
+            if manual: pDialog.update(message='Scanning TV sources...')
+            tv = self.scrapeTV(REAL_SETTINGS.getSetting('Scraper_TV_Folder')       , (self.getTVshows() or []))
+            if manual: pDialog.update(message='Scanning movie sources...')
+            movies = self.scrapeMovies(REAL_SETTINGS.getSetting('Scraper_Movie_Folder'), (self.getMovies()  or []))
+            result = tv & movies
             if result: notification(LANGUAGE(32024))
             return result
         except Exception as e:
             self.log('runScraper, Scan failed! %s'%(e), xbmc.LOGERROR)
             notification(LANGUAGE(32009))
             return False
+        finally:
+            if manual: pDialog.close()
 
     def scrapeTV(self, path, shows=[], includeEpisodes=None):
         if not path or not xbmcvfs.exists(path):
@@ -939,7 +947,7 @@ class Service(object):
         
         if show_dialog is None: show_dialog = REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')
         duplicates = findDupes(episodes, key='episode_key')
-        if show_dialog and duplicates:
+        if feedback or (show_dialog and duplicates):  # context runs always show progress; scheduled only when dupes found
             pDialog = xbmcgui.DialogProgressBG()
             pDialog.create(ADDON_NAME, 'Cleaning TV library entries...')
 
@@ -1150,7 +1158,10 @@ class Service(object):
         if not normalized.startswith(('smb:', 'nfs:')): weight += 5
         return weight
 
-    def runRefresh(self):
+    def runRefresh(self, manual=False):
+        # manual=True (menu) shows a busy dialog; scheduled runs stay silent in the background
+        pDialog = xbmcgui.DialogProgressBG()
+        if manual: pDialog.create(ADDON_NAME, 'Refreshing library...')
         try:
             result = (self.refreshTV((self.getTVshows()    or [])) & 
                     self.refreshMovies((self.getMovies() or [])))
@@ -1160,26 +1171,33 @@ class Service(object):
             self.log('runRefresh, Scan failed! %s'%(e), xbmc.LOGERROR)
             notification(LANGUAGE(32009))
             return False
+        finally:
+            if manual: pDialog.close()
 
-    def runClean(self):
+    def runClean(self, manual=False):
+        # manual=True (menu) shows a busy dialog; post-scan/scheduled runs stay silent
+        pDialog = xbmcgui.DialogProgressBG()
+        if manual: pDialog.create(ADDON_NAME, 'Cleaning library...')
         try:
             self._alertOfflineShares()
             tvshows  = self.getTVshows()
             movies   = self.getMovies()
             tv_ok    = True
             movie_ok = True
-            for show in tvshows:
+            for idx, show in enumerate(tvshows):
                 if self.monitor.waitForAbort(0.01): return False
-                tv_ok = self.cleanTV(show.get('tvshowid')) and tv_ok
+                if manual: pDialog.update(int((idx / len(tvshows)) * 100) if tvshows else 0, message='Cleaning TV shows...')
+                tv_ok = self.cleanTV(show.get('tvshowid'), False) and tv_ok  # False: runClean owns the dialog
             for movie in movies:
                 if self.monitor.waitForAbort(0.01): return False
                 elif not self._pauseWhilePlaying(): return False
                 if movie.get('file') and not xbmcvfs.exists(movie.get('file')):
                     self.log('cleanMovies, movie file no longer exists: %s' % movie.get('file'))
                     self._removeMovie(movie.get('movieid'), movie.get('file'), "cleanMovies (Missing File)")
+            if manual: pDialog.update(message='Cleaning movies...')
             for group in self._movieDuplicateGroups(movies):
                 if self.monitor.waitForAbort(0.01): return False
-                movie_ok = self.cleanMovies(group) and movie_ok
+                movie_ok = self.cleanMovies(group, False) and movie_ok  # False: runClean owns the dialog
             result = tv_ok and movie_ok
             if result: notification(LANGUAGE(32024))
             return result
@@ -1187,6 +1205,8 @@ class Service(object):
             self.log('runClean, Scan failed! %s'%(e), xbmc.LOGERROR)
             notification(LANGUAGE(32009))
             return False
+        finally:
+            if manual: pDialog.close()
 
     def cleanSeason(self, tvshowid, season):
         # confirmation happens in the context script; this runs the confirmed, gated pass
@@ -1224,16 +1244,22 @@ class Service(object):
                 self.log('markWatched, no episodes for showid=%s season=%s' % (tvshowid, season))
                 return True
             now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Kodi date format, not isoformat 'T'
+            pDialog = xbmcgui.DialogProgressBG()
+            pDialog.create(ADDON_NAME, 'Marking watched...')
             updated = 0
-            for e in eps:
-                if self.monitor.waitForAbort(0.01): return False
-                params = {'episodeid': e.get('episodeid')}
-                if watched:
-                    params.update({'playcount': (e.get('playcount') or 0) + 1, 'lastplayed': now})
-                else:
-                    params.update({'playcount': 0, 'lastplayed': None, 'resume': None})
-                if sendJSON({"method":"VideoLibrary.SetEpisodeDetails","params":params}).get('result') == 'OK':
-                    updated += 1
+            try:
+                for eidx, e in enumerate(eps):
+                    if self.monitor.waitForAbort(0.01): return False
+                    pDialog.update(int((eidx / len(eps)) * 100))
+                    params = {'episodeid': e.get('episodeid')}
+                    if watched:
+                        params.update({'playcount': (e.get('playcount') or 0) + 1, 'lastplayed': now})
+                    else:
+                        params.update({'playcount': 0, 'lastplayed': None, 'resume': None})
+                    if sendJSON({"method":"VideoLibrary.SetEpisodeDetails","params":params}).get('result') == 'OK':
+                        updated += 1
+            finally:
+                pDialog.close()
             notification(LANGUAGE(32069) % updated)
             return True
         except Exception as e:
@@ -1295,10 +1321,16 @@ class Service(object):
                 nonlocal attempts, removed
                 attempts += 1
                 if self._removeEpisode(e.get('episodeid'), e.get('file'), 'removeShowEntry'): removed += 1
-            for e in eps:
-                if self.monitor.waitForAbort(0.01): return False
-                elif not self._pauseWhilePlaying(): return False
-                rm(e)
+            pDialog = xbmcgui.DialogProgressBG()
+            pDialog.create(ADDON_NAME, 'Removing show...')
+            try:
+                for eidx, e in enumerate(eps):
+                    if self.monitor.waitForAbort(0.01): return False
+                    elif not self._pauseWhilePlaying(): return False
+                    pDialog.update(int((eidx / len(eps)) * 100))
+                    rm(e)
+            finally:
+                pDialog.close()
             if removed == attempts:  # everything actually went - safe to drop the show row too
                 if sendJSON({"method":"VideoLibrary.RemoveTVShow","params":{"tvshowid":tvshowid}}).get('result') == 'OK':
                     attempts += 1
@@ -1340,23 +1372,29 @@ class Service(object):
                 notification(LANGUAGE(32078))
                 self._que(self.scrapeDirectory, 2, path)
 
-    def runBackup(self):
+    def runBackup(self, manual=False):
+        # manual=True (menu) shows a busy dialog; scheduled runs stay silent
         folder = REAL_SETTINGS.getSetting('Backup_Folder')
         if not folder or not xbmcvfs.exists(folder):
             self.log('runBackup, invalid folder: %s' % folder, xbmc.LOGWARNING)
             return False
-        sub = '%s/powertoys-%s' % (folder.rstrip('/\\'), time.strftime('%Y%m%d-%H%M'))
-        xbmcvfs.mkdirs(sub)
-        self.log('runBackup, exporting library to %s' % sub)
-        resp = sendJSON({"method":"VideoLibrary.Export","params":{"path":sub,"playlists":False,"movies":{"enabled":True,"thumbnails":False},"tvshows":{"enabled":True,"episodes":True,"thumbnails":False}}})
-        ok = resp.get('result') == 'OK'
-        if ok:
-            pruned = self._pruneBackups(folder)
-            if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'):
-                if pruned: notification(LANGUAGE(32063))  # dry run never deletes
-            else:
-                notification(LANGUAGE(32036), show=True)
-        return ok
+        pDialog = xbmcgui.DialogProgressBG()
+        if manual: pDialog.create(ADDON_NAME, 'Exporting library backup...')
+        try:
+            sub = '%s/powertoys-%s' % (folder.rstrip('/\\'), time.strftime('%Y%m%d-%H%M'))
+            xbmcvfs.mkdirs(sub)
+            self.log('runBackup, exporting library to %s' % sub)
+            resp = sendJSON({"method":"VideoLibrary.Export","params":{"path":sub,"playlists":False,"movies":{"enabled":True,"thumbnails":False},"tvshows":{"enabled":True,"episodes":True,"thumbnails":False}}})
+            ok = resp.get('result') == 'OK'
+            if ok:
+                pruned = self._pruneBackups(folder)
+                if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'):
+                    if pruned: notification(LANGUAGE(32063))  # dry run never deletes
+                else:
+                    notification(LANGUAGE(32036), show=True)
+            return ok
+        finally:
+            if manual: pDialog.close()
 
     def _pruneBackups(self, folder):
         # ponytail: automatic prune after a successful export; consent = Backup_Keep_Count setting,
@@ -1492,7 +1530,10 @@ class Service(object):
             self.log('_trimAllocator: %s' % e, xbmc.LOGDEBUG)
         return None
 
-    def runTexture(self):
+    def runTexture(self, manual=False):
+        # manual=True (menu) shows a busy dialog; scheduled runs stay silent
+        pDialog = xbmcgui.DialogProgressBG()
+        if manual: pDialog.create(ADDON_NAME, 'Running texture maintenance...')
         try:
             dry = REAL_SETTINGS.getSettingBool('Dry_Run_Enabled')
             self.log('runTexture, dry_run = %s' % dry)
@@ -1503,12 +1544,15 @@ class Service(object):
         except Exception as e:
             self.log('runTexture failed: %s' % e, xbmc.LOGERROR)
             return False
+        finally:
+            if manual: pDialog.close()
 
-    def runMusic(self):
+    def runMusic(self, manual=False):
+        # manual=True (menu) shows a busy dialog; scheduled runs stay silent
         try:
             self.log('runMusic, scanning music library')
             pDialog = xbmcgui.DialogProgressBG()
-            pDialog.create(ADDON_NAME, 'Scanning music library...')
+            if manual: pDialog.create(ADDON_NAME, 'Scanning music library...')
             try:
                 sendJSON({"method":"AudioLibrary.Scan"})
                 if self.monitor.waitForAbort(2.0): return False  # let the scan actually start
@@ -1516,13 +1560,13 @@ class Service(object):
                     if self.monitor.waitForAbort(1.0): return False
                 if REAL_SETTINGS.getSettingBool('Music_Clean'):
                     self.log('runMusic, cleaning music library')
-                    pDialog.update(message='Cleaning music library...')
+                    if manual: pDialog.update(message='Cleaning music library...')
                     sendJSON({"method":"AudioLibrary.Clean"})
                     if self.monitor.waitForAbort(2.0): return False
                     while not self.monitor.abortRequested() and xbmc.getCondVisibility('Library.IsScanningMusic'):
                         if self.monitor.waitForAbort(1.0): return False
             finally:
-                pDialog.close()
+                if manual: pDialog.close()
             notification(LANGUAGE(32024))
             return True
         except Exception as e:
@@ -1559,17 +1603,20 @@ class Service(object):
         return report
 
     def _buildReport(self):
-        tvshows = (self.getTVshows() or [])
-        movies  = (self.getMovies() or [])
+        # module-level fresh queries - the self.getXXX wrappers are @cacheit'd and can be
+        # up to Scraper_Interval_DAYS stale, which made the report show old counts
+        tvshows = (getTVshows() or [])
+        movies  = (getMovies() or [])
         episodes_total, missing, dupes = 0, [], []
         for show in tvshows:
-            eps = (self.getEpisodes(show.get('tvshowid')) or [])
+            eps = (getEpisodes(show.get('tvshowid')) or [])
             episodes_total += len(eps)
             eps = [self._episodeKey(e) for e in eps]
             for e in eps:
                 if e.get('file') and not xbmcvfs.exists(e.get('file')): missing.append(e.get('file'))
             for key, group in findDupes(eps, key='episode_key').items():
-                dupes.append('TV %s: %d copies' % (key, len(group)))
+                g = group[0]
+                dupes.append('TV %s S%02dE%02d: %d copies' % (g.get('showtitle') or 'Unknown', g.get('season') or 0, g.get('episode') or 0, len(group)))
         missing_movies = [m.get('file') for m in movies if m.get('file') and not xbmcvfs.exists(m.get('file'))]
         missing.extend(missing_movies)
         for group in self._movieDuplicateGroups(movies):

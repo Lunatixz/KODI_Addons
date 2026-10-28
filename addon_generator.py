@@ -71,7 +71,7 @@ class Generator:
                 with open(addon_path, "r", encoding="utf-8") as f:
                     lines = f.readlines()
                 xml_content = "".join(line.rstrip() + "\n" for line in lines if "<?xml" not in line)
-                self._check_news(addon, xml_content)
+                xml_content = self._check_news(addon, xml_content)
                 addons_xml += xml_content.rstrip() + "\n\n"
             except Exception as e:
                 _log(f"Excluding {addon_path} for {e}")
@@ -83,10 +83,19 @@ class Generator:
         try:
             import re
             m = re.search(r'<news>(.*?)</news>', xml_content, re.DOTALL)
-            if m and len(m.group(1).strip()) > 1500:
-                _log(f"WARNING: {addon} <news> is {len(m.group(1).strip())} chars (max 1500)")
+            if not m:
+                return xml_content
+            news = m.group(1).strip()
+            if len(news) <= 1500:
+                return xml_content
+            cut = news[:1500]
+            nl = cut.rfind('\n')
+            if nl > 0:
+                cut = cut[:nl]
+            _log(f"TRUNCATED: {addon} <news> {len(news)} -> {len(cut)} chars (max 1500)")
+            return xml_content[:m.start(1)] + '\n' + cut + '\n' + xml_content[m.end(1):]
         except Exception:
-            pass
+            return xml_content
 
     def _generate_md5_file(self):
         try:

@@ -40,11 +40,6 @@ AI reliability and cost
 
 Matching and output
 - Entries matched to real library titles/files: unique-id wins, title matches must agree on year, episodes match by show+season+episode
-- AI returns episode numbers, years, and reference IDs (imdb/tmdb/trakt/tvdb); no entry limit; chronological ordering
-- File-name collision handling; auto Container.Refresh after builds
-
-Reliability fixes
-- Stale "build running" lock auto-expires; failed builds no longer record a build timestamp; missing XSP files are rebuilt on startup/auto-runs; progress dialog always closed; faster library matching
 </news>
         <reuselanguageinvoker>false</reuselanguageinvoker>
         <assets>
@@ -871,57 +866,49 @@ Reliability fixes
     <extension point="xbmc.python.script" library="resources/lib/menu.py">
         <provides>executable</provides>
     </extension>
-    <extension point="kodi.context.item" library="resources/lib/context.py">
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32038]</label>
-            <visible>Container.Content(tvshows)</visible>
-            <args>clean_show</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32039]</label>
-            <visible>Container.Content(movies)</visible>
-            <args>clean_movie</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32087]</label>
-            <visible>Container.Content(movies)</visible>
-            <args>remove_movie</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32040]</label>
-            <visible>Container.Content(files) | Container.Content(video)</visible>
-            <args>scan_folder</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32041]</label>
-            <visible>true</visible>
-            <args>health_report</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32062]</label>
-            <visible>ListItem.DBType = season</visible>
-            <args>clean_season</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32065]</label>
-            <visible>ListItem.DBType = season</visible>
-            <args>mark_watched_season</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32066]</label>
-            <visible>Container.Content(tvshows)</visible>
-            <args>mark_watched_show</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32089]</label>
-            <visible>Container.Content(tvshows)</visible>
-            <args>remove_show</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32088]</label>
-            <visible>ListItem.DBType = episode</visible>
-            <args>remove_episode</args>
-        </item>
+    <extension point="kodi.context.item">
+        <menu>
+            <item library="resources/lib/context.py" args="clean_show">
+                <label>$ADDON[service.kodi.powertoys 32038]</label>
+                <visible>Container.Content(tvshows)</visible>
+            </item>
+            <item library="resources/lib/context.py" args="clean_movie">
+                <label>$ADDON[service.kodi.powertoys 32039]</label>
+                <visible>Container.Content(movies)</visible>
+            </item>
+            <item library="resources/lib/context.py" args="remove_movie">
+                <label>$ADDON[service.kodi.powertoys 32087]</label>
+                <visible>Container.Content(movies)</visible>
+            </item>
+            <item library="resources/lib/context.py" args="scan_folder">
+                <label>$ADDON[service.kodi.powertoys 32040]</label>
+                <visible>Container.Content(files) | Container.Content(video)</visible>
+            </item>
+            <item library="resources/lib/context.py" args="health_report">
+                <label>$ADDON[service.kodi.powertoys 32041]</label>
+                <visible>true</visible>
+            </item>
+            <item library="resources/lib/context.py" args="clean_season">
+                <label>$ADDON[service.kodi.powertoys 32062]</label>
+                <visible>ListItem.DBType = season</visible>
+            </item>
+            <item library="resources/lib/context.py" args="mark_watched_season">
+                <label>$ADDON[service.kodi.powertoys 32065]</label>
+                <visible>ListItem.DBType = season</visible>
+            </item>
+            <item library="resources/lib/context.py" args="mark_watched_show">
+                <label>$ADDON[service.kodi.powertoys 32066]</label>
+                <visible>Container.Content(tvshows)</visible>
+            </item>
+            <item library="resources/lib/context.py" args="remove_show">
+                <label>$ADDON[service.kodi.powertoys 32089]</label>
+                <visible>Container.Content(tvshows)</visible>
+            </item>
+            <item library="resources/lib/context.py" args="remove_episode">
+                <label>$ADDON[service.kodi.powertoys 32088]</label>
+                <visible>ListItem.DBType = episode</visible>
+            </item>
+        </menu>
     </extension>
     <extension point="xbmc.addon.metadata">
         <license>GPL-3.0-or-later</license>
@@ -958,56 +945,7 @@ v1.3.0 (2026-10-26)
 - Add: web log viewer (/log) and HTML health report (/report)
 - Add: QR presets for play media, screenshot, and wake
 - Fix: strings.po #32055 typo
-- Change: settings reorganized - logical tab order, Dry Run/delete pair grouped, context-menu toggle now visible at Standard settings level, texture delete option greyed out until Dry Run is off, backup folder can browse any path
-- Change: setting labels rewritten for clarity (start delay/idle threshold, dry run, delete, NFO, sync, texture wording)
-- Change: dead code removed (legacy default.py, unused helpers and cache)
-- Fix: context clean actions now always answer - result notification with counts, a "nothing to clean" notice, or a "queued until playback stops" notice when clicked during playback
-- Add: one-click removal context items - remove selected movie, selected episode, or entire show; always confirmed, library changes gated by Dry Run, file deletion gated by Allow Media Deletion (season removal was already covered by Delete this season)
-- Change: context prompts now fire immediately on click and confirmed actions queue at high priority in click order, so multi-item removals breeze through without waiting on running scans; every prompt spells out exactly what confirming will do (library removal, file deletion per settings)
-- Change: README rewritten to document all features and APIs, with a Quick Start for new users
-v1.2.0 (2026-10-26)
-- Add: QR Action Server — built-in web page to stack JSON-RPC commands, generate a QR code, and execute on any discovered Kodi instance from your phone
-- Add: REST API for external QR generation (/api/v1/qr) and instance discovery (/api/v1/instances)
-- Add: optional HTTP Basic Auth for the QR server
-- Fix: network peer discovery now works (getServiceInfo call was using wrong casing, so peers were never found)
-- Fix: sync acknowledgement now uses the actual webserver port instead of hardcoded 8080
-v1.1.19 (2026-10-16)
-- Change: when "Run while Playing" is off, scheduled backup/texture maintenance and queued clean/refresh calls are held and resume automatically once playback stops (instead of aborting mid-task)
-v1.1.18 (2026-10-14)
-- Add: TV/Movie source paths auto-detected from Kodi's configured video sources on startup (only fills empty settings, can still be changed manually)
-v1.1.17 (2026-10-14)
-- Add: appears in Programs add-ons with a menu to run scraper, refresh, clean, texture maintenance, backup, or health report on demand
-v1.1.16 (2026-10-14)
-- Add: texture cache maintenance (prune orphaned artwork, re-cache missing, cache stats) via Textures JSON-RPC API
-- Add: optional deletion of orphaned thumbnail files from disk (requires Dry Run off)
-- Add: refresh items with blank plot/MPAA rating (QA check)
-- Change: duplicate movie detection now matches by IMDb number when available
-- Change: settings UI converted to new Kodi settings format with categorized sections
-v1.1.15 (2026-08-19)
-- Add: artwork-only refresh (only refresh items missing poster/fanart)
-- Add: automatic scraper retry after a scan error
-- Add: exclude list to skip specific titles during cleaning
-- Add: scheduled library backup/export
-- Add: alert when a configured network share is offline
-- Add: context menu actions (clean show/movie, scan folder, health report)
-v1.1.14 (2026-08-19)
-- Fix: movie physical duplicates with different file paths now removed (only identical paths were caught before)
-- Fix: TV duplicates no longer skipped when labels differ (only same-label duplicates were compared)
-v1.1.13 (2026-08-19)
-- Add: peer refresh confirmations with automatic retry for offline devices
-v1.1.12 (2026-08-19)
-- Perf: reduced CPU and RAM usage on low-power devices (no in-memory cache, slower poll intervals, async peer broadcast)
-v1.1.11 (2026-08-19)
-- Fix: peer refresh now uses JSONRPC.NotifyAll so peers actually receive and execute Container.Refresh
-v1.1.10 (2026-08-14)
-- Fix: network sync now browses the correct service type, so peers are actually discovered
-v1.1.9 (2026-08-01)
-- Add: Sync Library Refresh to Network Peers via zeroconf discovery
-- Fix: movie duplicate detection incorrectly grouped same-year movies (missing label property)
-- Fix: unique movies with missing files now removed during clean; duplicates matched by exact file path
-- Fix: queued tasks persist across Kodi restarts; idle-gate inversion fixed
-- Fix: settings labels, typos, and addon descriptions
-        </news>
+</news>
     </extension>
 </addon>
 

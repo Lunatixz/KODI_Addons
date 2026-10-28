@@ -155,7 +155,7 @@ Addons → Kodi PowerToys (Programs). Nine actions:
 | Free RAM now | Python garbage collection + platform memory trim + own-cache drop |
 | Library health report | Always works |
 
-Items whose feature toggle is off are silently skipped by the service.
+Items whose feature toggle is off are silently skipped by the service. Long actions started from this menu show a busy/progress indicator while they run; scheduled and background automation runs stay silent.
 
 ---
 

@@ -48,7 +48,9 @@ class CustomQueue:
     def push(self, package, priority=3):
         func, args, kwargs = package
         if kwargs is None: kwargs = {}
-        key = (func.__name__, args)
+        # repr(): args may contain lists (cleanMovies gets a dup-group) - raw tuples
+        # are unhashable and made every such push die with TypeError before queueing
+        key = (func.__name__, repr(args))
         with self.lock:
             if key in self.pending:
                 return
@@ -71,7 +73,7 @@ class CustomQueue:
             with self.lock:
                 if self.heap:
                     task = heapq.heappop(self.heap)
-                    key = (task.func.__name__, task.args)
+                    key = (task.func.__name__, repr(task.args))
                     self.pending.discard(key)
             if task is None:
                 if self.monitor.waitForAbort(5.0):

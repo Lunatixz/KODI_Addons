@@ -18,7 +18,7 @@
 # -*- coding: utf-8 -*-
 from globals import *
 import base64, json, os, threading, urllib.request
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
 WEB_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'web')
 
@@ -251,7 +251,10 @@ class PowerToysHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
 
-class PowerToysHTTPServer(HTTPServer):
+class PowerToysHTTPServer(ThreadingHTTPServer):
+    # ThreadingHTTPServer: each request runs on its own daemon thread, so a slow
+    # handler (/report walking a big library, a long /exec) can never block
+    # shutdown() and hang Kodi's exit sequence
     allow_reuse_address = True
     daemon_threads = True
 
@@ -279,8 +282,11 @@ def start_server(service):
 def stop_server():
     global _server, _thread
     if _server:
-        _server.shutdown()
-        _server.server_close()
+        try:
+            _server.shutdown()   # stops the accept loop only; handler threads are daemons
+            _server.server_close()
+        except Exception as e:
+            log('webserver stop error: %s' % e, xbmc.LOGWARNING)
         _server = None
         _thread = None
         log('webserver stopped')

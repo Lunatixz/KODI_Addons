@@ -99,7 +99,9 @@ def timeString2Seconds(string): #hh:mm:ss
     try:    return int(sum(x*y for x, y in zip(list(map(float, string.split(':')[::-1])), (1, 60, 3600, 86400))))
     except: return -1
 
-def notification(message, header=ADDON_NAME, sound=False, time=4000, icon=ICON, show=None):
+def notification(message, header=ADDON_NAME, sound=False, time=4000, icon=ICON, show=True):
+    # show=True by default: every bare notification() call actually displays; the old
+    # show=None default silently discarded ~28 result/feedback toasts across the addon
     log('notificationDialog: %s, show = %s'%(message,show))
     ## - Builtin Icons:
     ## - xbmcgui.NOTIFICATION_INFO

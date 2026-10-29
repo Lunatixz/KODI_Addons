@@ -723,12 +723,16 @@ class Service(object):
         self.sync.start()
         if REAL_SETTINGS.getSettingBool('WebServer_Enabled'):
             startWebServer(self)
-        while not self.monitor.abortRequested():
-            if    self.monitor.waitForAbort(5.0): break
-            else: self._run()
-        stopWebServer()
-        self.sync.stop()
-        self._save()
+        try:
+            while not self.monitor.abortRequested():
+                if    self.monitor.waitForAbort(5.0): break
+                else: self._run()
+        finally:
+            # always run the stop sequence, even if _run raised - every thread
+            # below is a daemon, but orderly teardown also persists the outbox/tasks
+            stopWebServer()
+            self.sync.stop()
+            self._save()
 
     def _detectSources(self):
         if REAL_SETTINGS.getSetting('Scraper_TV_Folder') and REAL_SETTINGS.getSetting('Scraper_Movie_Folder'): return
@@ -909,7 +913,7 @@ class Service(object):
             items = dict([(show['file'],show) for show in shows if show.get('file')])
             random.shuffle(files)
             for file in files:
-                if   self.monitor.waitForAbort(0.01): return 
+                if   self.monitor.waitForAbort(0.01): return False  # not bare return - runScraper does tv & movies
                 elif file.get('file') and file.get('file') not in items: 
                     self._tasks.setdefault('scrapeDirectory',set()).add(file['file'])
         return True

@@ -46,7 +46,7 @@ Enabled by **Sync with network peers**. Discovery uses Kodi's own `_xbmc-jsonrpc
 
 | Message | Trigger | Behavior |
 |---|---|---|
-| **UI refresh** | Local library scan finishes | `Container.Refresh` on all online peers; 5s debounce; ack + up to 3 retries (15s timeout) |
+| **UI refresh** | A scan batch finishes | `Container.Refresh` on all online peers **once per batch** — coalesced: the broadcast waits until scans go quiet (10s with no scan-finished events and nothing still queued) instead of flickering per directory scanned; ack + up to 3 retries (15s timeout) |
 | **Library scan** | A scan command is *received* (Programs menu, context menu, or QR `/exec` — not internal schedules) | Queued to **every known peer** with retry **until each confirms**; `path` propagates when the original command had one; peers that went dark are retried when they reappear (backoff 15s→15min), entries survive restarts, FIFO cap 50 |
 | **Watched state** | Playback ends, or manual mark-watched (context/skin) | `playcount`/`lastplayed`/`resume` pushed keyed by **file path** (DB IDs differ per instance); batched into one pending entry; newest `lastplayed` wins (skips only when the local timestamp is strictly newer); a 2s local suppression window prevents push-back loops |
 | **Wake-on-LAN** | First failed push (debounced 60s), `POST /wake`, or QR `PowerToys.Wake` | Magic packets for every MAC in the Wake-on-LAN setting |

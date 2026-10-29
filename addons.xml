@@ -855,7 +855,7 @@ Matching and output
     </extension>
 </addon>
 
-<addon id="service.kodi.powertoys" version="1.3.5" name="Kodi PowerToys" provider-name="Lunatixz">
+<addon id="service.kodi.powertoys" version="1.3.6" name="Kodi PowerToys" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.kodi-six" version="0.1.3.1"/>
@@ -942,6 +942,7 @@ All destructive operations honor Dry Run, and file deletion is a separate opt-in
 v1.3.4 (2026-10-26)
 - Fix: result notifications were never displayed (show-gate bug in the shared notification helper) - clean/refresh/backup completion toasts, dry-run notices, removal counts, and "nothing to clean" feedback all actually appear now
 - Fix: context "Clean this movie" could never queue (task-queue dedupe crashed with TypeError on list arguments); aborted scrapes no longer raise inside the scraper
+- Fix: UI refresh broadcasts are now coalesced - peers get one Container.Refresh after a whole scan batch goes quiet instead of one flicker per directory scanned
 - Change: shutdown hardened - web server runs each request on its own thread so Kodi exit can never hang on a slow web call, the stop sequence is wrapped in try/finally, and the webserver stop is guarded
 - Add: peer scan push - scan commands received by any instance are queued and retried until every networked PowerToys instance confirms (paths propagate; offline peers picked up on wake)
 - Add: watched/resume state sync across peers - playback progress and manual mark-watched propagate automatically (newest lastplayed wins)
@@ -949,8 +950,6 @@ v1.3.4 (2026-10-26)
 - Add: batch mark watched/unwatched for a show or season from the context menu
 - Add: music library scan/clean scheduling with its own interval
 - Add: network share recovery watcher (auto-rescan when a share comes back online)
-- Add: Wake-on-LAN - auto-fire on failed peer pushes, web endpoint, and QR command (comma-separated MAC list)
-- Add: backup rotation - timestamped exports with keep-N pruning (gated by Dry Run)
 </news>
     </extension>
 </addon>

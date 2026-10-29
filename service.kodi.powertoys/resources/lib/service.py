@@ -161,7 +161,7 @@ class Monitor(xbmc.Monitor):
                 self.service._onLibraryUpdate(method, data)
             if method == "VideoLibrary.OnScanFinished":
                 if self.service and hasattr(self.service, 'sync'):
-                    self.service.sync.broadcast_refresh()
+                    self.service.sync.request_refresh()  # coalesced - one broadcast per batch, not per scan
             if method == "VideoLibrary.OnScanError" and REAL_SETTINGS.getSettingBool('Scan_Retry_On_Error'):
                 now = time.time()
                 if self.service and not self.service.isRunning and (now - self.service._lastScanRetry) > 3600:
@@ -344,6 +344,7 @@ class Monitor(xbmc.Monitor):
 class SyncManager:
     SERVICE_TYPE = "_xbmc-jsonrpc-h._tcp.local."
     DEBOUNCE_SECONDS = 5
+    REFRESH_QUIET = 10     # seconds with no scan-finished event before a coalesced refresh goes out
     CONFIRM_TIMEOUT = 15
     MAX_RETRIES = 3
 
@@ -362,6 +363,8 @@ class SyncManager:
         self._local_ip = self._get_local_ip()
         self._pending = {}   # token -> {peer, ip, port, ts, retries} (refresh confirm path)
         self._token = 0
+        self._refresh_pending = False   # coalesced UI-refresh: batch, don't flicker per scan
+        self._last_scan_event = 0
 
     def log(self, msg, level=xbmc.LOGDEBUG):
         log('SyncManager: %s' % msg, level)
@@ -594,6 +597,32 @@ class SyncManager:
         except Exception as e:
             self.log('_load_outbox error: %s' % e, xbmc.LOGWARNING)
 
+    def request_refresh(self):
+        # a scan just finished - remember it; maybe_broadcast sends ONE refresh
+        # once the whole batch goes quiet instead of flickering per directory
+        self._refresh_pending = True
+        self._last_scan_event = time.time()
+
+    def maybe_broadcast(self):
+        # fire the coalesced refresh when: quiet since the last scan-finished event,
+        # nothing scanning, and no scrape work still queued (tasks or queue)
+        if not self._refresh_pending or not REAL_SETTINGS.getSettingBool('Sync_Enabled'):
+            return
+        if time.time() - self._last_scan_event < self.REFRESH_QUIET:
+            return
+        if isScanning():
+            return
+        if self.service:
+            if self.service._tasks.get('scrapeDirectory'):
+                return
+            try:
+                if any(name == 'scrapeDirectory' for name, _args in self.service.queue.snapshot()):
+                    return
+            except Exception:
+                pass
+        self._refresh_pending = False
+        self.broadcast_refresh()
+
     def broadcast_refresh(self):
         if not REAL_SETTINGS.getSettingBool('Sync_Enabled'):
             return
@@ -822,6 +851,7 @@ class Service(object):
 
     def _run(self):
         self._watchShares()
+        self.sync.maybe_broadcast()   # flush coalesced UI-refresh; runs pre-gates on purpose
         if isScanning():
             return
         if not self._chkIdle():

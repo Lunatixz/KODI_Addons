@@ -70,12 +70,13 @@ A built-in web page for stacking JSON-RPC commands into QR codes.
 ### How it works
 
 1. Enable the server: **Settings → QR Server → Enable QR server**
-2. Open the builder: `http://<your-kodi-ip>:9090/`
+2. Open the builder: `http://<your-kodi-ip>:9095/`
 3. Add commands from the method dropdown (Video Library, Audio Library, Input, System, GUI, Files, Add-ons, Profiles, Player, PowerToys, or custom JSON-RPC)
-4. Stack, reorder, remove; preview the JSON
-5. **Generate QR Code** — the QR encodes `http://<ip>:9090/run/<encoded-commands>`
-6. Scan with a phone camera → landing page shows the decoded commands, a multi-select of discovered Kodi instances, and **Execute**
-7. Results display per instance
+4. **Params render as controls, not raw JSON**: each parameter gets the right input — dropdowns for library IDs (movies, shows, episodes, seasons, artists, albums, profiles, add-ons, sources, playlists, active players) fetched **live from this Kodi instance**, enums from `JSONRPC.Introspect` (with curated fallback lists for action/window IDs, sort methods and order, and media types — schema enums always win when present), **checkbox lists for `properties`**, typed sub-fields for structured objects like **`sort`/`limits`** (enum selects, start/end numbers), number/boolean/JSON fields by type, required params marked with `*`. Episode/season dropdowns follow the selected show. **Edit as JSON** flips to the raw textarea for anything unusual — *Custom value…* in any dropdown also lets you type freely
+5. Stack, reorder, remove; preview the JSON
+6. **Generate QR Code** — the QR encodes `http://<ip>:9095/run/<encoded-commands>`; a **Share…** button appears on Android (native share sheet) to send the link without scanning
+7. Scan with a phone camera → landing page shows the decoded commands, a multi-select of discovered Kodi instances, and **Execute**
+8. Results display per instance
 
 ### Example use cases
 
@@ -89,7 +90,7 @@ A built-in web page for stacking JSON-RPC commands into QR codes.
 | Setting | Default | Description |
 |---|---|---|
 | Enable QR server | Off | Master toggle |
-| QR server port | 9090 | HTTP listen port (separate from Kodi's 8080) |
+| QR server port | 9095 | HTTP listen port (separate from Kodi's 8080) |
 | Require login | Off | HTTP Basic Auth for all endpoints |
 | Username / Password | — | Credentials the phone's browser will prompt for |
 
@@ -122,11 +123,26 @@ Response reports `ok`/`error` per instance. `VideoLibrary.Scan` commands sent he
 Returns an encoded URL ready for QR generation:
 
 ```json
-{"url": "http://192.168.1.100:9090/run/...", "encoded": "...", "commands": [...]}
+{"url": "http://192.168.1.100:9095/run/...", "encoded": "...", "commands": [...]}
 ```
 
 ### `GET /api/v1/instances`
 Discovered instances (this device plus zeroconf peers).
+
+### `GET /api/v1/schema?method=<jsonrpc-method>`
+Parameter descriptors for a method, derived from `JSONRPC.Introspect`: name, type, required flag, description, and enum values when the schema defines them (enums resolve inline, via array items, or through `$ref` type lookups).
+
+```json
+{"method": "Input.ExecuteAction", "description": "…",
+ "params": [{"name": "action", "required": true, "type": "string"}]}
+```
+
+### `GET /api/v1/options?kind=<kinds>[&tvshowid=<id>]`
+Live value lists for dropdowns, fetched from this Kodi instance. Kinds: `movies`, `tvshows`, `episodes` (all episodes, or just one show with `tvshowid`), `seasons` (requires `tvshowid`), `artists`, `albums`, `profiles` (includes `name` for `Profiles.LoadProfile`), `addons`, `sources` (video paths), `playlists`, `players` (active players, with 0/1 fallback).
+
+```json
+{"options": [{"value": 42, "label": "Blade Runner (1982)"}]}
+```
 
 ### `POST /wake`
 Sends Wake-on-LAN packets for every configured MAC: `{"woken": 2}`.
@@ -236,9 +252,9 @@ Enable, TV/Movie source paths (auto-detected from video sources when empty), int
 Enable + interval. **Only refresh items missing artwork** restricts to items lacking poster/fanart; **blank plot/MPAA QA** is a sub-option that only applies inside art-only mode. Include Episodes in TV Refresh (default on), Ignore local NFO files when refreshing (default off), Clean during refresh (queues cleans per item *while* refreshing — distinct from "Clean Library after Scan").
 
 ### Cleaning
-Clean after scan, exclude list (**comma-separated, case-insensitive, exact title match**), Dry Run (default on — blocks all removals), Also delete duplicate files from disk (permanent — greyed out until Dry Run is off). Duplicate matching: movies by IMDb number when present, else label+year; episodes by show/season/episode. Quality weighting picks the master copy: 2160p/4K +50, 1080p +30, 720p +10, remux +20, x265/HEVC +15, x264 +5, local (non-network) path +5.
+Clean after scan, exclude list (**comma-separated, case-insensitive, exact title match**), Dry Run (default on — blocks all removals), Also delete media files from disk (permanent — greyed out until Dry Run is off). Duplicate matching: movies by IMDb number when present, else label+year; episodes by show/season/episode. Quality weighting picks the master copy: 2160p/4K +50, 1080p +30, 720p +10, remux +20, x265/HEVC +15, x264 +5, local (non-network) path +5.
 
-### Texture Cache
+### Texture
 Enable + interval. Pruning covers **network-path textures only** (smb/nfs/ftp/dav/sftp); local artwork is skipped. Re-caching works by deleting stale database rows whose image file is gone — Kodi re-fetches the artwork when next viewed (nothing is downloaded by the addon). **Also delete orphaned thumbnail files from disk** requires both itself on **and** Dry Run off.
 
 ### Music
@@ -250,8 +266,8 @@ Enable, folder, interval, **Old backups to keep** (0 = unlimited). Each run expo
 ### Sync
 Enable peer sync, Wake-on-LAN MAC addresses (comma-separated).
 
-### QR Server
-Enable, port (9090), optional HTTP Basic Auth credentials.
+### QR
+Enable, port (9095), optional HTTP Basic Auth credentials.
 
 ### Maintenance
 Enable PowerToys context menu actions (off by default; the first toggle in this category), retry scraper after scan error (1h cooldown), alert on offline shares, auto-rescan on share recovery (60s check; triggers when a configured share transitions offline→online), Auto free RAM + interval (hours).
@@ -265,7 +281,7 @@ Run tasks while media is playing (defers instead of aborting — see above), onl
 
 - All Kodi devices on the same LAN; mDNS/Bonjour working (no client isolation)
 - **Allow remote control via HTTP** enabled on each device
-- QR server port open in any firewall (default 9090)
+- QR server port open in any firewall (default 9095)
 - WOL: target devices configured for wake-on-LAN in firmware/OS
 
 ---
@@ -276,7 +292,7 @@ Run tasks while media is playing (defers instead of aborting — see above), onl
 
 **Scan push never delivers:** the peer needs PowerToys running to acknowledge; the sender's own webserver must be on for the ack path. Watch logs with debugging enabled.
 
-**QR page won't load:** confirm the server is enabled and try `http://<kodi-ip>:9090/` directly.
+**QR page won't load:** confirm the server is enabled and try `http://<kodi-ip>:9095/` directly.
 
 **Context items missing:** the context-menu toggle is off by default (Maintenance settings).
 

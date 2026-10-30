@@ -34,6 +34,22 @@ def _fsize(path):
     except Exception: pass
     return 0
 
+def log(msg):
+    # INFO level: visible in kodi.log even with addon debugging off - this script
+    # runs out-of-process, so its failures otherwise vanish without a trace
+    xbmc.log('[%s/context] %s' % (ADDON_ID, msg), xbmc.LOGINFO)
+
+def _dbid(label='ListItem.DBID'):
+    raw = xbmc.getInfoLabel(label)
+    log('%s = %r' % (label, raw))
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        if raw:
+            # non-empty but unreadable id (skin/odd node) - say it instead of dying silently
+            xbmcgui.Dialog().notification(ADDON.getAddonInfo('name'), 'Cannot read %s: %s' % (label, raw), xbmcgui.NOTIFICATION_WARNING, 4000)
+        return None
+
 def _action(entry):
     # spell out exactly what confirming will do, derived from the live gate settings
     txt = 'Remove %s from the library' % entry
@@ -49,19 +65,22 @@ def _yesno(heading_id, body, entry):
     if ADDON.getSettingBool('Dry_Run_Enabled'): body = '[DRY RUN]\n%s' % body
     return xbmcgui.Dialog().yesno(LANGUAGE(heading_id), body)
 
-def main():
+def _main():
     if not ADDON.getSettingBool('Report_Context_Menu'): return
     action = (sys.argv[1] if len(sys.argv) > 1 else '').strip()
+    log('action=%r argv=%r' % (action, sys.argv))
     if   action == 'clean_show':
-        dbid = xbmc.getInfoLabel('ListItem.DBID')
-        if dbid: notify('CleanTVShow', {'tvshowid': int(dbid)})
+        dbid = _dbid()
+        if dbid is not None: notify('CleanTVShow', {'tvshowid': dbid})
     elif action == 'clean_movie':
-        dbid = xbmc.getInfoLabel('ListItem.DBID')
-        if dbid: notify('CleanMovie', {'movieid': int(dbid)})
+        dbid = _dbid()
+        if dbid is not None: notify('CleanMovie', {'movieid': dbid})
     elif action == 'clean_season':
-        showid, season = xbmc.getInfoLabel('ListItem.TVShowDBID'), xbmc.getInfoLabel('ListItem.Season')
-        if not showid or season == '': return
-        showid, season = int(showid), int(season)
+        showid = _dbid('ListItem.TVShowDBID')
+        raw = xbmc.getInfoLabel('ListItem.Season')
+        log('ListItem.Season = %r' % (raw,))
+        if showid is None or raw == '': return
+        season = int(raw)
         eps = _json('VideoLibrary.GetEpisodes', {'tvshowid': showid, 'properties': ['file','season','showtitle']}).get('result',{}).get('episodes', [])
         eps = [e for e in eps if e.get('season') == season]
         if not eps: return  # empty season - nothing to confirm
@@ -70,49 +89,60 @@ def main():
         if _yesno(32062, body, "this season's episodes"): notify('CleanSeason', {'tvshowid': showid, 'season': season})
     elif action in ('mark_watched_season', 'mark_watched_show'):
         if action == 'mark_watched_season':
-            showid, season = xbmc.getInfoLabel('ListItem.TVShowDBID'), xbmc.getInfoLabel('ListItem.Season')
-            if not showid or season == '': return
-            msg, data = 'WatchSeason', {'tvshowid': int(showid), 'season': int(season)}
+            showid = _dbid('ListItem.TVShowDBID')
+            raw = xbmc.getInfoLabel('ListItem.Season')
+            if showid is None or raw == '': return
+            msg, data = 'WatchSeason', {'tvshowid': showid, 'season': int(raw)}
         else:
-            dbid = xbmc.getInfoLabel('ListItem.DBID')
-            if not dbid: return
-            msg, data = 'WatchShow', {'tvshowid': int(dbid)}
+            dbid = _dbid()
+            if dbid is None: return
+            msg, data = 'WatchShow', {'tvshowid': dbid}
         idx = xbmcgui.Dialog().select(LANGUAGE(32065 if action == 'mark_watched_season' else 32066),
                                       [LANGUAGE(32067), LANGUAGE(32068)])
         if idx < 0: return
         data['watched'] = (idx == 0)
         notify(msg, data)
     elif action == 'remove_movie':
-        dbid = xbmc.getInfoLabel('ListItem.DBID')
-        if not dbid: return
-        d = _json('VideoLibrary.GetMovieDetails', {'movieid': int(dbid), 'properties': ['label','file']}).get('result',{}).get('movie')
+        dbid = _dbid()
+        if dbid is None: return
+        d = _json('VideoLibrary.GetMovieDetails', {'movieid': dbid, 'properties': ['label','file']}).get('result',{}).get('movie')
         if not d: return
         body = d.get('label','')
         size = _fsize(d.get('file'))
         if size: body = '%s\n%s' % (body, _fmt(size))
-        if _yesno(32087, body, 'this movie'): notify('RemoveMovie', {'movieid': int(dbid)})
+        if _yesno(32087, body, 'this movie'): notify('RemoveMovie', {'movieid': dbid})
     elif action == 'remove_episode':
-        dbid = xbmc.getInfoLabel('ListItem.DBID')
-        if not dbid: return
-        d = _json('VideoLibrary.GetEpisodeDetails', {'episodeid': int(dbid), 'properties': ['file','showtitle','title','season','episode']}).get('result',{}).get('episode')
+        dbid = _dbid()
+        if dbid is None: return
+        d = _json('VideoLibrary.GetEpisodeDetails', {'episodeid': dbid, 'properties': ['file','showtitle','title','season','episode']}).get('result',{}).get('episode')
         if not d: return
         body = '%s - S%02dE%02d %s' % (d.get('showtitle',''), d.get('season') or 0, d.get('episode') or 0, d.get('title',''))
         size = _fsize(d.get('file'))
         if size: body = '%s\n%s' % (body, _fmt(size))
-        if _yesno(32088, body, 'this episode'): notify('RemoveEpisode', {'episodeid': int(dbid)})
+        if _yesno(32088, body, 'this episode'): notify('RemoveEpisode', {'episodeid': dbid})
     elif action == 'remove_show':
-        dbid = xbmc.getInfoLabel('ListItem.DBID')
-        if not dbid: return
-        d = _json('VideoLibrary.GetTVShowDetails', {'tvshowid': int(dbid), 'properties': ['title']}).get('result',{}).get('tvshow')
+        dbid = _dbid()
+        if dbid is None: return
+        d = _json('VideoLibrary.GetTVShowDetails', {'tvshowid': dbid, 'properties': ['title']}).get('result',{}).get('tvshow')
         title = (d or {}).get('title','')
-        eps = _json('VideoLibrary.GetEpisodes', {'tvshowid': int(dbid), 'properties': ['file']}).get('result',{}).get('episodes', [])
+        eps = _json('VideoLibrary.GetEpisodes', {'tvshowid': dbid, 'properties': ['file']}).get('result',{}).get('episodes', [])
         total = sum(_fsize(e.get('file')) for e in eps)
         body = '%s\n%d episode(s), %s' % (title, len(eps), _fmt(total))
-        if _yesno(32089, body, 'this show (all seasons and episodes)'): notify('RemoveTVShow', {'tvshowid': int(dbid)})
+        if _yesno(32089, body, 'this show (all seasons and episodes)'): notify('RemoveTVShow', {'tvshowid': dbid})
     elif action == 'scan_folder':
         path = xbmc.getInfoLabel('ListItem.Path') or xbmc.getInfoLabel('ListItem.FolderPath')
         if path: notify('ScanFolder', {'path': path})
     elif action == 'health_report':
         notify('HealthReport')
+    else:
+        log('unknown action - nothing dispatched')
+
+def main():
+    try:
+        _main()
+    except Exception as e:
+        # a context script dies silently otherwise - always say why
+        log('context action failed: %s' % e)
+        xbmcgui.Dialog().notification(ADDON.getAddonInfo('name'), 'Context action failed: %s' % e, xbmcgui.NOTIFICATION_ERROR, 5000)
 
 if __name__ == '__main__': main()

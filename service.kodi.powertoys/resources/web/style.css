@@ -42,3 +42,25 @@ textarea{resize:vertical;font-family:'Consolas','Monaco',monospace;font-size:.85
   .card{padding:14px}
   header h1{font-size:1.3em}
 }
+
+/* schema-driven param form */
+.row-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.row-head label{margin-bottom:0}
+.btn-ghost{background:#2a2a4a;color:#aaa;padding:5px 12px;font-size:.75em}
+.pf-row{margin-bottom:10px}
+.pf-label{display:block;font-size:.8em;color:#aaa;margin-bottom:3px}
+.pf-label .req{color:#e94560}
+.pf-label .ptype{color:#666;font-weight:400}
+.pf-desc{font-size:.7em;color:#666;margin-bottom:3px}
+#params-form select,#params-form input,#params-form textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #333;background:#0f3460;color:#e0e0e0;font-size:.9em;font-family:inherit}
+#params-form textarea{font-family:'Consolas','Monaco',monospace;font-size:.8em}
+#params-form .loading{color:#888;font-size:.85em;font-style:italic}
+.qr-actions{text-align:center;padding-top:8px}
+
+/* structured params: checkbox lists + typed object fields */
+.pf-enumset{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:4px;max-height:190px;overflow-y:auto;border:1px solid #333;border-radius:6px;padding:8px;background:#0f3460}
+.pf-chk{display:flex;align-items:center;gap:6px;font-size:.8em;color:#ccc;cursor:pointer;padding:2px 0}
+.pf-chk input{width:auto;accent-color:#e94560}
+.pf-fields{border:1px solid #333;border-radius:6px;padding:10px;background:#12122b}
+.pf-field{margin-bottom:8px}
+.pf-field:last-child{margin-bottom:0}

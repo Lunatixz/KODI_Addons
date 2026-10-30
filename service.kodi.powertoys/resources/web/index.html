@@ -26,8 +26,12 @@
         <label for="method-desc" id="method-desc" class="method-desc"></label>
       </div>
       <div class="form-row">
-        <label for="params-editor">Params (JSON)</label>
-        <textarea id="params-editor" rows="3" spellcheck="false">{}</textarea>
+        <div class="row-head">
+          <label for="params-form">Params</label>
+          <button id="toggle-json" class="btn btn-sm btn-ghost" type="button">Edit as JSON</button>
+        </div>
+        <div id="params-form"></div>
+        <textarea id="params-editor" rows="5" spellcheck="false" style="display:none">{}</textarea>
       </div>
       <button id="add-cmd" class="btn btn-primary">+ Add Command</button>
     </div>
@@ -49,6 +53,9 @@
       <p class="hint">Scan with your phone camera to open the action page.</p>
       <div id="qr-container"></div>
       <p id="qr-url" class="url-display"></p>
+      <div class="qr-actions">
+        <button id="share-qr" class="btn btn-sm btn-ghost" type="button" style="display:none">Share&hellip;</button>
+      </div>
     </div>
   </section>
 
@@ -70,6 +77,7 @@
     </div>
   </section>
 </div>
+<script src="/qrcode.min.js"></script>
 <script src="/app.js"></script>
 </body>
 </html>

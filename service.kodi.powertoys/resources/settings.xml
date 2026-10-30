@@ -248,7 +248,7 @@
                 </setting>
             </group>
         </category>
-        <category id="sync" label="32025" help="">
+        <category id="sync" label="32090" help="">
             <group id="1" label="">
                 <setting id="Sync_Enabled" type="boolean" label="32025" help="">
                     <level>0</level>
@@ -276,8 +276,8 @@
                     <control type="toggle"/>
                 </setting>
                 <setting id="WebServer_Port" type="integer" label="32058" help="" parent="WebServer_Enabled">
-                    <level>1</level>
-                    <default>9090</default>
+                    <level>0</level>
+                    <default>9095</default>
                     <constraints><minimum>1024</minimum><maximum>65535</maximum></constraints>
                     <control type="edit" format="integer">
                         <heading>32058</heading>

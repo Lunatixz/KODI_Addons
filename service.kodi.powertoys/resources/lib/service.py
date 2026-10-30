@@ -906,10 +906,16 @@ class Service(object):
         if show_dialog is None: show_dialog = REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')
         self.log('scrapeDirectory, scraping [%s]'%(path))
         if sendJSON({"method":"VideoLibrary.Scan","params":{"directory":path,"showdialogs":show_dialog}}).get('result') == "OK":
+            waited = 0.0
             while not self.monitor.abortRequested():
                 if   self.monitor.waitForAbort(0.5): break
                 elif self._playing: break
-                elif isScanning(): self.log('scrapeDirectory, waiting for scraper to finish...')
+                elif isScanning():
+                    waited += 0.5
+                    if waited >= 600:  # a wedged scan must not deadlock the task queue forever
+                        self.log('scrapeDirectory, scanner still busy after 10min - moving on', xbmc.LOGWARNING)
+                        break
+                    self.log('scrapeDirectory, waiting for scraper to finish...')
                 else: break
         self.log('scrapeDirectory, finished!')
 

@@ -22,6 +22,195 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
 WEB_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'web')
 
+_INTRO_CACHE = None   # full JSONRPC.Introspect, fetched once per process
+_EP_CACHE = {'ts': 0, 'items': None}   # all-episodes memo (episodeid-only methods)
+
+def _introspect():
+    global _INTRO_CACHE
+    if _INTRO_CACHE is None:
+        _INTRO_CACHE = sendJSON({"method": "JSONRPC.Introspect", "params": {}}).get('result') or {}
+    return _INTRO_CACHE
+
+def _type_str(el, intro):
+    # unwrap one union/schema element to a plain type string (Kodi unions optional
+    # params as [{type:integer},{type:null}] - raw arrays stringify to [object Object])
+    if isinstance(el, str): return None if el == 'null' else el
+    if isinstance(el, list):
+        for e2 in el:
+            r = _type_str(e2, intro)
+            if r: return r
+        return None
+    if isinstance(el, dict):
+        et = el.get('type')
+        if isinstance(et, str): return None if et == 'null' else et
+        if isinstance(et, list):
+            for e2 in et:
+                r = _type_str(e2, intro)
+                if r: return r
+        ref = el.get('$ref')
+        if ref:
+            td = intro.get('types', {}).get(ref) or {}
+            if isinstance(td.get('type'), str): return td['type']
+            if isinstance(td.get('type'), (list, dict)):
+                r = _type_str(td.get('type'), intro)
+                if r: return r
+    return None
+
+def _param_type(param, intro):
+    t = param.get('type')
+    if isinstance(t, str): return t
+    if isinstance(t, (list, dict)):
+        for el in (t if isinstance(t, list) else [t]):
+            r = _type_str(el, intro)
+            if r: return r
+    ref = param.get('$ref')
+    if ref:
+        td = intro.get('types', {}).get(ref) or {}
+        if isinstance(td.get('type'), str): return td['type']
+        if isinstance(td.get('type'), (list, dict)):
+            r = _type_str(td.get('type'), intro)
+            if r: return r
+        if 'enum' in td: return 'string'
+        if td: return 'object'
+    return 'string'
+
+def _resolve_enum(param, intro):
+    # enums live at any depth: inline, array items, union elements, a $ref'd type
+    # def, or that def's own items (List.Attributes style) - walk the worklist
+    work, seen = [param], set()
+    while work:
+        src = work.pop(0)
+        if not isinstance(src, dict) or id(src) in seen: continue
+        seen.add(id(src))
+        if 'enum' in src: return src['enum']
+        for key in ('items', 'type'):
+            v = src.get(key)
+            if isinstance(v, dict): work.append(v)
+            elif isinstance(v, list): work.extend(x for x in v if isinstance(x, dict))
+        ref = src.get('$ref')
+        if ref and ref not in seen:
+            seen.add(ref)
+            td = intro.get('types', {}).get(ref)
+            if isinstance(td, dict): work.append(td)
+    return None
+
+def _first_ref(el):
+    # first $ref anywhere in a schema node (inline, unions, items)
+    if isinstance(el, dict):
+        if el.get('$ref'): return el['$ref']
+        for k in ('type', 'items'):
+            r = _first_ref(el.get(k))
+            if r: return r
+    elif isinstance(el, list):
+        for x in el:
+            r = _first_ref(x)
+            if r: return r
+    return None
+
+def _schema_for(method):
+    intro = _introspect()
+    m = intro.get('methods', {}).get(method)
+    if not m: return None
+    params = []
+    for p in (m.get('params') or []):
+        if not isinstance(p, dict) or not p.get('name'): continue
+        d = {'name': p['name'], 'required': bool(p.get('required')), 'type': _param_type(p, intro)}
+        if p.get('description'): d['description'] = p['description']
+        enum = _resolve_enum(p, intro)
+        prim = [v for v in enum if isinstance(v, (str, int, float, bool))] if enum else []
+        if prim and d['type'] == 'object' and p.get('name') == 'properties':
+            # schema quirk seen in the wild: 'properties' typed object although it is
+            # semantically a string list - canonicalize so the UI shows checkboxes
+            d['type'] = 'array'
+            d['itemsEnum'] = prim
+        elif prim and d['type'] == 'array':
+            d['itemsEnum'] = prim
+        elif prim:
+            # primitives only - dropdown labels must never stringify to objects
+            d['enum'] = prim
+        if d['type'] == 'object':
+            # structured object (sort/limits/...): expose the member fields so the
+            # UI can render typed sub-controls instead of a raw {} box
+            own = p.get('properties')
+            src = own if isinstance(own, dict) else (intro.get('types', {}).get(_first_ref(p)) or {})
+            props = src.get('properties')
+            req_list = src.get('required') if isinstance(src.get('required'), list) else []
+            if isinstance(props, dict):
+                fields = []
+                for fname, fspec in props.items():
+                    if not isinstance(fspec, dict): continue
+                    fd = {'name': fname, 'required': bool(fspec.get('required')) or fname in req_list,
+                          'type': _param_type(fspec, intro)}
+                    if fspec.get('description'): fd['description'] = fspec['description']
+                    fe = _resolve_enum(fspec, intro)
+                    if fe:
+                        fp = [v for v in fe if isinstance(v, (str, int, float, bool))]
+                        if fp: fd['enum'] = fp
+                    fields.append(fd)
+                if fields: d['fields'] = fields
+        params.append(d)
+    return {'method': method, 'description': m.get('description') or '', 'params': params}
+
+def _options(kind, arg):
+    # live value lists for dropdowns (IDs and names fetched from this Kodi instance)
+    try:
+        if kind == 'movies':
+            items = sendJSON({"method": "VideoLibrary.GetMovies", "params": {"properties": ["title", "year"]}}).get('result', {}).get('movies', [])
+            return [{'value': i.get('movieid'), 'label': '%s (%s)' % (i.get('title') or '?', i.get('year') or '?')} for i in items]
+        if kind == 'tvshows':
+            items = sendJSON({"method": "VideoLibrary.GetTVShows", "params": {"properties": ["title"]}}).get('result', {}).get('tvshows', [])
+            return [{'value': i.get('tvshowid'), 'label': i.get('title') or i.get('label') or '?'} for i in items]
+        if kind == 'episodes':
+            if arg:
+                items = sendJSON({"method": "VideoLibrary.GetEpisodes", "params": {"tvshowid": int(arg), "properties": ["title", "season", "episode"]}}).get('result', {}).get('episodes', [])
+                return [{'value': e.get('episodeid'), 'label': 'S%02dE%02d %s' % (e.get('season') or 0, e.get('episode') or 0, e.get('title') or '')} for e in items]
+            now = time.time()   # all-episodes list: N+1 query, memoized 5 min
+            if _EP_CACHE['items'] is not None and now - _EP_CACHE['ts'] < 300: return _EP_CACHE['items']
+            out = []
+            for s in sendJSON({"method": "VideoLibrary.GetTVShows", "params": {"properties": ["title"]}}).get('result', {}).get('tvshows', []):
+                eps = sendJSON({"method": "VideoLibrary.GetEpisodes", "params": {"tvshowid": s.get('tvshowid'), "properties": ["title", "season", "episode"]}}).get('result', {}).get('episodes', [])
+                for e in eps:
+                    out.append({'value': e.get('episodeid'), 'label': '%s S%02dE%02d %s' % (s.get('title') or '', e.get('season') or 0, e.get('episode') or 0, e.get('title') or '')})
+            _EP_CACHE['ts'] = now
+            _EP_CACHE['items'] = out
+            return out
+        if kind == 'seasons':
+            if not arg: return []
+            items = sendJSON({"method": "VideoLibrary.GetSeasons", "params": {"tvshowid": int(arg)}}).get('result', {}).get('seasons', [])
+            return [{'value': s.get('seasonid'), 'label': s.get('label') or ('Season %s' % s.get('season'))} for s in items]
+        if kind == 'artists':
+            items = sendJSON({"method": "AudioLibrary.GetArtists", "params": {}}).get('result', {}).get('artists', [])
+            return [{'value': i.get('artistid'), 'label': str(i.get('artist') or i.get('label') or i.get('artistid'))} for i in items]
+        if kind == 'albums':
+            items = sendJSON({"method": "AudioLibrary.GetAlbums", "params": {"properties": ["title", "artist"]}}).get('result', {}).get('albums', [])
+            out = []
+            for i in items:
+                a = i.get('artist')
+                if isinstance(a, list): a = ', '.join(str(x) for x in a)
+                out.append({'value': i.get('albumid'), 'label': '%s%s' % (i.get('title') or '?', ' - ' + a if a else '')})
+            return out
+        if kind == 'profiles':
+            items = sendJSON({"method": "Profiles.GetProfiles", "params": {}}).get('result', {}).get('profiles', [])
+            return [{'value': p.get('profileid'), 'name': str(p.get('name') or p.get('label') or ''),
+                     'label': str(p.get('name') or p.get('label') or p.get('profileid'))} for p in items]
+        if kind == 'addons':
+            items = sendJSON({"method": "Addons.GetAddons", "params": {}}).get('result', {}).get('addons', [])
+            return [{'value': i.get('addonid'), 'label': str(i.get('name') or i.get('label') or i.get('addonid'))} for i in items]
+        if kind == 'sources':
+            items = sendJSON({"method": "Files.GetSources", "params": {"media": "video"}}).get('result', {}).get('sources', [])
+            return [{'value': i.get('file'), 'label': '%s (%s)' % (i.get('label') or '?', i.get('file'))} for i in items]
+        if kind == 'playlists':
+            items = sendJSON({"method": "Playlist.GetPlaylists", "params": {}}).get('result', {}).get('playlists', [])
+            return [{'value': i.get('playlistid'), 'label': '%s #%s' % (i.get('type') or 'list', i.get('playlistid'))} for i in items]
+        if kind == 'players':
+            items = sendJSON({"method": "Player.GetActivePlayers", "params": {}}).get('result') or []
+            if items:
+                return [{'value': i.get('playerid'), 'label': str(i.get('type') or 'player') + ' player'} for i in items]
+            return [{'value': 0, 'label': 'No active player (0)'}, {'value': 1, 'label': 'No active player (1)'}]
+    except Exception as e:
+        log('options(%s) failed: %s' % (kind, e), xbmc.LOGWARNING)
+    return None
+
 class PowerToysHandler(BaseHTTPRequestHandler):
     server_version = 'PowerToys/1.3.4'
 
@@ -146,11 +335,33 @@ class PowerToysHandler(BaseHTTPRequestHandler):
             return self._send_file(os.path.join(WEB_ROOT, 'style.css'), 'text/css')
         if path == '/app.js':
             return self._send_file(os.path.join(WEB_ROOT, 'app.js'), 'application/javascript')
+        if path == '/qrcode.min.js':
+            return self._send_file(os.path.join(WEB_ROOT, 'qrcode.min.js'), 'application/javascript')
         if path.startswith('/run/'):
             return self._serve_index()
 
         if path == '/api/v1/instances':
             return self._send_json({'instances': self._get_instances()})
+
+        if path == '/api/v1/schema':
+            from urllib.parse import parse_qs
+            method = parse_qs(query).get('method', [''])[0]
+            if not method: return self._send_json({'error': 'missing method parameter'}, 400)
+            try:
+                schema = _schema_for(method)
+            except Exception as e:
+                return self._send_json({'error': 'introspect failed: %s' % e}, 500)
+            if not schema: return self._send_json({'error': 'method not found: %s' % method}, 404)
+            return self._send_json(schema)
+
+        if path == '/api/v1/options':
+            from urllib.parse import parse_qs
+            params = parse_qs(query)
+            kind = params.get('kind', [''])[0]
+            if not kind: return self._send_json({'error': 'missing kind parameter'}, 400)
+            opts = _options(kind, params.get('tvshowid', [''])[0])
+            if opts is None: return self._send_json({'error': 'unknown kind: %s' % kind}, 400)
+            return self._send_json({'options': opts})
 
         if path == '/report':
             try:
@@ -269,7 +480,7 @@ _thread = None
 def start_server(service):
     global _server, _thread
     if _server: return
-    port = REAL_SETTINGS.getSettingInt('WebServer_Port') or 9090
+    port = REAL_SETTINGS.getSettingInt('WebServer_Port') or 9095
     try:
         _server = PowerToysHTTPServer(('0.0.0.0', port), service)
         _thread = threading.Thread(target=_server.serve_forever, daemon=True)

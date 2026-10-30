@@ -41,11 +41,11 @@ msgid "Start delay and idle threshold (seconds)"
 msgstr ""
 
 msgctxt "#32003"
-msgid "Scraper Interval (Days)"
+msgid "Scraper interval (days)"
 msgstr ""
 
 msgctxt "#32004"
-msgid "Show Scraper Progress Dialog"
+msgid "Show scraper progress dialog"
 msgstr ""
 
 msgctxt "#32005"
@@ -53,15 +53,15 @@ msgid "Enable Refresh"
 msgstr ""
 
 msgctxt "#32006"
-msgid "Refresh Interval (Days)"
+msgid "Refresh interval (days)"
 msgstr ""
 
 msgctxt "#32007"
-msgid "TV Source Path"
+msgid "TV source path"
 msgstr ""
 
 msgctxt "#32008"
-msgid "Movie Source Path"
+msgid "Movie source path"
 msgstr ""
 
 msgctxt "#32009"
@@ -89,7 +89,7 @@ msgid "Only run when Kodi is idle"
 msgstr ""
 
 msgctxt "#32015"
-msgid "Include Episodes in TV Refresh"
+msgid "Include episodes in TV refresh"
 msgstr ""
 
 msgctxt "#32016"
@@ -97,7 +97,7 @@ msgid "Dry Run (preview only - no entries or files deleted)"
 msgstr ""
 
 msgctxt "#32017"
-msgid "Also delete duplicate files from disk (permanent)"
+msgid "Also delete media files from disk (permanent)"
 msgstr ""
 
 msgctxt "#32018"
@@ -105,7 +105,7 @@ msgid "Permissions"
 msgstr ""
 
 msgctxt "#32023"
-msgid "Clean Library after Scan."
+msgid "Clean library after scan"
 msgstr ""
 
 msgctxt "#32024"
@@ -141,11 +141,11 @@ msgid "Enable scheduled library backup"
 msgstr ""
 
 msgctxt "#32032"
-msgid "Backup Folder"
+msgid "Backup folder"
 msgstr ""
 
 msgctxt "#32033"
-msgid "Backup Interval (Days)"
+msgid "Backup interval (days)"
 msgstr ""
 
 msgctxt "#32034"
@@ -153,7 +153,7 @@ msgid "Enable PowerToys context menu actions"
 msgstr ""
 
 msgctxt "#32035"
-msgid "Library Health Report"
+msgid "Library health report"
 msgstr ""
 
 msgctxt "#32036"
@@ -165,19 +165,19 @@ msgid "Source Offline"
 msgstr ""
 
 msgctxt "#32038"
-msgid "PowerToys: Clean this show"
+msgid "Clean this show"
 msgstr ""
 
 msgctxt "#32039"
-msgid "PowerToys: Clean this movie"
+msgid "Clean this movie"
 msgstr ""
 
 msgctxt "#32040"
-msgid "PowerToys: Scan this folder"
+msgid "Scan this folder"
 msgstr ""
 
 msgctxt "#32041"
-msgid "PowerToys: Library health report"
+msgid "Library health report"
 msgstr ""
 
 msgctxt "#32042"
@@ -189,7 +189,7 @@ msgid "Cleaning"
 msgstr ""
 
 msgctxt "#32044"
-msgid "Texture Cache"
+msgid "Texture"
 msgstr ""
 
 msgctxt "#32045"
@@ -205,7 +205,7 @@ msgid "Enable texture cache maintenance (prune orphans, clear stale rows)"
 msgstr ""
 
 msgctxt "#32048"
-msgid "Texture maintenance interval (Days)"
+msgid "Texture maintenance interval (days)"
 msgstr ""
 
 msgctxt "#32049"
@@ -237,7 +237,7 @@ msgid "Run backup now"
 msgstr ""
 
 msgctxt "#32062"
-msgid "PowerToys: Delete this season"
+msgid "Delete this season"
 msgstr ""
 
 msgctxt "#32063"
@@ -249,11 +249,11 @@ msgid "Removed: %d of %d entries"
 msgstr ""
 
 msgctxt "#32065"
-msgid "PowerToys: Mark season watched"
+msgid "Mark season watched"
 msgstr ""
 
 msgctxt "#32066"
-msgid "PowerToys: Mark show watched"
+msgid "Mark show watched"
 msgstr ""
 
 msgctxt "#32067"
@@ -337,19 +337,23 @@ msgid "Queued - will run after playback stops"
 msgstr ""
 
 msgctxt "#32087"
-msgid "PowerToys: Remove this movie"
+msgid "Remove this movie"
 msgstr ""
 
 msgctxt "#32088"
-msgid "PowerToys: Remove this episode"
+msgid "Remove this episode"
+msgstr ""
+
+msgctxt "#32090"
+msgid "Sync"
 msgstr ""
 
 msgctxt "#32089"
-msgid "PowerToys: Remove this show"
+msgid "Remove this show"
 msgstr ""
 
 msgctxt "#32056"
-msgid "QR Server"
+msgid "QR"
 msgstr ""
 
 msgctxt "#32057"

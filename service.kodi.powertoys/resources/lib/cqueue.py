@@ -40,6 +40,7 @@ class CustomQueue:
         self.heap = []
         self.counter = 0
         self.pending = set()
+        self._blocked = None
         self.thread = threading.Thread(target=self._loop, name=f"{ADDON_ID}.queue", daemon=True)
 
     def log(self, msg, level=xbmc.LOGDEBUG):
@@ -64,6 +65,12 @@ class CustomQueue:
     def _loop(self):
         while not self.monitor.abortRequested():
             if isScanning():
+                with self.lock:
+                    has_work = bool(self.heap)
+                if has_work and self._blocked != 'scan':
+                    # explain the silence: tasks are queued but a library scan owns the box
+                    self._blocked = 'scan'
+                    notification('%s: waiting for the library scan to finish...' % ADDON_NAME)
                 if self.monitor.waitForAbort(1.0): break
                 continue
             if self.service._playing:
@@ -79,11 +86,14 @@ class CustomQueue:
                 if self.monitor.waitForAbort(5.0):
                     break
                 continue
+            self._blocked = None
             self.log(f"execute, {task.func.__name__} (Priority: {task.priority})")
             try:
                 task.func(*task.args, **task.kwargs)
             except Exception as e:
                 self.log(f"execute failed: {e}", xbmc.LOGERROR)
+                # surface crashes - otherwise a failing task is invisible to the user
+                notification('%s: %s failed: %s' % (ADDON_NAME, task.func.__name__, e), icon=xbmcgui.NOTIFICATION_ERROR)
             if self.monitor.waitForAbort(1.0): break
 
     def snapshot(self):

@@ -855,7 +855,7 @@ Matching and output
     </extension>
 </addon>
 
-<addon id="service.kodi.powertoys" version="1.3.6" name="Kodi PowerToys" provider-name="Lunatixz">
+<addon id="service.kodi.powertoys" version="1.3.7" name="Kodi PowerToys" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.kodi-six" version="0.1.3.1"/>
@@ -866,57 +866,55 @@ Matching and output
     <extension point="xbmc.python.script" library="resources/lib/menu.py">
         <provides>executable</provides>
     </extension>
-    <extension point="kodi.context.item" library="resources/lib/context.py">
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32038]</label>
-            <visible>Container.Content(tvshows)</visible>
-            <args>clean_show</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32039]</label>
-            <visible>Container.Content(movies)</visible>
-            <args>clean_movie</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32087]</label>
-            <visible>Container.Content(movies)</visible>
-            <args>remove_movie</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32040]</label>
-            <visible>Container.Content(files) | Container.Content(video)</visible>
-            <args>scan_folder</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32041]</label>
-            <visible>true</visible>
-            <args>health_report</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32062]</label>
-            <visible>ListItem.DBType = season</visible>
-            <args>clean_season</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32065]</label>
-            <visible>ListItem.DBType = season</visible>
-            <args>mark_watched_season</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32066]</label>
-            <visible>Container.Content(tvshows)</visible>
-            <args>mark_watched_show</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32089]</label>
-            <visible>Container.Content(tvshows)</visible>
-            <args>remove_show</args>
-        </item>
-        <item>
-            <label>$ADDON[service.kodi.powertoys 32088]</label>
-            <visible>ListItem.DBType = episode</visible>
-            <args>remove_episode</args>
-        </item>
+    <!-- official kodi.context.item schema (Kodi 19+): args is an ATTRIBUTE inside a
+         <menu> element - the legacy child <args> element is ignored by the parser.
+         All actions sit behind one master "PowerToys" submenu (nested <menu> per wiki). -->
+    <extension point="kodi.context.item">
+        <menu id="kodi.core.main">
+            <menu>
+                <label>PowerToys</label>
+                <item library="resources/lib/context.py" args="clean_show">
+                    <label>32038</label>
+                    <visible>Container.Content(tvshows)</visible>
+                </item>
+                <item library="resources/lib/context.py" args="clean_movie">
+                    <label>32039</label>
+                    <visible>Container.Content(movies)</visible>
+                </item>
+                <item library="resources/lib/context.py" args="remove_movie">
+                    <label>32087</label>
+                    <visible>Container.Content(movies)</visible>
+                </item>
+                <item library="resources/lib/context.py" args="scan_folder">
+                    <label>32040</label>
+                    <visible>Container.Content(files) | Container.Content(video)</visible>
+                </item>
+                <item library="resources/lib/context.py" args="health_report">
+                    <label>32041</label>
+                    <visible>true</visible>
+                </item>
+                <item library="resources/lib/context.py" args="clean_season">
+                    <label>32062</label>
+                    <visible>ListItem.DBType = season</visible>
+                </item>
+                <item library="resources/lib/context.py" args="mark_watched_season">
+                    <label>32065</label>
+                    <visible>ListItem.DBType = season</visible>
+                </item>
+                <item library="resources/lib/context.py" args="mark_watched_show">
+                    <label>32066</label>
+                    <visible>Container.Content(tvshows)</visible>
+                </item>
+                <item library="resources/lib/context.py" args="remove_show">
+                    <label>32089</label>
+                    <visible>Container.Content(tvshows)</visible>
+                </item>
+                <item library="resources/lib/context.py" args="remove_episode">
+                    <label>32088</label>
+                    <visible>ListItem.DBType = episode</visible>
+                </item>
+            </menu>
+        </menu>
     </extension>
     <extension point="xbmc.addon.metadata">
         <license>GPL-3.0-or-later</license>
@@ -940,16 +938,17 @@ Maintenance: scan-error retry, offline-share alerts, context menu actions (clean
 All destructive operations honor Dry Run, and file deletion is a separate opt-in.</description>
         <news>
 v1.3.4 (2026-10-26)
-- Fix: result notifications were never displayed (show-gate bug in the shared notification helper) - clean/refresh/backup completion toasts, dry-run notices, removal counts, and "nothing to clean" feedback all actually appear now
-- Fix: context "Clean this movie" could never queue (task-queue dedupe crashed with TypeError on list arguments); aborted scrapes no longer raise inside the scraper
-- Fix: UI refresh broadcasts are now coalesced - peers get one Container.Refresh after a whole scan batch goes quiet instead of one flicker per directory scanned
-- Change: shutdown hardened - web server runs each request on its own thread so Kodi exit can never hang on a slow web call, the stop sequence is wrapped in try/finally, and the webserver stop is guarded
-- Add: peer scan push - scan commands received by any instance are queued and retried until every networked PowerToys instance confirms (paths propagate; offline peers picked up on wake)
-- Add: watched/resume state sync across peers - playback progress and manual mark-watched propagate automatically (newest lastplayed wins)
-- Add: season cleanup - context menu deletes a season's files and library entries behind an always-on confirmation, gated by Dry Run
-- Add: batch mark watched/unwatched for a show or season from the context menu
-- Add: music library scan/clean scheduling with its own interval
-- Add: network share recovery watcher (auto-rescan when a share comes back online)
+- Add: peer scan push and watched/resume sync across networked instances (offline peers picked up on wake)
+- Add: Wake-on-LAN (auto on failed push, /wake endpoint, QR command)
+- Add: context items - delete season, remove movie/episode/show, batch mark watched (always confirmed, Dry Run/Delete gated)
+- Add: music scheduling, share recovery auto-rescan, backup rotation, system cache cleanup, Free RAM tool
+- Add: web log viewer (/log) and HTML health report (/report)
+- Add: QR builder params are schema-driven (ID/enum dropdowns via introspect, live from Kodi, curated sort/media/action fallbacks); Share button on Android; new /api/v1/schema and /api/v1/options
+- Fix: QR codes were malformed - encoder replaced with qrcodejs
+- Fix: result notifications never displayed - feedback, counts, and dry-run notices now appear
+- Change: context actions log every dispatch to kodi.log and surface unreadable-item, queue-blocked-behind-a-scan, and task-crash errors as visible notifications; a wedged library scan can no longer stall queued work forever
+- Fix: context menu items use Kodi's official args attribute inside a menu block - the legacy child &lt;args&gt; element is ignored by the parser (argv arrived empty), so context actions never fired
+- Change: all PowerToys context actions now sit behind a single "PowerToys" submenu instead of cluttering the top-level context menu (item labels no longer need the PowerToys prefix)
 </news>
     </extension>
 </addon>

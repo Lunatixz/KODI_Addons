@@ -57,6 +57,12 @@ def _action(entry):
         txt += ' and delete the file(s) from disk' if ADDON.getSettingBool('Delete_Enabled') else ' (files kept on disk)'
     return txt + '?'
 
+def _busy(msg):
+    # visible while details are gathered - RPC + file stats can stall on slow shares
+    p = xbmcgui.DialogProgressBG()
+    p.create(ADDON.getAddonInfo('name'), msg)
+    return p
+
 def _yesno(heading_id, body, entry):
     # one clear yes/no gate: identifying info, size, then exactly what happens on Yes.
     # prompts fire HERE, immediately on click - execution queues behind them, so rapid
@@ -81,10 +87,14 @@ def _main():
         log('ListItem.Season = %r' % (raw,))
         if showid is None or raw == '': return
         season = int(raw)
-        eps = _json('VideoLibrary.GetEpisodes', {'tvshowid': showid, 'properties': ['file','season','showtitle']}).get('result',{}).get('episodes', [])
-        eps = [e for e in eps if e.get('season') == season]
+        p = _busy('Loading season...')
+        try:
+            eps = _json('VideoLibrary.GetEpisodes', {'tvshowid': showid, 'properties': ['file','season','showtitle']}).get('result',{}).get('episodes', [])
+            eps = [e for e in eps if e.get('season') == season]
+            total = sum(_fsize(e.get('file')) for e in eps)
+        finally:
+            p.close()
         if not eps: return  # empty season - nothing to confirm
-        total = sum(_fsize(e.get('file')) for e in eps)
         body = '%s - Season %d\n%d episode(s), %s' % (eps[0].get('showtitle',''), season, len(eps), _fmt(total))
         if _yesno(32062, body, "this season's episodes"): notify('CleanSeason', {'tvshowid': showid, 'season': season})
     elif action in ('mark_watched_season', 'mark_watched_show'):
@@ -105,28 +115,40 @@ def _main():
     elif action == 'remove_movie':
         dbid = _dbid()
         if dbid is None: return
-        d = _json('VideoLibrary.GetMovieDetails', {'movieid': dbid, 'properties': ['label','file']}).get('result',{}).get('movie')
+        p = _busy('Loading movie...')
+        try:
+            d = _json('VideoLibrary.GetMovieDetails', {'movieid': dbid, 'properties': ['label','file']}).get('result',{}).get('movie')
+            size = _fsize(d.get('file')) if d else 0
+        finally:
+            p.close()
         if not d: return
         body = d.get('label','')
-        size = _fsize(d.get('file'))
         if size: body = '%s\n%s' % (body, _fmt(size))
         if _yesno(32087, body, 'this movie'): notify('RemoveMovie', {'movieid': dbid})
     elif action == 'remove_episode':
         dbid = _dbid()
         if dbid is None: return
-        d = _json('VideoLibrary.GetEpisodeDetails', {'episodeid': dbid, 'properties': ['file','showtitle','title','season','episode']}).get('result',{}).get('episode')
+        p = _busy('Loading episode...')
+        try:
+            d = _json('VideoLibrary.GetEpisodeDetails', {'episodeid': dbid, 'properties': ['file','showtitle','title','season','episode']}).get('result',{}).get('episode')
+            size = _fsize(d.get('file')) if d else 0
+        finally:
+            p.close()
         if not d: return
         body = '%s - S%02dE%02d %s' % (d.get('showtitle',''), d.get('season') or 0, d.get('episode') or 0, d.get('title',''))
-        size = _fsize(d.get('file'))
         if size: body = '%s\n%s' % (body, _fmt(size))
         if _yesno(32088, body, 'this episode'): notify('RemoveEpisode', {'episodeid': dbid})
     elif action == 'remove_show':
         dbid = _dbid()
         if dbid is None: return
-        d = _json('VideoLibrary.GetTVShowDetails', {'tvshowid': dbid, 'properties': ['title']}).get('result',{}).get('tvshow')
-        title = (d or {}).get('title','')
-        eps = _json('VideoLibrary.GetEpisodes', {'tvshowid': dbid, 'properties': ['file']}).get('result',{}).get('episodes', [])
-        total = sum(_fsize(e.get('file')) for e in eps)
+        p = _busy('Loading show...')
+        try:
+            d = _json('VideoLibrary.GetTVShowDetails', {'tvshowid': dbid, 'properties': ['title']}).get('result',{}).get('tvshow')
+            title = (d or {}).get('title','')
+            eps = _json('VideoLibrary.GetEpisodes', {'tvshowid': dbid, 'properties': ['file']}).get('result',{}).get('episodes', [])
+            total = sum(_fsize(e.get('file')) for e in eps)
+        finally:
+            p.close()
         body = '%s\n%d episode(s), %s' % (title, len(eps), _fmt(total))
         if _yesno(32089, body, 'this show (all seasons and episodes)'): notify('RemoveTVShow', {'tvshowid': dbid})
     elif action == 'scan_folder':

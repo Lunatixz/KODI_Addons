@@ -2,7 +2,7 @@
 
 Automated library maintenance for Kodi: scraping, refresh, cleaning, texture cache, backup, music, network sync, QR-coded remote actions, and system upkeep.
 
-Documents **PowerToys v1.3.4**.
+Documents **PowerToys v1.3.7**.
 
 ## Features
 

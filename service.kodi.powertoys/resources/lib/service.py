@@ -1270,6 +1270,7 @@ class Service(object):
                 pDialog.close()
             if REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'): notification(LANGUAGE(32063))
             else: notification(LANGUAGE(32064) % (removed, len(eps)))
+            self._keptFilesNote(removed)
             return True
         except Exception as e:
             self.log('cleanSeason failed! %s' % e, xbmc.LOGERROR)
@@ -1319,6 +1320,7 @@ class Service(object):
                 return False
             removed = 1 if self._removeMovie(movieid, d.get('file',''), 'removeMovieEntry') else 0
             self._cleanFeedback(1, removed)
+            self._keptFilesNote(removed)
             return True
         except Exception as e:
             self.log('removeMovieEntry failed! %s' % e, xbmc.LOGERROR)
@@ -1337,6 +1339,7 @@ class Service(object):
                 return False
             removed = 1 if self._removeEpisode(episodeid, d.get('file',''), 'removeEpisodeEntry') else 0
             self._cleanFeedback(1, removed)
+            self._keptFilesNote(removed)
             return True
         except Exception as e:
             self.log('removeEpisodeEntry failed! %s' % e, xbmc.LOGERROR)
@@ -1372,10 +1375,18 @@ class Service(object):
             finally:
                 pDialog.close()
             if removed == attempts:  # everything actually went - safe to drop the show row too
-                if sendJSON({"method":"VideoLibrary.RemoveTVShow","params":{"tvshowid":tvshowid}}).get('result') == 'OK':
+                resp = sendJSON({"method":"VideoLibrary.RemoveTVShow","params":{"tvshowid":tvshowid}})
+                self.log('removeShowEntry, RemoveTVShow response: %s' % resp)
+                if resp.get('result') == 'OK':
                     attempts += 1
                     removed += 1
+                else:
+                    # never report success for a show row that stayed behind
+                    notification('%s: episodes removed, but the show entry remains (a library clean will drop it)' % title)
+            elif attempts:
+                notification('%s: some episodes could not be removed - show entry kept' % title)
             self._cleanFeedback(attempts, removed)
+            self._keptFilesNote(removed)
             return True
         except Exception as e:
             self.log('removeShowEntry failed! %s' % e, xbmc.LOGERROR)
@@ -1712,6 +1723,11 @@ class Service(object):
         if attempts <= 0:            notification(LANGUAGE(32085))
         elif REAL_SETTINGS.getSettingBool('Dry_Run_Enabled'): notification(LANGUAGE(32063))
         else:                        notification(LANGUAGE(32064) % (removed, attempts))
+
+    def _keptFilesNote(self, removed):
+        # entries went but files stayed - remind that a library removal isn't permanent
+        if removed and not REAL_SETTINGS.getSettingBool('Dry_Run_Enabled') and not REAL_SETTINGS.getSettingBool('Delete_Enabled'):
+            notification('Removed from library - files kept on disk (a later scan can re-add them)')
 
 
 if __name__ == '__main__': Service()._start()

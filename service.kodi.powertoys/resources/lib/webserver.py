@@ -212,7 +212,7 @@ def _options(kind, arg):
     return None
 
 class PowerToysHandler(BaseHTTPRequestHandler):
-    server_version = 'PowerToys/1.3.4'
+    server_version = 'PowerToys/1.3.7'
 
     def log_message(self, fmt, *args):
         log('webserver: %s - %s' % (self.address_string(), fmt % args))

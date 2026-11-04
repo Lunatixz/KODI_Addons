@@ -883,9 +883,9 @@ class Service(object):
                 self._que(self.refreshMovie, 4, *self._tasks.get('refreshMovie').pop())
         elif not self.isRunning:
             self.isRunning = True
-            if REAL_SETTINGS.getSettingBool('Scraper_Enabled'):
+            if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self._playing:
                 with self._chkUpdate(self.runScraper,REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')): pass
-            if REAL_SETTINGS.getSettingBool('Refresh_Enabled'):
+            if REAL_SETTINGS.getSettingBool('Refresh_Enabled') and not self._playing:
                 with self._chkUpdate(self.runRefresh,REAL_SETTINGS.getSettingInt('Refresh_Interval_DAYS')): pass
             if not self._playing and REAL_SETTINGS.getSettingBool('Backup_Enabled'):
                 with self._chkUpdate(self.runBackup,REAL_SETTINGS.getSettingInt('Backup_Interval_DAYS')): pass

@@ -92,6 +92,7 @@ v1.3.7 (2026-10-30)
 - Change: remote exec and sync pushes authenticate with this Kodi's webserver credentials and report auth-failure/unreachable/timeout distinctly; QR builder rejects method names that are not Namespace.Method
 - Change: peer scan pushes verify the path against the receiver's library first - only missing items trigger a scan, already-caught-up paths skip it (roots scan plain)
 - Fix: Container.Refresh now only runs when another instance sent it - after this instance's own scan the local view updates itself (self-echoed refreshes are skipped and still acked)
+- Fix: scheduled scraper and refresh runs now defer while media is playing, like every other scheduled task (Run while Playing off = nothing heavy runs during playback)
 v1.3.4 (2026-10-26)
 - Add: peer scan push and watched/resume sync across networked instances (offline peers picked up on wake)
 - Add: Wake-on-LAN (auto on failed push, /wake endpoint, QR command)

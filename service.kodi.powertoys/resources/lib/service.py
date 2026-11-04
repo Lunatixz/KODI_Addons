@@ -135,8 +135,16 @@ class Monitor(xbmc.Monitor):
         self.log("onNotification, sender %s - method: %s  - data: %s" % (sender, method, data))
         if self.service:
             if sender == ADDON_ID and method.endswith(".RefreshLibrary"):
-                self.log("Peer refresh signal received")
-                xbmc.executebuiltin("Container.Refresh")
+                # refresh only when ANOTHER instance sent this - after our own scan Kodi
+                # updates its own view, so a local Container.Refresh is pointless (a
+                # self-echo happens when zeroconf reports a different local IP)
+                payload = json.loads(data) if isinstance(data, str) else (data or {})
+                our_ip = self.service.sync._local_ip if getattr(self.service, 'sync', None) else None
+                if payload.get('ip') and payload.get('ip') == our_ip:
+                    self.log("Refresh originated on this instance - skipping local Container.Refresh")
+                else:
+                    self.log("Peer refresh signal received")
+                    xbmc.executebuiltin("Container.Refresh")
                 self._confirm(data, "RefreshConfirmed")
             if sender == ADDON_ID and method.endswith(".RefreshConfirmed"):
                 self.log("Peer refresh confirmed")

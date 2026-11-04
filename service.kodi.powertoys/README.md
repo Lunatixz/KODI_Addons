@@ -47,7 +47,7 @@ Enabled by **Sync with network peers**. Discovery uses Kodi's own `_xbmc-jsonrpc
 | Message | Trigger | Behavior |
 |---|---|---|
 | **UI refresh** | A scan batch finishes | `Container.Refresh` on all online peers **once per batch** — coalesced: the broadcast waits until scans go quiet (10s with no scan-finished events and nothing still queued) instead of flickering per directory scanned; ack + up to 3 retries (15s timeout) |
-| **Library scan** | A scan command is *received* (Programs menu, context menu, or QR `/exec` — not internal schedules) | Queued to **every known peer** with retry **until each confirms**; `path` propagates when the original command had one; peers that went dark are retried when they reappear (backoff 15s→15min), entries survive restarts, FIFO cap 50 |
+| **Library scan** | A scan command is *received* (Programs menu, context menu, or QR `/exec` — not internal schedules) | Queued to **every known peer** with retry **until each confirms**; `path` propagates when the original command had one; each receiver **verifies the path against its own library first** (fresh items, new episodes, unknown movie files trigger a scan; already-caught-up paths ack without scanning — roots fall through to a plain scan); peers that went dark are retried when they reappear (backoff 15s→15min), entries survive restarts, FIFO cap 50 |
 | **Watched state** | Playback ends, or manual mark-watched (context/skin) | `playcount`/`lastplayed`/`resume` pushed keyed by **file path** (DB IDs differ per instance); batched into one pending entry; newest `lastplayed` wins (skips only when the local timestamp is strictly newer); a 2s local suppression window prevents push-back loops |
 | **Wake-on-LAN** | First failed push (debounced 60s), `POST /wake`, or QR `PowerToys.Wake` | Magic packets for every MAC in the Wake-on-LAN setting |
 
@@ -117,7 +117,7 @@ Executes JSON-RPC commands on selected instances.
 }
 ```
 
-Response reports `ok`/`error` per instance. `VideoLibrary.Scan` commands sent here also queue the peer scan push. The pseudo-command `{"method": "PowerToys.Wake"}` wakes configured MACs.
+Response reports `ok`/`error` per instance, with the failure classified as **auth failed / unreachable / timed out** — outbound calls authenticate with *this* Kodi's webserver username/password (peers secured by the same credentials now work). `VideoLibrary.Scan` commands sent here also queue the peer scan push. The pseudo-command `{"method": "PowerToys.Wake"}` wakes configured MACs.
 
 ### `GET /api/v1/qr?commands=<json>`
 Returns an encoded URL ready for QR generation:
@@ -127,7 +127,7 @@ Returns an encoded URL ready for QR generation:
 ```
 
 ### `GET /api/v1/instances`
-Discovered instances (this device plus zeroconf peers).
+Discovered instances (this device plus zeroconf peers). Each peer is pinged (`JSONRPC.Ping`, 1.5s timeout) and carries `reachable: true|false` — the landing page greys out unreachable ones.
 
 ### `GET /api/v1/schema?method=<jsonrpc-method>`
 Parameter descriptors for a method, derived from `JSONRPC.Introspect`: name, type, required flag, description, and enum values when the schema defines them (enums resolve inline, via array items, or through `$ref` type lookups).
@@ -152,6 +152,9 @@ Serves `special://logpath/kodi.log` as plain text. Parameters: `?file=old` for `
 
 ### `GET /report`
 The library health report as an HTML page (phone-friendly).
+
+### `GET /now`
+Now Playing page (phone-friendly, auto-refreshes every 5s): current title/file, video codec/resolution/aspect, audio codec/channels, screen resolution, and a progress bar with paused state. Shows HDR from Kodi's info labels **plus filename hints** (`DV`, `HDR10+`, `HDR10`, `HLG`) — release names carry formats Kodi 21 misreports, and a disagreement is flagged as "Kodi reports: …". Idle state shows "Nothing playing".
 
 ---
 

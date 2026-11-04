@@ -64,3 +64,5 @@ textarea{resize:vertical;font-family:'Consolas','Monaco',monospace;font-size:.85
 .pf-fields{border:1px solid #333;border-radius:6px;padding:10px;background:#12122b}
 .pf-field{margin-bottom:8px}
 .pf-field:last-child{margin-bottom:0}
+
+.instance-unreachable{opacity:.5}

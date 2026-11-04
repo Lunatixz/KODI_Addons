@@ -17,7 +17,7 @@
 # along with Kodi PowerToys.  If not, see <http://www.gnu.org/licenses/>.
 # -*- coding: utf-8 -*-
 from globals import *
-import base64, json, os, threading, urllib.request
+import base64, json, os, re, threading, urllib.error, urllib.request
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
 WEB_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'web')
@@ -211,6 +211,36 @@ def _options(kind, arg):
         log('options(%s) failed: %s' % (kind, e), xbmc.LOGWARNING)
     return None
 
+def _remote_error(e):
+    # classify outbound failures so /exec says WHY a peer failed
+    if isinstance(e, urllib.error.HTTPError):
+        if e.code in (401, 403):
+            return 'auth failed (peer rejected credentials - check Kodi webserver username/password)'
+        return 'HTTP %s' % e.code
+    if isinstance(e, TimeoutError):
+        return 'timed out'
+    if isinstance(e, urllib.error.URLError):
+        reason = getattr(e, 'reason', e)
+        if isinstance(reason, TimeoutError):
+            return 'timed out'
+        return 'unreachable (%s)' % reason
+    return str(e)
+
+_HDR_HINT_PATTERNS = (
+    # Kodi 21 reports HDR10+ as hdr10 and misses the HDR10 base layer of DV
+    # streams - release names usually carry the truth
+    ('dolbyvision', r'(?:dovi|dv|dolby[ ._-]?vision)(?![a-z0-9])'),
+    ('hdr10plus',   r'hdr10(?:(?:plus|p)(?![a-z0-9])|\+)'),
+    ('hdr10',       r'hdr(?:10)?(?![a-z0-9+])'),
+    ('hlg',         r'hlg(?![a-z0-9])'),
+)
+_HDR_HINTS = [(h, re.compile(r'(?<![a-z0-9])' + p, re.IGNORECASE)) for h, p in _HDR_HINT_PATTERNS]
+
+def _hdr_hints(filename):
+    # HDR formats named in the file name; extension ignored (.dv camera files give no hint)
+    name = os.path.splitext(filename or '')[0]
+    return [h for h, pat in _HDR_HINTS if pat.search(name)]
+
 class PowerToysHandler(BaseHTTPRequestHandler):
     server_version = 'PowerToys/1.3.7'
 
@@ -272,13 +302,23 @@ class PowerToysHandler(BaseHTTPRequestHandler):
     def _local_ip(self):
         return self.svc.sync._local_ip if self.svc and self.svc.sync else '127.0.0.1'
 
+    def _ping(self, ip, port):
+        # quick reachability probe - zeroconf entries can outlive a dead box
+        try:
+            cmd = {"jsonrpc": "2.0", "method": "JSONRPC.Ping", "id": ADDON_ID}
+            resp = urllib.request.urlopen(authRequest('http://%s:%d/jsonrpc' % (ip, port), cmd), timeout=1.5)
+            return loadJSON(resp.read()).get('result') == 'pong'
+        except Exception:
+            return False
+
     def _get_instances(self):
-        instances = [{'label': 'This device (%s)' % self._local_ip(), 'ip': self._local_ip(), 'port': 'local', 'self': True}]
+        instances = [{'label': 'This device (%s)' % self._local_ip(), 'ip': self._local_ip(), 'port': 'local', 'self': True, 'reachable': True}]
         if self.svc and self.svc.sync:
             with self.svc.sync._lock:
                 for name, peer in self.svc.sync.peers.items():
                     instances.append({'label': '%s (%s:%d)' % (peer.get('host', name), peer['ip'], peer['port']),
-                                      'ip': peer['ip'], 'port': peer['port'], 'self': False})
+                                      'ip': peer['ip'], 'port': peer['port'], 'self': False,
+                                      'reachable': self._ping(peer['ip'], peer['port'])})
         return instances
 
     def _encode_commands(self, commands):
@@ -318,11 +358,87 @@ class PowerToysHandler(BaseHTTPRequestHandler):
             cmd['jsonrpc'] = '2.0'
             cmd['id'] = ADDON_ID
             url = 'http://%s:%s/jsonrpc' % (ip, port)
-            req = urllib.request.Request(url, data=json.dumps(cmd).encode('utf-8'))
-            req.add_header('Content-Type', 'application/json')
-            resp = urllib.request.urlopen(req, timeout=10)
-            responses.append(loadJSON(resp.read()))
+            try:
+                resp = urllib.request.urlopen(authRequest(url, cmd), timeout=10)
+                responses.append(loadJSON(resp.read()))
+            except Exception as e:
+                raise RuntimeError(_remote_error(e))
         return responses
+
+    def _now_page(self):
+        css = ('body{font-family:monospace;background:#1a1a2e;color:#e0e0e0;padding:16px}'
+               '.card{background:#16213e;border-radius:12px;padding:18px;max-width:560px;margin:0 auto}'
+               'h1{font-size:1.15em;color:#e94560;word-break:break-word}'
+               'h2{font-size:.9em;color:#888;margin:14px 0 4px}'
+               '.big{font-size:1.05em}.muted{color:#777;font-size:.85em;word-break:break-all}'
+               '.bar{height:10px;background:#0a0a1a;border-radius:5px;overflow:hidden;margin-top:6px}'
+               '.fill{height:100%;background:#e94560}.hdr{color:#ffd166}')
+        head = ('<!DOCTYPE html><html><head><meta charset="utf-8">'
+                '<meta name="viewport" content="width=device-width,initial-scale=1">'
+                '<meta http-equiv="refresh" content="5">'
+                '<title>Now Playing</title><style>%s</style></head><body>' % css)
+
+        def esc(s):
+            return str(s or '').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+        def secs(t):
+            t = t or {}
+            return (t.get('hours', 0) or 0) * 3600 + (t.get('minutes', 0) or 0) * 60 + (t.get('seconds', 0) or 0)
+
+        def fmt(s):
+            return '%d:%02d:%02d' % (s // 3600, (s % 3600) // 60, s % 60)
+
+        try:
+            players = sendJSON({"method": "Player.GetActivePlayers"}).get('result') or []
+            if not players:
+                return head + '<div class="card"><h1>Nothing playing</h1></div></body></html>'
+            props = sendJSON({"method": "Player.GetProperties", "params": {
+                "playerid": players[0].get('playerid', 1),
+                "properties": ["currentvideostream", "videostreams", "currentaudiostream",
+                               "audiostreams", "speed", "time", "totaltime"]}}).get('result', {})
+            labels = sendJSON({"method": "XBMC.GetInfoLabels", "params": {"labels": [
+                "Player.Title", "Player.Filename", "VideoPlayer.HdrType",
+                "VideoPlayer.VideoResolution", "VideoPlayer.VideoAspect",
+                "System.ScreenResolution"]}}).get('result', {}) or {}
+        except Exception as e:
+            return head + '<div class="card"><h1>Error</h1><p class="muted">%s</p></div></body></html>' % esc(str(e))
+
+        rows = []
+        title = labels.get('Player.Title') or labels.get('Player.Filename') or ''
+        if title: rows.append('<h1>%s</h1>' % esc(title))
+        fn = labels.get('Player.Filename') or ''
+        if fn and fn != title: rows.append('<div class="muted">%s</div>' % esc(fn))
+        cur = props.get('currentvideostream') or {}
+        # cover art embedded in a container shows up as a video stream - keep it only
+        # when it is the current stream
+        vids = [s for s in (props.get('videostreams') or [])
+                if s.get('codec') not in ('mjpeg', 'png') or s.get('index') == cur.get('index')]
+        vparts = [x for x in [cur.get('codec'),
+                              '%sx%s' % (cur.get('width'), cur.get('height')) if cur.get('width') else '',
+                              labels.get('VideoPlayer.VideoResolution'),
+                              'aspect %s' % labels.get('VideoPlayer.VideoAspect') if labels.get('VideoPlayer.VideoAspect') else ''] if x]
+        if len(vids) > 1: vparts.append('%d video streams' % len(vids))
+        if vparts: rows.append('<h2>Video</h2><div class="big">%s</div>' % esc(' | '.join(vparts)))
+        hdr = (labels.get('VideoPlayer.HdrType') or '').strip()
+        hints = _hdr_hints(labels.get('Player.Filename'))
+        if hdr or hints:
+            parts = list(dict.fromkeys(hints))
+            if hdr and hdr.lower() not in [h.lower() for h in hints]:
+                parts.append('Kodi reports: %s' % hdr)
+            rows.append('<h2>HDR</h2><div class="big hdr">%s</div>' % esc(' + '.join(parts)))
+        audio = props.get('currentaudiostream') or {}
+        aparts = [x for x in [audio.get('codec'),
+                              '%sch' % audio.get('channels') if audio.get('channels') else ''] if x]
+        if aparts: rows.append('<h2>Audio</h2><div class="big">%s</div>' % esc(' | '.join(aparts)))
+        if labels.get('System.ScreenResolution'):
+            rows.append('<h2>Screen</h2><div class="muted">%s</div>' % esc(labels.get('System.ScreenResolution')))
+        elapsed, total = secs(props.get('time')), secs(props.get('totaltime'))
+        if total:
+            paused = '' if props.get('speed', 1) else ' (paused)'
+            rows.append('<h2>Progress%s</h2><div class="muted">%s / %s</div>'
+                        '<div class="bar"><div class="fill" style="width:%d%%"></div></div>'
+                        % (paused, fmt(elapsed), fmt(total), min(100, int(elapsed * 100 / total))))
+        return head + '<div class="card">%s</div></body></html>' % ''.join(r for r in rows if r)
 
     def do_GET(self):
         if not self._check_auth(): return self._send_auth_challenge()
@@ -375,6 +491,9 @@ class PowerToysHandler(BaseHTTPRequestHandler):
                     'pre{white-space:pre-wrap;word-break:break-all}</style></head><body><pre>%s</pre></body></html>'
                     % report.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'))
             return self._send_html(html)
+
+        if path == '/now':
+            return self._send_html(self._now_page())
 
         if path == '/log':
             from urllib.parse import parse_qs

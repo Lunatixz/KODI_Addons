@@ -18,6 +18,7 @@
 # -*- coding: utf-8 -*-
 import time, traceback, json, os, platform
 import datetime, heapq, random, sys
+import urllib.request
 
 try:    from simplecache             import SimpleCache
 except: from simplecache.simplecache import SimpleCache #pycharm stub
@@ -112,6 +113,32 @@ def notification(message, header=ADDON_NAME, sound=False, time=4000, icon=ICON, 
         except: xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (header, message, time, icon))
     return True
          
+_KODI_WEB_AUTH = {}   # {'header': {...}|None} - Kodi webserver creds, read once per process
+
+def kodiAuthHeader():
+    # Basic auth for OUTBOUND calls to a peer's Kodi /jsonrpc endpoint. What secures
+    # that endpoint is the Kodi webserver user/pass (same setting on every box), NOT
+    # our QR-server auth. UTF-8 encode per RFC 7617.
+    if 'header' not in _KODI_WEB_AUTH:
+        try:
+            import base64
+            u = sendJSON({"method":"Settings.GetSettingValue","params":{"setting":"services.webserverusername"}}).get('result',{}).get('value') or ''
+            p = sendJSON({"method":"Settings.GetSettingValue","params":{"setting":"services.webserverpassword"}}).get('result',{}).get('value') or ''
+            _KODI_WEB_AUTH['header'] = ({'Authorization': 'Basic ' + base64.b64encode(('%s:%s' % (u, p)).encode('utf-8')).decode('ascii')}
+                                        if u else None)
+        except Exception:
+            _KODI_WEB_AUTH['header'] = None
+    return _KODI_WEB_AUTH['header']
+
+def authRequest(url, payload):
+    # outbound JSON-RPC request with peer webserver auth attached when configured
+    req = urllib.request.Request(url, data=payload if isinstance(payload, bytes) else json.dumps(payload).encode('utf-8'))
+    req.add_header('Content-Type', 'application/json')
+    auth = kodiAuthHeader()
+    if auth:
+        for k, v in auth.items(): req.add_header(k, v)
+    return req
+
 def sendJSON(param):
     command = dict(param)
     command["jsonrpc"] = "2.0"

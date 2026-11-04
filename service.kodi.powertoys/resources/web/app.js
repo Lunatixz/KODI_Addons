@@ -469,6 +469,7 @@ function addCommand(){
     var m=window.prompt('Enter JSON-RPC method name (e.g. VideoLibrary.Scan):');
     if(!m)return;method=m;
   }
+  if(!/^\w+\.\w+$/.test(method)){ alert('Method must look like Namespace.Method (e.g. VideoLibrary.Scan)'); return; }
   var params;
   try{
     params = jsonMode ? JSON.parse($('params-editor').value||'{}') : collectFormValues(true);
@@ -554,6 +555,7 @@ function initLanding(){
       var name=document.createElement('span');name.className='instance-name';name.textContent=inst.label;
       label.appendChild(cb);label.appendChild(name);
       if(inst.self){var badge=document.createElement('span');badge.className='instance-self';badge.textContent='THIS';label.appendChild(badge)}
+      else if(inst.reachable===false){label.className='instance-unreachable';name.textContent=inst.label+' (unreachable)'}
       container.appendChild(label);
     });
   }).catch(function(){

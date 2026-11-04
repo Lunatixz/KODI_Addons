@@ -284,8 +284,13 @@ class Monitor(xbmc.Monitor):
             if self._peerTokenSeen(token):
                 self._confirm(data, "SyncConfirmed"); return
             if path:
-                self.log('Peer scan received (path): %s' % path)
-                self.service._que(self.service.scrapeDirectory, 2, path)
+                if not xbmcvfs.exists(path):
+                    self.log('Peer scan: path not present locally (%s) - acking without scan' % path, xbmc.LOGWARNING)
+                elif self.service._needsScan(path):
+                    self.log('Peer scan received (path): %s' % path)
+                    self.service._que(self.service.scrapeDirectory, 2, path)
+                else:
+                    self.log('Peer scan: %s already up to date - skipping scan' % path)
             elif REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self.service.isRunning:
                 self.log('Peer scan received (full)')
                 self.service._que(self.service.runScraper, 2)
@@ -334,8 +339,7 @@ class Monitor(xbmc.Monitor):
                        "params":{"sender":ADDON_ID,"message":message,"data":{"token":token}},
                        "id":"kodi.powertoys.sync"}
             url = 'http://%s:%d/jsonrpc' % (cb_ip, cb_port or 8080)
-            req = urllib.request.Request(url, data=json.dumps(confirm).encode('utf-8'))
-            req.add_header('Content-Type', 'application/json')
+            req = authRequest(url, confirm)
             urllib.request.urlopen(req, timeout=5)
             self.log('Confirmed (%s) to %s:%s' % (message, cb_ip, cb_port))
         except Exception as e:
@@ -528,8 +532,7 @@ class SyncManager:
                    "params":{"sender":ADDON_ID,"message":msg,"data":data},
                    "id":"kodi.powertoys.sync"}
             url = 'http://%s:%d/jsonrpc' % (t['ip'], t['port'])
-            req = urllib.request.Request(url, data=json.dumps(cmd).encode('utf-8'))
-            req.add_header('Content-Type', 'application/json')
+            req = authRequest(url, cmd)
             urllib.request.urlopen(req, timeout=5)
             with self._lock:
                 t['sent_ts'] = time.time()
@@ -671,8 +674,7 @@ class SyncManager:
                              "data":{"ip":self._local_ip,"port":self._local_web_port,"token":token}},
                    "id":"kodi.powertoys.sync"}
             url = 'http://%s:%d/jsonrpc' % (ip, port)
-            req = urllib.request.Request(url, data=json.dumps(cmd).encode('utf-8'))
-            req.add_header('Content-Type', 'application/json')
+            req = authRequest(url, cmd)
             response = urllib.request.urlopen(req, timeout=5)
             with self._lock:
                 self._pending[token] = {'peer':name,'ip':ip,'port':port,'ts':time.time(),'retries':0}
@@ -1185,6 +1187,51 @@ class Service(object):
 
     def _pathKey(self, path):
         return (path or '').replace('\\', '/').rstrip('/').lower()
+
+    def _unknownMedia(self, dirpath, known_tv, known_movies, depth):
+        # walk up to depth levels below dirpath looking for media files the library lacks
+        if depth <= 0: return False
+        for e in (self.getDirectory(dirpath) or []):
+            f = self._pathKey(e.get('file'))
+            if e.get('filetype') == 'file':
+                if f not in known_tv and f not in known_movies: return True
+            elif self._unknownMedia(e.get('file'), known_tv, known_movies, depth - 1):
+                return True
+        return False
+
+    def _needsScan(self, path):
+        # Peer scan verify (scan-push flow): False = this library already has everything
+        # under path, so the redundant scan can be skipped. Anything uncertain -> True,
+        # because a Kodi scan is the cheapest authority. Handles fresh items (new folder),
+        # new episodes of a known show (episode-file walk) and movie folders; roots or
+        # multi-show paths fall through to an unconditional scan.
+        try:
+            npath = self._pathKey(path)
+            if not npath: return True
+            movies = {self._pathKey(m.get('file')) for m in (self.getMovies() or [])}
+            if npath in movies: return False           # path is a known movie file
+            rel = []
+            for s in (self.getTVshows() or []):
+                sf = self._pathKey(s.get('file'))
+                if sf and (sf == npath or npath.startswith(sf + '/')):
+                    rel.append((sf, s))
+            if len(rel) > 1: return True               # root / multi-show: too broad to verify
+            if len(rel) == 1:
+                sf, show = rel[0]
+                # module-level getEpisodes: fresh, a stale cache could skip a needed scan
+                known_tv = {sf} | {self._pathKey(e.get('file')) for e in (getEpisodes(show.get('tvshowid')) or [])}
+                if npath == sf:
+                    return self._unknownMedia(path, known_tv, movies, 2)   # show folder -> seasons -> files
+                if npath.startswith(sf + '/'):
+                    return self._unknownMedia(path, known_tv, movies, 1)   # season/sub folder -> files
+                return True                             # path sits above the show: too broad
+            files = [k for k in (self.getDirectory(path) or []) if k.get('filetype') == 'file']
+            if files:
+                return any(self._pathKey(k.get('file')) not in movies for k in files)
+            return True                                 # fresh/unknown structure - scan
+        except Exception as e:
+            self.log('_needsScan failed (%s) - scanning to be safe' % e, xbmc.LOGWARNING)
+            return True
 
     def get_stream_weight(self, file_path):
         weight = 0

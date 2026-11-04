@@ -828,7 +828,7 @@ Matching and output
     </extension>
 </addon>
 
-<addon id="service.kodi.powertoys" version="1.3.8" name="Kodi PowerToys" provider-name="Lunatixz">
+<addon id="service.kodi.powertoys" version="1.3.9" name="Kodi PowerToys" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.kodi-six" version="0.1.3.1"/>
@@ -917,9 +917,7 @@ v1.3.7 (2026-10-30)
 - Change: settings pass - single-word category tabs, sentence-case labels, fixed the delete-files toggle wording (it gates all media file deletions, not just duplicates)
 - Fix: removing a show no longer reports success when the show entry stayed behind - the RemoveTVShow outcome is logged and an explicit toast explains a partial/failed drop; context prompts show a busy dialog while details are gathered (slow shares)
 - Change: removal actions toast a reminder when Allow Delete is off - entries left the library but files stay on disk, so a later scan can re-add them
-v1.3.4 (2026-10-26)
-- Add: peer scan push and watched/resume sync across networked instances (offline peers picked up on wake)
-- Add: Wake-on-LAN (auto on failed push, /wake endpoint, QR command)
+- Add: /now Now Playing page (streams, progress, HDR with filename-hint fallback for formats Kodi 21 misreports); instances list pings peers and greys out unreachable ones
 </news>
     </extension>
 </addon>

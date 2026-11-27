@@ -152,8 +152,9 @@ def _main():
         body = '%s\n%d episode(s), %s' % (title, len(eps), _fmt(total))
         if _yesno(32089, body, 'this show (all seasons and episodes)'): notify('RemoveTVShow', {'tvshowid': dbid})
     elif action == 'scan_folder':
-        path = xbmc.getInfoLabel('ListItem.Path') or xbmc.getInfoLabel('ListItem.FolderPath')
-        if path: notify('ScanFolder', {'path': path})
+        path = xbmc.getInfoLabel('ListItem.FolderPath') or xbmc.getInfoLabel('ListItem.Path')
+        if path and not path.lower().startswith(('sources://', 'videodb://', 'library://', 'plugin://', 'addons://', 'special://')):
+            notify('ScanFolder', {'path': path})
     elif action == 'health_report':
         notify('HealthReport')
     else:

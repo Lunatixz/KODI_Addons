@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="service.kodi.powertoys" version="1.4.0" name="Kodi PowerToys" provider-name="Lunatixz">
+<addon id="service.kodi.powertoys" version="1.4.1" name="Kodi PowerToys" provider-name="Lunatixz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.kodi-six" version="0.1.3.1"/>
@@ -81,6 +81,11 @@ Sync: broadcasts library refresh to network peers (zeroconf discovery) with conf
 Maintenance: scan-error retry, offline-share alerts, context menu actions (clean show/movie, scan folder, health report).
 All destructive operations honor Dry Run, and file deletion is a separate opt-in.</description>
         <news>
+v1.4.1 (2026-11-27)
+- Fix: Container.Refresh no longer fires repeatedly and flashes the screen — fixed _pending peer lookup bug in SyncManager, deduplicated peer endpoints, added local instance ID + multi-NIC IP filtering, increased scan-quiet/broadcast debounce, and added a 30s cooldown + playback/screensaver/scan deferral for local Container.Refresh
+- Fix: peer sync now propagates newly discovered content from scheduled/share-recovery scans to all PowerToys instances without duplicates, checks fresh library state (non-cached), and refreshes UI on shared MySQL peers when the item is already in the shared DB
+- Fix: TV scan/refresh no longer queues non-directory files, helper folders, virtual Kodi paths (sources://, videodb://, etc.), or unnormalized/invalid IDs that could cause Kodi to scan a source/file path and attach a TV show thumbnail to a UI ListItem source path
+- Perf: eliminated playback slowdowns — unified _isPlaying() gate (respects Run_Playing live and Player.Playing), skipped share polling and RAM trimming during playback, added playback pause checks to texture maintenance, scraper, cleaner, and music clean, cached schedule timestamps and web port in memory instead of polling SQLite/JSON-RPC every 5s, and eased refresh task pacing
 v1.3.7 (2026-10-30)
 - Fix: context menu items use Kodi's official args attribute inside a menu block - the legacy child &lt;args&gt; element is ignored by the parser (argv arrived empty), so context actions never fired
 - Change: all PowerToys context actions now sit behind a single "PowerToys" submenu instead of cluttering the top-level context menu (item labels no longer need the PowerToys prefix)

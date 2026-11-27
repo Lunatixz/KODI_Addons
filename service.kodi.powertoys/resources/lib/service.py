@@ -128,150 +128,148 @@ class Monitor(xbmc.Monitor):
 
     def _toastIfPlaying(self):
         # queued context work waits silently in the queue otherwise - say so up front
-        if self.service and getattr(self.service, '_playing', False):
+        if self.service and self.service._isPlaying():
             notification(LANGUAGE(32086))
         
     def onNotification(self, sender, method, data):
         self.log("onNotification, sender %s - method: %s  - data: %s" % (sender, method, data))
-        if self.service:
-            if sender == ADDON_ID and method.endswith(".RefreshLibrary"):
-                # refresh only when ANOTHER instance sent this - after our own scan Kodi
-                # updates its own view, so a local Container.Refresh is pointless (a
-                # self-echo happens when zeroconf reports a different local IP)
+        if not self.service:
+            return
+        if sender == ADDON_ID:
+            if method.endswith(".RefreshLibrary"):
+                # refresh only when ANOTHER instance sent this, and never spam Container.Refresh
+                # during playback, fullscreen video, screensaver, scanning, or within cooldown
                 payload = json.loads(data) if isinstance(data, str) else (data or {})
-                our_ip = self.service.sync._local_ip if getattr(self.service, 'sync', None) else None
-                if payload.get('ip') and payload.get('ip') == our_ip:
+                sync = getattr(self.service, 'sync', None)
+                local_ips = sync._local_ips if sync else set()
+                from_self = ((payload.get('instance') and payload.get('instance') == self.service.pid) or
+                             (payload.get('ip') and payload.get('ip') in local_ips))
+                if from_self:
                     self.log("Refresh originated on this instance - skipping local Container.Refresh")
                 else:
-                    self.log("Peer refresh signal received")
-                    xbmc.executebuiltin("Container.Refresh")
+                    self.service.requestLocalRefresh()
                 self._confirm(data, "RefreshConfirmed")
-            if sender == ADDON_ID and method.endswith(".RefreshConfirmed"):
-                self.log("Peer refresh confirmed")
-                if self.service and hasattr(self.service, 'sync'):
+            elif method.endswith(".RefreshConfirmed") or method.endswith(".SyncConfirmed"):
+                self.log("Peer %s" % method.split('.')[-1])
+                if hasattr(self.service, 'sync'):
                     self.service.sync.on_confirm(data)
-            if sender == ADDON_ID and method.endswith(".SyncConfirmed"):
-                self.log("Peer sync confirmed")
-                if self.service and hasattr(self.service, 'sync'):
-                    self.service.sync.on_confirm(data)
-            if sender == ADDON_ID and method.endswith(".ScanLibrary"):
+            elif method.endswith(".ScanLibrary"):
                 self._handle_peer_scan(data)
-            if sender == ADDON_ID and method.endswith(".WatchedUpdate"):
+            elif method.endswith(".WatchedUpdate"):
                 self._handle_peer_watched(data)
-            if method == "VideoLibrary.OnScanFinished" and REAL_SETTINGS.getSettingBool('Clean_OnScanFinished'):
-                self.log("Event Intercept -> Library Scan Finished. Injecting optimization pass.")
-                self.service._que(self.service.runClean, priority=5)
-            if method in ["VideoLibrary.OnUpdate", "VideoLibrary.OnScanStarted"]:
-                if hasattr(self.service, 'cache'):  # report counts went stale
-                    try:    self.service.cache.set('healthreport', '', checksum=ADDON_VERSION, json_data=True)
-                    except Exception: pass
-            if method == "VideoLibrary.OnUpdate" and hasattr(self.service, '_onLibraryUpdate'):
-                self.service._onLibraryUpdate(method, data)
-            if method == "VideoLibrary.OnScanFinished":
-                if self.service and hasattr(self.service, 'sync'):
-                    self.service.sync.request_refresh()  # coalesced - one broadcast per batch, not per scan
-            if method == "VideoLibrary.OnScanError" and REAL_SETTINGS.getSettingBool('Scan_Retry_On_Error'):
-                now = time.time()
-                if self.service and not self.service.isRunning and (now - self.service._lastScanRetry) > 3600:
-                    self.service._lastScanRetry = now
-                    self.log('Scan error detected, re-queuing scraper (cooldown 1h)', xbmc.LOGWARNING)
-                    self.service._que(self.service.runScraper, 2)
-            if sender == ADDON_ID and method.endswith(".HealthReport"):
-                if self.service: threading.Thread(target=self.service.healthReport, daemon=True).start()
-            if sender == ADDON_ID and method.endswith(".RunScraper"):
-                if self.service:
-                    if hasattr(self.service, 'sync'): self.service.sync.queue_msg('ScanLibrary', {'path': None})
-                    if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self.service.isRunning:
-                        self.service._que(self.service.runScraper, 2, True)  # True: manual menu run
-            if sender == ADDON_ID and method.endswith(".RunRefresh"):
-                if self.service and REAL_SETTINGS.getSettingBool('Refresh_Enabled'):
+            elif method.endswith(".HealthReport"):
+                threading.Thread(target=self.service.healthReport, daemon=True).start()
+            elif method.endswith(".RunScraper"):
+                if hasattr(self.service, 'sync'): self.service.sync.queue_msg('ScanLibrary', {'path': None})
+                if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self.service.isRunning:
+                    self.service._que(self.service.runScraper, 2, True)  # True: manual menu run
+            elif method.endswith(".RunRefresh"):
+                if REAL_SETTINGS.getSettingBool('Refresh_Enabled'):
                     self.service._que(self.service.runRefresh, 2, True)  # True: manual menu run
-            if sender == ADDON_ID and method.endswith(".RunClean"):
-                if self.service: self.service._que(self.service.runClean, 3, True)  # True: manual menu run
-            if sender == ADDON_ID and method.endswith(".RunTexture"):
-                if self.service and REAL_SETTINGS.getSettingBool('Texture_Enabled'):
+            elif method.endswith(".RunClean"):
+                self.service._que(self.service.runClean, 3, True)  # True: manual menu run
+            elif method.endswith(".RunTexture"):
+                if REAL_SETTINGS.getSettingBool('Texture_Enabled'):
                     self.service._que(self.service.runTexture, 3, True)  # True: manual menu run
-            if sender == ADDON_ID and method.endswith(".RunBackup"):
-                if self.service and REAL_SETTINGS.getSettingBool('Backup_Enabled'):
+            elif method.endswith(".RunBackup"):
+                if REAL_SETTINGS.getSettingBool('Backup_Enabled'):
                     self.service._que(self.service.runBackup, 3, True)  # True: manual menu run
-            if sender == ADDON_ID and method.endswith(".RunMusic"):
-                if self.service and REAL_SETTINGS.getSettingBool('Music_Enabled'):
+            elif method.endswith(".RunMusic"):
+                if REAL_SETTINGS.getSettingBool('Music_Enabled'):
                     self.service._que(self.service.runMusic, 3, True)  # True: manual menu run
-            if sender == ADDON_ID and method.endswith(".RunCacheClean"):
-                if self.service: threading.Thread(target=self.service.runCacheClean, daemon=True).start()
-            if sender == ADDON_ID and method.endswith(".RunFreeRam"):
-                if self.service: self.service._que(self.service.runRamFree, 3)
-            if sender == ADDON_ID and method.endswith(".CleanTVShow"):
+            elif method.endswith(".RunCacheClean"):
+                threading.Thread(target=self.service.runCacheClean, daemon=True).start()
+            elif method.endswith(".RunFreeRam"):
+                self.service._que(self.service.runRamFree, 3)
+            elif method.endswith(".CleanTVShow"):
                 try:
                     tvshowid = int((json.loads(data) if isinstance(data, str) else (data or {})).get('tvshowid', -1))
-                    if tvshowid >= 0 and self.service:
+                    if tvshowid >= 0:
                         self.service._que(self.service.cleanTV, 1, tvshowid, None, True)
                         self._toastIfPlaying()
                 except Exception as e: self.log('CleanTVShow error: %s' % e, xbmc.LOGWARNING)
-            if sender == ADDON_ID and method.endswith(".CleanMovie"):
+            elif method.endswith(".CleanMovie"):
                 try:
                     payload = json.loads(data) if isinstance(data, str) else (data or {})
                     movieid = int(payload.get('movieid', -1))
-                    if movieid >= 0 and self.service:
+                    if movieid >= 0:
                         movies = [m for m in (self.service.getMovies() or []) if m.get('movieid') == movieid]
                         if movies:
                             group = next((g for g in self.service._movieDuplicateGroups(self.service.getMovies() or []) if any(m.get('movieid') == movieid for m in g)), movies)
                             self.service._que(self.service.cleanMovies, 1, group, None, True)
                             self._toastIfPlaying()
                 except Exception as e: self.log('CleanMovie error: %s' % e, xbmc.LOGWARNING)
-            if sender == ADDON_ID and method.endswith(".CleanSeason"):
+            elif method.endswith(".CleanSeason"):
                 try:
                     payload = json.loads(data) if isinstance(data, str) else (data or {})
                     tvshowid, season = int(payload.get('tvshowid', -1)), int(payload.get('season', -99))
-                    if tvshowid >= 0 and season > -99 and self.service:
+                    if tvshowid >= 0 and season > -99:
                         self.service._que(self.service.cleanSeason, 1, tvshowid, season)
                         self._toastIfPlaying()
                 except Exception as e: self.log('CleanSeason error: %s' % e, xbmc.LOGWARNING)
-            if sender == ADDON_ID and method.endswith(".WatchSeason"):
+            elif method.endswith(".WatchSeason"):
                 try:
                     payload = json.loads(data) if isinstance(data, str) else (data or {})
                     tvshowid, season, watched = int(payload.get('tvshowid', -1)), int(payload.get('season', -99)), bool(payload.get('watched', True))
-                    if tvshowid >= 0 and season > -99 and self.service:
+                    if tvshowid >= 0 and season > -99:
                         self.service._que(self.service.markWatched, 1, tvshowid, season, watched)
                         self._toastIfPlaying()
                 except Exception as e: self.log('WatchSeason error: %s' % e, xbmc.LOGWARNING)
-            if sender == ADDON_ID and method.endswith(".WatchShow"):
+            elif method.endswith(".WatchShow"):
                 try:
                     payload = json.loads(data) if isinstance(data, str) else (data or {})
                     tvshowid, watched = int(payload.get('tvshowid', -1)), bool(payload.get('watched', True))
-                    if tvshowid >= 0 and self.service:
+                    if tvshowid >= 0:
                         self.service._que(self.service.markWatched, 1, tvshowid, None, watched)
                         self._toastIfPlaying()
                 except Exception as e: self.log('WatchShow error: %s' % e, xbmc.LOGWARNING)
-            if sender == ADDON_ID and method.endswith(".RemoveMovie"):
+            elif method.endswith(".RemoveMovie"):
                 try:
                     movieid = int((json.loads(data) if isinstance(data, str) else (data or {})).get('movieid', -1))
-                    if movieid >= 0 and self.service:
+                    if movieid >= 0:
                         self.service._que(self.service.removeMovieEntry, 1, movieid)
                         self._toastIfPlaying()
                 except Exception as e: self.log('RemoveMovie error: %s' % e, xbmc.LOGWARNING)
-            if sender == ADDON_ID and method.endswith(".RemoveEpisode"):
+            elif method.endswith(".RemoveEpisode"):
                 try:
                     episodeid = int((json.loads(data) if isinstance(data, str) else (data or {})).get('episodeid', -1))
-                    if episodeid >= 0 and self.service:
+                    if episodeid >= 0:
                         self.service._que(self.service.removeEpisodeEntry, 1, episodeid)
                         self._toastIfPlaying()
                 except Exception as e: self.log('RemoveEpisode error: %s' % e, xbmc.LOGWARNING)
-            if sender == ADDON_ID and method.endswith(".RemoveTVShow"):
+            elif method.endswith(".RemoveTVShow"):
                 try:
                     tvshowid = int((json.loads(data) if isinstance(data, str) else (data or {})).get('tvshowid', -1))
-                    if tvshowid >= 0 and self.service:
+                    if tvshowid >= 0:
                         self.service._que(self.service.removeShowEntry, 1, tvshowid)
                         self._toastIfPlaying()
                 except Exception as e: self.log('RemoveTVShow error: %s' % e, xbmc.LOGWARNING)
-            if sender == ADDON_ID and method.endswith(".ScanFolder"):
+            elif method.endswith(".ScanFolder"):
                 try:
                     payload = json.loads(data) if isinstance(data, str) else (data or {})
                     path = payload.get('path')
-                    if path and self.service:
+                    if path:
                         if hasattr(self.service, 'sync'): self.service.sync.queue_msg('ScanLibrary', {'path': path})
                         self.service._que(self.service.scrapeDirectory, 2, path)
                 except Exception as e: self.log('ScanFolder error: %s' % e, xbmc.LOGWARNING)
+        elif method == "VideoLibrary.OnScanFinished":
+            if REAL_SETTINGS.getSettingBool('Clean_OnScanFinished'):
+                self.log("Event Intercept -> Library Scan Finished. Injecting optimization pass.")
+                self.service._que(self.service.runClean, priority=5)
+            if hasattr(self.service, 'sync'):
+                self.service.sync.request_refresh()  # coalesced - one broadcast per batch, not per scan
+        elif method in ("VideoLibrary.OnUpdate", "VideoLibrary.OnScanStarted"):
+            if hasattr(self.service, 'cache'):  # report counts went stale
+                try:    self.service.cache.set('healthreport', '', checksum=ADDON_VERSION, json_data=True)
+                except Exception: pass
+            if method == "VideoLibrary.OnUpdate" and hasattr(self.service, '_onLibraryUpdate'):
+                self.service._onLibraryUpdate(method, data)
+        elif method == "VideoLibrary.OnScanError" and REAL_SETTINGS.getSettingBool('Scan_Retry_On_Error'):
+            now = time.time()
+            if not self.service.isRunning and (now - self.service._lastScanRetry) > 3600:
+                self.service._lastScanRetry = now
+                self.log('Scan error detected, re-queuing scraper (cooldown 1h)', xbmc.LOGWARNING)
+                self.service._que(self.service.runScraper, 2)
 
     def _peerTokenSeen(self, token):
         # shared re-ack-no-requeue LRU for peer push tokens (safe resends if acks get lost)
@@ -296,12 +294,15 @@ class Monitor(xbmc.Monitor):
                     self.log('Peer scan: path not present locally (%s) - acking without scan' % path, xbmc.LOGWARNING)
                 elif self.service._needsScan(path):
                     self.log('Peer scan received (path): %s' % path)
-                    self.service._que(self.service.scrapeDirectory, 2, path)
+                    self.service._que(self.service.scrapeDirectory, 2, path, None, True)  # True: from_peer
                 else:
-                    self.log('Peer scan: %s already up to date - skipping scan' % path)
+                    self.log('Peer scan: %s already in library (shared DB) - refreshing UI' % path)
+                    self.service.requestLocalRefresh()
             elif REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self.service.isRunning:
                 self.log('Peer scan received (full)')
                 self.service._que(self.service.runScraper, 2)
+            else:
+                self.service.requestLocalRefresh()
             if token: self._confirm(data, "SyncConfirmed")
         except Exception as e:
             self.log('ScanLibrary error: %s' % e, xbmc.LOGWARNING)
@@ -355,10 +356,10 @@ class Monitor(xbmc.Monitor):
 
 class SyncManager:
     SERVICE_TYPE = "_xbmc-jsonrpc-h._tcp.local."
-    DEBOUNCE_SECONDS = 5
-    REFRESH_QUIET = 10     # seconds with no scan-finished event before a coalesced refresh goes out
+    DEBOUNCE_SECONDS = 15
+    REFRESH_QUIET = 15     # seconds with no scan-finished event before a coalesced refresh goes out
     CONFIRM_TIMEOUT = 15
-    MAX_RETRIES = 3
+    MAX_RETRIES = 2
 
     def __init__(self, service=None):
         self.log('SyncManager.__init__')
@@ -373,6 +374,8 @@ class SyncManager:
         self._last_broadcast = 0
         self._lock = threading.Lock()
         self._local_ip = self._get_local_ip()
+        self._local_ips = self._get_local_ips()
+        self._web_port_cache = (0, 8080)
         self._pending = {}   # token -> {peer, ip, port, ts, retries} (refresh confirm path)
         self._token = 0
         self._refresh_pending = False   # coalesced UI-refresh: batch, don't flicker per scan
@@ -407,7 +410,7 @@ class SyncManager:
             if not info or not info.getAddress():
                 return
             ip = socket.inet_ntoa(info.getAddress())
-            if ip == self._local_ip:
+            if ip in self._local_ips:
                 self.log('Skipping self: %s' % ip)
                 return
             with self._lock:
@@ -443,12 +446,28 @@ class SyncManager:
         except Exception:
             return "127.0.0.1"
 
+    def _get_local_ips(self):
+        ips = {'127.0.0.1', self._local_ip}
+        try:
+            for res in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
+                if res[4] and res[4][0]:
+                    ips.add(res[4][0])
+        except Exception:
+            pass
+        return ips
+
     @property
     def _local_web_port(self):
+        now = time.time()
+        ts, port = self._web_port_cache
+        if now - ts < 300:
+            return port
         try:
-            return sendJSON({"method":"Settings.GetSettingValue","params":{"setting":"services.webserverport"}}).get('result',{}).get('value', 8080)
+            port = sendJSON({"method":"Settings.GetSettingValue","params":{"setting":"services.webserverport"}}).get('result',{}).get('value', 8080) or 8080
         except Exception:
-            return 8080
+            port = 8080
+        self._web_port_cache = (now, port)
+        return port
 
     # ── durable outbox (ScanLibrary / WatchedUpdate) ────────────────────
     def queue_msg(self, msg, payload):
@@ -616,7 +635,7 @@ class SyncManager:
 
     def maybe_broadcast(self):
         # fire the coalesced refresh when: quiet since the last scan-finished event,
-        # nothing scanning, and no scrape work still queued (tasks or queue)
+        # nothing scanning, and no scrape work still queued or actively running
         if not self._refresh_pending or not REAL_SETTINGS.getSettingBool('Sync_Enabled'):
             return
         if time.time() - self._last_scan_event < self.REFRESH_QUIET:
@@ -624,7 +643,9 @@ class SyncManager:
         if isScanning():
             return
         if self.service:
-            if self.service._tasks.get('scrapeDirectory'):
+            if self.service.isRunning or self.service._tasks.get('scrapeDirectory'):
+                return
+            if getattr(self.service.queue, 'current_task', None) == 'scrapeDirectory':
                 return
             try:
                 if any(name == 'scrapeDirectory' for name, _args in self.service.queue.snapshot()):
@@ -636,6 +657,10 @@ class SyncManager:
 
     def broadcast_refresh(self):
         if not REAL_SETTINGS.getSettingBool('Sync_Enabled'):
+            return
+        with self._lock:
+            has_peers = bool(self.peers)
+        if not has_peers:
             return
         now = time.time()
         if now - self._last_broadcast < self.DEBOUNCE_SECONDS:
@@ -669,8 +694,15 @@ class SyncManager:
         return sent
 
     def _broadcast_loop(self):
-        for name, peer in list(self.peers.items()):
-            if name in self._pending: continue
+        seen_endpoints = set()
+        with self._lock:
+            peers = list(self.peers.items())
+            pending_peers = {e['peer'] for e in self._pending.values()}
+        for name, peer in peers:
+            endpoint = (peer['ip'], peer['port'])
+            if name in pending_peers or endpoint in seen_endpoints:
+                continue
+            seen_endpoints.add(endpoint)
             self._send_refresh(name, peer['ip'], peer['port'])
 
     def _send_refresh(self, name, ip, port):
@@ -679,7 +711,8 @@ class SyncManager:
         try:
             cmd = {"jsonrpc":"2.0","method":"JSONRPC.NotifyAll",
                    "params":{"sender":ADDON_ID,"message":"RefreshLibrary",
-                             "data":{"ip":self._local_ip,"port":self._local_web_port,"token":token}},
+                             "data":{"ip":self._local_ip,"port":self._local_web_port,"token":token,
+                                     "instance":self.service.pid if self.service else ""}},
                    "id":"kodi.powertoys.sync"}
             url = 'http://%s:%d/jsonrpc' % (ip, port)
             req = authRequest(url, cmd)
@@ -726,6 +759,9 @@ class Service(object):
         self._shareState = {}
         self._lastShareCheck = 0
         self._suppressWatchPush = 0  # deadline; set when applying a remote watched update
+        self._nextRun = {}           # in-memory schedule cache so _chkUpdate avoids SQLite hits every 5s
+        self._lastContainerRefresh = 0
+        self._pendingLocalRefresh = False
 
     def __del__(self):
         self._save()
@@ -801,13 +837,41 @@ class Service(object):
         for k, v in list(self._tasks.items()): _tasks[k] = list(v)
         self.cache.set('tasks', json.dumps(_tasks, default=list), checksum=ADDON_VERSION, expiration=datetime.timedelta(days=28), json_data=True)
             
+    def _isPlaying(self):
+        if REAL_SETTINGS.getSettingBool('Run_Playing'):
+            return False
+        return self._playing or isPlaying()
+
+    def requestLocalRefresh(self):
+        # Coalesced, playback-safe, cooldown-gated Container.Refresh
+        if (self._isPlaying() or isScanning() or
+                xbmc.getCondVisibility('Window.IsActive(fullscreenvideo)') or
+                xbmc.getCondVisibility('System.ScreenSaverActive')):
+            self._pendingLocalRefresh = True
+            self.log('Deferring Container.Refresh (playing, scanning, or screensaver active)')
+            return
+        self._pendingLocalRefresh = False
+        now = time.time()
+        if now - self._lastContainerRefresh < 30:
+            self.log('Skipping Container.Refresh (cooldown %.1fs remaining)' % (30 - (now - self._lastContainerRefresh)))
+            return
+        self._lastContainerRefresh = now
+        self.log('Executing Container.Refresh')
+        xbmc.executebuiltin("Container.Refresh")
+
     def _chkIdle(self):
         if REAL_SETTINGS.getSettingBool('Run_Idling'): return int(xbmc.getGlobalIdleTime() or '0') > self.wait
         return True
         
     @contextmanager
     def _chkUpdate(self, func, days=1, nextrun=None, *args, **kwargs):
-        nxrun    = (nextrun or self.cache.get(func.__name__) or 0) 
+        fname = func.__name__
+        if nextrun is not None:
+            nxrun = nextrun
+        else:
+            if fname not in self._nextRun:
+                self._nextRun[fname] = (self.cache.get(fname) or 0)
+            nxrun = self._nextRun[fname]
         epoch    = int(time.time())
         runevery = days * 86400
         if epoch >= nxrun:
@@ -818,14 +882,16 @@ class Service(object):
                 self.log('_chkUpdate, failed! %s'%(e), xbmc.LOGERROR)
             finally:
                 if finished: 
-                    self.log('_chkUpdate, func = %s, next run in %s days, finished = %s' % (func.__name__, days, finished))
-                    self.cache.set(func.__name__, (epoch + runevery), checksum=ADDON_VERSION, expiration=datetime.timedelta(days=28))
+                    nxt = epoch + runevery
+                    self._nextRun[fname] = nxt
+                    self.log('_chkUpdate, func = %s, next run in %s days, finished = %s' % (fname, days, finished))
+                    self.cache.set(fname, nxt, checksum=ADDON_VERSION, expiration=datetime.timedelta(days=28))
         yield
          
     def _pauseWhilePlaying(self):
-        if not self._playing: return True
+        if not self._isPlaying(): return True
         self.log('_pauseWhilePlaying, playback started - holding...')
-        while self._playing and not self.monitor.abortRequested():
+        while self._isPlaying() and not self.monitor.abortRequested():
             if self.monitor.waitForAbort(5.0): return False
         self.log('_pauseWhilePlaying, playback stopped - resuming...')
         return True
@@ -860,8 +926,12 @@ class Service(object):
             self.log('_onLibraryUpdate: %s' % e, xbmc.LOGWARNING)
 
     def _run(self):
-        self._watchShares()
         self.sync.maybe_broadcast()   # flush coalesced UI-refresh; runs pre-gates on purpose
+        if self._pendingLocalRefresh:
+            self.requestLocalRefresh()
+        if self._isPlaying():
+            return
+        self._watchShares()
         if isScanning():
             return
         if not self._chkIdle():
@@ -883,19 +953,21 @@ class Service(object):
                 self._que(self.refreshMovie, 4, *self._tasks.get('refreshMovie').pop())
         elif not self.isRunning:
             self.isRunning = True
-            if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self._playing:
-                with self._chkUpdate(self.runScraper,REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')): pass
-            if REAL_SETTINGS.getSettingBool('Refresh_Enabled') and not self._playing:
-                with self._chkUpdate(self.runRefresh,REAL_SETTINGS.getSettingInt('Refresh_Interval_DAYS')): pass
-            if not self._playing and REAL_SETTINGS.getSettingBool('Backup_Enabled'):
-                with self._chkUpdate(self.runBackup,REAL_SETTINGS.getSettingInt('Backup_Interval_DAYS')): pass
-            if not self._playing and REAL_SETTINGS.getSettingBool('Texture_Enabled'):
-                with self._chkUpdate(self.runTexture,REAL_SETTINGS.getSettingInt('Texture_Interval_DAYS')): pass
-            if not self._playing and REAL_SETTINGS.getSettingBool('Music_Enabled'):
-                with self._chkUpdate(self.runMusic,REAL_SETTINGS.getSettingInt('Music_Interval_DAYS')): pass
-            if not self._playing and REAL_SETTINGS.getSettingBool('FreeRam_Enabled'):
-                with self._chkUpdate(self.runRamFree, REAL_SETTINGS.getSettingInt('FreeRam_Interval_HOURS') / 24.0): pass
-            self.isRunning = False
+            try:
+                if REAL_SETTINGS.getSettingBool('Scraper_Enabled') and not self._isPlaying():
+                    with self._chkUpdate(self.runScraper,REAL_SETTINGS.getSettingInt('Scraper_Interval_DAYS')): pass
+                if REAL_SETTINGS.getSettingBool('Refresh_Enabled') and not self._isPlaying():
+                    with self._chkUpdate(self.runRefresh,REAL_SETTINGS.getSettingInt('Refresh_Interval_DAYS')): pass
+                if not self._isPlaying() and REAL_SETTINGS.getSettingBool('Backup_Enabled'):
+                    with self._chkUpdate(self.runBackup,REAL_SETTINGS.getSettingInt('Backup_Interval_DAYS')): pass
+                if not self._isPlaying() and REAL_SETTINGS.getSettingBool('Texture_Enabled'):
+                    with self._chkUpdate(self.runTexture,REAL_SETTINGS.getSettingInt('Texture_Interval_DAYS')): pass
+                if not self._isPlaying() and REAL_SETTINGS.getSettingBool('Music_Enabled'):
+                    with self._chkUpdate(self.runMusic,REAL_SETTINGS.getSettingInt('Music_Interval_DAYS')): pass
+                if not self._isPlaying() and REAL_SETTINGS.getSettingBool('FreeRam_Enabled'):
+                    with self._chkUpdate(self.runRamFree, REAL_SETTINGS.getSettingInt('FreeRam_Interval_HOURS') / 24.0): pass
+            finally:
+                self.isRunning = False
    
     def getDirectory(self, path):
         return getDirectory(path)
@@ -912,16 +984,21 @@ class Service(object):
     def getEpisodes(self, tvshowid):
         return getEpisodes(tvshowid)
 
-    def scrapeDirectory(self, path, show_dialog=None):
+    def scrapeDirectory(self, path, show_dialog=None, from_peer=False):
+        if not path or path.lower().startswith(('sources://', 'videodb://', 'library://', 'plugin://', 'addons://', 'special://')):
+            self.log('scrapeDirectory, skipping virtual/invalid path [%s]' % (path), xbmc.LOGWARNING)
+            return
+        if not from_peer and hasattr(self, 'sync'):
+            self.sync.queue_msg('ScanLibrary', {'path': path})
         if show_dialog is None: show_dialog = REAL_SETTINGS.getSettingBool('Scraper_Show_Dialog')
         self.log('scrapeDirectory, scraping [%s]'%(path))
         if sendJSON({"method":"VideoLibrary.Scan","params":{"directory":path,"showdialogs":show_dialog}}).get('result') == "OK":
             waited = 0.0
             while not self.monitor.abortRequested():
-                if   self.monitor.waitForAbort(0.5): break
-                elif self._playing: break
+                if   self.monitor.waitForAbort(1.0): break
+                elif self._isPlaying(): break
                 elif isScanning():
-                    waited += 0.5
+                    waited += 1.0
                     if waited >= 600:  # a wedged scan must not deadlock the task queue forever
                         self.log('scrapeDirectory, scanner still busy after 10min - moving on', xbmc.LOGWARNING)
                         break
@@ -956,11 +1033,14 @@ class Service(object):
         files = (self.getDirectory(path) or [])
         if len(files) > 0:
             self.log('scrapeTV path = %s, files = %s'%(path,len(files)))
-            items = dict([(show['file'],show) for show in shows if show.get('file')])
+            items = {self._pathKey(show['file']): show for show in shows if show.get('file')}
             random.shuffle(files)
             for file in files:
                 if   self.monitor.waitForAbort(0.01): return False  # not bare return - runScraper does tv & movies
-                elif file.get('file') and file.get('file') not in items: 
+                elif not self._pauseWhilePlaying(): return False
+                elif file.get('filetype') != 'directory': continue
+                elif (file.get('label') or '').lower() in ('.actors', 'extrafanart', 'extrathumbs'): continue
+                elif file.get('file') and self._pathKey(file.get('file')) not in items:
                     self._tasks.setdefault('scrapeDirectory',set()).add(file['file'])
         return True
         
@@ -975,6 +1055,7 @@ class Service(object):
             random.shuffle(files)
             for file in files:
                 if   self.monitor.waitForAbort(0.01): return False
+                elif not self._pauseWhilePlaying(): return False
                 elif not self._pathKey(file.get('file')) in items:
                     self._tasks.setdefault('scrapeDirectory',set()).add(file.get('file'))
         return True
@@ -1106,8 +1187,10 @@ class Service(object):
         for show in shows:
             if   self.monitor.waitForAbort(0.01): return False
             elif artOnly and not self._needsRefresh(show): continue
-            elif clean: self._tasks.setdefault('cleanTV',set()).add(show.get('tvshowid',-1))
-            self._tasks.setdefault('refreshTVshow',set()).add((show.get('tvshowid'),ignoreNFO,includeEpisodes))
+            tid = show.get('tvshowid')
+            if tid is None or int(tid) < 0: continue
+            if clean: self._tasks.setdefault('cleanTV',set()).add(tid)
+            self._tasks.setdefault('refreshTVshow',set()).add((tid,ignoreNFO,includeEpisodes))
         return True
 
     def refreshMovies(self, movies=[], clean=None, ignoreNFO=None):
@@ -1122,7 +1205,9 @@ class Service(object):
         for movie in movies:
             if self.monitor.waitForAbort(0.01): return False
             elif artOnly and not self._needsRefresh(movie): continue
-            self._tasks.setdefault('refreshMovie',set()).add((movie.get('movieid'),ignoreNFO))
+            mid = movie.get('movieid')
+            if mid is None or int(mid) < 0: continue
+            self._tasks.setdefault('refreshMovie',set()).add((mid,ignoreNFO))
         return True
 
     def _needsRefresh(self, item):
@@ -1155,10 +1240,12 @@ class Service(object):
         return True
 
     def refreshTVshow(self, tvshowid, ignorenfo=True, includeEpisodes=True):
+        if tvshowid is None or int(tvshowid) < 0: return False
         self.log('refreshTVshow, tvshowid = %s, ignorenfo = %s, includeEpisodes = %s' % (tvshowid, ignorenfo, includeEpisodes))
         return refreshTVshow(tvshowid, ignorenfo, includeEpisodes)
 
     def refreshMovie(self, movieid, ignorenfo=True):
+        if movieid is None or int(movieid) < 0: return False
         self.log('refreshMovie, movieid = %s, ignorenfo = %s' % (movieid, ignorenfo))
         return refreshMovie(movieid, ignorenfo)
 
@@ -1216,10 +1303,12 @@ class Service(object):
         try:
             npath = self._pathKey(path)
             if not npath: return True
-            movies = {self._pathKey(m.get('file')) for m in (self.getMovies() or [])}
+            # module-level getMovies/getTVshows: fresh, a stale @cacheit list could miss
+            # newly added items on a shared MySQL DB or trigger redundant scans
+            movies = {self._pathKey(m.get('file')) for m in (getMovies() or [])}
             if npath in movies: return False           # path is a known movie file
             rel = []
-            for s in (self.getTVshows() or []):
+            for s in (getTVshows() or []):
                 sf = self._pathKey(s.get('file'))
                 if sf and (sf == npath or npath.startswith(sf + '/')):
                     rel.append((sf, s))
@@ -1281,6 +1370,7 @@ class Service(object):
             movie_ok = True
             for idx, show in enumerate(tvshows):
                 if self.monitor.waitForAbort(0.01): return False
+                elif not self._pauseWhilePlaying(): return False
                 if manual: pDialog.update(int((idx / len(tvshows)) * 100) if tvshows else 0, message='Cleaning TV shows...')
                 tv_ok = self.cleanTV(show.get('tvshowid'), False) and tv_ok  # False: runClean owns the dialog
             for movie in movies:
@@ -1596,6 +1686,9 @@ class Service(object):
 
     def runRamFree(self):
         # cross-platform RAM free: Python gc plus a best-effort platform allocator trim
+        if self._isPlaying():
+            self.log('runRamFree: skipped while playing')
+            return False
         try:
             def freeMB():
                 try: return int(xbmc.getInfoLabel('System.Memory(free)') or 0) // 1048576
@@ -1643,8 +1736,8 @@ class Service(object):
         try:
             dry = REAL_SETTINGS.getSettingBool('Dry_Run_Enabled')
             self.log('runTexture, dry_run = %s' % dry)
-            stale = recache_missing(dry_run=dry)
-            orphans = prune(dry_run=dry)
+            stale = recache_missing(dry_run=dry, pause_cb=self._pauseWhilePlaying)
+            orphans = prune(dry_run=dry, pause_cb=self._pauseWhilePlaying)
             self.log('runTexture, stale removed = %s, orphans removed = %s' % (stale, orphans))
             return True
         except Exception as e:
@@ -1665,6 +1758,7 @@ class Service(object):
                 while not self.monitor.abortRequested() and xbmc.getCondVisibility('Library.IsScanningMusic'):
                     if self.monitor.waitForAbort(1.0): return False
                 if REAL_SETTINGS.getSettingBool('Music_Clean'):
+                    if not self._pauseWhilePlaying(): return False
                     self.log('runMusic, cleaning music library')
                     if manual: pDialog.update(message='Cleaning music library...')
                     sendJSON({"method":"AudioLibrary.Clean"})

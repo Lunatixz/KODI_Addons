@@ -41,6 +41,8 @@ class CustomQueue:
         self.counter = 0
         self.pending = set()
         self._blocked = None
+        self.current_task = None
+        self._wake = threading.Event()
         self.thread = threading.Thread(target=self._loop, name=f"{ADDON_ID}.queue", daemon=True)
 
     def log(self, msg, level=xbmc.LOGDEBUG):
@@ -58,6 +60,7 @@ class CustomQueue:
             self.pending.add(key)
             self.counter += 1
             heapq.heappush(self.heap, Task(func, args, kwargs, priority, self.counter))
+        self._wake.set()
         if not self.thread.is_alive():
             self.thread = threading.Thread(target=self._loop, name=f"{ADDON_ID}.queue", daemon=True)
             self.thread.start()
@@ -73,7 +76,7 @@ class CustomQueue:
                     notification('%s: waiting for the library scan to finish...' % ADDON_NAME)
                 if self.monitor.waitForAbort(1.0): break
                 continue
-            if self.service._playing:
+            if self.service._isPlaying():
                 if self.monitor.waitForAbort(10.0): break
                 continue
             task = None
@@ -82,19 +85,29 @@ class CustomQueue:
                     task = heapq.heappop(self.heap)
                     key = (task.func.__name__, repr(task.args))
                     self.pending.discard(key)
+                else:
+                    self._wake.clear()
             if task is None:
-                if self.monitor.waitForAbort(5.0):
-                    break
+                self._wake.wait(5.0)
+                continue
+            if self.service._isPlaying():
+                # playback started between the check above and popping the task; re-queue it
+                self.push((task.func, task.args, task.kwargs), task.priority)
+                if self.monitor.waitForAbort(10.0): break
                 continue
             self._blocked = None
-            self.log(f"execute, {task.func.__name__} (Priority: {task.priority})")
+            self.current_task = task.func.__name__
+            self.log(f"execute, {self.current_task} (Priority: {task.priority})")
             try:
                 task.func(*task.args, **task.kwargs)
             except Exception as e:
                 self.log(f"execute failed: {e}", xbmc.LOGERROR)
                 # surface crashes - otherwise a failing task is invisible to the user
-                notification('%s: %s failed: %s' % (ADDON_NAME, task.func.__name__, e), icon=xbmcgui.NOTIFICATION_ERROR)
-            if self.monitor.waitForAbort(1.0): break
+                notification('%s: %s failed: %s' % (ADDON_NAME, self.current_task, e), icon=xbmcgui.NOTIFICATION_ERROR)
+            finally:
+                self.current_task = None
+            delay = 2.0 if task.func.__name__ in ('refreshTVshow', 'refreshMovie') else 1.0
+            if self.monitor.waitForAbort(delay): break
 
     def snapshot(self):
         with self.lock:

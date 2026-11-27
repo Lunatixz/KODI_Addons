@@ -47,11 +47,12 @@ def _libraryArtURLs():
 def _isNetworkPath(url):
     return any((url or '').lower().startswith(p) for p in NETWORK_PROTO)
 
-def prune(dry_run=True):
+def prune(dry_run=True, pause_cb=None):
     delete_files = REAL_SETTINGS.getSettingBool('Texture_Delete_Files') and not REAL_SETTINGS.getSettingBool('Dry_Run_Enabled')
     referenced = _libraryArtURLs()
     removed = 0
-    for tex in getTextures():
+    for idx, tex in enumerate(getTextures()):
+        if pause_cb and idx % 25 == 0 and not pause_cb(): return removed
         url = (tex.get('url') or '').replace('image://', '')
         if not _isNetworkPath(url): continue
         if url in referenced: continue
@@ -68,9 +69,10 @@ def prune(dry_run=True):
     if dry_run: tlog('prune [DRY RUN] complete')
     return removed
 
-def recache_missing(dry_run=True):
+def recache_missing(dry_run=True, pause_cb=None):
     removed = 0
-    for tex in getTextures():
+    for idx, tex in enumerate(getTextures()):
+        if pause_cb and idx % 25 == 0 and not pause_cb(): return removed
         cachedurl = tex.get('cachedurl')
         if not cachedurl: continue
         path = 'special://thumbnails/%s' % cachedurl

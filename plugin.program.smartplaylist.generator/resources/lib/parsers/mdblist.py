@@ -27,6 +27,7 @@ class MDBList:
     PREFIXES  = {'user': '', 'top': 'top:', 'official': 'official:', 'external': 'ext:'}
 
     def __init__(self, cache=None):
+        self.monitor = MONITOR()
         if cache is None: self.cache = SimpleCache()
         else:
             self.cache = cache
@@ -55,11 +56,17 @@ class MDBList:
         url = 'https://api.mdblist.com%s'%path
         params = {'apikey': api_key}
         params.update(extra.pop('params', {}))
-        response = requests.get(url, params=params, timeout=15, **extra)
+        try:
+            response = requests.get(url, params=params, timeout=15, **extra)
+        except Exception as e:
+            self.log('_get, request failed! %s %s'%(path, e), xbmc.LOGERROR)
+            return None
         if response.status_code == 401:
             self.log('_get, invalid API key', xbmc.LOGERROR)
             return None
-        response.raise_for_status()
+        if response.status_code != 200:
+            self.log('_get, HTTP %s for %s'%(response.status_code, path), xbmc.LOGWARNING)
+            return None
         return response
 
 
@@ -81,9 +88,9 @@ class MDBList:
         return parsed
 
 
-    def _classify(self, item):
+    def _classify(self, item, default='tvshows'):
         mtype = (item.get('mediatype') or '').lower()
-        return self.TYPE_MAP.get(mtype, 'tvshows')
+        return self.TYPE_MAP.get(mtype, default)
 
 
     def _list_id(self, prefix, raw_id):
@@ -101,14 +108,15 @@ class MDBList:
         items = []
         offset = 0
         limit = 1000
-        while True:
+        while not self.monitor.abortRequested():
             response = self._get(path, params={'limit': limit, 'offset': offset, **params})
             if response is None: break
             data = response.json()
             for key in ('movies', 'shows'):
+                default_type = 'movies' if key == 'movies' else 'tvshows'
                 for item in data.get(key, []):
                     parsed = self._parse_item(item)
-                    if parsed: items.append((self._classify(item), parsed))
+                    if parsed: items.append((self._classify(item, default=default_type), parsed))
             if response.headers.get('X-Has-More', 'false').lower() != 'true': break
             offset += limit
         return items
@@ -130,7 +138,7 @@ class MDBList:
         response = self._get('/lists/user')
         if response is None:
             self.log('get_lists, API key missing or invalid', xbmc.LOGERROR)
-            xbmc.executebuiltin('Notification(%s,%s,5000)'%(self.name, LANGUAGE(32304)))
+            xbmcgui.Dialog().notification(self.name, LANGUAGE(32304), self.logo, 5000)
             return []
         for lst in response.json():
             desc = lst.get('description','')

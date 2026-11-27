@@ -33,9 +33,13 @@ class Service():
         
     def _start(self):
         while not self.monitor.abortRequested():
+            hours = REAL_SETTINGS.getSettingInt('Run_Every_Hours')
+            if hours <= 0:
+                if self.monitor.waitForAbort(3600): break
+                continue
             self.log('_start, Starting %s Service'%(ADDON_NAME))
             self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Run_All)'%(ADDON_ID))
-            if self.monitor.waitForAbort(REAL_SETTINGS.getSettingInt('Run_Every_Hours')*3600): break
+            if self.monitor.waitForAbort(hours * 3600): break
 
 
 if __name__ == '__main__': Service()._start()

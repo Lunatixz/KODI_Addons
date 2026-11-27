@@ -14,41 +14,40 @@
     </extension>
     <extension point="xbmc.service" library="resources/lib/service.py"/>
     <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Generate Smartplaylists from third-party lists.</summary>
+        <description lang="en_GB">Generate Smartplaylists from third-party lists.</description>
         <platform>all</platform>
         <license>GPL-3.0-or-later</license>
         <source>https://github.com/Lunatixz/KODI_Addons/tree/master/plugin.program.smartplaylist.generator</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=379825</forum>
+        <disclaimer lang="en_GB">BETA PROJECT; SUBJECT TO BUGS</disclaimer>
         <news>
 Version 0.2.6
-- MDBList: new source — user lists, top 50 public lists, official curated lists, and external/linked lists (IMDb, Trakt, Letterboxd, etc.) via API key (free 1,000 req/day)
-- Trakt: added popular, trending, and official public lists alongside user lists
-- Added "Allow Community Lists" setting to Trakt and MDBList tabs (off by default) to gate non-user lists
+- MDBList source: user, top 50 public, official, and external lists via API key
+- Trakt: added popular and trending public lists alongside user lists
+- "Allow Community Lists" toggle for Trakt and MDBList (off by default)
 - Removed IMDB source (replaced by MDBList)
+- Fixed Trakt season items not being added to playlists
+- Fixed service tight-loop when Run Every Hours is set to 0 (Disabled)
+- Fixed thread-safety and item ordering in library matching; sequential Run_All builds
+- Fixed OpenRouter Clear Build Time action and missing-arg launch crash
+- Fixed Mixed (PseudoTV) playlist path when parent path contains "video"
 
 Version 0.2.4
-- Generated playlists keep the order the source API returns items in (no more year/episode re-sorting)
+- Playlists keep the order the source API returns items in
 
 Version 0.2.3
-New sources and modules
-- OpenRouter AI module: natural-language prompts build smartplaylists in Trakt format - model picker (free/BYOK tagged, preselects current), always-on AI proofreading (title + prompt), manual rules, Regenerate, auto-rebuild after add/edit, auto-add to selection
-- IMDB user lists: full Trakt-parity parsing (CSV export with page-scrape fallback)
+- OpenRouter AI module: natural-language prompts build smartplaylists - model picker, AI proofreading, manual rules, auto-rebuild
 - Trakt person credits: per-person Movies / TV Shows playlists from cast
-
-AI reliability and cost
-- Model chain sticks to the user's configured model first, then rolls through live free models (includes free BYOK); hard wall-clock timeout; bounded roll; never logs API keys; standard API error notifications
-- Default model: cohere/north-mini-code:free (free, fast)
-
-Matching and output
-- Entries matched to real library titles/files: unique-id wins, title matches must agree on year, episodes match by show+season+episode
+- Unique-id matching wins; title matches must agree on year; episodes match by show+season+episode
+- File-name collision handling; auto Container.Refresh after builds
+- Stale build lock auto-expires; failed builds no longer record timestamps; missing XSP files rebuilt on auto-runs
 </news>
         <reuselanguageinvoker>false</reuselanguageinvoker>
         <assets>
             <icon>resources/images/icon.png</icon>
             <fanart>resources/images/fanart.jpg</fanart>
         </assets>
-        <summary lang="en_GB">Generate Smartplaylists from third-party lists.</summary>
-        <description lang="en_GB">Generate Smartplaylists from third-party lists.</description>
-        <disclaimer lang="en_GB">BETA PROJECT; SUBJECT TO BUGS</disclaimer>
     </extension>
 </addon>
 

@@ -127,7 +127,9 @@ class OpenRouter:
             try:
                 response = requests.post('https://openrouter.ai/api/v1/chat/completions', headers=self._headers(), json=payload, timeout=(5, timeout))
                 if response.status_code == 200: result['data'] = response.json()
-                else: self.log('_request, failed! %s'%(response.status_code), xbmc.LOGERROR)
+                else:
+                    self.log('_request, failed! %s'%(response.status_code), xbmc.LOGERROR)
+                    if response.status_code == 401: self._handleError(response)
             except Exception as e: self.log('_request, failed! %s'%(e), xbmc.LOGERROR)
 
         thread = threading.Thread(target=_call, daemon=True)
@@ -212,9 +214,13 @@ class OpenRouter:
 
 
     def _save(self, prompts):
+        if not xbmcvfs.exists(SETTINGS_LOC):
+            xbmcvfs.mkdirs(SETTINGS_LOC)
         fle = xbmcvfs.File(self._prompts_file(), 'w')
-        fle.write(json.dumps(prompts, indent=2))
-        fle.close()
+        try:
+            fle.write(json.dumps(prompts, indent=2))
+        finally:
+            fle.close()
 
 
     def _find(self, playlist_id):
@@ -417,7 +423,16 @@ class OpenRouter:
         elif act == 3:
             p['gen'] = int(p.get('gen', 0)) + 1
         elif act == 4:
-            self.cache.delete('%s.BuildTime.%s'%(ADDON_ID, p.get('id')), 1, False)
+            bt_path = os.path.join(xbmcvfs.translatePath(SETTINGS_LOC), 'build_times.json')
+            try:
+                if os.path.exists(bt_path):
+                    with open(bt_path, 'r') as f: bt = json.load(f)
+                    bt.pop('%s.%s'%(self.name, p.get('id')), None)
+                    with open(bt_path, 'w') as f: json.dump(bt, f)
+            except Exception as e:
+                self.log('manage, clear build time failed: %s'%(e), xbmc.LOGWARNING)
+            key = 'openrouter.ai.%s.%s'%(p.get('id'), hashlib.md5(json.dumps(p).encode('utf-8')).hexdigest()[:10])
+            self.cache.set('openrouter.fail.%s'%(key), False, ADDON_VERSION, datetime.timedelta(seconds=1), True)
         elif act == 5:
             if dlg.yesno(ADDON_NAME, 'Delete %s?' % p.get('name')):
                 prompts.pop(idx)

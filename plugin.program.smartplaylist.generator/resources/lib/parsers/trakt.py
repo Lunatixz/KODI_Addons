@@ -80,7 +80,11 @@ class Trakt:
         while not self.monitor.abortRequested():
             p = {'page': page, 'limit': limit}
             if params: p.update(params)
-            response = requests.get(url, headers=headers, params=p, timeout=15)
+            try:
+                response = requests.get(url, headers=headers, params=p, timeout=15)
+            except Exception as e:
+                self.log('_fetch_paginated, request failed! %s %s'%(url, e), xbmc.LOGERROR)
+                break
             if response.status_code in (204, 404):
                 self.log('_fetch_paginated, empty %s %s'%(response.status_code, url))
                 break
@@ -124,34 +128,40 @@ class Trakt:
 
         # 2) Popular personal lists
         if self.allow_community:
-            url = "https://api.trakt.tv/lists/popular/personal"
-            response = requests.get(url, headers=headers, params={'limit': 25}, timeout=15)
-            if response.status_code == 200:
-                for item in response.json():
-                    lst = item.get('list', item)
-                    user = lst.get('user',{})
-                    count = lst.get('item_count', 0)
-                    _add({
-                        'name': '[Popular] %s'%self.clean_string(lst.get('name')),
-                        'description': '%s items - by %s - %s likes'%(count, user.get('username',''), item.get('like_count',0)),
-                        'id': self._list_id('popular', str(lst.get('ids',{}).get('trakt'))),
-                        'icon': self.logo
-                    })
+            try:
+                url = "https://api.trakt.tv/lists/popular/personal"
+                response = requests.get(url, headers=headers, params={'limit': 25}, timeout=15)
+                if response.status_code == 200:
+                    for item in response.json():
+                        lst = item.get('list', item)
+                        user = lst.get('user',{})
+                        count = lst.get('item_count', 0)
+                        _add({
+                            'name': '[Popular] %s'%self.clean_string(lst.get('name')),
+                            'description': '%s items - by %s - %s likes'%(count, user.get('username',''), item.get('like_count',0)),
+                            'id': self._list_id('popular', str(lst.get('ids',{}).get('trakt'))),
+                            'icon': self.logo
+                        })
+            except Exception as e:
+                self.log('get_lists, popular failed! %s'%(e), xbmc.LOGWARNING)
 
             # 3) Trending personal lists
-            url = "https://api.trakt.tv/lists/trending/personal"
-            response = requests.get(url, headers=headers, params={'limit': 25}, timeout=15)
-            if response.status_code == 200:
-                for item in response.json():
-                    lst = item.get('list', item)
-                    user = lst.get('user',{})
-                    count = lst.get('item_count', 0)
-                    _add({
-                        'name': '[Trending] %s'%self.clean_string(lst.get('name')),
-                        'description': '%s items - by %s - %s watchers'%(count, user.get('username',''), item.get('watchers',0)),
-                        'id': self._list_id('trending', str(lst.get('ids',{}).get('trakt'))),
-                        'icon': self.logo
-                    })
+            try:
+                url = "https://api.trakt.tv/lists/trending/personal"
+                response = requests.get(url, headers=headers, params={'limit': 25}, timeout=15)
+                if response.status_code == 200:
+                    for item in response.json():
+                        lst = item.get('list', item)
+                        user = lst.get('user',{})
+                        count = lst.get('item_count', 0)
+                        _add({
+                            'name': '[Trending] %s'%self.clean_string(lst.get('name')),
+                            'description': '%s items - by %s - %s watchers'%(count, user.get('username',''), item.get('watchers',0)),
+                            'id': self._list_id('trending', str(lst.get('ids',{}).get('trakt'))),
+                            'icon': self.logo
+                        })
+            except Exception as e:
+                self.log('get_lists, trending failed! %s'%(e), xbmc.LOGWARNING)
 
         return sorted(tmp, key=itemgetter('name'))
             
@@ -160,35 +170,36 @@ class Trakt:
     def get_list_items(self, list_id):
         self.log('get_list_items, list_id = %s'%list_id)
         tmp = {}
-        prefix, raw_id = self._resolve_id(list_id)
+        _, raw_id = self._resolve_id(list_id)
         headers = self._headers()
 
         for list_type in ['movie','show','season','episode','person']:
-            page = 1
-            limit = 1000
-            while not self.monitor.abortRequested():
-                url = f"https://api.trakt.tv/lists/{raw_id}/items/{list_type}"
-                params = {'page': page, 'limit': limit}
-                response = requests.get(url, headers=headers, params=params, timeout=15)
-                if response.status_code in (204, 404):
-                    break
-                if response.status_code != 200:
-                    self.log("get_list_items, failed! %s [%s]"%(response.status_code,list_type))
-                    break
+            url = f"https://api.trakt.tv/lists/{raw_id}/items/{list_type}"
+            results = self._fetch_paginated(url, headers)
+            for item in results:
+                if list_type == 'person':
+                    person = item.get('person', {})
+                    person_id = person.get('ids', {}).get('trakt')
+                    if person.get('name') and person_id:
+                        tmp.setdefault('persons', []).append({'name': person.get('name'),'id': str(person_id)})
                 else:
-                    results = response.json()
-                    for item in results:
-                        if list_type == 'person':
-                            person = item.get('person', {})
-                            person_id = person.get('ids', {}).get('trakt')
-                            if person.get('name') and person_id:
-                                tmp.setdefault('persons', []).append({'name': person.get('name'),'id': str(person_id)})
-                        elif list_type == 'season' and 'show' in item: item[list_type].update(item.pop('show'))
-                        else: tmp.setdefault(self.convert_type(list_type),[]).append({'type':item.get('type'),'title':item.get(list_type,{}).get('title'),'year':item.get(list_type,{}).get('year'),'season':item.get(list_type,{}).get('number'),'uniqueid':item.get(list_type,{}).get('ids'),'data':item})
-                    self.log("get_list_items, %s = %s, page = %s"%(list_type,len(results),page))
-                    total_pages = int(response.headers.get('X-Pagination-Page-Count', 1))
-                    if page >= total_pages: break
-                    page += 1
+                    if list_type == 'season' and 'show' in item:
+                        item[list_type].update(item.pop('show'))
+                    entry = item.get(list_type, {})
+                    parsed = {
+                        'type': item.get('type'),
+                        'title': entry.get('title'),
+                        'year': entry.get('year'),
+                        'season': entry.get('number'),
+                        'uniqueid': entry.get('ids'),
+                        'data': item
+                    }
+                    if list_type == 'episode':
+                        parsed['season'] = entry.get('season')
+                        parsed['episode'] = entry.get('number')
+                        parsed['showtitle'] = (item.get('show') or {}).get('title')
+                    tmp.setdefault(self.convert_type(list_type), []).append(parsed)
+            self.log("get_list_items, %s = %s"%(list_type, len(results)))
         return tmp
 
 
@@ -203,7 +214,11 @@ class Trakt:
             page = 1
             while not self.monitor.abortRequested():
                 params   = {'page': page, 'limit': limit}
-                response = requests.get(url, headers=headers, params=params, timeout=15)
+                try:
+                    response = requests.get(url, headers=headers, params=params, timeout=15)
+                except Exception as e:
+                    self.log('get_trakt_person, request failed! %s'%(e), xbmc.LOGERROR)
+                    break
                 if response.status_code in (204, 404):
                     break
                 if response.status_code != 200:

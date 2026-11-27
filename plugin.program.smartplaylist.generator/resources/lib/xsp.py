@@ -18,7 +18,6 @@
 #
 # -*- coding: utf-8 -*-
 from globals  import *
-from parsers  import trakt
 from kodi     import Kodi
 
 try:    from simplecache             import SimpleCache
@@ -64,9 +63,14 @@ class XSP:
     def _write(self, root, path, list_name, pretty_print):
         self.log('create, Out: %s'%(ET.tostring(root, encoding='unicode')))
         if pretty_print: ET.indent(root)
+        parent = os.path.dirname(path)
+        if parent and not xbmcvfs.exists(parent):
+            xbmcvfs.mkdirs(parent)
         fle = xbmcvfs.File(path, 'w')
-        ET.ElementTree(root).write(fle, encoding='utf-8', xml_declaration=True)
-        fle.close()
+        try:
+            ET.ElementTree(root).write(fle, encoding='utf-8', xml_declaration=True)
+        finally:
+            fle.close()
         
         
     def create(self, list_name, match_items, pretty_print=True, uid=''):
@@ -125,8 +129,10 @@ class XSP:
                 value.text = name
                     
             if len(values) > 0:
-                path = REAL_SETTINGS.getSetting('XSP_LOC').replace(os.path.basename(os.path.normpath(REAL_SETTINGS.getSetting('XSP_LOC'))),"Mixed")
-                path = os.path.join(xbmcvfs.translatePath(path),'%s.xsp'%("%s - %s"%(validString(list_name),"Mixed")))
+                xsp_loc = REAL_SETTINGS.getSetting('XSP_LOC').rstrip('/\\')
+                parent = xsp_loc.rsplit('/', 1)[0] if '/' in xsp_loc else os.path.dirname(xsp_loc)
+                mixed_dir = '%s/Mixed'%(parent) if '/' in xsp_loc else os.path.join(parent, 'Mixed')
+                path = os.path.join(xbmcvfs.translatePath(mixed_dir),'%s.xsp'%("%s - %s"%(validString(list_name),"Mixed")))
                 path = self._unique_path(path, uid)
                 self.log('create, File: %s'%(path))
                 self._write(root, path, list_name, pretty_print)

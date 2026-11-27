@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# Run: python test_smartplaylist.py
-# Standalone check of IMDB/Trakt classification + parsing (stubs Kodi/network).
+# Run: python test_smartplaylist.py (or pytest)
+# Standalone check of MDBList/Trakt/OpenRouter/XSP/SPGenerator (stubs Kodi/network).
 import json
 import os
 import sys
@@ -90,62 +90,46 @@ class _Soup:
 stub('bs4', BeautifulSoup=lambda content, parser: _Soup(content.decode('utf-8', 'replace')))
 
 sys.path.insert(0, ROOT)
-from parsers import imdb, trakt, openrouter  # noqa: E402
+from parsers import mdblist, trakt, openrouter  # noqa: E402
 
-m = imdb.IMDB.__new__(imdb.IMDB)
+mdb = mdblist.MDBList.__new__(mdblist.MDBList)
+mdb.monitor = Mon()
+mdb.enabled = True
+mdb.allow_community = False
+mdb.name = 'MDBList'
+mdb.logo = 'mdblist.png'
+mdb._api_key = lambda: 'test_key'
 
-assert m.classify('Movie') == 'movies'
-assert m.classify('TV Series') == 'tvshows'
-assert m.classify('tvMiniSeries') == 'tvshows'
-assert m.classify('TV Episode') == 'episodes'
-assert m.classify('Video') is None
-assert m.classify('') is None
-assert m.classify(None) is None
+assert mdb._classify({'mediatype': 'movie'}) == 'movies'
+assert mdb._classify({'mediatype': 'show'}) == 'tvshows'
+assert mdb._classify({'mediatype': 'season'}) == 'seasons'
+assert mdb._classify({'mediatype': 'episode'}) == 'episodes'
+assert mdb._classify({}, default='movies') == 'movies'
 
-CSV = ('\ufeffPosition,Const,Created,Modified,Description,Title,URL,Title Type,IMDb Rating,Runtime (mins),Year,Genres,Num Votes,Release Date,Directors\n'
-       '1,tt0111161,,,,"The Shawshank Redemption",https://www.imdb.com/title/tt0111161/,Movie,9.3,142,1994,"Drama, Crime",2870496,1994-10-14,Frank Darabont\n'
-       '2,tt0944947,,,,"Game of Thrones",https://www.imdb.com/title/tt0944947/,TV Series,9.2,57,2011,"Action, Adventure, Drama",2369769,2011-04-17,David Benioff\n'
-       '3,tt1480055,,,,"The Walking Dead",https://www.imdb.com/title/tt1480055/,TV Mini Series,8.2,45,2010,"Drama, Horror",1144290,2010-10-31,Frank Darabont\n'
-       '4,tt0944947,,,,"Winter Is Coming",https://www.imdb.com/title/tt1480055/,TV Episode,9.0,57,2011,"Action, Adventure, Drama",2369769,2011-04-17,Timothy Van Patten\n'
-       '5,tt0111161,,,,"Some Video",https://www.imdb.com/title/tt0111161/,Video,5.0,10,2000,"X",1,,John')
-d = m._parse_csv(CSV)
-assert sorted(d) == ['episodes', 'movies', 'tvshows'], sorted(d)
-assert d['movies'][0]['uniqueid'] == {'imdb': 'tt0111161'}
-assert len(d['movies']) == 1 and len(d['tvshows']) == 2 and len(d['episodes']) == 1
+parsed_movie = mdb._parse_item({'title': 'Shawshank', 'release_year': 1994, 'imdb_id': 'tt0111161', 'mediatype': 'movie'})
+assert parsed_movie['uniqueid'] == {'imdb': 'tt0111161'} and parsed_movie['year'] == 1994
+assert mdb._parse_item({'title': 'No ID', 'imdb_id': ''}) is None
 
-PAGE = ('{"props":{"pageProps":{"contentData":{"list":{"items":['
-        '{"item":{"id":"tt1","titleText":{"text":"A"},"titleType":{"id":"movie"}}},'
-        '{"item":{"id":"tt2","titleText":{"text":"B"},"titleType":{"id":"tvSeries"}}},'
-        '{"item":{"id":"tt3","titleText":{"text":"C"},"titleType":{"id":"video"}}}'
-        ']}}}}}').encode('utf-8')
-RESP['ls123'] = FakeResp(PAGE)
-d2 = m._parse_page('ls123', {})
-assert sorted(d2) == ['movies', 'tvshows'], sorted(d2)
-assert d2['movies'][0]['uniqueid'] == {'imdb': 'tt1'}
+parsed_ep = mdb._parse_item({
+    'title': 'Winter Is Coming', 'release_year': 2011, 'imdb_id': 'tt1480055',
+    'season_number': 1, 'episode_number': 1, 'show_title': 'Game of Thrones'
+})
+assert parsed_ep['season'] == 1 and parsed_ep['episode'] == 1 and parsed_ep['showtitle'] == 'Game of Thrones'
 
-PAGE_NEW = ('{"props":{"pageProps":{"mainColumnData":{"list":{"titleListItemSearch":{"edges":['
-            '{"listItem":{"id":"tt0092455","titleText":{"text":"STTNG"},"titleType":{"id":"tvSeries"},"releaseYear":{"year":1987}}},'
-            '{"listItem":{"id":"tt0102975","titleText":{"text":"STVI"},"titleType":{"id":"movie"},"releaseYear":{"year":1991}}}'
-            ']}}}}}}').encode('utf-8')
-RESP['ls4173525176'] = FakeResp(PAGE_NEW)
-d2b = m._parse_page('ls4173525176', {})
-assert sorted(d2b) == ['movies', 'tvshows'], sorted(d2b)
-assert d2b['tvshows'][0]['uniqueid'] == {'imdb': 'tt0092455'} and d2b['tvshows'][0]['year'] == 1987
-assert d2b['movies'][0]['uniqueid'] == {'imdb': 'tt0102975'} and d2b['movies'][0]['year'] == 1991
+RESP['/lists/user'] = FakeResp(json.dumps([
+    {'id': 10, 'name': 'Watchlist', 'description': 'My picks', 'items': 5},
+]).encode())
+mdb_lists = mdblist.MDBList.get_lists.__wrapped__(mdb)
+assert mdb_lists == [{'name': '[User] Watchlist', 'description': '5 items - My picks', 'id': '10', 'icon': 'mdblist.png'}], mdb_lists
 
-LISTS_NEW = ('{"props":{"pageProps":{"mainColumnData":{"userListSearch":{"edges":['
-             '{"node":{"id":"ls4173525176","name":{"originalText":"Star Trek TV/Movie"},"description":null}},'
-             '{"node":{"id":"ls2","name":{"originalText":"Other List"},"description":{"plainText":"desc"}}}'
-             ']}}}}}').encode('utf-8')
-RESP['/user/false/lists'] = FakeResp(LISTS_NEW)
-imdb_user = imdb.IMDB.__new__(imdb.IMDB)
-imdb_user.enabled = True
-imdb_user.logo = 'imdb.png'
-lst = imdb.IMDB.get_lists.__wrapped__(imdb_user)
-assert lst == [{'name': 'Other List', 'description': 'desc', 'id': 'ls2', 'icon': 'imdb.png'},
-               {'name': 'Star Trek TV/Movie', 'description': '', 'id': 'ls4173525176', 'icon': 'imdb.png'}], lst
-
-assert m._parse_csv('<html><body>blocked</body></html>') == {}
+RESP['/lists/10/items'] = FakeResp(json.dumps({
+    'movies': [{'title': 'RED', 'release_year': 2010, 'imdb_id': 'tt1245526'}],
+    'shows': [{'title': 'The Expanse', 'release_year': 2015, 'imdb_id': 'tt3230854', 'mediatype': 'show'}],
+}).encode())
+mdb_items = mdblist.MDBList.get_list_items.__wrapped__(mdb, '10')
+assert sorted(mdb_items) == ['movies', 'tvshows'], mdb_items
+assert mdb_items['movies'][0]['uniqueid'] == {'imdb': 'tt1245526'}
+assert mdb_items['tvshows'][0]['uniqueid'] == {'imdb': 'tt3230854'}
 
 t = trakt.Trakt.__new__(trakt.Trakt)
 t.monitor = Mon()
@@ -165,6 +149,7 @@ out = trakt.Trakt.get_list_items.__wrapped__(t, '123')
 assert out['persons'] == [{'name': 'Tom Hanks', 'id': '100'}], out['persons']
 assert out['movies'][0]['uniqueid'] == {'trakt': 1, 'imdb': 'tt0114709'}
 assert out['tvshows'][0]['uniqueid'] == {'trakt': 2, 'imdb': 'tt0374463'}
+assert len(out['seasons']) == 1 and out['seasons'][0]['season'] == 1, out
 
 PCAST = {'cast': [{'character': 'Woody', 'movie': {'title': 'Toy Story', 'year': 1995, 'ids': {'imdb': 'tt0114709'}}}],
          'crew': [{'job': 'Director', 'movie': {'title': 'Crew Film', 'ids': {'imdb': 'tt0000000'}}}]}
@@ -188,11 +173,12 @@ assert trakt.Trakt.get_lists.__wrapped__(t2) == []
 t3 = trakt.Trakt.__new__(trakt.Trakt)
 t3.monitor = Mon()
 t3.enabled = True
+t3.allow_community = False
 t3.logo = 'trakt.png'
 RESP['/users/false/lists'] = FakeResp(json.dumps(
     [{'name': 'My List', 'description': 'desc', 'ids': {'trakt': 42}}]).encode())
 lst = trakt.Trakt.get_lists.__wrapped__(t3)
-assert lst == [{'name': 'My List', 'description': 'desc', 'id': '42', 'icon': 'trakt.png'}], lst
+assert lst == [{'name': 'My List', 'description': '0 items - desc', 'id': '42', 'icon': 'trakt.png'}], lst
 
 import default as default_mod  # noqa: E402
 
@@ -401,6 +387,8 @@ sp2 = default_mod.SPGenerator.__new__(default_mod.SPGenerator)
 sp2.kodi = RunKodi()
 sp2.xsp = types.SimpleNamespace(create=lambda *a, **k: None)
 sp2.modules = {'Trakt': RunModule()}
+sp2._build_times = {}
+sp2._save_build_times = lambda: None
 sp2.dia = None
 sp2.pct = 0
 sp2.msg = ''
@@ -414,7 +402,7 @@ default_mod.REAL_SETTINGS.setSetting = lambda *a: None
 
 sp2.run('Build_Trakt_auto')
 assert sp2.modules['Trakt'].built == 1
-assert 'plugin.program.smartplaylist.generator.BuildTime.42' in sp2.kodi.cache
+assert 'Trakt.42' in sp2._build_times
 sp2.run('Build_Trakt_auto')
 assert sp2.modules['Trakt'].built == 1, 'auto build should skip when recently built'
 sp2.run('Build_Trakt')
@@ -481,5 +469,34 @@ try:
 finally:
     sys.modules['xbmc'].executebuiltin = orig_exec
 assert calls and 'Build_OpenRouter' in calls[0], calls
+
+# Order preservation in SPGenerator.match_items
+sp4 = default_mod.SPGenerator.__new__(default_mod.SPGenerator)
+sp4.kodi = FakeKodi()
+sp4.dia = None
+sp4.msg = ''
+sp4.pct = 0
+order_out = sp4.match_items({'movies': [
+    {'title': 'Toy Story', 'uniqueid': {'imdb': 'tt0114709'}},
+    {'title': 'RED', 'uniqueid': {'imdb': 'tt1245526'}},
+]})
+assert [m['title'] for m in order_out['movies']] == ['Toy Story', 'RED'], order_out
+
+# Service does not tight-loop when Run_Every_Hours == 0
+import service as service_mod  # noqa: E402
+svc_calls = []
+class AbortAfterFirst:
+    def __init__(self): self.n = 0
+    def abortRequested(self): return self.n >= 1
+    def waitForAbort(self, secs):
+        svc_calls.append(secs)
+        self.n += 1
+        return True
+svc = service_mod.Service.__new__(service_mod.Service)
+svc.monitor = AbortAfterFirst()
+svc.kodi = types.SimpleNamespace(executebuiltin=lambda *a, **k: svc_calls.append('RUN'))
+service_mod.REAL_SETTINGS.getSettingInt = lambda k: 0
+svc._start()
+assert svc_calls == [3600], svc_calls
 
 print('test_smartplaylist OK')

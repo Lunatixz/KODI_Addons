@@ -57,7 +57,11 @@ class SPGenerator:
 
     def _save_build_times(self):
         try:
-            with open(self._build_times_path(), 'w') as f: json.dump(self._build_times, f)
+            path = self._build_times_path()
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            tmp = '%s.tmp'%(path)
+            with open(tmp, 'w') as f: json.dump(self._build_times, f)
+            os.replace(tmp, path)
         except Exception as e: self.log('_save_build_times, failed: %s'%e, xbmc.LOGERROR)
 
 
@@ -91,8 +95,6 @@ class SPGenerator:
                      'episodes': self.kodi.get_kodi_episodes}
 
         def __match(list_item, type, index, titles, eps, by_title):
-            self.cntpct = round(self.cnt*100//self.tot)
-            if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, '%s (%s%%)'%(self.msg, self.cntpct))
             uniqueid = list_item.get('uniqueid') or {}
             kodi_item = None
             # 1) Authoritative: match on a real unique id when present.
@@ -112,11 +114,12 @@ class SPGenerator:
                     kodi_item = titles.get((title, year)) if year else titles.get((title, ''))
             if kodi_item:
                 self.log('match_items, __match found! type %s | %s -> %s'%(type,kodi_item.get('uniqueid'),list_item.get('uniqueid')))
-                if type == "seasons": matches.setdefault(type,[]).extend(self.kodi.get_kodi_seasons(kodi_item, list_item))
-                else:                 matches.setdefault(type,[]).append(kodi_item)
-            self.cnt += 1
+                if type == "seasons": return self.kodi.get_kodi_seasons(kodi_item, list_item) or None
+                return [kodi_item]
+            return None
 
         for type, list_items in list(source_items.items()):
+            if not list_items or type not in func_list: continue
             self.log('match_items, type %s | list_items = %s'%(type, len(list_items)))
             index  = {}
             titles = {}
@@ -130,11 +133,16 @@ class SPGenerator:
                 titles.setdefault((nkey, ''), kodi_item)
                 if type == 'episodes':
                     eps.setdefault((self._norm(kodi_item.get('showtitle')), str(kodi_item.get('season') or ''), str(kodi_item.get('episode') or '')), kodi_item)
-            self.msg    = '%s %s'%(LANGUAGE(32022),type.title().replace('Tvshows','TV Shows'))
-            self.cntpct = 0
-            self.cnt    = 0
-            self.tot    = len(list(list_items))
-            poolit(__match)(list_items, **{'type':type,'index':index,'titles':titles,'eps':eps,'by_title':by_title})
+            self.msg = '%s %s'%(LANGUAGE(32022),type.title().replace('Tvshows','TV Shows'))
+            if self.dia: self.dia = self.kodi.progressBGDialog(self.pct, self.dia, self.msg)
+            # Collect ordered results from poolit so API item order is preserved
+            # and shared state is never mutated from worker threads.
+            if type == 'seasons':
+                matched_groups = poolit(__match)(list_items, **{'type':type,'index':index,'titles':titles,'eps':eps,'by_title':by_title})
+            else:
+                matched_groups = [__match(item, type=type, index=index, titles=titles, eps=eps, by_title=by_title) for item in list_items]
+            for group in matched_groups:
+                if group: matches.setdefault(type, []).extend(group)
         return matches
 
 
@@ -191,7 +199,7 @@ class SPGenerator:
                                         continue
                                 self.pct = int((idx+1)*100//len(list_items))
                                 self.dia = self.kodi.progressBGDialog(self.pct, self.dia, message='%s:\n%s'%(ADDON_NAME,list_item.get('name')))
-                                tmlLST = module.get_list_items(list_id)
+                                tmlLST = dict(module.get_list_items(list_id) or {})
                                 persons = tmlLST.pop('persons', [])
                                 self.log("run, get_list_items\n%s"%(tmlLST))
                                 matches = self.match_items(tmlLST, by_title=getattr(module, 'match_mode', '') == 'title')
@@ -209,7 +217,7 @@ class SPGenerator:
         elif param == 'Run_All':
             if REAL_SETTINGS.getSettingBool('Auto_Enable'): self.auto_lists()
             for source in list(self.modules.keys()):
-                self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Build_%s_auto)'%(ADDON_ID,source))
+                self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Build_%s_auto)'%(ADDON_ID,source), wait=True)
             REAL_SETTINGS.setSetting('Last_Update',datetime.datetime.fromtimestamp(time.time()).strftime(DTFORMAT))
         elif self.kodi.yesnoDialog('%s?'%(LANGUAGE(32110))):
             self.kodi.executebuiltin('RunScript(special://home/addons/%s/resources/lib/default.py, Run_All)'%(ADDON_ID))
@@ -217,5 +225,5 @@ class SPGenerator:
             REAL_SETTINGS.openSettings()
         
 
-if __name__ == '__main__': SPGenerator(sys.argv).run(sys.argv[1])
+if __name__ == '__main__': SPGenerator(sys.argv).run(sys.argv[1] if len(sys.argv) > 1 else 'None')
 
